@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue API - Login</title>
+    <style>
+        :root {
+            --bg-main: #0b0e14;
+            --bg-card: #151a27;
+            --primary-blue: #2563eb;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        .login-container {
+            background-color: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .login-container h1 { font-size: 1.5rem; margin-bottom: 24px; color: var(--text-main); }
+        
+        .connect-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 24px;
+            transition: all 0.2s;
+        }
+
+        .connect-btn:hover { background-color: rgba(37, 99, 235, 0.1); }
+        
+        .unavailable-text {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: -16px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .divider {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .divider span {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-card);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+        .form-group input:focus { border-color: var(--primary-blue); }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .login-btn:hover { opacity: 0.9; }
+
+        .error-msg { color: var(--danger); font-size: 0.85rem; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Blue API Portal</h1>
+        
+        <button class="connect-btn" onclick="showUnavailable()">Connect Web3 Wallet</button>
+        <div class="unavailable-text" id="unavailableText">Wallet connection is currently unavailable.</div>
+
+        <div class="divider"><span>OR</span></div>
+
+        <% if (error) { %>
+            <div class="error-msg"><%= error %></div>
+        <% } %>
+
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+    </div>
+
+    <script>
+        function showUnavailable() {
+            document.getElementById('unavailableText').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
