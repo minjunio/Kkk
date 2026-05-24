@@ -1,16 +1,32 @@
 const express = require('express');
 const app = express();
 
-// Tell Express to use EJS as the template engine
 app.set('view engine', 'ejs');
+// This allows Express to read the data from the login form
+app.use(express.urlencoded({ extended: true })); 
 
-// Serve the index.ejs file when someone visits the site
+// 1. Show the Login Page
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { error: null });
 });
 
-// Render provides a PORT environment variable, otherwise fallback to 3000
+// 2. Handle the Login Request
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    if (username === 'admin' && password === 'monterysasd') {
+        res.redirect('/wallet');
+    } else {
+        res.render('index', { error: 'Invalid username or password' });
+    }
+});
+
+// 3. Show the Wallet Page (only after login)
+app.get('/wallet', (req, res) => {
+    res.render('wallet');
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Blue API Wallet is running on port ${PORT}`);
+    console.log(`Blue API running on port ${PORT}`);
 });
