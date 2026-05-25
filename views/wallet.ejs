@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue API Wallet & Markets Dashboard</title>
+    <title>BlueCrypto - Premium Multi-Asset Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root, [data-theme="dark"] {
@@ -76,7 +76,7 @@
         .user-profile { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem; }
         .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: 2px solid var(--bg-panel); }
 
-        /* Quick Transfer Actions Bar */
+        /* Actions Bar */
         .wallet-quick-actions {
             max-width: 1200px;
             margin: 20px auto 0 auto;
@@ -86,7 +86,7 @@
             gap: 12px;
         }
 
-        /* Main Dashboard Grid */
+        /* Main Grid */
         .dashboard {
             max-width: 1200px;
             margin: 0 auto;
@@ -96,7 +96,6 @@
             gap: 24px;
         }
 
-        /* Metrics Grid */
         .overview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -125,8 +124,8 @@
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-secondary { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); }
         .btn-secondary:hover { background: var(--bg-panel-hover); }
-        .btn-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid transparent; }
-        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-icon { pndding: 8px; width: 36px; height: 36px; border-radius: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-icon:hover { background: var(--bg-panel-hover); color: var(--primary); }
 
         /* Market Tabs Navigation */
         .tabs-container { margin-top: 24px; }
@@ -136,7 +135,7 @@
         .tab-btn.active { color: var(--primary); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -9px; left: 0; width: 100%; height: 3px; background: var(--primary); border-radius: 3px; }
 
-        /* Section Modifiers */
+        /* Tables and Responsive Cards */
         .section-header { display: flex; justify-content: space-between; align-items: center; margin: 28px 0 16px 0; }
         .section-header h2 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
         
@@ -148,7 +147,7 @@
         tr:hover { background: var(--bg-panel-hover); }
 
         .asset-cell { display: flex; align-items: center; gap: 12px; }
-        .asset-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--input-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); }
+        .asset-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--input-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
         .asset-name { font-weight: 600; }
         .asset-symbol { font-size: 0.8rem; color: var(--text-muted); }
 
@@ -161,15 +160,20 @@
         /* Modern Custom Modal Framework */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 1000; padding: 16px; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: var(--bg-panel); padding: 24px; border-radius: var(--radius); width: 100%; max-width: 440px; border: 1px solid var(--border); transform: translateY(10px); transition: transform 0.2s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .modal-content { background: var(--bg-panel); padding: 24px; border-radius: var(--radius); width: 100%; max-width: 440px; border: 1px solid var(--border); transform: translateY(10px); transition: transform 0.2s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
         .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
         
-        .form-group { margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; position: relative; }
         .form-group label { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
         .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.95rem; outline: none; }
         .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
         
+        /* Filterable Search Suggestion Box */
+        .search-results-box { position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; max-height: 180px; overflow-y: auto; z-index: 10; display: none; box-shadow: 0 8px 16px rgba(0,0,0,0.2); margin-top: 4px; }
+        .search-item { padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .search-item:hover { background: var(--bg-panel-hover); color: var(--primary); }
+
         .fee-preview { background: var(--input-bg); padding: 12px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 16px; border: 1px solid var(--border); }
         .fee-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .fee-row:last-child { margin-bottom: 0; font-weight: 600; }
@@ -194,7 +198,7 @@
     <nav>
         <div class="brand-section">
             <div class="logo-box">B</div>
-            <div class="brand-name">Blue API Wallet</div>
+            <div class="brand-name">BlueCrypto</div>
         </div>
         <div class="nav-actions">
             <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
@@ -225,7 +229,7 @@
                 <div class="card-balance" id="totalBalance">$0.00</div>
                 <div class="pnl-badge pnl-positive" id="totalPnl">+$0.00 (0.00%) All-Time</div>
                 <div class="actions">
-                    <button class="btn btn-primary" style="flex:1;" onclick="openModal('assetModal')">+ Add Asset</button>
+                    <button class="btn btn-primary" style="flex:1;" onclick="openAssetModalForAddition()">+ Configure Asset</button>
                 </div>
             </div>
 
@@ -240,7 +244,7 @@
                     <span class="staking-profit-text" id="stakingProfits">+$0.00</span>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-secondary" style="flex:1;" onclick="openModal('stakeActionModal')">Stake / Unstake</button>
+                    <button class="btn btn-secondary" style="flex:1;" onclick="openModal('stakeActionModal')">Stake / Unstake Engine</button>
                 </div>
             </div>
         </div>
@@ -258,7 +262,7 @@
                         <th>Holdings</th>
                         <th class="hide-mobile">Avg Purchase Cost</th>
                         <th>Value & PnL</th>
-                        <th style="text-align: right;">Action</th>
+                        <th style="text-align: right;">Settings</th>
                     </tr>
                 </thead>
                 <tbody id="portfolioList"></tbody>
@@ -309,20 +313,27 @@
 
     <!-- Modals Layer -->
     
-    <!-- Add/Update Asset Modal -->
+    <!-- Unified Settings Asset Allocation Adjustments Modal -->
     <div class="modal-overlay" id="assetModal">
         <div class="modal-content">
-            <h2 class="modal-title">Manage Asset Portfolio Holdings</h2>
+            <h2 class="modal-title" id="assetModalTitle">Adjust Asset Properties</h2>
+            
+            <div class="form-group" id="searchableGroup">
+                <label>Search Currencies / Ticker Index</label>
+                <input type="text" id="currencySearchInput" placeholder="Type to filter e.g. BTC, SOL, AAPL..." oninput="filterCurrencySearch(this.value, 'searchSuggestionsBox', selectAssetTicker)">
+                <div class="search-results-box" id="searchSuggestionsBox"></div>
+            </div>
+
             <div class="form-group">
-                <label>Token / Asset Ticker Prefix</label>
-                <input type="text" id="currencyInput" placeholder="BTC, ETH, SOL, AAPL, etc.">
+                <label>Selected Target Ticker</label>
+                <input type="text" id="currencyInput" readonly style="opacity: 0.7;">
             </div>
             <div class="form-group">
                 <label>Token Name Designation</label>
-                <input type="text" id="nameInput" placeholder="Bitcoin, Ethereum, Apple Inc.">
+                <input type="text" id="nameInput" placeholder="E.g. Bitcoin, Solana">
             </div>
             <div class="form-group">
-                <label>Total Account Balance Units</label>
+                <label>Total Account Balance Units (Set to 0 to wipe holdings)</label>
                 <input type="number" id="amountInput" placeholder="0.00" step="any">
             </div>
             <div class="form-group">
@@ -345,8 +356,8 @@
                 <select id="sendAssetSelect"></select>
             </div>
             <div class="form-group">
-                <label>Destination Web3 Network Secure Address</label>
-                <input type="text" placeholder="0x... or deposit address payload">
+                <label>Destination Secure Address</label>
+                <input type="text" placeholder="0x... or network destination address">
             </div>
             <div class="form-group">
                 <label>Volume Transaction Quantities</label>
@@ -380,7 +391,7 @@
             </div>
             <div style="display: flex; gap: 10px; margin-top: 24px;">
                 <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('withdrawModal')">Dismiss</button>
-                <button class="btn btn-danger" style="flex:1;" onclick="executeWithdrawAction()">Confirm Permanent Withdrawal</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="executeWithdrawAction()">Confirm Permanent Withdrawal</button>
             </div>
         </div>
     </div>
@@ -402,8 +413,8 @@
                 <select id="swapDestSelect" onchange="calculateSwapFees()"></select>
             </div>
             <div class="fee-preview">
-                <div class="fee-row"><span>Estimated Network Liquidity Protocol Fee (0.3%):</span><span id="feeNetworkSpan">$0.00</span></div>
-                <div class="fee-row"><span>Expected Swapped Received Output:</span><span id="swapTargetReceiveSpan">0.00</span></div>
+                <div class="fee-row"><span>Liquidity Protocol Swap Fee (0.3%):</span><span id="feeNetworkSpan">$0.00</span></div>
+                <div class="fee-row"><span>Expected Swapped Output:</span><span id="swapTargetReceiveSpan">0.00</span></div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 24px;">
                 <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('swapModal')">Abort</button>
@@ -424,8 +435,13 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Validation Pool Asset Target Selection</label>
-                <select id="stakeAssetSelect"></select>
+                <label>Search Currencies for Staking Pools</label>
+                <input type="text" id="stakeSearchInput" placeholder="Type to filter staking assets..." oninput="filterCurrencySearch(this.value, 'stakeSuggestionsBox', selectStakeTicker)">
+                <div class="search-results-box" id="stakeSuggestionsBox"></div>
+            </div>
+            <div class="form-group">
+                <label>Selected Validation Pool Target</label>
+                <input type="text" id="stakeAssetTarget" readonly style="opacity:0.7;">
             </div>
             <div class="form-group">
                 <label>Staking Amount</label>
@@ -452,25 +468,30 @@
             { currency: 'SOL', name: 'Solana Delegated Validation', stakedAmount: 50, apy: 7.2, earnedAmount: 1.8 }
         ];
 
-        // Central Live-Updating Price Feed Dictionary
+        // Deep Global Dynamic Master Asset Currency Repository Index
         let marketPrices = {
-            'BTC': { price: 67340.50, change24h: 3.45, cap: "$1.32T", type: "top-crypto" },
-            'ETH': { price: 3420.15, change24h: -1.20, cap: "$410.5B", type: "top-crypto" },
-            'SOL': { price: 164.80, change24h: 8.92, cap: "$76.3B", type: "top-crypto" },
-            'LINK': { price: 16.25, change24h: 0.15, cap: "$9.5B", type: "alt-coins" },
-            'ADA': { price: 0.48, change24h: -2.11, cap: "$17.1B", type: "alt-coins" },
-            'DOT': { price: 6.85, change24h: 4.30, cap: "$9.8B", type: "alt-coins" },
-            'AVAX': { price: 34.10, change24h: -0.45, cap: "$13.4B", type: "alt-coins" },
-            'AAPL': { price: 189.45, change24h: 1.15, cap: "$2.95T", type: "stocks" },
-            'TSLA': { price: 174.60, change24h: -3.80, cap: "$556.2B", type: "stocks" },
-            'NVDA': { price: 945.20, change24h: 6.22, cap: "$2.36T", type: "stocks" },
-            'USOIL': { price: 78.45, change24h: 1.62, cap: "Global Benchmark", type: "commodities" },
-            'UKOIL': { price: 82.90, change24h: 1.48, cap: "Brent Crude", type: "commodities" }
+            'BTC': { name: 'Bitcoin', price: 67340.50, change24h: 3.45, cap: "$1.32T", type: "top-crypto" },
+            'ETH': { name: 'Ethereum', price: 3420.15, change24h: -1.20, cap: "$410.5B", type: "top-crypto" },
+            'SOL': { name: 'Solana', price: 164.80, change24h: 8.92, cap: "$76.3B", type: "top-crypto" },
+            'BNB': { name: 'BNB', price: 585.30, change24h: 0.85, cap: "$86.1B", type: "top-crypto" },
+            'XRP': { name: 'Ripple', price: 0.52, change24h: -0.40, cap: "$28.9B", type: "top-crypto" },
+            'LINK': { name: 'Chainlink', price: 16.25, change24h: 0.15, cap: "$9.5B", type: "alt-coins" },
+            'ADA': { name: 'Cardano', price: 0.48, change24h: -2.11, cap: "$17.1B", type: "alt-coins" },
+            'DOT': { name: 'Polkadot', price: 6.85, change24h: 4.30, cap: "$9.8B", type: "alt-coins" },
+            'AVAX': { name: 'Avalanche', price: 34.10, change24h: -0.45, cap: "$13.4B", type: "alt-coins" },
+            'MATIC': { name: 'Polygon', price: 0.72, change24h: 1.95, cap: "$7.1B", type: "alt-coins" },
+            'NEAR': { name: 'Near Protocol', price: 6.10, change24h: 11.20, cap: "$6.5B", type: "alt-coins" },
+            'AAPL': { name: 'Apple Inc.', price: 189.45, change24h: 1.15, cap: "$2.95T", type: "stocks" },
+            'TSLA': { name: 'Tesla Inc.', price: 174.60, change24h: -3.80, cap: "$556.2B", type: "stocks" },
+            'NVDA': { name: 'NVIDIA Corp.', price: 945.20, change24h: 6.22, cap: "$2.36T", type: "stocks" },
+            'MSFT': { name: 'Microsoft Corp.', price: 420.30, change24h: 0.55, cap: "$3.15T", type: "stocks" },
+            'USOIL': { name: 'WTI Crude Oil', price: 78.45, change24h: 1.62, cap: "Global Benchmark", type: "commodities" },
+            'UKOIL': { name: 'Brent Crude Oil', price: 82.90, change24h: 1.48, cap: "Brent Benchmark", type: "commodities" },
+            'GOLD': { name: 'Gold Ounce Futures', price: 2345.10, change24h: 0.32, cap: "Precious Metals", type: "commodities" }
         };
 
         let currentActiveMarketTab = 'top-crypto';
 
-        // Interface Display Drivers & UI Sync Triggers
         function toggleTheme() {
             const currentTheme = document.body.getAttribute('data-theme');
             const targetTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -482,7 +503,6 @@
             if(id === 'sendModal') populateSelectOptions('sendAssetSelect');
             if(id === 'withdrawModal') populateSelectOptions('withdrawAssetSelect');
             if(id === 'swapModal') { populateSelectOptions('swapSrcSelect'); populateSelectOptions('swapDestSelect'); calculateSwapFees(); }
-            if(id === 'stakeActionModal') populateStakingAssetOptions();
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
@@ -491,28 +511,76 @@
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
         }
 
+        // Global Currencies Suggestion Filters Engine
+        function filterCurrencySearch(query, boxId, selectionCallback) {
+            const resultsBox = document.getElementById(boxId);
+            resultsBox.innerHTML = '';
+            if (!query.trim()) { resultsBox.style.display = 'none'; return; }
+
+            const filtered = Object.keys(marketPrices).filter(ticker => 
+                ticker.toLowerCase().includes(query.toLowerCase()) || 
+                marketPrices[ticker].name.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length > 0) {
+                resultsBox.style.display = 'block';
+                filtered.forEach(ticker => {
+                    const item = document.createElement('div');
+                    item.className = 'search-item';
+                    item.innerHTML = `<span><strong>${ticker}</strong> - ${marketPrices[ticker].name}</span> <span style="color:var(--text-muted); font-size:0.8rem;">${marketPrices[ticker].type}</span>`;
+                    item.onclick = () => {
+                        selectionCallback(ticker);
+                        resultsBox.style.display = 'none';
+                    };
+                    resultsBox.appendChild(item);
+                });
+            } else {
+                resultsBox.style.display = 'none';
+            }
+        }
+
+        function selectAssetTicker(ticker) {
+            document.getElementById('currencySearchInput').value = ticker;
+            document.getElementById('currencyInput').value = ticker;
+            document.getElementById('nameInput').value = marketPrices[ticker]?.name || '';
+        }
+
+        function selectStakeTicker(ticker) {
+            document.getElementById('stakeSearchInput').value = ticker;
+            document.getElementById('stakeAssetTarget').value = ticker;
+        }
+
+        function openAssetModalForAddition() {
+            document.getElementById('assetModalTitle').innerText = "Configure Portfolio Holdings";
+            document.getElementById('searchableGroup').style.display = "block";
+            document.getElementById('currencySearchInput').value = "";
+            document.getElementById('currencyInput').value = "";
+            document.getElementById('nameInput').value = "";
+            document.getElementById('amountInput').value = "";
+            document.getElementById('buyPriceInput').value = "";
+            openModal('assetModal');
+        }
+
+        function openAssetModalForAdjustment(symbol) {
+            const asset = portfolio.find(a => a.currency === symbol);
+            if(!asset) return;
+            document.getElementById('assetModalTitle').innerText = `Configure Allocation Index: ${symbol}`;
+            document.getElementById('searchableGroup').style.display = "none";
+            document.getElementById('currencyInput').value = asset.currency;
+            document.getElementById('nameInput').value = asset.name;
+            document.getElementById('amountInput').value = asset.amount;
+            document.getElementById('buyPriceInput').value = asset.avgBuyPrice;
+            openModal('assetModal');
+        }
+
         function populateSelectOptions(selectElementId) {
             const selectEl = document.getElementById(selectElementId);
             selectEl.innerHTML = '';
             portfolio.forEach(asset => {
                 const opt = document.createElement('option');
                 opt.value = asset.currency;
-                opt.innerText = `${asset.name} (${asset.currency}) - Available: ${asset.amount}`;
+                opt.innerText = `${asset.name} (${asset.currency}) - Bal: ${asset.amount}`;
                 selectEl.appendChild(opt);
-            });
-        }
-
-        function populateStakingAssetOptions() {
-            const selectEl = document.getElementById('stakeAssetSelect');
-            selectEl.innerHTML = '';
-            // For staking, allow choosing from anywhere in market data that is crypto
-            Object.keys(marketPrices).forEach(ticker => {
-                if(marketPrices[ticker].type === 'top-crypto' || marketPrices[ticker].type === 'alt-coins') {
-                    const opt = document.createElement('option');
-                    opt.value = ticker;
-                    opt.innerText = `${ticker}`;
-                    selectEl.appendChild(opt);
-                }
             });
         }
 
@@ -523,10 +591,9 @@
             const amt = parseFloat(document.getElementById('amountInput').value);
             const buyPrice = parseFloat(document.getElementById('buyPriceInput').value) || 0;
 
-            if (!sym || isNaN(amt)) return alert('Input processing error: Check configuration metrics.');
+            if (!sym || isNaN(amt)) return alert('Parsing error: asset structure fields invalid.');
 
             if(amt <= 0) {
-                // Drop index logic
                 portfolio = portfolio.filter(a => a.currency !== sym);
             } else {
                 const targetAsset = portfolio.find(a => a.currency === sym);
@@ -536,7 +603,7 @@
                 } else {
                     portfolio.push({ currency: sym, name: name || sym, amount: amt, avgBuyPrice: buyPrice });
                     if(!marketPrices[sym]) {
-                        marketPrices[sym] = { price: buyPrice || 1.0, change24h: 0, cap: 'Custom Asset', type: 'alt-coins' };
+                        marketPrices[sym] = { name: name || sym, price: buyPrice || 1.0, change24h: 0, cap: 'Custom Node', type: 'alt-coins' };
                     }
                 }
             }
@@ -544,20 +611,15 @@
             renderDashboard();
         }
 
-        function dropAssetCompletely(symbol) {
-            portfolio = portfolio.filter(a => a.currency !== symbol);
-            renderDashboard();
-        }
-
         function executeSendAction() {
             const ticker = document.getElementById('sendAssetSelect').value;
             const amt = parseFloat(document.getElementById('sendAmountInput').value);
             const asset = portfolio.find(a => a.currency === ticker);
-            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Invalid transactional volume.');
+            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Invalid transaction configuration metrics.');
             
             asset.amount -= amt;
             if(asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
-            alert(`Transfer Dispatched Successfully: ${amt} ${ticker} routed to target hex address.`);
+            alert(`Outbound Transaction Broadcasted: ${amt} ${ticker} scheduled for chain departure.`);
             closeModal('sendModal');
             renderDashboard();
         }
@@ -566,11 +628,11 @@
             const ticker = document.getElementById('withdrawAssetSelect').value;
             const amt = parseFloat(document.getElementById('withdrawAmountInput').value);
             const asset = portfolio.find(a => a.currency === ticker);
-            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Insufficient capital allocation reserves.');
+            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Settlement configuration error.');
 
             asset.amount -= amt;
             if(asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
-            alert(`Settlement Initiated: ${formatUSD(amt * (marketPrices[ticker]?.price || 0))} conversion sent to clearing channel.`);
+            alert(`Liquidation Confirmed: ${formatUSD(amt * (marketPrices[ticker]?.price || 0))} routed to external settlement rail.`);
             closeModal('withdrawModal');
             renderDashboard();
         }
@@ -597,7 +659,7 @@
             const amt = parseFloat(document.getElementById('swapAmountInput').value) || 0;
 
             const srcAsset = portfolio.find(a => a.currency === srcTicker);
-            if(!srcAsset || amt > srcAsset.amount || amt <= 0) return alert('Counterparty ledger parsing exception: check balances.');
+            if(!srcAsset || amt > srcAsset.amount || amt <= 0) return alert('Inflow metrics error.');
 
             const srcPrice = marketPrices[srcTicker]?.price || 0;
             const destPrice = marketPrices[destTicker]?.price || 1;
@@ -612,24 +674,24 @@
             if(destAsset) {
                 destAsset.amount += netReceiveUnits;
             } else {
-                portfolio.push({ currency: destTicker, name: destTicker, amount: netReceiveUnits, avgBuyPrice: destPrice });
+                portfolio.push({ currency: destTicker, name: marketPrices[destTicker]?.name || destTicker, amount: netReceiveUnits, avgBuyPrice: destPrice });
             }
 
-            alert(`Execution complete. Swapped ${amt} ${srcTicker} for ${netReceiveUnits.toFixed(4)} ${destTicker}`);
+            alert(`Swap execution finalized: Exchanged ${amt} ${srcTicker} for ${netReceiveUnits.toFixed(4)} ${destTicker}`);
             closeModal('swapModal');
             renderDashboard();
         }
 
         function executeStakingModification() {
             const type = document.getElementById('stakeOperationType').value;
-            const ticker = document.getElementById('stakeAssetSelect').value;
+            const ticker = document.getElementById('stakeAssetTarget').value;
             const amt = parseFloat(document.getElementById('stakeActionAmountInput').value) || 0;
 
-            if(amt <= 0 || isNaN(amt)) return alert('Incompatible allocation mass parameters.');
+            if(!ticker || amt <= 0 || isNaN(amt)) return alert('Incompatible ledger parameters.');
 
             if(type === 'STAKE') {
                 const srcAsset = portfolio.find(a => a.currency === ticker);
-                if(!srcAsset || srcAsset.amount < amt) return alert('Liquid threshold parameter limits bypassed.');
+                if(!srcAsset || srcAsset.amount < amt) return alert('Source asset reserves insufficient for locking requirements.');
                 
                 srcAsset.amount -= amt;
                 if(srcAsset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
@@ -638,18 +700,18 @@
                 if(existingVault) {
                     existingVault.stakedAmount += amt;
                 } else {
-                    stakingVaults.push({ currency: ticker, name: `${ticker} Validation Vault`, stakedAmount: amt, apy: 5.0, earnedAmount: 0 });
+                    stakingVaults.push({ currency: ticker, name: `${marketPrices[ticker]?.name || ticker} Staking Pool`, stakedAmount: amt, apy: 5.5, earnedAmount: 0 });
                 }
             } else {
                 const vaultIdx = stakingVaults.findIndex(v => v.currency === ticker);
-                if(vaultIdx === -1 || stakingVaults[vaultIdx].stakedAmount < amt) return alert('Requested redemption outpaces vault limits.');
+                if(vaultIdx === -1 || stakingVaults[vaultIdx].stakedAmount < amt) return alert('Redemption quota invalid.');
 
                 stakingVaults[vaultIdx].stakedAmount -= amt;
                 const destAsset = portfolio.find(a => a.currency === ticker);
                 if(destAsset) {
                     destAsset.amount += amt;
                 } else {
-                    portfolio.push({ currency: ticker, name: ticker, amount: amt, avgBuyPrice: marketPrices[ticker]?.price || 0 });
+                    portfolio.push({ currency: ticker, name: marketPrices[ticker]?.name || ticker, amount: amt, avgBuyPrice: marketPrices[ticker]?.price || 0 });
                 }
                 if(stakingVaults[vaultIdx].stakedAmount <= 0) stakingVaults.splice(vaultIdx, 1);
             }
@@ -681,7 +743,7 @@
                     <td>
                         <div class="asset-cell">
                             <div class="asset-icon">${ticker.substring(0,2)}</div>
-                            <div class="asset-name">${ticker}</div>
+                            <div class="asset-name">${data.name} <span class="asset-symbol" style="margin-left:4px;">${ticker}</span></div>
                         </div>
                     </td>
                     <td class="value-cell">${formatUSD(data.price)}</td>
@@ -737,7 +799,9 @@
                         <div class="sub-value ${pnlClass}">${sign}${formatUSD(pnlAbsolute)}</div>
                     </td>
                     <td style="text-align: right;">
-                        <button class="btn btn-danger" style="padding:6px 10px; font-size:0.75rem;" onclick="dropAssetCompletely('${asset.currency}')">Remove</button>
+                        <button class="btn-icon" title="Adjust Asset Parameters" onclick="openAssetModalForAdjustment('${asset.currency}')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
                     </td>
                 `;
                 portfolioList.appendChild(tr);
@@ -752,7 +816,7 @@
                 pnlEl.innerText = `${netPnlUsd >= 0 ? '+' : ''}${formatUSD(netPnlUsd)} (${netPnlPct.toFixed(2)}%) All-Time`;
             }
 
-            // Staking Table Generation Loop
+            // Staking Yield Arrays Processing Loop
             let combinedStakingValueUsd = 0;
             let aggregatedYieldDistributedUsd = 0;
             const stakingContainer = document.getElementById('stakingList');
@@ -796,16 +860,26 @@
             renderMarketTabSection();
         }
 
-        // Simulating Real-Time Multi-Market Feed Changes Fluctuations
+        // Live Market Flux Simulator Engine
         function simulateVolatilityFeed() {
             Object.keys(marketPrices).forEach(ticker => {
-                const deltaPct = (Math.random() - 0.5) * 0.4; // 0.2% max change per cycle
+                const deltaPct = (Math.random() - 0.5) * 0.3;
                 marketPrices[ticker].price *= (1 + (deltaPct / 100));
             });
             renderDashboard();
         }
 
-        // Initialization Routine Execution
+        // Global Close Trigger listener for dynamic overlays
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active');
+            }
+            if (!e.target.closest('.form-group')) {
+                document.querySelectorAll('.search-results-box').forEach(box => box.style.display = 'none');
+            }
+        });
+
+        // Initialize Application Context
         renderDashboard();
         setInterval(simulateVolatilityFeed, 4000);
     </script>
