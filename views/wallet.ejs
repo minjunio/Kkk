@@ -73,7 +73,7 @@
     
     .flash-up { color: var(--green) !important; text-shadow: 0 0 8px rgba(16,185,129,0.4); transition: 0.1s; }
     .flash-down { color: var(--pink) !important; text-shadow: 0 0 8px rgba(225,29,72,0.4); transition: 0.1s; }
-    
+
     .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 24px; }
     .quick-btn { min-height: 76px; border-radius: 24px; padding: 12px; text-align: center; color: var(--text); background: var(--solid); border: 1px solid var(--border); box-shadow: var(--shadow2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .quick-btn.primary { color: white; background: linear-gradient(135deg, var(--blue2), var(--cyan)); border: none; box-shadow: 0 16px 32px rgba(37,99,235,0.25); }
@@ -82,7 +82,7 @@
     .quick-btn span { color: var(--muted); font-size: 0.7rem; font-weight: 700; }
     .quick-btn.primary span, .quick-btn.tensor-btn span { color: rgba(255,255,255,0.9); }
 
-    .panel { margin-top: 14px; border-radius: 28px; padding: 20px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow2); backdrop-filter: blur(24px); }
+    .panel { margin-top: 14px; border-radius: 28px; padding: 20px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
     .panel.tensor-panel { border-color: rgba(139,92,246,0.3); background: linear-gradient(180deg, rgba(139,92,246,0.05), var(--glass)); }
     .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .title { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.03em; }
@@ -96,6 +96,7 @@
     .asset-card.tensor { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.05); }
     .asset-card.tensor:hover { border-color: var(--tensor); }
     .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(255,255,255,0.3)); }
+    [data-theme="dark"] .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(17,29,51,0.4)); }
 
     .asset-top { display: flex; align-items: center; gap: 12px; }
     .coin { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); border: 1px solid var(--border); color: var(--blue); font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden; }
@@ -113,7 +114,7 @@
     .tensor-primary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: white; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); box-shadow: 0 12px 24px rgba(139,92,246,0.25); }
     .secondary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; background: var(--solid); border: 1px solid var(--border); color: var(--text); }
 
-    .form { display: grid; gap: 16px; }
+    .form { display: grid; gap: 12px; }
     .field { display: grid; gap: 8px; }
     label { color: var(--muted); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
 
@@ -125,19 +126,26 @@
     .box.tensor { background: rgba(139,92,246,0.05); border-color: rgba(139,92,246,0.2); }
     .box.bad { color: var(--pink); background: rgba(225,29,72,0.06); border-color: rgba(225,29,72,0.15); }
 
+    /* Modern Swap Input */
     .defi-input-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--soft); border-radius: 20px; padding: 12px 16px; border: 1px solid var(--border); transition: 0.2s; }
     .defi-input-wrap:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--solid); }
     .defi-input-wrap.tensor-focus:focus-within { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
     .defi-amount { flex: 1; font-size: 1.8rem; font-weight: 900; background: transparent; color: var(--text); padding: 0; outline: none; border: none; font-variant-numeric: tabular-nums; width: 100%; }
     .defi-amount::placeholder { color: var(--muted2); }
 
-    .pill-toggle { display: flex; background: var(--soft); border-radius: 99px; padding: 6px; border: 1px solid var(--border); }
-    .pill-toggle button { flex: 1; height: 42px; border-radius: 99px; font-size: 0.95rem; font-weight: 800; color: var(--muted); transition: 0.2s; }
+    .icon-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
+    .icon-option { height: 48px; border-radius: 14px; border: 1px solid var(--border); background: var(--solid); display: grid; place-items: center; color: var(--muted); transition: 0.2s; }
+    .icon-option.selected { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
+    .icon-option svg { width: 28px; height: 28px; }
+
+    /* Pill Toggles */
+    .pill-toggle { display: flex; background: var(--soft); border-radius: 99px; padding: 4px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .pill-toggle button { flex: 1; height: 38px; border-radius: 99px; font-size: 0.9rem; font-weight: 800; color: var(--muted); transition: 0.2s; }
     .pill-toggle button.active { background: var(--solid); color: var(--text); box-shadow: var(--shadow2); border: 1px solid var(--border); }
 
-    .modal-overlay, .drawer-overlay { position: fixed; inset: 0; z-index: 100; display: none; background: rgba(15,23,42,0.5); backdrop-filter: blur(16px); padding: 16px; overflow-y: auto; }
+    .modal-overlay, .drawer-overlay { position: fixed; inset: 0; z-index: 100; display: none; background: rgba(15,23,42,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 16px; overflow-y: auto; }
     .modal-overlay.active, .drawer-overlay.active { display: block; }
-    .modal-card { width: min(500px, 100%); margin: calc(12px + var(--safe-top)) auto 20px auto; padding: 28px; border-radius: 36px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); box-shadow: 0 32px 80px rgba(0,0,0,0.1); backdrop-filter: blur(40px); animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
+    .modal-card { width: min(520px, 100%); margin: calc(12px + var(--safe-top)) auto 20px auto; padding: 24px; border-radius: 36px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); box-shadow: 0 32px 80px rgba(0,0,0,0.1); backdrop-filter: blur(40px); animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
     [data-theme="dark"] .modal-card { background: rgba(13,22,40,0.95); box-shadow: 0 32px 80px rgba(0,0,0,0.4); }
     
     .drawer { position: absolute; top: 0; right: 0; width: min(440px, 100%); height: 100%; overflow-y: auto; padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); background: var(--solid); border-left: 1px solid var(--border); box-shadow: -20px 0 80px rgba(0,0,0,0.2); animation: slide 0.25s ease both; }
@@ -152,7 +160,7 @@
     .toast { position: fixed; left: 50%; bottom: calc(100px + var(--safe-bottom)); transform: translateX(-50%) translateY(20px); z-index: 150; padding: 14px 24px; border-radius: 20px; background: rgba(15,23,42,0.95); color: white; font-weight: 800; font-size: 0.9rem; box-shadow: 0 16px 32px rgba(0,0,0,0.3); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); white-space:nowrap; }
     .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .bottom-nav { position: fixed; left: 50%; bottom: calc(12px + var(--safe-bottom)); transform: translateX(-50%); z-index: 70; width: min(440px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px; border-radius: 28px; background: rgba(255,255,255,0.92); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(24px); }
+    .bottom-nav { position: fixed; left: 50%; bottom: calc(12px + var(--safe-bottom)); transform: translateX(-50%); z-index: 70; width: min(440px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px; border-radius: 28px; background: rgba(255,255,255,0.92); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
     [data-theme="dark"] .bottom-nav { background: rgba(13,22,40,0.95); }
     .bottom-nav button { min-height: 58px; border-radius: 20px; color: var(--muted); background: transparent; font-size: 0.75rem; font-weight: 800; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
     .bottom-nav button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition:0.2s; }
@@ -170,6 +178,7 @@
       .modal-card { width: 100%; border-radius: 36px 36px 0 0; margin: auto auto 0 auto; max-height: 92vh; }
       .drawer { width: 100%; }
       .defi-amount { font-size: 1.6rem; }
+      .icon-picker-grid { grid-template-columns: repeat(5, 1fr); }
     }
   </style>
 </head>
@@ -281,7 +290,7 @@
     <div class="modal-card">
       <div class="modal-head"><div><div class="modal-title">Receive</div><div class="modal-sub">Select network and asset.</div></div><button class="close" onclick="closeModal('receiveModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
       <div class="form">
-        <div class="pill-toggle">
+        <div class="pill-toggle" style="margin-bottom:16px;">
           <button id="btnRecCrypto" class="active" onclick="switchRecMode('crypto')">Standard Crypto</button>
           <button id="btnRecTensor" onclick="switchRecMode('tensor')">Tensor (AI) Network</button>
         </div>
@@ -326,6 +335,75 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="tensorChartModal" onclick="overlayClose(event,'tensorChartModal')">
+    <div class="modal-card" style="width:min(760px, 100%); border-color:var(--tensor); max-height: 95vh; display: flex; flex-direction: column;">
+      <div class="modal-head" style="margin-bottom: 16px;">
+        <div>
+          <div class="modal-title" id="chartModalTitle" style="color:var(--tensor);">AI Token Dynamics</div>
+          <div class="modal-sub" id="chartModalStats">Cap: $0.00 | Dominance: 0.00%</div>
+        </div>
+        <button class="close" onclick="closeModal('tensorChartModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div class="pill-toggle" style="margin:0;">
+          <button id="chartTypeCandle" class="active" onclick="setChartType('candle')">Candle</button>
+          <button id="chartTypeLine" onclick="setChartType('line')">Line</button>
+        </div>
+        <div class="pill-toggle" style="margin:0;">
+          <button class="active tf-btn" onclick="setChartTF(1, this)">1m</button>
+          <button class="tf-btn" onclick="setChartTF(5, this)">5m</button>
+          <button class="tf-btn" onclick="setChartTF(15, this)">15m</button>
+          <button class="tf-btn" onclick="setChartTF(60, this)">1H</button>
+          <button class="tf-btn" onclick="setChartTF(1440, this)">1D</button>
+        </div>
+      </div>
+
+      <div id="chartContainer" style="width:100%; height:360px; background:var(--solid); border-radius:20px; border:1px solid var(--border); overflow:hidden; position:relative; box-shadow: inset 0 2px 12px rgba(0,0,0,0.02);"></div>
+      
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:16px; text-align:center;">
+         <div class="box" style="padding:12px; border-radius:18px;"><div class="tiny">Circulating Supply</div><strong id="chartMetricSupply" style="font-size:0.95rem;">0</strong></div>
+         <div class="box" style="padding:12px; border-radius:18px;"><div class="tiny">24h Vol (Sim)</div><strong id="chartMetricVolume" style="font-size:0.95rem;">$0.00</strong></div>
+         <div class="box tensor" style="padding:12px; border-radius:18px;"><div class="tiny" style="color:var(--tensor);">Dominance</div><strong id="chartMetricDominance" style="font-size:0.95rem; color:var(--tensor);">0.00%</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="tensorManageModal" onclick="overlayClose(event,'tensorManageModal')">
+    <div class="modal-card" style="border-color:var(--tensor);">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" style="color:var(--tensor);">Manage AI Asset</div>
+          <div class="modal-sub" id="manageTokenName">Update token mechanics.</div>
+        </div>
+        <button class="close" onclick="closeModal('tensorManageModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="form">
+        <input type="hidden" id="editTokenId" />
+        <div class="field">
+          <label>Algorithm Bias</label>
+          <select class="select" id="editBias">
+            <option value="bull">Bullish Bias</option>
+            <option value="bear">Bearish Bias</option>
+            <option value="random">Random Walk</option>
+            <option value="pegged">True Stablecoin</option>
+          </select>
+        </div>
+        <div class="field"><label>Bull Probability (%)</label><input class="input" id="editBullChance" type="number" step="1" max="100" min="0" placeholder="60" /></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field"><label>Min Interval Drop/Raise (%)</label><input class="input" id="editMinPct" type="number" step="0.1" /></div>
+          <div class="field"><label>Max Interval Drop/Raise (%)</label><input class="input" id="editMaxPct" type="number" step="0.1" /></div>
+        </div>
+        <div class="field"><label>Circulating Supply</label><input class="input" id="editSupply" type="number" step="1" /></div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+          <button class="secondary-btn" style="color:var(--pink); border-color:var(--pink);" onclick="deleteTensorToken()">Delete Asset</button>
+          <button class="tensor-primary-btn" onclick="updateTensorToken()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event,'settingsOverlay')">
     <aside class="drawer">
       <div class="drawer-head"><div><div class="drawer-title">Settings</div><div class="drawer-sub">Preferences and security.</div></div><button class="close" onclick="closeSettings()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
@@ -333,6 +411,53 @@
         <div class="box"><div class="name">Web3 Address</div><div class="tiny" id="settingsAddress" style="font-family:monospace; margin-top:6px; font-size:0.85rem; word-break:break-all;">Loading...</div></div>
         <div class="box tensor"><div class="name" style="color:var(--tensor);">Tensor Address (T0x)</div><div class="tiny" id="settingsTensorAddress" style="font-family:monospace; margin-top:6px; font-size:0.85rem; word-break:break-all;">Loading...</div></div>
         
+        <div id="adminSettingsControls" style="display:none; margin-top:16px;">
+           <div class="box tensor" style="margin-top:12px;">
+             <div class="name" style="color:var(--tensor);">Admin: Mint Tensor Token</div>
+             <div style="display:flex; gap:8px; margin-top:12px;">
+               <select class="select" id="adMintSelect" style="flex:1;"></select>
+               <input class="input" id="adMintAmount" type="number" placeholder="Amt" style="width:90px;" />
+             </div>
+             <button class="tensor-primary-btn" style="margin-top:12px; height:44px;" onclick="adminMintTensor()">Mint to Myself</button>
+           </div>
+
+           <div class="box bad" style="border-color:var(--cyan); background:rgba(6,182,212,0.05); margin-top:12px;">
+             <div class="name" style="color:var(--cyan);">Admin: Demo Balances</div>
+             <div class="field" style="margin-top:12px;"><label>ETH Balance</label><input class="input" id="adBalETH" type="number" step="any" /></div>
+             <div class="field"><label>USDT Balance</label><input class="input" id="adBalUSDT" type="number" step="any" /></div>
+             <div class="field"><label>BTC Balance</label><input class="input" id="adBalBTC" type="number" step="any" /></div>
+             <button class="primary-btn" style="margin-top:12px; height:44px;" onclick="saveAdminBalances()">Save Crypto Balances</button>
+           </div>
+           
+           <div class="box tensor" style="margin-top:12px;">
+             <div class="name" style="color:var(--tensor);">Admin: Tensor Factory</div>
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+               <div class="field"><label>Name</label><input class="input" id="adTenName" placeholder="Neural" /></div>
+               <div class="field"><label>Symbol</label><input class="input" id="adTenSym" placeholder="NRL" /></div>
+             </div>
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+               <div class="field"><label>Price ($)</label><input class="input" id="adTenPrice" type="number" step="any" placeholder="1.00" /></div>
+               <div class="field">
+                 <label>Algorithm Bias</label>
+                 <select class="select" id="adTenBias">
+                   <option value="bull">Bullish</option>
+                   <option value="bear">Bearish</option>
+                   <option value="random">Random Walk</option>
+                   <option value="pegged">True Stablecoin</option>
+                 </select>
+               </div>
+             </div>
+             <div class="field" style="margin-top:12px;"><label>Bull Probability (%)</label><input class="input" id="adTenBullChance" type="number" value="60" step="1" max="100" min="0" /></div>
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+               <div class="field"><label>Drop/Raise Min %</label><input class="input" id="adTenMinPct" type="number" value="1" step="0.1" /></div>
+               <div class="field"><label>Drop/Raise Max %</label><input class="input" id="adTenMaxPct" type="number" value="5" step="0.1" /></div>
+             </div>
+             <div class="field" style="margin-top:12px;"><label>Total Circulating Supply</label><input class="input" id="adTenSupply" type="number" value="10000000" /></div>
+             <div class="field" style="margin-top:12px;"><label>Icon Setup</label><div class="icon-picker-grid" id="adTenIconPicker"></div></div>
+             <button class="tensor-primary-btn" style="margin-top:16px; height:48px;" onclick="deployTensorToken()">Deploy AI Token</button>
+           </div>
+        </div>
+
         <div class="field" style="margin-top:16px;"><label>Display currency</label><select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)"><option value="USD">USD</option><option value="AED">AED</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option></select></div>
         <div class="field"><label>Theme</label><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:48px;" onclick="setTheme('light')">Light</button><button class="secondary-btn" style="height:48px;" onclick="setTheme('dark')">Dark</button></div></div>
         
@@ -362,15 +487,69 @@
       solana:{name:'Solana Native',chainId:null,symbol:'SOL'}
     };
 
+    // 30 Sharp SVGs for the Tensor AI Token Icon Picker
+    const TENSOR_ICONS = [
+      `<svg viewBox="0 0 24 24" fill="url(#grad1)"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ec4899" /><stop offset="100%" stop-color="#8b5cf6" /></linearGradient></defs><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#0ea5e9"><circle cx="12" cy="12" r="10"/><path fill="#ffffff" d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke="#ffffff" stroke-width="2" d="M12 8v4l3 3"/></svg>`,
+      `<svg viewBox="0 0 24 24" stroke="#f59e0b" stroke-width="2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#8b5cf6"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line stroke="#ffffff" stroke-width="2" x1="8" y1="21" x2="16" y2="21"/><line stroke="#ffffff" stroke-width="2" x1="12" y1="17" x2="12" y2="21"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#84cc16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#6366f1"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#eab308"><path d="M12 2L15 8l6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#14b8a6"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f97316"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-4a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#d946ef"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm4 2h4v4h-4V8z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#3b82f6"><circle cx="8" cy="8" r="4"/><circle cx="16" cy="16" r="4"/><line stroke="#3b82f6" stroke-width="2" x1="10" y1="10" x2="14" y2="14"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 2a10 10 0 0 0-7.07 17.07l1.41-1.41A8 8 0 1 1 12 4v-2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M20 12l-8 8-8-8 1.41-1.41L11 16.17V4h2v12.17l5.58-5.59L20 12z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f43f5e"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#64748b"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#0ea5e9"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10h-2a8 8 0 0 0-8-8V2zm0 20a10 10 0 0 1-10-10h2a8 8 0 0 0 8 8v2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#ec4899"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#14b8a6"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#eab308"><path d="M11 2v4h2V2h-2zm-6.22 3.36l1.41 1.41 2.83-2.83-1.41-1.41-2.83 2.83zm14.44 0l-2.83-2.83-1.41 1.41 2.83 2.83 1.41-1.41zM2 11h4v2H2v-2zm16 0h4v2h-4v-2zM4.78 18.64l2.83-2.83-1.41-1.41-2.83 2.83 1.41 1.41zm14.44 0l1.41-1.41-2.83-2.83-1.41 1.41 2.83 2.83zM11 20v4h2v-4h-2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#3b82f6"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm4-4H7v-2h9v2zm0-4H7V7h9v2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#a855f7"><path d="M21 3H3v18h18V3zm-2 16H5V5h14v14zM11 7h2v4h4v2h-4v4h-2v-4H7v-2h4V7z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f97316"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>`
+    ];
+
     let displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
     let activeSigner = null, allBalances = [], combinedAssets = [], ownedPositions = [];
     let tensorAddress = "", baseTensorData = [], tensorBalances = {};
     let prices = {};
     let toastTimer;
 
+    // CHART ENGINE variables
+    let chartingIntervalObject = null;
+    let activeChartTokenId = null;
+    let tvChart = null, lineSeries = null, candleSeries = null;
+    let currentChartType = 'candle';
+    let currentTF = 1;
+    let rawCandleData = [];
+
     // Tensor Global Integration
     async function initTensor() {
       tensorAddress = SERVER_WALLET?.tensorAddress || "T0x...Loading";
+      
+      if (IS_ADMIN) {
+        document.getElementById('adminSettingsControls').style.display = 'block';
+        document.getElementById('adTenIconPicker').innerHTML = TENSOR_ICONS.map((svg, i) => `<button class="icon-option ${i===0?'selected':''}" onclick="selAdTenIcon(this, ${i})">${svg}</button>`).join('');
+        window.selectedTenIcon = 0;
+        
+        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
+        document.getElementById('adBalETH').value = saved.eth;
+        document.getElementById('adBalUSDT').value = saved.usdt;
+        document.getElementById('adBalBTC').value = saved.btc;
+      }
+      
       await fetchTensorData();
       setInterval(fetchTensorData, 4000); // Polling globally without cache
     }
@@ -384,6 +563,13 @@
             tensorAddress = data.address || tensorAddress;
             tensorBalances = data.balances || {};
             renderTensorCards();
+            
+            if (IS_ADMIN) {
+               const mintSel = document.getElementById('adMintSelect');
+               if(mintSel && mintSel.options.length !== baseTensorData.length) {
+                   mintSel.innerHTML = baseTensorData.map(t => `<option value="${t.id}">${t.symbol}</option>`).join('');
+               }
+            }
          }
        } catch(e) { console.error('Tensor fetch failed', e); }
     }
@@ -398,8 +584,10 @@
         const val = bal * t.price; 
         totTenUsd += val;
         const diff = t.startPrice ? (((t.price - t.startPrice)/t.startPrice)*100) : 0;
+        const adminBtn = IS_ADMIN ? `<button class="small-btn" style="position:absolute; top:12px; right:12px; height:24px; padding:0 8px; font-size:0.65rem;" onclick="event.stopPropagation(); openTensorManage('${t.id}')">Manage</button>` : '';
 
-        return `<div class="asset-card tensor">
+        return `<div class="asset-card tensor" onclick="openTensorAnalytics('${t.id}')">
+          ${adminBtn}
           <div class="asset-top">
             <div class="coin tensor-coin">${t.icon}</div>
             <div style="width:calc(100% - 56px); overflow:hidden;">
@@ -416,6 +604,199 @@
       
       renderTotals(totTenUsd);
     }
+
+    // --- Admin Functions ---
+    function selAdTenIcon(btn, i) { document.querySelectorAll('.icon-option').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); window.selectedTenIcon = i; }
+    
+    function saveAdminBalances() {
+      const eth = Number(document.getElementById('adBalETH').value);
+      const usdt = Number(document.getElementById('adBalUSDT').value);
+      const btc = Number(document.getElementById('adBalBTC').value);
+      localStorage.setItem('blue_admin_balances', JSON.stringify({eth, usdt, btc}));
+      toast('Demo crypto balances saved!');
+      refreshAllBalances(true);
+    }
+
+    async function adminMintTensor() {
+       const tId = document.getElementById('adMintSelect').value;
+       const amt = Number(document.getElementById('adMintAmount').value);
+       if(!tId || amt <= 0) return toast('Invalid mint amount');
+       
+       try {
+         const res = await fetch('/api/tensor/admin-mint', {
+           method: 'POST', headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ tokenId: tId, amount: amt })
+         });
+         
+         if(res.ok) {
+           toast(`Minted ${amt} to Admin Wallet!`);
+           fetchTensorData();
+         } else { toast('Failed to mint.'); }
+       } catch (e) { toast('Network error.'); }
+    }
+
+    async function deployTensorToken() {
+      const name = document.getElementById('adTenName').value; 
+      const symbol = document.getElementById('adTenSym').value.toUpperCase();
+      const price = Number(document.getElementById('adTenPrice').value); 
+      const bias = document.getElementById('adTenBias').value;
+      const bullChance = Number(document.getElementById('adTenBullChance').value) || 60;
+      const supply = Number(document.getElementById('adTenSupply').value);
+      const minPct = Number(document.getElementById('adTenMinPct').value);
+      const maxPct = Number(document.getElementById('adTenMaxPct').value);
+
+      if(!name || !symbol || price <= 0 || supply <= 0 || minPct < 0 || maxPct < 0) return toast('Invalid details');
+      
+      try {
+        const res = await fetch('/api/tensor/deploy', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, symbol, price, bias, bullChance, minPct, maxPct, icon: TENSOR_ICONS[window.selectedTenIcon], supply })
+        });
+        if(res.ok) { toast(`${symbol} deployed!`); fetchTensorData(); closeSettings(); } 
+        else throw new Error('Failed');
+      } catch (e) { toast('Deployment failed.'); }
+    }
+
+    function openTensorManage(id) {
+      const t = baseTensorData.find(x => x.id === id);
+      if(!t) return;
+      document.getElementById('editTokenId').value = id;
+      document.getElementById('manageTokenName').textContent = `Editing ${t.symbol}`;
+      document.getElementById('editBias').value = t.bias || 'random';
+      document.getElementById('editBullChance').value = t.bullChance || 60;
+      document.getElementById('editMinPct').value = (t.minPct || 0.01) * 100;
+      document.getElementById('editMaxPct').value = (t.maxPct || 0.05) * 100;
+      document.getElementById('editSupply').value = t.supply || 10000000;
+      openModal('tensorManageModal');
+    }
+
+    async function updateTensorToken() {
+      const id = document.getElementById('editTokenId').value;
+      const bias = document.getElementById('editBias').value;
+      const bullChance = document.getElementById('editBullChance').value;
+      const minPct = document.getElementById('editMinPct').value;
+      const maxPct = document.getElementById('editMaxPct').value;
+      const supply = document.getElementById('editSupply').value;
+
+      try {
+        const res = await fetch(`/api/tensor/update/${id}`, {
+          method: 'PUT', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ bias, bullChance, minPct, maxPct, supply })
+        });
+        if(res.ok) { toast('Token mechanics updated.'); closeModal('tensorManageModal'); fetchTensorData(); }
+      } catch(e) { toast('Update failed.'); }
+    }
+
+    async function deleteTensorToken() {
+      const id = document.getElementById('editTokenId').value;
+      try {
+        const res = await fetch(`/api/tensor/delete/${id}`, { method: 'DELETE' });
+        if(res.ok) { toast('Token deleted.'); closeModal('tensorManageModal'); fetchTensorData(); }
+      } catch(e) { toast('Deletion failed.'); }
+    }
+
+
+    // --- CHARTING ENGINE (Lightweight Charts) ---
+    function initChart() {
+        if(tvChart) return;
+        const container = document.getElementById('chartContainer');
+        tvChart = LightweightCharts.createChart(container, {
+            layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#64748b' },
+            grid: { vertLines: { color: 'rgba(2, 132, 199, 0.05)' }, horzLines: { color: 'rgba(2, 132, 199, 0.05)' } },
+            rightPriceScale: { borderVisible: false },
+            timeScale: { borderVisible: false, timeVisible: true, fixLeftEdge: true },
+            crosshair: { mode: 0, vertLine: { color: '#38bdf8', labelBackgroundColor: '#0284c7' }, horzLine: { color: '#38bdf8', labelBackgroundColor: '#0284c7' } }
+        });
+        
+        candleSeries = tvChart.addCandlestickSeries({ upColor: '#10b981', downColor: '#e11d48', borderVisible: false, wickUpColor: '#10b981', wickDownColor: '#e11d48' });
+        lineSeries = tvChart.addLineSeries({ color: '#38bdf8', lineWidth: 2 });
+        lineSeries.applyOptions({ visible: false });
+        
+        new ResizeObserver(entries => {
+            if (entries.length === 0 || entries[0].target !== container) { return; }
+            const newRect = entries[0].contentRect;
+            tvChart.applyOptions({ height: newRect.height, width: newRect.width });
+        }).observe(container);
+    }
+
+    function setChartType(type) {
+        currentChartType = type;
+        document.getElementById('chartTypeCandle').className = type === 'candle' ? 'active' : '';
+        document.getElementById('chartTypeLine').className = type === 'line' ? 'active' : '';
+        if (type === 'candle') { candleSeries.applyOptions({visible:true}); lineSeries.applyOptions({visible:false}); } 
+        else { candleSeries.applyOptions({visible:false}); lineSeries.applyOptions({visible:true}); }
+    }
+
+    function setChartTF(minutes, btn) {
+        currentTF = minutes;
+        document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        processAndRenderChartData();
+    }
+
+    async function openTensorAnalytics(tokenId) {
+      activeChartTokenId = tokenId;
+      openModal('tensorChartModal');
+      setTimeout(() => {
+          initChart();
+          fetchAndDrawChart();
+      }, 100); 
+      
+      clearInterval(chartingIntervalObject);
+      chartingIntervalObject = setInterval(fetchAndDrawChart, 5000);
+    }
+
+    async function fetchAndDrawChart() {
+      if (!activeChartTokenId || !document.getElementById('tensorChartModal').classList.contains('active')) {
+        clearInterval(chartingIntervalObject); return;
+      }
+      
+      const token = baseTensorData.find(t => t.id === activeChartTokenId);
+      if (!token) return;
+
+      document.getElementById('chartModalTitle').textContent = `${token.name} (${token.symbol})`;
+      document.getElementById('chartModalStats').textContent = `Cap: $${Number(token.marketCap || 0).toLocaleString(undefined, {maximumFractionDigits:0})} | Share: ${fmt(token.dominance || 0, 2)}%`;
+      document.getElementById('chartMetricSupply').textContent = Number(token.supply || 0).toLocaleString();
+      document.getElementById('chartMetricVolume').textContent = money(token.volume || 0);
+      document.getElementById('chartMetricDominance').textContent = `${fmt(token.dominance || 0, 2)}%`;
+
+      try {
+        const response = await fetch(`/api/tensor/chart?tokenId=${activeChartTokenId}&_t=${Date.now()}`);
+        const data = await response.json();
+        if (data && data.candles) {
+            rawCandleData = data.candles;
+            processAndRenderChartData();
+        }
+      } catch (e) { }
+    }
+
+    function processAndRenderChartData() {
+        if(!rawCandleData || rawCandleData.length === 0 || !tvChart) return;
+        
+        let aggregated = [];
+        let currentBucket = null;
+        let msInterval = currentTF * 60 * 1000;
+
+        rawCandleData.forEach(c => {
+            const bucketTime = Math.floor(c.time / msInterval) * msInterval;
+            if (!currentBucket || currentBucket.originalTime !== bucketTime) {
+                if (currentBucket) aggregated.push(currentBucket);
+                currentBucket = { time: Math.floor(bucketTime / 1000), originalTime: bucketTime, open: c.open, high: c.high, low: c.low, close: c.close, value: c.close };
+            } else {
+                currentBucket.high = Math.max(currentBucket.high, c.high);
+                currentBucket.low = Math.min(currentBucket.low, c.low);
+                currentBucket.close = c.close;
+                currentBucket.value = c.close;
+            }
+        });
+        if(currentBucket) aggregated.push(currentBucket);
+
+        const unique = Array.from(new Map(aggregated.map(item => [item.time, item])).values());
+        candleSeries.setData(unique);
+        lineSeries.setData(unique);
+    }
+    // --- END CHARTING ---
+
 
     // --- SWAP / SEND TENSOR ---
     function openTensorSwap() {
@@ -559,7 +940,7 @@
         if(id==='receiveModal') renderReceiveAssets(); 
         if(id==='sendModal') populateSendAssets();
     }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'tensorChartModal') clearInterval(chartingIntervalObject); }
     function overlayClose(e,id) { if(e.target.id === id) closeModal(id); }
     function navSetActive(id) { document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active')); document.getElementById(id)?.classList.add('active'); }
     
@@ -603,10 +984,11 @@
       if(force) { document.getElementById('statusText').textContent = 'Updating...'; }
       
       if(IS_ADMIN) { 
+        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
         allBalances = [
-          {networkKey:'ethereum', type:'native', symbol:'ETH', name:'Ethereum', balance: 5.4, decimals:18, gecko:'ethereum'},
-          {networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: 25000, decimals:6, gecko:'tether'},
-          {networkKey:'bitcoin', type:'native', symbol:'BTC', name:'Bitcoin', balance: 0.38, decimals:8, gecko:'bitcoin'}
+          {networkKey:'ethereum', type:'native', symbol:'ETH', name:'Ethereum', balance: saved.eth, decimals:18, gecko:'ethereum'},
+          {networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: saved.usdt, decimals:6, gecko:'tether'},
+          {networkKey:'bitcoin', type:'native', symbol:'BTC', name:'Bitcoin', balance: saved.btc, decimals:8, gecko:'bitcoin'}
         ]; 
         await fetchPricesForAll(); combineAssets(); renderAssetCards(); 
         document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
@@ -658,7 +1040,7 @@
       } catch (err) {}
     }
     
-    window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); }});
+    window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); clearInterval(chartingIntervalObject); }});
     window.onload = init;
   </script>
 </body>
