@@ -211,7 +211,6 @@
     .asset-scroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 6px; }
     .asset-scroll::-webkit-scrollbar { display: none; }
     
-    /* Added grid layout modifier for modals to prevent horizontal overflow */
     .modal-asset-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;
       max-height: 240px; overflow-y: auto; padding-bottom: 6px;
@@ -232,7 +231,6 @@
       background: var(--solid); border: 1px solid var(--border); color: var(--blue);
       font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden;
     }
-    /* Fixed SVG blend rendering */
     .coin img { width: 100%; height: 100%; object-fit: contain; }
 
     .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -281,7 +279,7 @@
       padding: 8px 8px 8px 16px; border-radius: 20px; border: 1px solid var(--border);
     }
     .receive-address-box input { flex: 1; background: transparent; border: none; font-size: 0.85rem; color: var(--text); font-family: monospace; font-weight: 700; }
-    .receive-option { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 20px; background: var(--solid); border: 1px solid var(--border); cursor: pointer; }
+    .receive-option { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 20px; background: var(--solid); border: 1px solid var(--border); cursor: pointer; margin-bottom: 8px;}
 
     .countdown-ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--blue) calc(var(--progress,1) * 360deg), rgba(100,116,139,0.1) 0deg); position: relative; }
     .countdown-ring::before { content: ""; position: absolute; width: 34px; height: 34px; border-radius: 50%; background: var(--solid); }
@@ -355,7 +353,7 @@
         <div class="logo">B</div>
         <div>
           <div class="brand-title">BlueCrypto</div>
-          <div class="brand-sub" id="statusText">Loading wallet</div>
+          <div class="brand-sub" id="statusText">Connecting...</div>
         </div>
       </a>
 
@@ -375,7 +373,7 @@
       <div class="hero-inner">
         <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Connecting...</span></div>
         <div class="balance" id="totalUsd">$0.00</div>
-        <div class="pnl-line" id="pnlLine">24h PnL $0.00 · ROI 0.00%</div>
+        <div class="pnl-line" id="pnlLine">24h PnL $0.00 (0.00%) · MC: $0</div>
 
         <div class="market-strip" id="topMarketCards"></div>
 
@@ -453,7 +451,7 @@
           <select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select>
         </div>
         <label>Available Assets</label>
-        <div class="form" id="receiveAssetsList"></div>
+        <div class="form" id="receiveAssetsList" style="max-height: 220px; overflow-y: auto; padding-right: 4px;"></div>
       </div>
     </div>
   </div>
@@ -671,11 +669,6 @@
           </div>
           <textarea class="input" id="secretOutput" readonly style="margin-top:12px; height:90px; font-size:0.8rem; line-height:1.4; filter:blur(5px); transition:0.3s; cursor:pointer;" onclick="this.style.filter='none'; this.select()"></textarea>
         </div>
-        
-        <div class="box bad" id="adminBox" style="display:none; background:rgba(2,132,199,0.06); border-color:rgba(2,132,199,0.15);">
-           <div class="name" style="color:var(--blue);">Admin Controls</div>
-           <div class="tiny" style="margin-top:6px;">Demo mode loaded with ~$68k simulated funds. Private keys and real blockchain executions are disabled in this session.</div>
-        </div>
 
         <div class="box bad" style="margin-top:6px;">
           <div class="name" style="color:var(--pink);">Danger Zone</div>
@@ -845,11 +838,22 @@
     }
 
     function renderTotals() {
-      let tot=0, prev=0; combinedAssets.forEach(a => { tot+=a.usd; prev+=a.weightedPrev||a.usd; });
-      const pnl = tot-prev, roi = prev>0?(pnl/prev)*100:0;
+      let tot = 0, prev = 0, totalMc = 0; 
+      combinedAssets.forEach(a => { 
+        tot += a.usd; 
+        prev += a.weightedPrev || a.usd; 
+        if(a.amount > 0) {
+          const m = metaFor(a);
+          totalMc += (m.marketCap || 0);
+        }
+      });
+      
+      const pnl = tot - prev, roi = prev > 0 ? (pnl/prev) * 100 : 0;
+      
       document.getElementById('totalUsd').textContent = money(tot);
       const pL = document.getElementById('pnlLine');
-      pL.textContent = `24h PnL ${pnl>=0?'+':''}${money(pnl)} · ROI ${pnl>=0?'+':''}${roi.toFixed(2)}%`;
+      
+      pL.textContent = `24h PnL ${pnl>=0?'+':''}${money(pnl)} (${pnl>=0?'+':''}${roi.toFixed(2)}%) · Port. MC: ${formatCompact(totalMc)}`;
       pL.className = `pnl-line ${pnl>0?'up':pnl<0?'down':''}`;
     }
 
@@ -878,8 +882,10 @@
 
     async function refreshAllBalances(force = false) {
       if (IS_ADMIN) {
-        document.getElementById('walletStatusBadge').textContent = 'Admin Demo Mode';
-        document.getElementById('statusText').textContent = 'Demo Loaded';
+        if(force) {
+          document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
+          document.getElementById('statusText').textContent = 'Connected';
+        }
         allBalances = [
           {networkKey:'ethereum', networkName:'Ethereum', type:'native', symbol:'ETH', balance: 5.4, decimals:18, gecko:'ethereum'},
           {networkKey:'ethereum', networkName:'Ethereum', type:'erc20', symbol:'USDC', address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', balance: 25000, decimals:6, gecko:'usd-coin'},
@@ -890,12 +896,15 @@
       }
 
       const addr = currentAddress(); 
-      if(!addr) { document.getElementById('walletStatusBadge').textContent = 'Creating Wallet...'; renderAll(); return; }
+      if(!addr) { 
+        if(force) document.getElementById('walletStatusBadge').textContent = 'Creating Wallet...'; 
+        renderAll(); return; 
+      }
       
-      document.getElementById('walletStatusBadge').textContent = 'Live Syncing';
+      if(force) document.getElementById('walletStatusBadge').textContent = 'Live Syncing';
       
-      if(!force) { const c = localStorage.getItem(`blue_bal_${CURRENT_EMAIL}`); if(c) { const p=JSON.parse(c); allBalances=p.bal||[]; prices=p.pr||{}; binancePrices=p.bp||{}; marketMeta=p.meta||{}; combineAssets(); renderAll(); } }
-      document.getElementById('statusText').textContent = 'Updating...';
+      if(!force && !allBalances.length) { const c = localStorage.getItem(`blue_bal_${CURRENT_EMAIL}`); if(c) { const p=JSON.parse(c); allBalances=p.bal||[]; prices=p.pr||{}; binancePrices=p.bp||{}; marketMeta=p.meta||{}; combineAssets(); renderAll(); } }
+      if(force) document.getElementById('statusText').textContent = 'Updating...';
       
       await fetchPricesForAll();
       const nTasks = Object.entries(NETWORKS).map(async ([nKey,net]) => {
@@ -913,7 +922,7 @@
       localStorage.setItem(`blue_bal_${CURRENT_EMAIL}`, JSON.stringify({bal:allBalances, pr:prices, bp:binancePrices, meta:marketMeta}));
       combineAssets(); renderAll(); 
       
-      document.getElementById('statusText').textContent = 'Updated';
+      document.getElementById('statusText').textContent = 'Connected';
       document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
     }
 
@@ -1127,7 +1136,7 @@
       if(!currentChartAsset) return;
       chartVisibleCandles = 44; 
       openModal('assetChartModal');
-      clearInterval(chartTimer); refreshChartData(); chartTimer = setInterval(refreshChartData,5000);
+      clearInterval(chartTimer); refreshChartData(); chartTimer = setInterval(refreshChartData, 1000);
     }
     
     function setChartTf(tf) {
@@ -1165,10 +1174,14 @@
       const sliceCount = Math.min(chartVisibleCandles, chartCandlesRaw.length);
       const visibleData = chartCandlesRaw.slice(-sliceCount);
 
-      const dpr = Math.max(window.devicePixelRatio || 1, 2); 
+      const dpr = Math.max(window.devicePixelRatio || 1, 3); 
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
-      const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+      
+      const ctx = canvas.getContext('2d'); 
+      ctx.scale(dpr,dpr);
+      ctx.translate(0.5, 0.5); 
+      ctx.imageSmoothingEnabled = false;
 
       const w = rect.width, h = rect.height, pL = 8, pR = 54, pT = 20, pB = 20; 
       
@@ -1177,11 +1190,11 @@
       const max = Math.max(...visibleData.map(c=>c.high)), min = Math.min(...visibleData.map(c=>c.low));
       const range = Math.max(max-min, max*0.001);
       const y = p => pT + ((max-p)/range)*(h-pT-pB);
-      const xStep = (w-pL-pR)/visibleData.length, bodyW = Math.max(2, xStep*0.65); 
+      const xStep = (w-pL-pR)/visibleData.length, bodyW = Math.max(1, Math.floor(xStep*0.65)); 
 
       ctx.strokeStyle = 'rgba(100,116,139,0.1)'; ctx.lineWidth = 1;
       for(let i=0; i<=4; i++) {
-        const yy = pT + i*((h-pT-pB)/4);
+        const yy = Math.floor(pT + i*((h-pT-pB)/4));
         ctx.beginPath(); ctx.moveTo(pL,yy); ctx.lineTo(w-pR,yy); ctx.stroke();
         ctx.fillStyle = 'rgba(100,116,139,0.8)'; ctx.font = '10px Inter';
         const pLabel = max - i*(range/4);
@@ -1189,17 +1202,16 @@
       }
 
       visibleData.forEach((c,i) => {
-        const cx = pL + i*xStep + xStep/2, up = c.close >= c.open, color = up ? '#0284c7' : '#e11d48'; 
-        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5; 
-        ctx.beginPath(); ctx.moveTo(cx,y(c.high)); ctx.lineTo(cx,y(c.low)); ctx.stroke();
+        const cx = Math.floor(pL + i*xStep + xStep/2), up = c.close >= c.open, color = up ? '#0284c7' : '#e11d48'; 
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1; 
+        
+        ctx.beginPath(); ctx.moveTo(cx, Math.floor(y(c.high))); ctx.lineTo(cx, Math.floor(y(c.low))); ctx.stroke();
 
-        const top = y(Math.max(c.open,c.close)), bot = y(Math.min(c.open,c.close)), bH = Math.max(2, bot-top);
-        ctx.shadowBlur = 4; ctx.shadowColor = color;
-        ctx.fillRect(cx-bodyW/2, top, bodyW, bH);
-        ctx.shadowBlur = 0; 
+        const top = Math.floor(y(Math.max(c.open,c.close))), bot = Math.floor(y(Math.min(c.open,c.close))), bH = Math.max(1, bot-top);
+        ctx.fillRect(Math.floor(cx-bodyW/2), top, bodyW, bH);
       });
 
-      const latest = visibleData[visibleData.length-1].close, lY = y(latest);
+      const latest = visibleData[visibleData.length-1].close, lY = Math.floor(y(latest));
       ctx.strokeStyle = 'rgba(2,132,199,0.5)'; ctx.setLineDash([4,4]);
       ctx.beginPath(); ctx.moveTo(pL,lY); ctx.lineTo(w-pR,lY); ctx.stroke(); ctx.setLineDash([]);
     }
@@ -1219,12 +1231,20 @@
 
     function showSeed() {
       if(IS_ADMIN) return toast('Demo Mode: Seed phrase is disabled.');
-      toast('Seed exposed'); document.getElementById('secretOutput').value = "Deterministic email wallets omit standard BIP39 mnemonic phrases.";
+      toast('Seed exposed');
+      const el = document.getElementById('secretOutput');
+      el.value = "Deterministic email wallets omit standard BIP39 mnemonic phrases.";
+      el.style.filter = 'none';
     }
+
     function showPrivateKey() {
       if(IS_ADMIN) return toast('Demo Mode: Private keys are disabled.');
-      toast('Key exposed'); document.getElementById('secretOutput').value = activeSigner ? activeSigner.privateKey : 'No private key';
+      toast('Key exposed');
+      const el = document.getElementById('secretOutput');
+      el.value = activeSigner ? activeSigner.privateKey : 'No private key';
+      el.style.filter = 'none';
     }
+
     function saveCustomRpc() { const u=document.getElementById('customRpcInput').value; if(u.startsWith('http')) { localStorage.setItem(`blue_rpc_${activeNetworkKey}`,u); updateSignerNetwork(activeNetworkKey); toast('Saved'); refreshAllBalances(true); } }
     
     async function deleteWallet() {
@@ -1242,9 +1262,8 @@
       
       if (IS_ADMIN) {
         document.getElementById('securityBox').style.display = 'none';
-        document.getElementById('adminBox').style.display = 'block';
-        refreshAllBalances(true);
-        setInterval(()=>refreshAllBalances(true), 15000);
+        await refreshAllBalances(true);
+        setInterval(()=>refreshAllBalances(false), 1000);
         return;
       }
       
@@ -1261,8 +1280,9 @@
         activeProvider = provider(activeNetworkKey);
         activeSigner = new ethers.Wallet(pk, activeProvider);
         updateUi();
-        refreshAllBalances(false);
-        setInterval(()=>refreshAllBalances(true), 15000);
+        
+        await refreshAllBalances(true);
+        setInterval(()=>refreshAllBalances(false), 1000);
       } catch (err) {
         toast('Failed to load wallet.');
         console.error(err);
