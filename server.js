@@ -7,13 +7,15 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'bluecrypto-cloud-secret-key';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'bluecrypto-secure-secret-key';
 
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
 
-// Persistent Disk Setup for Render
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+// Automatically target the Render Persistent Disk at /data if in production, 
+// ensuring keys and seed phrases are reliably stored outside the ephemeral filesystem.
+const IS_PROD = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+const DATA_DIR = process.env.DATA_DIR || (IS_PROD ? '/data' : path.join(__dirname, 'data'));
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
@@ -33,7 +35,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   rolling: true,
-  cookie: { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 1000 * 60 * 60 * 24 * 7 }
+  cookie: { httpOnly: true, sameSite: 'lax', secure: IS_PROD, maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
 
 const cache = new Map();
@@ -56,35 +58,28 @@ function readDb() {
 
 function writeDb(db) {
   ensureDb();
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  // Atomic write: Prevents data corruption if the Render server restarts mid-write
+  const tempPath = `${DB_PATH}.tmp`;
+  fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
+  fs.renameSync(tempPath, DB_PATH);
 }
 
 function sha(input) { return crypto.createHash('sha256').update(String(input)).digest('hex'); }
 function normalizeEmail(email) { return String(email || '').trim().toLowerCase(); }
 function nowIso() { return new Date().toISOString(); }
 
+function createWalletRecord(email, role = 'user') {
+  return { id: `wallet_${sha(email).slice(0, 20)}`, email, role, createdAt: nowIso(), updatedAt: nowIso(), encryptedVault: null, publicWallets: [], assets: [] };
+}
+
 function getOrCreateUser(email, role = 'user') {
   const normEmail = normalizeEmail(email);
   const db = readDb();
-  
-  let isNew = false;
   if (!db.users[normEmail]) {
-    isNew = true;
-    db.users[normEmail] = {
-      id: `wallet_${sha(normEmail).slice(0, 20)}`,
-      email: normEmail,
-      role: role,
-      createdAt: nowIso(),
-      lastLogin: nowIso(),
-      walletData: null // Stores the real encrypted payload/keys
-    };
-  } else {
-    db.users[normEmail].lastLogin = nowIso();
-    if (role === 'staff') db.users[normEmail].role = 'staff';
+    db.users[normEmail] = createWalletRecord(normEmail, role);
+    writeDb(db);
   }
-  
-  writeDb(db);
-  return { user: db.users[normEmail], isNew };
+  return db.users[normEmail];
 }
 
 function requireAuth(req, res, next) {
@@ -170,8 +165,8 @@ app.post('/verify-otp', (req, res) => {
   
   if (!result.ok) return res.render('index', { error: result.reason, success: null, otpEmail: email });
 
-  const { user, isNew } = getOrCreateUser(email, 'user');
-  req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id, isNew };
+  const user = getOrCreateUser(email, 'user');
+  req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id };
   req.session.save(() => res.redirect('/wallet'));
 });
 
@@ -181,8 +176,8 @@ app.post('/staff-login', (req, res) => {
   if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) return res.render('index', { error: 'Invalid staff login.', success: null, otpEmail: null });
 
   const adminEmail = `admin@bluecrypto.local`;
-  const { user } = getOrCreateUser(adminEmail, 'staff');
-  req.session.user = { email: adminEmail, username: 'admin', role: 'staff', walletId: user.id, isNew: false };
+  const user = getOrCreateUser(adminEmail, 'staff');
+  req.session.user = { email: adminEmail, username: 'admin', role: 'staff', walletId: user.id };
   req.session.save(() => res.redirect('/wallet'));
 });
 
@@ -191,28 +186,30 @@ app.post('/logout', (req, res) => res.redirect('/logout'));
 
 /* App Routes */
 app.get('/wallet', requireAuth, (req, res) => {
-  res.render('wallet', { email: req.session.user.email, role: req.session.user.role, isNew: req.session.user.isNew });
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+  res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
 /* API Routes */
-app.get('/api/wallet/keys', requireAuthJson, (req, res) => {
-  const db = readDb();
-  res.json({ walletData: db.users[req.session.user.email]?.walletData || null });
-});
+app.get('/api/wallet', requireAuthJson, (req, res) => res.json(getOrCreateUser(req.session.user.email, req.session.user.role)));
 
-app.post('/api/wallet/keys', requireAuthJson, (req, res) => {
+app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
   const db = readDb();
-  if(db.users[req.session.user.email]) {
-    db.users[req.session.user.email].walletData = req.body.walletData;
+  if (req.body.encryptedVault) {
+    db.users[req.session.user.email].encryptedVault = req.body.encryptedVault;
+    db.users[req.session.user.email].publicWallets = req.body.publicWallets || [];
+    db.users[req.session.user.email].updatedAt = nowIso();
     writeDb(db);
     return res.json({ ok: true });
   }
-  res.status(404).json({ error: 'User not found' });
+  res.status(400).json({ error: 'No vault data provided.' });
 });
 
 app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
   const db = readDb();
-  delete db.users[req.session.user.email];
+  db.users[req.session.user.email].encryptedVault = null;
+  db.users[req.session.user.email].publicWallets = [];
+  db.users[req.session.user.email].updatedAt = nowIso();
   writeDb(db);
   res.json({ ok: true });
 });
@@ -229,7 +226,7 @@ app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
   try {
     const symbols = new Set(String(req.query.symbols || '').split(',').filter(Boolean));
     if (!symbols.size) return res.json({});
-    res.json(await cachedJson(`binance-prices`, 2000, async () => {
+    res.json(await cachedJson(`binance-prices`, 4000, async () => {
       const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/ticker/24hr`);
       const output = {};
       for (const row of rows || []) if (symbols.has(row.symbol)) output[row.symbol] = { lastPrice: Number(row.lastPrice), priceChangePercent: Number(row.priceChangePercent) };
@@ -242,7 +239,7 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
   try {
     const { id, symbol, tf = '5m' } = req.query;
     if (symbol) {
-      const data = await cachedJson(`binance-chart:${symbol}:${tf}`, 2000, async () => {
+      const data = await cachedJson(`binance-chart:${symbol}:${tf}`, 4000, async () => {
         const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/klines?symbol=${symbol}USDT&interval=${tf}&limit=80`);
         return { candles: rows.map(k => ({ time: Number(k[0]), open: Number(k[1]), high: Number(k[2]), low: Number(k[3]), close: Number(k[4]) })) };
       });
