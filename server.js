@@ -529,6 +529,56 @@ app.get('/api/prices', requireAuthJson, async (req, res) => {
   }
 });
 
+app.get('/api/market-meta', requireAuthJson, async (req, res) => {
+  try {
+    const ids = String(req.query.ids || '')
+      .split(',')
+      .map(x => x.trim())
+      .filter(Boolean)
+      .slice(0, 120);
+
+    if (!ids.length) return res.json({});
+
+    const uniqueIds = [...new Set(ids)].sort();
+    const key = `market-meta:${uniqueIds.join(',')}`;
+
+    const data = await cachedJson(key, 30_000, async () => {
+      const url = `${COINGECKO_BASE}/coins/markets?vs_currency=usd&ids=${encodeURIComponent(uniqueIds.join(','))}&order=market_cap_desc&per_page=120&page=1&sparkline=false&price_change_percentage=24h`;
+
+      const response = await fetch(url, {
+        headers: {
+          accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`CoinGecko market meta failed: ${response.status}`);
+      }
+
+      const rows = await response.json();
+      const output = {};
+
+      for (const row of rows) {
+        output[row.id] = {
+          id: row.id,
+          symbol: String(row.symbol || '').toUpperCase(),
+          name: row.name,
+          marketCap: Number(row.market_cap || 0),
+          volume24h: Number(row.total_volume || 0),
+          change24h: Number(row.price_change_percentage_24h || 0)
+        };
+      }
+
+      return output;
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error('Market meta error:', error);
+    res.status(500).json({ error: 'Unable to load market metadata.' });
+  }
+});
+
 app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
   try {
     const symbols = String(req.query.symbols || '')
@@ -540,38 +590,37 @@ app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
     if (!symbols.length) return res.json({});
 
     const uniqueSymbols = [...new Set(symbols)].sort();
-    const key = `binance-prices:${uniqueSymbols.join(',')}`;
+    const key = `binance-prices-batch:${uniqueSymbols.join(',')}`;
 
-    const data = await cachedJson(key, 5_000, async () => {
+    const data = await cachedJson(key, 4_000, async () => {
       const output = {};
 
-      await Promise.all(uniqueSymbols.map(async symbol => {
-        try {
-          const url = `${BINANCE_BASE}/api/v3/ticker/24hr?symbol=${encodeURIComponent(symbol)}`;
-
-          const response = await fetch(url, {
-            headers: {
-              accept: 'application/json'
-            }
-          });
-
-          if (!response.ok) return;
-
-          const body = await response.json();
-
-          output[symbol] = {
-            symbol,
-            lastPrice: Number(body.lastPrice || 0),
-            priceChangePercent: Number(body.priceChangePercent || 0),
-            priceChange: Number(body.priceChange || 0),
-            quoteVolume: Number(body.quoteVolume || 0),
-            highPrice: Number(body.highPrice || 0),
-            lowPrice: Number(body.lowPrice || 0)
-          };
-        } catch {
-          // unsupported pair or temporary Binance issue
+      const response = await fetch(`${BINANCE_BASE}/api/v3/ticker/24hr`, {
+        headers: {
+          accept: 'application/json'
         }
-      }));
+      });
+
+      if (!response.ok) {
+        throw new Error(`Binance failed: ${response.status}`);
+      }
+
+      const rows = await response.json();
+      const wanted = new Set(uniqueSymbols);
+
+      for (const row of rows) {
+        if (!wanted.has(row.symbol)) continue;
+
+        output[row.symbol] = {
+          symbol: row.symbol,
+          lastPrice: Number(row.lastPrice || 0),
+          priceChangePercent: Number(row.priceChangePercent || 0),
+          priceChange: Number(row.priceChange || 0),
+          quoteVolume: Number(row.quoteVolume || 0),
+          highPrice: Number(row.highPrice || 0),
+          lowPrice: Number(row.lowPrice || 0)
+        };
+      }
 
       return output;
     });
@@ -600,7 +649,7 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
       try {
         const key = `binance-chart:${binanceSymbol}:${interval}`;
 
-        const data = await cachedJson(key, 5_000, async () => {
+        const data = await cachedJson(key, 4_000, async () => {
           const url = `${BINANCE_BASE}/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=80`;
 
           const response = await fetch(url, {
