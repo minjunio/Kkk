@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Bluebook Wallet</title>
+  <title>BlueCrypto</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,6 +110,8 @@
       display:flex;
       align-items:center;
       gap:10px;
+      text-decoration: none;
+      color: inherit;
     }
 
     .logo {
@@ -936,13 +938,13 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">
+      <a href="/" class="brand">
         <div class="logo">B</div>
         <div>
-          <div class="brand-title">Bluebook Wallet</div>
+          <div class="brand-title">BlueCrypto</div>
           <div class="brand-sub" id="statusText">Loading wallet</div>
         </div>
-      </div>
+      </a>
 
       <div class="top-actions">
         <button class="icon-btn" onclick="refreshAllBalances(true)">⟳</button>
@@ -1787,31 +1789,35 @@
     }
 
     async function fetchPricesForAll() {
-      const ids = new Set();
+      try {
+        const ids = new Set();
 
-      for (const key of Object.keys(NETWORKS)) {
-        ids.add(NATIVE_GECKO[key]);
-        for (const token of ERC20_TOKENS[key] || []) {
-          if (token.gecko) ids.add(token.gecko);
+        for (const key of Object.keys(NETWORKS)) {
+          ids.add(NATIVE_GECKO[key]);
+          for (const token of ERC20_TOKENS[key] || []) {
+            if (token.gecko) ids.add(token.gecko);
+          }
         }
+
+        for (const watch of WATCH_ASSETS) ids.add(watch.gecko);
+
+        const symbols = Object.values(BINANCE_SYMBOLS);
+
+        const binancePromise = fetch(`/api/binance-prices?symbols=${encodeURIComponent(symbols.join(','))}`,{cache:'no-store'})
+          .then(r => r.ok ? r.json() : {})
+          .catch(() => ({}));
+
+        const geckoPromise = fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`,{cache:'no-store'})
+          .then(r => r.ok ? r.json() : {})
+          .catch(() => ({}));
+
+        const [bp,gp] = await Promise.all([binancePromise,geckoPromise]);
+
+        binancePrices = bp || {};
+        prices = gp || {};
+      } catch (err) {
+        console.error('Failed fetching prices:', err);
       }
-
-      for (const watch of WATCH_ASSETS) ids.add(watch.gecko);
-
-      const symbols = Object.values(BINANCE_SYMBOLS);
-
-      const binancePromise = fetch(`/api/binance-prices?symbols=${encodeURIComponent(symbols.join(','))}`,{cache:'no-store'})
-        .then(r => r.ok ? r.json() : {})
-        .catch(() => ({}));
-
-      const geckoPromise = fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`,{cache:'no-store'})
-        .then(r => r.ok ? r.json() : {})
-        .catch(() => ({}));
-
-      const [bp,gp] = await Promise.all([binancePromise,geckoPromise]);
-
-      binancePrices = bp || {};
-      prices = gp || {};
     }
 
     function priceFor(asset) {
