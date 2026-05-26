@@ -13,7 +13,7 @@
     :root {
       color-scheme: light;
       --bg1: #e8f7ff;
-      --bg2: #f7fbff;
+      --bg2: #f8fbff;
       --bg3: #d5efff;
       --glass: rgba(255,255,255,.72);
       --glass2: rgba(255,255,255,.52);
@@ -63,8 +63,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       max-width: 100%;
       overflow-x: hidden;
@@ -82,10 +81,7 @@
       padding-bottom: calc(88px + var(--safe-bottom));
     }
 
-    button,
-    input,
-    select,
-    textarea {
+    button, input, select, textarea {
       font: inherit;
     }
 
@@ -109,7 +105,7 @@
     }
 
     .topbar-inner {
-      width: min(960px, 100%);
+      width: min(940px, 100%);
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -179,7 +175,7 @@
     }
 
     .shell {
-      width: min(960px, 100%);
+      width: min(940px, 100%);
       margin: 0 auto;
       padding: 12px;
     }
@@ -248,13 +244,30 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .address {
-      margin-top: 10px;
+    .pnl-line {
+      margin-top: 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--glass2);
+      border: 1px solid var(--border);
       color: var(--muted);
-      font-size: .8rem;
-      line-height: 1.45;
-      font-weight: 800;
-      word-break: break-all;
+      font-weight: 900;
+      font-size: .76rem;
+    }
+
+    .pnl-line.up {
+      color: var(--green);
+      background: rgba(22,163,74,.09);
+      border-color: rgba(22,163,74,.16);
+    }
+
+    .pnl-line.down {
+      color: var(--pink);
+      background: rgba(225,29,72,.08);
+      border-color: rgba(225,29,72,.14);
     }
 
     .chips {
@@ -331,7 +344,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 330px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 12px;
       margin-top: 12px;
     }
@@ -344,10 +357,7 @@
       box-shadow: var(--shadow2);
       backdrop-filter: blur(20px);
       overflow: hidden;
-    }
-
-    .panel + .panel {
-      margin-top: 12px;
+      max-width: 100%;
     }
 
     .panel-head {
@@ -387,6 +397,8 @@
       background: var(--glass2);
       border: 1px solid var(--border);
       backdrop-filter: blur(14px);
+      max-width: 100%;
+      min-width: 0;
     }
 
     .asset {
@@ -422,6 +434,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      min-width: 0;
     }
 
     .tiny {
@@ -431,12 +444,14 @@
       line-height: 1.45;
       font-weight: 800;
       overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .value {
       text-align: right;
       font-weight: 950;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .value-sub {
@@ -445,6 +460,7 @@
       color: var(--muted);
       font-size: .72rem;
       font-weight: 800;
+      white-space: nowrap;
     }
 
     .small-btn,
@@ -481,14 +497,6 @@
     .danger-btn {
       color: white;
       background: linear-gradient(135deg, #be123c, #fb7185);
-    }
-
-    .small-btn:hover,
-    .primary-btn:hover,
-    .secondary-btn:hover,
-    .danger-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border2);
     }
 
     .pills {
@@ -551,6 +559,7 @@
       border: 1px solid var(--border);
       outline: none;
       font-weight: 850;
+      max-width: 100%;
     }
 
     .textarea {
@@ -585,6 +594,8 @@
       border-radius: 18px;
       background: var(--glass2);
       border: 1px solid var(--border);
+      max-width: 100%;
+      min-width: 0;
     }
 
     .box.warn {
@@ -620,6 +631,43 @@
       background: var(--soft);
       border: 1px solid var(--border);
       text-align: left;
+      max-width: 100%;
+    }
+
+    .fee-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .countdown-ring {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        conic-gradient(var(--blue) calc(var(--progress, 1) * 360deg), rgba(100,116,139,.16) 0deg);
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .countdown-ring::before {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--solid);
+      position: absolute;
+    }
+
+    .countdown-ring span {
+      position: relative;
+      font-size: .72rem;
+      font-weight: 950;
+      color: var(--blue);
+      z-index: 1;
     }
 
     .modal-overlay,
@@ -649,6 +697,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       animation: pop .22s ease both;
+      max-width: 100%;
     }
 
     .drawer {
@@ -663,6 +712,7 @@
       border-left: 1px solid var(--border);
       box-shadow: -24px 0 80px rgba(0,0,0,.22);
       animation: slide .23s ease both;
+      max-width: 100%;
     }
 
     @keyframes pop {
@@ -783,12 +833,6 @@
       background: linear-gradient(135deg, var(--blue2), var(--blue));
     }
 
-    @media (max-width: 860px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
     @media (max-width: 580px) {
       body {
         padding-bottom: calc(82px + var(--safe-bottom));
@@ -808,7 +852,6 @@
       }
 
       .quick-btn {
-        min-width: 0;
         min-height: 64px;
         padding: 9px 6px;
       }
@@ -852,6 +895,10 @@
         width: 100%;
         margin-top: calc(8px + var(--safe-top));
       }
+
+      .fee-box {
+        grid-template-columns: 1fr 42px;
+      }
     }
   </style>
 </head>
@@ -868,7 +915,7 @@
       </div>
 
       <div class="top-actions">
-        <button class="icon-btn" onclick="refreshBalances()">⟳</button>
+        <button class="icon-btn" onclick="refreshAllBalances()">⟳</button>
         <button class="icon-btn" onclick="openSettings()">⚙</button>
       </div>
     </div>
@@ -879,10 +926,10 @@
       <div class="hero-inner">
         <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Wallet loading</span></div>
         <div class="balance" id="totalUsd">$0.00</div>
-        <div class="address" id="walletAddressText">Preparing wallet...</div>
+        <div class="pnl-line" id="pnlLine">24h PnL $0.00 · ROI 0.00%</div>
 
         <div class="chips">
-          <span class="chip" id="activeNetworkText">Ethereum</span>
+          <span class="chip" id="activeNetworkText">All networks</span>
           <span class="chip" id="tokenCountText">0 assets</span>
           <span class="chip" id="securityText">Auto encrypted</span>
         </div>
@@ -890,69 +937,34 @@
         <div class="quick">
           <button class="quick-btn primary" onclick="openModal('receiveModal')">
             <strong>Receive</strong>
-            <span>All options</span>
+            <span>Network first</span>
           </button>
 
           <button class="quick-btn" onclick="openModal('sendModal')">
             <strong>Send</strong>
-            <span>Real tx</span>
+            <span>Auto fee</span>
           </button>
 
           <button class="quick-btn" onclick="openModal('swapModal')">
             <strong>Swap</strong>
-            <span>Fees</span>
+            <span>Live quote</span>
           </button>
         </div>
       </div>
     </section>
 
     <section class="grid">
-      <div>
-        <section class="panel" id="assetsSection">
-          <div class="panel-head">
-            <div>
-              <h2 class="title">Assets</h2>
-              <p class="sub">Real EVM balances with USD estimates.</p>
-            </div>
-            <button class="small-btn" onclick="refreshBalances()">Refresh</button>
+      <section class="panel" id="assetsSection">
+        <div class="panel-head">
+          <div>
+            <h2 class="title">My assets</h2>
+            <p class="sub">All balances across supported EVM networks.</p>
           </div>
+          <button class="small-btn" onclick="refreshAllBalances()">Refresh</button>
+        </div>
 
-          <div class="pills" id="networkPills"></div>
-          <div class="list" id="tokenList"></div>
-        </section>
-      </div>
-
-      <aside>
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="title">Wallet</h2>
-              <p class="sub">Same saved wallet loads for this email account.</p>
-            </div>
-          </div>
-
-          <div class="list" id="walletInfoList"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="title">Network fee</h2>
-              <p class="sub">Current gas estimate for active network.</p>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="row">
-              <div>
-                <div class="name">Gas</div>
-                <div class="tiny" id="gasText">Loading gas...</div>
-              </div>
-              <button class="small-btn" onclick="updateGas()">Check</button>
-            </div>
-          </div>
-        </section>
-      </aside>
+        <div class="list" id="tokenList"></div>
+      </section>
     </section>
   </main>
 
@@ -963,28 +975,33 @@
     <button onclick="openSettings()">Settings</button>
   </nav>
 
-  <!-- RECEIVE -->
   <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event, 'receiveModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Pick the asset/network. Copy the same EVM address, but only send using the selected network.</div>
+          <div class="modal-sub">Select the network first, then copy the address for the asset you want to receive.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
 
-      <div class="receive-grid" id="receiveOptions"></div>
+      <div class="form">
+        <div class="field">
+          <label>Network</label>
+          <select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select>
+        </div>
+
+        <div class="receive-grid" id="receiveAssetsList"></div>
+      </div>
     </div>
   </div>
 
-  <!-- SEND -->
   <div class="modal-overlay" id="sendModal" onclick="overlayClose(event, 'sendModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Send</div>
-          <div class="modal-sub">Send native coins or ERC-20 tokens from your wallet.</div>
+          <div class="modal-sub">Fee auto-refreshes every 5 seconds.</div>
         </div>
         <button class="close" onclick="closeModal('sendModal')">×</button>
       </div>
@@ -992,31 +1009,40 @@
       <div class="form">
         <div class="field">
           <label>Network</label>
-          <select class="select" id="sendNetworkSelect" onchange="setNetwork(this.value)"></select>
+          <select class="select" id="sendNetworkSelect" onchange="setSendNetwork(this.value)"></select>
         </div>
 
         <div class="field">
           <label>Asset</label>
-          <select class="select" id="sendAssetSelect" onchange="estimateSendFee()"></select>
+          <select class="select" id="sendAssetSelect" onchange="renderSendBalance(); scheduleImmediateFeeRefresh();"></select>
+        </div>
+
+        <div class="box">
+          <div class="name">Available balance</div>
+          <div class="tiny" id="sendBalanceText">Select asset.</div>
         </div>
 
         <div class="field">
           <label>Recipient</label>
-          <input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" oninput="estimateSendFee()" />
+          <input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" oninput="scheduleImmediateFeeRefresh()" />
         </div>
 
         <div class="field">
           <label>Amount</label>
-          <input class="input" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="estimateSendFee()" />
+          <input class="input" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh(); renderSendBalance();" />
         </div>
 
         <div class="box">
-          <div class="name">Estimated network fee</div>
-          <div class="tiny" id="sendFeePreview">Enter details to estimate fee.</div>
+          <div class="fee-box">
+            <div>
+              <div class="name">Estimated network fee</div>
+              <div class="tiny" id="sendFeePreview">Enter address and amount.</div>
+            </div>
+            <div class="countdown-ring" id="sendCountdown" style="--progress:1"><span>5</span></div>
+          </div>
         </div>
 
-        <div class="button-row">
-          <button class="secondary-btn" onclick="estimateSendFee()">Estimate</button>
+        <div class="button-row one">
           <button class="primary-btn" onclick="openSendConfirm()">Send</button>
         </div>
       </div>
@@ -1045,13 +1071,12 @@
     </div>
   </div>
 
-  <!-- SWAP -->
   <div class="modal-overlay" id="swapModal" onclick="overlayClose(event, 'swapModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Swap</div>
-          <div class="modal-sub">Get quote first. Real swaps need your server-side /api/swap/quote route.</div>
+          <div class="modal-sub">Swap quote auto-refreshes every 5 seconds.</div>
         </div>
         <button class="close" onclick="closeModal('swapModal')">×</button>
       </div>
@@ -1059,31 +1084,40 @@
       <div class="form">
         <div class="field">
           <label>Network</label>
-          <select class="select" id="swapNetworkSelect" onchange="setNetwork(this.value)"></select>
+          <select class="select" id="swapNetworkSelect" onchange="setSwapNetwork(this.value)"></select>
         </div>
 
         <div class="field">
           <label>Sell asset</label>
-          <select class="select" id="swapSellSelect" onchange="estimateSwapFee()"></select>
+          <select class="select" id="swapSellSelect" onchange="renderSwapBalances(); scheduleImmediateFeeRefresh();"></select>
+        </div>
+
+        <div class="box">
+          <div class="name">Your sell balance</div>
+          <div class="tiny" id="swapSellBalanceText">Select asset.</div>
         </div>
 
         <div class="field">
           <label>Buy asset</label>
-          <select class="select" id="swapBuySelect" onchange="estimateSwapFee()"></select>
+          <select class="select" id="swapBuySelect" onchange="scheduleImmediateFeeRefresh()"></select>
         </div>
 
         <div class="field">
           <label>Sell amount</label>
-          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" oninput="estimateSwapFee()" />
+          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" oninput="renderSwapBalances(); scheduleImmediateFeeRefresh()" />
         </div>
 
         <div class="box">
-          <div class="name">Estimated swap fee</div>
-          <div class="tiny" id="swapQuoteText">Enter amount to estimate route.</div>
+          <div class="fee-box">
+            <div>
+              <div class="name">Estimated swap fee</div>
+              <div class="tiny" id="swapQuoteText">Enter amount to estimate route.</div>
+            </div>
+            <div class="countdown-ring" id="swapCountdown" style="--progress:1"><span>5</span></div>
+          </div>
         </div>
 
-        <div class="button-row">
-          <button class="secondary-btn" onclick="getSwapQuote()">Get quote</button>
+        <div class="button-row one">
           <button class="primary-btn" onclick="openSwapConfirm()">Swap</button>
         </div>
       </div>
@@ -1112,7 +1146,6 @@
     </div>
   </div>
 
-  <!-- SETTINGS -->
   <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event, 'settingsOverlay')">
     <aside class="drawer">
       <div class="drawer-head">
@@ -1128,18 +1161,10 @@
         <div class="tiny" id="settingsAddress">No wallet loaded.</div>
       </div>
 
-      <div class="box">
-        <div class="name">Wallet actions</div>
-        <div class="tiny">Wallet auto-creates on first login. It is saved to this email account and encrypted for this browser.</div>
-        <div class="button-row">
-          <button class="primary-btn" onclick="createWalletNoPin()">Create wallet</button>
-          <button class="secondary-btn" onclick="refreshBalances()">Refresh</button>
-        </div>
-      </div>
-
       <div class="box warn">
         <div class="name">Recovery</div>
-        <div class="tiny">Save your seed phrase. If you delete browser data and lose the seed phrase, you may lose access.</div>
+        <div class="tiny">Save your seed phrase. If you delete browser data and lose your seed phrase, you may lose access.</div>
+
         <div class="button-row">
           <button class="secondary-btn" onclick="showSeed()">Show seed</button>
           <button class="secondary-btn" onclick="showPrivateKey()">Show key</button>
@@ -1152,13 +1177,8 @@
       </div>
 
       <div class="box">
-        <div class="name">Supported receive options</div>
-        <div class="tiny" id="settingsReceiveOptions">Loading...</div>
-      </div>
-
-      <div class="box">
         <div class="name">Custom RPC</div>
-        <div class="tiny">Applies to the current active network.</div>
+        <div class="tiny">Applies to the active network.</div>
         <div class="field" style="margin-top:10px;">
           <input class="input" id="customRpcInput" placeholder="https://..." />
         </div>
@@ -1278,9 +1298,12 @@
     let ACTIVE_DECRYPTED_WALLET = null;
     let activeProvider = null;
     let activeSigner = null;
-    let balances = [];
+    let allBalances = [];
     let prices = {};
     let toastTimer;
+    let sendFeeRefreshAt = 0;
+    let swapFeeRefreshAt = 0;
+    let countdownTimer = null;
 
     function toast(msg) {
       const el = document.getElementById('toast');
@@ -1332,7 +1355,12 @@
     function openModal(id) {
       document.getElementById(id).classList.add('active');
       renderSelects();
-      renderReceiveOptions();
+      renderReceiveAssets();
+
+      if (id === 'sendModal' || id === 'swapModal') {
+        scheduleImmediateFeeRefresh();
+        startCountdownLoop();
+      }
     }
 
     function closeModal(id) {
@@ -1425,7 +1453,6 @@
       const key = await deriveAesKey(secret, encryptedVault.salt);
       const iv = base64ToBytes(encryptedVault.iv);
       const encryptedData = base64ToBytes(encryptedVault.data);
-
       const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encryptedData);
       return JSON.parse(new TextDecoder().decode(decrypted));
     }
@@ -1450,7 +1477,6 @@
       });
 
       if (!res.ok) throw new Error('Could not save wallet vault');
-
       return res.json();
     }
 
@@ -1461,7 +1487,6 @@
         }
 
         const real = generateWallet();
-
         const vault = {
           wallets: [real],
           createdAt: new Date().toISOString(),
@@ -1484,13 +1509,11 @@
         localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
 
         ACTIVE_DECRYPTED_WALLET = vault;
-        activeProvider = provider();
+        activeProvider = provider(activeNetworkKey);
         activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
 
-        toast('Wallet created for this email');
         updateUi();
-        refreshBalances();
-
+        refreshAllBalances();
         return vault;
       } catch (err) {
         console.error(err);
@@ -1506,25 +1529,23 @@
         }
 
         const deviceKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
-
         if (!deviceKey) {
-          toast('Wallet exists for this email, but this browser cannot decrypt it. Use saved seed phrase recovery in next version.');
+          toast('This browser cannot decrypt the saved wallet. Use recovery in a future version.');
           return null;
         }
 
         const secret = `${CURRENT_EMAIL}:${deviceKey}`;
         ACTIVE_DECRYPTED_WALLET = await decryptVault(SERVER_WALLET.encryptedVault, secret);
 
-        activeProvider = provider();
+        activeProvider = provider(activeNetworkKey);
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
 
         updateUi();
-        refreshBalances();
-
+        refreshAllBalances();
         return ACTIVE_DECRYPTED_WALLET;
       } catch (err) {
         console.error(err);
-        toast('Could not load wallet on this browser');
+        toast('Could not load wallet');
         return null;
       }
     }
@@ -1536,12 +1557,14 @@
       return activeSigner;
     }
 
-    async function fetchPrices() {
+    async function fetchPricesForAll() {
       const ids = new Set();
-      ids.add(NATIVE_GECKO[activeNetworkKey]);
 
-      for (const token of ERC20_TOKENS[activeNetworkKey] || []) {
-        if (token.gecko) ids.add(token.gecko);
+      for (const key of Object.keys(NETWORKS)) {
+        ids.add(NATIVE_GECKO[key]);
+        for (const token of ERC20_TOKENS[key] || []) {
+          if (token.gecko) ids.add(token.gecko);
+        }
       }
 
       try {
@@ -1554,67 +1577,122 @@
     }
 
     function priceFor(asset) {
-      if (asset.type === 'native') return prices[NATIVE_GECKO[activeNetworkKey]]?.usd || 0;
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd || 0;
       return prices[asset.gecko]?.usd || 0;
     }
 
-    function renderUsdTotal() {
-      const total = balances.reduce((sum, b) => sum + Number(b.balance || 0) * priceFor(b), 0);
-      document.getElementById('totalUsd').textContent = money(total);
+    function changeFor(asset) {
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd_24h_change || 0;
+      return prices[asset.gecko]?.usd_24h_change || 0;
     }
 
-    async function refreshBalances() {
+    function renderTotals() {
+      let total = 0;
+      let previous = 0;
+
+      for (const asset of allBalances) {
+        const value = Number(asset.balance || 0) * priceFor(asset);
+        const ch = Number(changeFor(asset) || 0);
+        total += value;
+
+        if (ch > -99.9) {
+          previous += value / (1 + ch / 100);
+        } else {
+          previous += value;
+        }
+      }
+
+      const pnl = total - previous;
+      const roi = previous > 0 ? (pnl / previous) * 100 : 0;
+
+      document.getElementById('totalUsd').textContent = money(total);
+
+      const pnlLine = document.getElementById('pnlLine');
+      pnlLine.textContent = `24h PnL ${pnl >= 0 ? '+' : ''}${money(pnl)} · ROI ${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%`;
+      pnlLine.className = `pnl-line ${pnl > 0 ? 'up' : pnl < 0 ? 'down' : ''}`;
+    }
+
+    async function refreshAllBalances() {
       try {
         const addr = currentAddress();
 
         if (!addr) {
           renderTokenList([]);
-          renderUsdTotal();
+          renderTotals();
           return;
         }
 
-        document.getElementById('statusText').textContent = 'Reading balances...';
+        document.getElementById('statusText').textContent = 'Reading all assets...';
 
-        await fetchPrices();
+        await fetchPricesForAll();
 
-        const p = provider();
-        const net = NETWORKS[activeNetworkKey];
-        const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
+        const output = [];
 
-        const output = [{
-          type: 'native',
-          symbol: net.symbol,
-          name: `${net.name} Native`,
-          balance: nativeBalance,
-          decimals: 18,
-          gecko: NATIVE_GECKO[activeNetworkKey],
-          address: null
-        }];
-
-        for (const token of ERC20_TOKENS[activeNetworkKey] || []) {
+        for (const [networkKey, net] of Object.entries(NETWORKS)) {
           try {
-            const contract = new ethers.Contract(token.address, ERC20_ABI, p);
-            const raw = await contract.balanceOf(addr);
+            const p = provider(networkKey);
+            const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
 
             output.push({
-              ...token,
-              type: 'erc20',
-              balance: Number(ethers.formatUnits(raw, token.decimals))
+              networkKey,
+              networkName: net.name,
+              type: 'native',
+              symbol: net.symbol,
+              name: `${net.name} Native`,
+              balance: nativeBalance,
+              decimals: 18,
+              gecko: NATIVE_GECKO[networkKey],
+              address: null
             });
+
+            for (const token of ERC20_TOKENS[networkKey] || []) {
+              try {
+                const contract = new ethers.Contract(token.address, ERC20_ABI, p);
+                const raw = await contract.balanceOf(addr);
+
+                output.push({
+                  ...token,
+                  networkKey,
+                  networkName: net.name,
+                  type: 'erc20',
+                  balance: Number(ethers.formatUnits(raw, token.decimals))
+                });
+              } catch {
+                output.push({
+                  ...token,
+                  networkKey,
+                  networkName: net.name,
+                  type: 'erc20',
+                  balance: 0,
+                  error: true
+                });
+              }
+            }
           } catch {
-            output.push({ ...token, type: 'erc20', balance: 0, error: true });
+            output.push({
+              networkKey,
+              networkName: net.name,
+              type: 'native',
+              symbol: net.symbol,
+              name: `${net.name} Native`,
+              balance: 0,
+              decimals: 18,
+              gecko: NATIVE_GECKO[networkKey],
+              address: null,
+              error: true
+            });
           }
         }
 
-        balances = output;
+        allBalances = output;
         renderTokenList(output);
-        renderUsdTotal();
+        renderTotals();
         await updateGas();
 
-        document.getElementById('statusText').textContent = 'Balances updated';
+        document.getElementById('statusText').textContent = 'All balances updated';
       } catch (err) {
         console.error(err);
-        toast('Could not read balances. Check RPC.');
+        toast('Could not read balances');
         document.getElementById('statusText').textContent = 'RPC error';
       }
     }
@@ -1627,57 +1705,63 @@
           <div class="row">
             <div>
               <div class="name">Creating wallet...</div>
-              <div class="tiny">Your wallet should auto-create for this email.</div>
+              <div class="tiny">Your wallet is being created for this email.</div>
             </div>
           </div>
         `;
-
         document.getElementById('tokenCountText').textContent = '0 assets';
-        document.getElementById('totalUsd').textContent = '$0.00';
         return;
       }
 
-      el.innerHTML = list.map(token => {
-        const usd = Number(token.balance || 0) * priceFor(token);
+      const sorted = [...list].sort((a, b) => {
+        const av = Number(a.balance || 0) * priceFor(a);
+        const bv = Number(b.balance || 0) * priceFor(b);
+        return bv - av;
+      });
+
+      el.innerHTML = sorted.map(asset => {
+        const usd = Number(asset.balance || 0) * priceFor(asset);
+        const change = changeFor(asset);
 
         return `
           <div class="row">
             <div class="asset">
-              ${icon(token.symbol)}
+              ${icon(asset.symbol)}
               <div>
-                <div class="name">${token.symbol}</div>
-                <div class="tiny">${token.name}${token.error ? ' · read error' : ''}</div>
+                <div class="name">${asset.symbol}</div>
+                <div class="tiny">${asset.networkName} · ${asset.name}${asset.error ? ' · read error' : ''}</div>
               </div>
             </div>
             <div>
               <div class="value">${money(usd)}</div>
-              <div class="value-sub">${fmt(token.balance, token.balance < 1 ? 8 : 6)} ${token.symbol}</div>
+              <div class="value-sub">${fmt(asset.balance, asset.balance < 1 ? 8 : 6)} ${asset.symbol} · ${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}%</div>
             </div>
           </div>
         `;
       }).join('');
 
-      document.getElementById('tokenCountText').textContent = `${list.length} assets`;
+      const nonZero = list.filter(x => Number(x.balance) > 0).length;
+      document.getElementById('tokenCountText').textContent = `${nonZero}/${list.length} assets`;
     }
 
-    function renderNetworks() {
-      document.getElementById('networkPills').innerHTML = Object.entries(NETWORKS).map(([key, net]) => `
-        <button class="pill ${key === activeNetworkKey ? 'active' : ''}" onclick="setNetwork('${key}')">${net.name}</button>
-      `).join('');
-    }
-
-    function setNetwork(key) {
+    function setSendNetwork(key) {
       activeNetworkKey = key;
       localStorage.setItem('blue_active_network', key);
-
-      activeProvider = provider();
+      activeProvider = provider(key);
 
       if (ACTIVE_DECRYPTED_WALLET) {
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
       }
 
       updateUi();
-      refreshBalances();
+      renderSelects();
+      renderSendBalance();
+      scheduleImmediateFeeRefresh();
+    }
+
+    function setSwapNetwork(key) {
+      setSendNetwork(key);
+      renderSwapBalances();
     }
 
     function receiveOptionsFor(networkKey) {
@@ -1689,45 +1773,48 @@
       ];
     }
 
-    function renderReceiveOptions() {
-      const box = document.getElementById('receiveOptions');
+    function renderReceiveSelects() {
+      const select = document.getElementById('receiveNetworkSelect');
+      if (!select) return;
+
+      select.innerHTML = Object.entries(NETWORKS).map(([key, net]) => `
+        <option value="${key}">${net.name}</option>
+      `).join('');
+
+      select.value = activeNetworkKey;
+      renderReceiveAssets();
+    }
+
+    function renderReceiveAssets() {
+      const box = document.getElementById('receiveAssetsList');
       if (!box) return;
 
+      const networkKey = document.getElementById('receiveNetworkSelect')?.value || activeNetworkKey;
+      const net = NETWORKS[networkKey];
       const addr = currentAddress();
 
-      box.innerHTML = Object.entries(NETWORKS).map(([networkKey, net]) => {
-        const options = receiveOptionsFor(networkKey).map(asset => `
-          <button class="receive-option" onclick="copySpecificReceive('${networkKey}', '${asset.symbol}')">
-            <div>
-              <div class="name">${asset.symbol} · ${net.name}</div>
-              <div class="tiny">${asset.name} · ${addr ? short(addr) : 'No address'}</div>
-            </div>
-            <span class="small-btn">Copy</span>
-          </button>
-        `).join('');
-
-        return `
-          <div class="box">
-            <div class="name">${net.name}</div>
-            <div class="tiny">Only receive assets on ${net.name} using this address.</div>
-            <div class="receive-grid" style="margin-top:8px;">${options}</div>
+      box.innerHTML = receiveOptionsFor(networkKey).map(asset => `
+        <button class="receive-option" onclick="copySpecificReceive('${networkKey}', '${asset.symbol}')">
+          <div>
+            <div class="name">${asset.symbol}</div>
+            <div class="tiny">${asset.name} on ${net.name} · ${addr ? short(addr) : 'No address'}</div>
           </div>
-        `;
-      }).join('');
+          <span class="small-btn">Copy</span>
+        </button>
+      `).join('');
     }
 
     function copySpecificReceive(networkKey, symbol) {
       const addr = currentAddress();
 
       if (!addr) {
-        toast('No address available yet');
+        toast('No address available');
         return;
       }
 
       navigator.clipboard?.writeText(addr);
       activeNetworkKey = networkKey;
       localStorage.setItem('blue_active_network', networkKey);
-
       updateUi();
       toast(`${symbol} ${NETWORKS[networkKey].name} address copied`);
     }
@@ -1759,42 +1846,86 @@
       const send = document.getElementById('sendAssetSelect');
       if (send) send.innerHTML = sendOptions;
 
-      const swapSell = document.getElementById('swapSellSelect');
-      if (swapSell) swapSell.innerHTML = [
+      const sell = document.getElementById('swapSellSelect');
+      if (sell) sell.innerHTML = [
         `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
         ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
       ].join('');
 
-      const swapBuy = document.getElementById('swapBuySelect');
-      if (swapBuy) swapBuy.innerHTML = (ERC20_TOKENS[activeNetworkKey] || [])
-        .map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
-        .join('');
+      const buy = document.getElementById('swapBuySelect');
+      if (buy) buy.innerHTML = [
+        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`),
+        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`
+      ].join('');
+
+      renderSendBalance();
+      renderSwapBalances();
     }
 
     function renderSelects() {
+      renderReceiveSelects();
       renderAssetSelects();
-      renderReceiveOptions();
     }
 
     function tokenByAddress(address) {
       return (ERC20_TOKENS[activeNetworkKey] || []).find(t => t.address.toLowerCase() === String(address).toLowerCase());
     }
 
+    function selectedBalance(networkKey, assetValue) {
+      if (assetValue === 'native' || assetValue === NATIVE_TOKEN) {
+        return allBalances.find(x => x.networkKey === networkKey && x.type === 'native');
+      }
+
+      return allBalances.find(x => x.networkKey === networkKey && x.address && x.address.toLowerCase() === String(assetValue).toLowerCase());
+    }
+
+    function renderSendBalance() {
+      const asset = document.getElementById('sendAssetSelect')?.value;
+      const item = selectedBalance(activeNetworkKey, asset);
+      const el = document.getElementById('sendBalanceText');
+
+      if (!el) return;
+
+      if (!item) {
+        el.textContent = 'Balance unavailable. Refresh assets.';
+        return;
+      }
+
+      el.textContent = `${fmt(item.balance, item.balance < 1 ? 8 : 6)} ${item.symbol} · ${money(Number(item.balance || 0) * priceFor(item))}`;
+    }
+
+    function renderSwapBalances() {
+      const asset = document.getElementById('swapSellSelect')?.value;
+      const item = selectedBalance(activeNetworkKey, asset);
+      const el = document.getElementById('swapSellBalanceText');
+
+      if (!el) return;
+
+      if (!item) {
+        el.textContent = 'Balance unavailable. Refresh assets.';
+        return;
+      }
+
+      el.textContent = `${fmt(item.balance, item.balance < 1 ? 8 : 6)} ${item.symbol} · ${money(Number(item.balance || 0) * priceFor(item))}`;
+    }
+
     async function updateGas() {
       try {
-        const fee = await provider().getFeeData();
+        const fee = await provider(activeNetworkKey).getFeeData();
         const gasPrice = fee.gasPrice ? Number(ethers.formatUnits(fee.gasPrice, 'gwei')) : 0;
-        document.getElementById('gasText').textContent = `${gasPrice.toFixed(3)} gwei on ${NETWORKS[activeNetworkKey].name}`;
+        return `${gasPrice.toFixed(3)} gwei on ${NETWORKS[activeNetworkKey].name}`;
       } catch {
-        document.getElementById('gasText').textContent = 'Gas unavailable. Check RPC.';
+        return 'Gas unavailable. Check RPC.';
       }
     }
 
     async function estimateSendFee() {
       try {
+        if (!document.getElementById('sendModal').classList.contains('active')) return;
+
         if (!activeSigner) {
           document.getElementById('sendFeePreview').textContent = 'Wallet is still loading.';
-          return null;
+          return;
         }
 
         const asset = document.getElementById('sendAssetSelect').value;
@@ -1803,7 +1934,7 @@
 
         if (!ethers.isAddress(to) || !amount || Number(amount) <= 0) {
           document.getElementById('sendFeePreview').textContent = 'Enter valid address and amount.';
-          return null;
+          return;
         }
 
         let gas;
@@ -1822,11 +1953,8 @@
 
         document.getElementById('sendFeePreview').textContent =
           `Gas ${gas.toString()} · fee ≈ ${ethers.formatEther(totalFee)} ${NETWORKS[activeNetworkKey].symbol}`;
-
-        return gas;
       } catch (err) {
         document.getElementById('sendFeePreview').textContent = err.shortMessage || err.message || 'Fee estimate failed';
-        return null;
       }
     }
 
@@ -1868,7 +1996,7 @@
         await tx.wait();
 
         toast('Transaction confirmed');
-        refreshBalances();
+        refreshAllBalances();
       } catch (err) {
         console.error(err);
         toast(err.shortMessage || err.message || 'Send failed');
@@ -1886,20 +2014,31 @@
     }
 
     async function estimateSwapFee() {
-      const amount = document.getElementById('swapAmount').value.trim();
-      const sell = sellTokenMeta();
-      const buy = tokenByAddress(document.getElementById('swapBuySelect').value);
+      try {
+        if (!document.getElementById('swapModal').classList.contains('active')) return;
 
-      if (!amount || Number(amount) <= 0) {
-        document.getElementById('swapQuoteText').textContent = 'Enter amount to estimate route.';
-        return;
+        const amount = document.getElementById('swapAmount').value.trim();
+        const sell = sellTokenMeta();
+        const buyRaw = document.getElementById('swapBuySelect').value;
+        const buy = buyRaw === NATIVE_TOKEN
+          ? { symbol: NETWORKS[activeNetworkKey].symbol }
+          : tokenByAddress(buyRaw);
+
+        if (!amount || Number(amount) <= 0) {
+          document.getElementById('swapQuoteText').textContent = 'Enter amount to estimate route.';
+          return;
+        }
+
+        document.getElementById('swapQuoteText').textContent =
+          `Route preview: ${amount} ${sell?.symbol || 'SELL'} → ${buy?.symbol || 'BUY'} on ${NETWORKS[activeNetworkKey].name}. Getting exact quote...`;
+
+        await getSwapQuote(false);
+      } catch {
+        // getSwapQuote writes its own message
       }
-
-      document.getElementById('swapQuoteText').textContent =
-        `Estimated route: ${amount} ${sell?.symbol || 'SELL'} → ${buy?.symbol || 'BUY'} on ${NETWORKS[activeNetworkKey].name}. Click Get quote for exact gas.`;
     }
 
-    async function getSwapQuote() {
+    async function getSwapQuote(showToast = true) {
       try {
         const signer = await ensureUnlocked();
         const sellToken = document.getElementById('swapSellSelect').value;
@@ -1930,191 +2069,15 @@
         window.__BLUE_SWAP_QUOTE = quote;
 
         document.getElementById('swapQuoteText').textContent =
-          `Quote ready. Gas: ${quote.gas || 'N/A'} · value: ${quote.value || '0'} · review before swap.`;
+          `Quote ready. Gas: ${quote.gas || 'N/A'} · value: ${quote.value || '0'} · refreshes every 5s.`;
 
-        toast('Quote loaded');
+        if (showToast) toast('Quote loaded');
       } catch (err) {
-        console.error(err);
+        window.__BLUE_SWAP_QUOTE = null;
         document.getElementById('swapQuoteText').textContent = err.message || 'Quote failed';
-        toast(err.message || 'Quote failed');
+        if (showToast) toast(err.message || 'Quote failed');
       }
     }
 
     function openSwapConfirm() {
-      const quote = window.__BLUE_SWAP_QUOTE;
-
-      if (!quote) {
-        toast('Get a quote first');
-        return;
-      }
-
-      document.getElementById('swapConfirmText').textContent =
-        `Execute swap on ${NETWORKS[activeNetworkKey].name}. Gas: ${quote.gas || 'N/A'}.`;
-
-      openModal('swapConfirmModal');
-    }
-
-    async function executeSwap() {
-      try {
-        const quote = window.__BLUE_SWAP_QUOTE;
-        if (!quote) throw new Error('Get quote first');
-
-        const signer = await ensureUnlocked();
-
-        const tx = await signer.sendTransaction({
-          to: quote.to,
-          data: quote.data,
-          value: quote.value ? BigInt(quote.value) : 0n,
-          gasLimit: quote.gas ? BigInt(quote.gas) : undefined
-        });
-
-        closeModal('swapConfirmModal');
-        closeModal('swapModal');
-        toast('Swap sent');
-
-        await tx.wait();
-
-        toast('Swap confirmed');
-        refreshBalances();
-      } catch (err) {
-        console.error(err);
-        toast(err.shortMessage || err.message || 'Swap failed');
-      }
-    }
-
-    async function showSeed() {
-      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
-      if (!wallet) return;
-
-      const output = document.getElementById('secretOutput');
-      output.value = wallet.wallets[0].phrase;
-      output.classList.add('visible');
-      toast('Seed phrase shown');
-    }
-
-    async function showPrivateKey() {
-      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
-      if (!wallet) return;
-
-      const output = document.getElementById('secretOutput');
-      output.value = wallet.wallets[0].privateKey;
-      output.classList.add('visible');
-      toast('Private key shown');
-    }
-
-    async function deleteWallet() {
-      const value = document.getElementById('deleteConfirmInput').value.trim();
-
-      if (value !== 'DELETE') {
-        toast('Type DELETE to confirm');
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/wallet/vault', { method: 'DELETE' });
-
-        if (!res.ok) throw new Error('Delete failed');
-
-        localStorage.removeItem('bluecrypto_public_wallets');
-        localStorage.removeItem(`blue_device_key_${CURRENT_EMAIL}`);
-
-        ACTIVE_DECRYPTED_WALLET = null;
-        activeSigner = null;
-        balances = [];
-
-        toast('Wallet deleted');
-
-        setTimeout(() => window.location.reload(), 800);
-      } catch (err) {
-        console.error(err);
-        toast(err.message || 'Delete failed');
-      }
-    }
-
-    function saveCustomRpc() {
-      const url = document.getElementById('customRpcInput').value.trim();
-
-      if (!url.startsWith('http')) {
-        toast('Enter a valid RPC URL');
-        return;
-      }
-
-      localStorage.setItem(`blue_rpc_${activeNetworkKey}`, url);
-      activeProvider = provider();
-
-      if (ACTIVE_DECRYPTED_WALLET) {
-        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
-      }
-
-      toast('RPC saved');
-      refreshBalances();
-    }
-
-    function renderSettings() {
-      const addr = currentAddress();
-      const allOptions = Object.entries(NETWORKS)
-        .map(([key, net]) => `${net.name}: ${receiveOptionsFor(key).map(x => x.symbol).join(', ')}`)
-        .join(' | ');
-
-      document.getElementById('settingsAddress').textContent = addr || 'No wallet loaded';
-      document.getElementById('settingsReceiveOptions').textContent = allOptions;
-    }
-
-    function updateUi() {
-      const addr = currentAddress();
-      const net = NETWORKS[activeNetworkKey];
-
-      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
-      document.getElementById('walletAddressText').textContent = addr
-        ? `${net.name}: ${addr}`
-        : 'Wallet is being created for this email.';
-
-      document.getElementById('activeNetworkText').textContent = net.name;
-      document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
-
-      document.getElementById('walletInfoList').innerHTML = `
-        <div class="row">
-          <div>
-            <div class="name">${addr ? short(addr) : 'Creating wallet'}</div>
-            <div class="tiny">${addr ? 'Same EVM address across supported networks' : 'Auto-generating wallet for this email'}</div>
-          </div>
-          <button class="small-btn" onclick="openSettings()">Info</button>
-        </div>
-      `;
-
-      renderNetworks();
-      renderSelects();
-      renderSettings();
-    }
-
-    async function initialize() {
-      document.documentElement.setAttribute('data-theme', localStorage.getItem('blue_theme') || 'light');
-
-      if (SERVER_WALLET?.publicWallets) {
-        localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(SERVER_WALLET.publicWallets));
-      }
-
-      activeProvider = provider();
-
-      updateUi();
-
-      if (SERVER_WALLET?.encryptedVault) {
-        await unlockDeviceWallet();
-      } else {
-        await createWalletNoPin();
-      }
-
-      renderReceiveOptions();
-    }
-
-    window.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        closeSettings();
-        document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
-      }
-    });
-
-    initialize();
-  </script>
-</body>
-</html>
+      const quote = window.__BLUE_SWAP
