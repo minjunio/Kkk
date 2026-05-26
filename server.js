@@ -17,11 +17,10 @@ const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
-const ZEROX_API_KEY = process.env.ZEROX_API_KEY || '';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const BINANCE_ENDPOINTS = [
-  'https://api.binance.com',
-  'https://data-api.binance.vision'
+  'https://data-api.binance.vision',
+  'https://api.binance.com'
 ];
 
 app.set('trust proxy', 1);
@@ -50,9 +49,7 @@ app.use(session({
 const cache = new Map();
 
 function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {} }, null, 2));
@@ -142,7 +139,11 @@ function getOrCreateUser(email, role = 'user') {
     return db.users[normalizedEmail];
   }
 
-  db.users[normalizedEmail] = normalizeWalletRecord(db.users[normalizedEmail], normalizedEmail, role);
+  db.users[normalizedEmail] = normalizeWalletRecord(
+    db.users[normalizedEmail],
+    normalizedEmail,
+    role
+  );
 
   if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
     db.users[normalizedEmail].role = 'staff';
@@ -230,9 +231,7 @@ function verifyOtp(email, otp) {
   const db = readDb();
   const record = db.otps[normalizedEmail];
 
-  if (!record) {
-    return { ok: false, reason: 'No OTP found. Request a new code.' };
-  }
+  if (!record) return { ok: false, reason: 'No OTP found. Request a new code.' };
 
   if (Date.now() > record.expiresAt) {
     delete db.otps[normalizedEmail];
@@ -293,11 +292,9 @@ async function sendOtpEmail(email, otp) {
         <div style="border:1px solid #dbeafe;border-radius:22px;padding:24px;background:#f8fcff;">
           <h2 style="margin:0 0 10px;font-size:22px;">Bluebook Wallet Login Code</h2>
           <p style="color:#475569;margin:0 0 18px;">Use this code to access your wallet.</p>
-
           <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:16px;background:#eef6ff;color:#0284c7;text-align:center;">
             ${otp}
           </div>
-
           <p style="color:#64748b;font-size:13px;margin-top:18px;">
             This code expires in 10 minutes. If you do not see it, check Spam/Junk.
           </p>
@@ -363,7 +360,10 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
     }
 
     if (!response.ok) {
-      const msg = typeof body === 'string' ? body.slice(0, 200) : JSON.stringify(body).slice(0, 200);
+      const msg = typeof body === 'string'
+        ? body.slice(0, 200)
+        : JSON.stringify(body).slice(0, 200);
+
       throw new Error(`HTTP ${response.status}: ${msg}`);
     }
 
@@ -376,8 +376,6 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
 /* Pages */
 
 app.get('/', (req, res) => {
-  if (req.session.user) return res.redirect('/wallet');
-
   res.render('index', {
     error: null,
     success: null,
@@ -776,55 +774,28 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
   }
 });
 
-/* Swap API */
+/* No-key swap helper */
 
-app.post('/api/swap/quote', requireAuthJson, async (req, res) => {
-  try {
-    if (!ZEROX_API_KEY) {
-      return res.status(501).json({
-        error: 'Swap API key missing. Add ZEROX_API_KEY in Render environment variables.'
-      });
-    }
+app.get('/api/swap/link', requireAuthJson, (req, res) => {
+  const inputCurrency = String(req.query.inputCurrency || 'ETH').trim();
+  const outputCurrency = String(req.query.outputCurrency || '').trim();
+  const value = String(req.query.value || '').trim();
 
-    const { chainId, sellToken, buyToken, sellAmount, taker } = req.body;
+  const params = new URLSearchParams();
 
-    if (!chainId || !sellToken || !buyToken || !sellAmount || !taker) {
-      return res.status(400).json({ error: 'Missing swap quote fields.' });
-    }
+  params.set('inputCurrency', inputCurrency);
 
-    const params = new URLSearchParams({
-      chainId: String(chainId),
-      sellToken: String(sellToken),
-      buyToken: String(buyToken),
-      sellAmount: String(sellAmount),
-      taker: String(taker)
-    });
-
-    const url = `https://api.0x.org/swap/allowance-holder/quote?${params.toString()}`;
-
-    const response = await fetch(url, {
-      headers: {
-        '0x-api-key': ZEROX_API_KEY,
-        '0x-version': 'v2',
-        accept: 'application/json',
-        'user-agent': 'BluebookWallet/1.0'
-      }
-    });
-
-    const body = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: body?.message || body?.reason || 'Swap quote failed.',
-        details: body
-      });
-    }
-
-    res.json(body);
-  } catch (error) {
-    console.error('Swap quote error:', error.message);
-    res.status(500).json({ error: 'Unable to get swap quote.' });
+  if (outputCurrency) params.set('outputCurrency', outputCurrency);
+  if (value) {
+    params.set('value', value);
+    params.set('field', 'input');
   }
+
+  res.json({
+    ok: true,
+    provider: 'uniswap',
+    url: `https://app.uniswap.org/swap?${params.toString()}`
+  });
 });
 
 /* Debug */
@@ -840,29 +811,17 @@ app.get('/api/debug-prices', requireAuthJson, async (req, res) => {
   };
 
   try {
-    const body = await fetchJsonWithTimeout('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {}, 8000);
-    result.binance = {
-      ok: true,
-      sample: body
-    };
+    const body = await fetchJsonWithTimeout('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT', {}, 8000);
+    result.binance = { ok: true, sample: body };
   } catch (e) {
-    result.binance = {
-      ok: false,
-      error: e.message
-    };
+    result.binance = { ok: false, error: e.message };
   }
 
   try {
     const body = await fetchJsonWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd', {}, 8000);
-    result.coingecko = {
-      ok: true,
-      sample: body
-    };
+    result.coingecko = { ok: true, sample: body };
   } catch (e) {
-    result.coingecko = {
-      ok: false,
-      error: e.message
-    };
+    result.coingecko = { ok: false, error: e.message };
   }
 
   res.json(result);
