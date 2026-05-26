@@ -12,13 +12,13 @@
   <style>
     :root {
       color-scheme: light;
-      --bg1: #eaf7ff;
-      --bg2: #f8fbff;
-      --bg3: #d8efff;
+      --bg1: #e8f7ff;
+      --bg2: #f7fbff;
+      --bg3: #d5efff;
       --glass: rgba(255,255,255,.72);
-      --glass2: rgba(255,255,255,.48);
+      --glass2: rgba(255,255,255,.52);
       --solid: #ffffff;
-      --solid2: #f4f9ff;
+      --soft: #f4f9ff;
       --text: #0f172a;
       --muted: #64748b;
       --muted2: #94a3b8;
@@ -29,7 +29,7 @@
       --green: #16a34a;
       --orange: #d97706;
       --border: rgba(15,23,42,.08);
-      --border2: rgba(2,132,199,.24);
+      --border2: rgba(2,132,199,.25);
       --shadow: 0 24px 80px rgba(37,99,235,.14);
       --shadow2: 0 12px 34px rgba(15,23,42,.08);
       --safe-top: env(safe-area-inset-top);
@@ -42,16 +42,15 @@
       --bg2: #050816;
       --bg3: #0b2940;
       --glass: rgba(13,22,40,.78);
-      --glass2: rgba(17,29,51,.56);
+      --glass2: rgba(17,29,51,.58);
       --solid: #0d1628;
-      --solid2: #111d33;
+      --soft: #111d33;
       --text: #f8fafc;
       --muted: #94a3b8;
       --muted2: #64748b;
       --blue: #38bdf8;
-      --blue2: #2563eb;
       --border: rgba(125,211,252,.13);
-      --border2: rgba(56,189,248,.28);
+      --border2: rgba(56,189,248,.3);
       --shadow: 0 24px 80px rgba(0,0,0,.36);
       --shadow2: 0 12px 34px rgba(0,0,0,.22);
     }
@@ -75,10 +74,10 @@
       min-height: 100vh;
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 5%, rgba(56,189,248,.28), transparent 28%),
-        radial-gradient(circle at 90% 10%, rgba(37,99,235,.16), transparent 24%),
-        radial-gradient(circle at 50% 100%, rgba(14,165,233,.16), transparent 28%),
-        linear-gradient(135deg, var(--bg1), var(--bg2) 48%, var(--bg3));
+        radial-gradient(circle at 8% 5%, rgba(56,189,248,.30), transparent 30%),
+        radial-gradient(circle at 92% 12%, rgba(37,99,235,.16), transparent 24%),
+        radial-gradient(circle at 50% 105%, rgba(14,165,233,.18), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 46%, var(--bg3));
       background-attachment: fixed;
       padding-bottom: calc(88px + var(--safe-bottom));
     }
@@ -100,7 +99,7 @@
       top: 0;
       z-index: 50;
       padding: calc(10px + var(--safe-top)) 12px 10px;
-      background: rgba(248,251,255,.62);
+      background: rgba(248,251,255,.58);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(20px);
     }
@@ -110,7 +109,7 @@
     }
 
     .topbar-inner {
-      width: min(1080px, 100%);
+      width: min(960px, 100%);
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -155,8 +154,8 @@
 
     .top-actions {
       display: flex;
-      gap: 6px;
       align-items: center;
+      gap: 6px;
     }
 
     .icon-btn {
@@ -180,7 +179,7 @@
     }
 
     .shell {
-      width: min(1080px, 100%);
+      width: min(960px, 100%);
       margin: 0 auto;
       padding: 12px;
     }
@@ -204,7 +203,7 @@
       width: 310px;
       height: 310px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(2,132,199,.22), transparent 70%);
+      background: radial-gradient(circle, rgba(2,132,199,.24), transparent 70%);
       pointer-events: none;
     }
 
@@ -285,7 +284,7 @@
 
     .quick {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 15px;
     }
@@ -303,7 +302,7 @@
     }
 
     .quick-btn.primary {
-      color: #fff;
+      color: white;
       background: linear-gradient(135deg, var(--blue2), var(--blue));
       border-color: transparent;
     }
@@ -332,7 +331,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
+      grid-template-columns: minmax(0, 1fr) 330px;
       gap: 12px;
       margin-top: 12px;
     }
@@ -403,7 +402,7 @@
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: var(--solid2);
+      background: var(--soft);
       border: 1px solid var(--border);
       color: var(--blue);
       font-size: .72rem;
@@ -548,7 +547,7 @@
       padding: 12px;
       border-radius: 15px;
       color: var(--text);
-      background: var(--solid2);
+      background: var(--soft);
       border: 1px solid var(--border);
       outline: none;
       font-weight: 850;
@@ -604,6 +603,23 @@
       color: var(--pink);
       background: rgba(225,29,72,.08);
       border-color: rgba(225,29,72,.14);
+    }
+
+    .receive-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .receive-option {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      text-align: left;
     }
 
     .modal-overlay,
@@ -689,7 +705,7 @@
       height: 40px;
       border-radius: 15px;
       color: var(--text);
-      background: var(--solid2);
+      background: var(--soft);
       border: 1px solid var(--border);
       font-size: 1.2rem;
       font-weight: 950;
@@ -767,7 +783,7 @@
       background: linear-gradient(135deg, var(--blue2), var(--blue));
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
       }
@@ -788,12 +804,21 @@
       }
 
       .quick {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .quick-btn {
         min-width: 0;
-        min-height: 66px;
+        min-height: 64px;
+        padding: 9px 6px;
+      }
+
+      .quick-btn strong {
+        font-size: .82rem;
+      }
+
+      .quick-btn span {
+        font-size: .64rem;
       }
 
       .panel {
@@ -801,7 +826,8 @@
         border-radius: 22px;
       }
 
-      .row {
+      .row,
+      .receive-option {
         grid-template-columns: 1fr;
       }
 
@@ -837,7 +863,7 @@
         <div class="logo">B</div>
         <div>
           <div class="brand-title">Bluebook Wallet</div>
-          <div class="brand-sub" id="statusText">Encrypted real EVM wallet</div>
+          <div class="brand-sub" id="statusText">Loading wallet</div>
         </div>
       </div>
 
@@ -853,18 +879,18 @@
       <div class="hero-inner">
         <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Wallet loading</span></div>
         <div class="balance" id="totalUsd">$0.00</div>
-        <div class="address" id="walletAddressText">Loading wallet...</div>
+        <div class="address" id="walletAddressText">Preparing wallet...</div>
 
         <div class="chips">
           <span class="chip" id="activeNetworkText">Ethereum</span>
           <span class="chip" id="tokenCountText">0 assets</span>
-          <span class="chip" id="securityText">Device encrypted</span>
+          <span class="chip" id="securityText">Auto encrypted</span>
         </div>
 
         <div class="quick">
           <button class="quick-btn primary" onclick="openModal('receiveModal')">
             <strong>Receive</strong>
-            <span>USDT / tokens</span>
+            <span>All options</span>
           </button>
 
           <button class="quick-btn" onclick="openModal('sendModal')">
@@ -874,12 +900,7 @@
 
           <button class="quick-btn" onclick="openModal('swapModal')">
             <strong>Swap</strong>
-            <span>Fee quote</span>
-          </button>
-
-          <button class="quick-btn" onclick="openSettings()">
-            <strong>Settings</strong>
-            <span>Wallet info</span>
+            <span>Fees</span>
           </button>
         </div>
       </div>
@@ -891,24 +912,13 @@
           <div class="panel-head">
             <div>
               <h2 class="title">Assets</h2>
-              <p class="sub">Balances on the selected EVM network with USD estimates.</p>
+              <p class="sub">Real EVM balances with USD estimates.</p>
             </div>
             <button class="small-btn" onclick="refreshBalances()">Refresh</button>
           </div>
 
-          <div class="list" id="tokenList"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="title">Receive networks</h2>
-              <p class="sub">Same wallet address works across supported EVM networks. Choose the exact network before receiving.</p>
-            </div>
-          </div>
-
           <div class="pills" id="networkPills"></div>
-          <div class="list" id="networkList"></div>
+          <div class="list" id="tokenList"></div>
         </section>
       </div>
 
@@ -917,7 +927,7 @@
           <div class="panel-head">
             <div>
               <h2 class="title">Wallet</h2>
-              <p class="sub">Create, delete, and reveal wallet secrets from Settings only.</p>
+              <p class="sub">Same saved wallet loads for this email account.</p>
             </div>
           </div>
 
@@ -927,18 +937,18 @@
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2 class="title">Fees</h2>
-              <p class="sub">Send and swap fees are estimated before confirmation.</p>
+              <h2 class="title">Network fee</h2>
+              <p class="sub">Current gas estimate for active network.</p>
             </div>
           </div>
 
           <div class="list">
             <div class="row">
               <div>
-                <div class="name">Current gas</div>
-                <div class="tiny" id="gasText">Refresh to estimate gas.</div>
+                <div class="name">Gas</div>
+                <div class="tiny" id="gasText">Loading gas...</div>
               </div>
-              <button class="small-btn" onclick="updateGas()">Gas</button>
+              <button class="small-btn" onclick="updateGas()">Check</button>
             </div>
           </div>
         </section>
@@ -959,32 +969,12 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Choose network and asset. Use only the selected network when depositing.</div>
+          <div class="modal-sub">Pick the asset/network. Copy the same EVM address, but only send using the selected network.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
 
-      <div class="form">
-        <div class="field">
-          <label>Network</label>
-          <select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select>
-        </div>
-
-        <div class="field">
-          <label>Currency</label>
-          <select class="select" id="receiveAssetSelect" onchange="renderReceiveCard()"></select>
-        </div>
-
-        <div class="box good">
-          <div class="name" id="receiveAssetName">Receive address</div>
-          <div class="tiny" id="receiveAddressText">No wallet loaded.</div>
-        </div>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="copyReceiveAddress()">Copy address</button>
-          <button class="primary-btn" onclick="useReceiveNetwork()">Use network</button>
-        </div>
-      </div>
+      <div class="receive-grid" id="receiveOptions"></div>
     </div>
   </div>
 
@@ -1000,6 +990,11 @@
       </div>
 
       <div class="form">
+        <div class="field">
+          <label>Network</label>
+          <select class="select" id="sendNetworkSelect" onchange="setNetwork(this.value)"></select>
+        </div>
+
         <div class="field">
           <label>Asset</label>
           <select class="select" id="sendAssetSelect" onchange="estimateSendFee()"></select>
@@ -1056,12 +1051,17 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Swap</div>
-          <div class="modal-sub">Get a quote first. Exact fees require your server-side swap API route.</div>
+          <div class="modal-sub">Get quote first. Real swaps need your server-side /api/swap/quote route.</div>
         </div>
         <button class="close" onclick="closeModal('swapModal')">×</button>
       </div>
 
       <div class="form">
+        <div class="field">
+          <label>Network</label>
+          <select class="select" id="swapNetworkSelect" onchange="setNetwork(this.value)"></select>
+        </div>
+
         <div class="field">
           <label>Sell asset</label>
           <select class="select" id="swapSellSelect" onchange="estimateSwapFee()"></select>
@@ -1118,7 +1118,7 @@
       <div class="drawer-head">
         <div>
           <div class="drawer-title">Settings</div>
-          <div class="drawer-sub">Wallet info, secret recovery, RPC, theme, and deletion.</div>
+          <div class="drawer-sub">Wallet info, seed phrase, private key, RPC, theme, and deletion.</div>
         </div>
         <button class="close" onclick="closeSettings()">×</button>
       </div>
@@ -1130,10 +1130,10 @@
 
       <div class="box">
         <div class="name">Wallet actions</div>
-        <div class="tiny">Create a real EVM wallet with no PIN. It is encrypted using this browser’s device key.</div>
+        <div class="tiny">Wallet auto-creates on first login. It is saved to this email account and encrypted for this browser.</div>
         <div class="button-row">
           <button class="primary-btn" onclick="createWalletNoPin()">Create wallet</button>
-          <button class="secondary-btn" onclick="unlockDeviceWallet()">Unlock</button>
+          <button class="secondary-btn" onclick="refreshBalances()">Refresh</button>
         </div>
       </div>
 
@@ -1147,13 +1147,13 @@
 
         <div class="field" style="margin-top:10px;">
           <label>Secret output</label>
-          <textarea class="textarea secret-card" id="secretOutput" readonly placeholder="Seed phrase or private key appears here after unlocking."></textarea>
+          <textarea class="textarea secret-card" id="secretOutput" readonly placeholder="Seed phrase or private key appears here."></textarea>
         </div>
       </div>
 
       <div class="box">
-        <div class="name">Receive support</div>
-        <div class="tiny" id="settingsReceiveOptions">Loading receive options...</div>
+        <div class="name">Supported receive options</div>
+        <div class="tiny" id="settingsReceiveOptions">Loading...</div>
       </div>
 
       <div class="box">
@@ -1177,13 +1177,11 @@
 
       <div class="box bad">
         <div class="name">Delete wallet</div>
-        <div class="tiny">Deletes the encrypted wallet vault from this account. This does not delete blockchain funds. Save your seed phrase first.</div>
-
+        <div class="tiny">Deletes the encrypted wallet vault from this email account. This does not delete blockchain funds.</div>
         <div class="field" style="margin-top:10px;">
           <label>Type DELETE to confirm</label>
           <input class="input" id="deleteConfirmInput" placeholder="DELETE" />
         </div>
-
         <div class="button-row one">
           <button class="danger-btn" onclick="deleteWallet()">Delete wallet</button>
         </div>
@@ -1334,6 +1332,7 @@
     function openModal(id) {
       document.getElementById(id).classList.add('active');
       renderSelects();
+      renderReceiveOptions();
     }
 
     function closeModal(id) {
@@ -1458,11 +1457,11 @@
     async function createWalletNoPin() {
       try {
         if (SERVER_WALLET?.encryptedVault || getPublicWallet()) {
-          toast('Wallet already exists. Use unlock.');
-          return;
+          return await unlockDeviceWallet();
         }
 
         const real = generateWallet();
+
         const vault = {
           wallets: [real],
           createdAt: new Date().toISOString(),
@@ -1488,27 +1487,28 @@
         activeProvider = provider();
         activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
 
-        toast('Real wallet created');
+        toast('Wallet created for this email');
         updateUi();
         refreshBalances();
-        renderSettings();
+
+        return vault;
       } catch (err) {
         console.error(err);
         toast(err.message || 'Wallet creation failed');
+        return null;
       }
     }
 
     async function unlockDeviceWallet() {
       try {
         if (!SERVER_WALLET?.encryptedVault) {
-          toast('No wallet exists yet');
-          return null;
+          return await createWalletNoPin();
         }
 
         const deviceKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
 
         if (!deviceKey) {
-          toast('Device key missing. Use seed phrase recovery in future version.');
+          toast('Wallet exists for this email, but this browser cannot decrypt it. Use saved seed phrase recovery in next version.');
           return null;
         }
 
@@ -1518,22 +1518,21 @@
         activeProvider = provider();
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
 
-        toast('Wallet unlocked');
         updateUi();
         refreshBalances();
 
         return ACTIVE_DECRYPTED_WALLET;
       } catch (err) {
         console.error(err);
-        toast('Unlock failed on this browser');
+        toast('Could not load wallet on this browser');
         return null;
       }
     }
 
     async function ensureUnlocked() {
       if (activeSigner) return activeSigner;
-      const unlocked = await unlockDeviceWallet();
-      if (!unlocked) throw new Error('Unlock wallet first');
+      const wallet = await unlockDeviceWallet();
+      if (!wallet) throw new Error('Wallet not available');
       return activeSigner;
     }
 
@@ -1541,13 +1540,13 @@
       const ids = new Set();
       ids.add(NATIVE_GECKO[activeNetworkKey]);
 
-      for (const t of ERC20_TOKENS[activeNetworkKey] || []) {
-        if (t.gecko) ids.add(t.gecko);
+      for (const token of ERC20_TOKENS[activeNetworkKey] || []) {
+        if (token.gecko) ids.add(token.gecko);
       }
 
       try {
         const res = await fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('price error');
+        if (!res.ok) throw new Error('Price error');
         prices = await res.json();
       } catch {
         prices = {};
@@ -1594,8 +1593,9 @@
 
         for (const token of ERC20_TOKENS[activeNetworkKey] || []) {
           try {
-            const c = new ethers.Contract(token.address, ERC20_ABI, p);
-            const raw = await c.balanceOf(addr);
+            const contract = new ethers.Contract(token.address, ERC20_ABI, p);
+            const raw = await contract.balanceOf(addr);
+
             output.push({
               ...token,
               type: 'erc20',
@@ -1626,10 +1626,9 @@
         el.innerHTML = `
           <div class="row">
             <div>
-              <div class="name">No wallet yet</div>
-              <div class="tiny">Open Settings and create a real wallet.</div>
+              <div class="name">Creating wallet...</div>
+              <div class="tiny">Your wallet should auto-create for this email.</div>
             </div>
-            <button class="small-btn" onclick="openSettings()">Create</button>
           </div>
         `;
 
@@ -1638,21 +1637,21 @@
         return;
       }
 
-      el.innerHTML = list.map(t => {
-        const usd = Number(t.balance || 0) * priceFor(t);
+      el.innerHTML = list.map(token => {
+        const usd = Number(token.balance || 0) * priceFor(token);
 
         return `
           <div class="row">
             <div class="asset">
-              ${icon(t.symbol)}
+              ${icon(token.symbol)}
               <div>
-                <div class="name">${t.symbol}</div>
-                <div class="tiny">${t.name}${t.error ? ' · read error' : ''}</div>
+                <div class="name">${token.symbol}</div>
+                <div class="tiny">${token.name}${token.error ? ' · read error' : ''}</div>
               </div>
             </div>
             <div>
               <div class="value">${money(usd)}</div>
-              <div class="value-sub">${fmt(t.balance, t.balance < 1 ? 8 : 6)} ${t.symbol}</div>
+              <div class="value-sub">${fmt(token.balance, token.balance < 1 ? 8 : 6)} ${token.symbol}</div>
             </div>
           </div>
         `;
@@ -1665,20 +1664,6 @@
       document.getElementById('networkPills').innerHTML = Object.entries(NETWORKS).map(([key, net]) => `
         <button class="pill ${key === activeNetworkKey ? 'active' : ''}" onclick="setNetwork('${key}')">${net.name}</button>
       `).join('');
-
-      document.getElementById('networkList').innerHTML = Object.entries(NETWORKS).map(([key, net]) => {
-        const tokens = receiveOptionsFor(key).map(x => x.symbol).join(', ');
-
-        return `
-          <div class="row">
-            <div>
-              <div class="name">${net.name}</div>
-              <div class="tiny">${tokens} · ${short(currentAddress())}</div>
-            </div>
-            <button class="small-btn" onclick="setNetwork('${key}')">${key === activeNetworkKey ? 'Active' : 'Use'}</button>
-          </div>
-        `;
-      }).join('');
     }
 
     function setNetwork(key) {
@@ -1699,64 +1684,71 @@
       const net = NETWORKS[networkKey];
 
       return [
-        { type: 'native', symbol: net.symbol, name: `${net.symbol} native`, address: NATIVE_TOKEN, decimals: 18 },
+        { type: 'native', symbol: net.symbol, name: `${net.symbol} Native`, address: NATIVE_TOKEN, decimals: 18 },
         ...(ERC20_TOKENS[networkKey] || [])
       ];
     }
 
-    function renderReceiveSelects() {
-      const networkSelect = document.getElementById('receiveNetworkSelect');
-      if (!networkSelect) return;
+    function renderReceiveOptions() {
+      const box = document.getElementById('receiveOptions');
+      if (!box) return;
 
-      networkSelect.innerHTML = Object.entries(NETWORKS)
-        .map(([key, net]) => `<option value="${key}">${net.name}</option>`)
-        .join('');
-
-      networkSelect.value = activeNetworkKey;
-      renderReceiveAssets();
-    }
-
-    function renderReceiveAssets() {
-      const key = document.getElementById('receiveNetworkSelect').value;
-      const assetSelect = document.getElementById('receiveAssetSelect');
-
-      assetSelect.innerHTML = receiveOptionsFor(key)
-        .map(asset => `<option value="${asset.address}">${asset.symbol} · ${asset.name}</option>`)
-        .join('');
-
-      renderReceiveCard();
-    }
-
-    function renderReceiveCard() {
-      const key = document.getElementById('receiveNetworkSelect').value;
-      const assetText = document.getElementById('receiveAssetSelect').selectedOptions[0]?.textContent || 'Asset';
       const addr = currentAddress();
 
-      document.getElementById('receiveAssetName').textContent = `Receive ${assetText} on ${NETWORKS[key].name}`;
-      document.getElementById('receiveAddressText').textContent = addr
-        ? `${addr} — only send ${assetText} on ${NETWORKS[key].name}`
-        : 'Create a wallet first.';
+      box.innerHTML = Object.entries(NETWORKS).map(([networkKey, net]) => {
+        const options = receiveOptionsFor(networkKey).map(asset => `
+          <button class="receive-option" onclick="copySpecificReceive('${networkKey}', '${asset.symbol}')">
+            <div>
+              <div class="name">${asset.symbol} · ${net.name}</div>
+              <div class="tiny">${asset.name} · ${addr ? short(addr) : 'No address'}</div>
+            </div>
+            <span class="small-btn">Copy</span>
+          </button>
+        `).join('');
+
+        return `
+          <div class="box">
+            <div class="name">${net.name}</div>
+            <div class="tiny">Only receive assets on ${net.name} using this address.</div>
+            <div class="receive-grid" style="margin-top:8px;">${options}</div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function copyReceiveAddress() {
+    function copySpecificReceive(networkKey, symbol) {
       const addr = currentAddress();
 
       if (!addr) {
-        toast('No address available');
+        toast('No address available yet');
         return;
       }
 
       navigator.clipboard?.writeText(addr);
-      toast('Address copied');
-    }
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network', networkKey);
 
-    function useReceiveNetwork() {
-      const key = document.getElementById('receiveNetworkSelect').value;
-      setNetwork(key);
-      closeModal('receiveModal');
+      updateUi();
+      toast(`${symbol} ${NETWORKS[networkKey].name} address copied`);
     }
 
     function renderAssetSelects() {
+      const networkOptions = Object.entries(NETWORKS)
+        .map(([key, net]) => `<option value="${key}">${net.name}</option>`)
+        .join('');
+
+      const sendNet = document.getElementById('sendNetworkSelect');
+      if (sendNet) {
+        sendNet.innerHTML = networkOptions;
+        sendNet.value = activeNetworkKey;
+      }
+
+      const swapNet = document.getElementById('swapNetworkSelect');
+      if (swapNet) {
+        swapNet.innerHTML = networkOptions;
+        swapNet.value = activeNetworkKey;
+      }
+
       const net = NETWORKS[activeNetworkKey];
 
       const sendOptions = [
@@ -1781,7 +1773,7 @@
 
     function renderSelects() {
       renderAssetSelects();
-      renderReceiveSelects();
+      renderReceiveOptions();
     }
 
     function tokenByAddress(address) {
@@ -1801,7 +1793,7 @@
     async function estimateSendFee() {
       try {
         if (!activeSigner) {
-          document.getElementById('sendFeePreview').textContent = 'Wallet unlock required. Try Settings → Unlock.';
+          document.getElementById('sendFeePreview').textContent = 'Wallet is still loading.';
           return null;
         }
 
@@ -1884,13 +1876,13 @@
     }
 
     function sellTokenMeta() {
-      const val = document.getElementById('swapSellSelect').value;
+      const value = document.getElementById('swapSellSelect').value;
 
-      if (val === NATIVE_TOKEN) {
+      if (value === NATIVE_TOKEN) {
         return { symbol: NETWORKS[activeNetworkKey].symbol, decimals: 18, address: NATIVE_TOKEN };
       }
 
-      return tokenByAddress(val);
+      return tokenByAddress(value);
     }
 
     async function estimateSwapFee() {
@@ -1904,7 +1896,7 @@
       }
 
       document.getElementById('swapQuoteText').textContent =
-        `Estimated route: ${amount} ${sell?.symbol || 'SELL'} → ${buy?.symbol || 'BUY'} on ${NETWORKS[activeNetworkKey].name}. Click Get quote for exact gas and swap data.`;
+        `Estimated route: ${amount} ${sell?.symbol || 'SELL'} → ${buy?.symbol || 'BUY'} on ${NETWORKS[activeNetworkKey].name}. Click Get quote for exact gas.`;
     }
 
     async function getSwapQuote() {
@@ -2060,30 +2052,31 @@
 
     function renderSettings() {
       const addr = currentAddress();
-      const tokens = receiveOptionsFor(activeNetworkKey).map(x => x.symbol).join(', ');
+      const allOptions = Object.entries(NETWORKS)
+        .map(([key, net]) => `${net.name}: ${receiveOptionsFor(key).map(x => x.symbol).join(', ')}`)
+        .join(' | ');
 
       document.getElementById('settingsAddress').textContent = addr || 'No wallet loaded';
-      document.getElementById('settingsReceiveOptions').textContent =
-        `${NETWORKS[activeNetworkKey].name}: ${tokens}`;
+      document.getElementById('settingsReceiveOptions').textContent = allOptions;
     }
 
     function updateUi() {
       const addr = currentAddress();
       const net = NETWORKS[activeNetworkKey];
 
-      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'No wallet';
+      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
       document.getElementById('walletAddressText').textContent = addr
         ? `${net.name}: ${addr}`
-        : 'Open Settings to create a real wallet.';
+        : 'Wallet is being created for this email.';
 
       document.getElementById('activeNetworkText').textContent = net.name;
-      document.getElementById('securityText').textContent = activeSigner ? 'Unlocked' : 'Device encrypted';
+      document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
 
       document.getElementById('walletInfoList').innerHTML = `
         <div class="row">
           <div>
-            <div class="name">${addr ? short(addr) : 'No wallet'}</div>
-            <div class="tiny">${addr ? 'EVM address active across supported networks' : 'Create wallet from Settings'}</div>
+            <div class="name">${addr ? short(addr) : 'Creating wallet'}</div>
+            <div class="tiny">${addr ? 'Same EVM address across supported networks' : 'Auto-generating wallet for this email'}</div>
           </div>
           <button class="small-btn" onclick="openSettings()">Info</button>
         </div>
@@ -2108,14 +2101,14 @@
       if (SERVER_WALLET?.encryptedVault) {
         await unlockDeviceWallet();
       } else {
-        document.getElementById('totalUsd').textContent = '$0.00';
-        renderTokenList([]);
-        toast('Open Settings to create your wallet');
+        await createWalletNoPin();
       }
+
+      renderReceiveOptions();
     }
 
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
         closeSettings();
         document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
       }
