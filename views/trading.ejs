@@ -122,9 +122,15 @@
     .token-name { font-weight: 900; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
     .token-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); color: var(--tensor); box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 4px; border: 1px solid var(--border); }
     .token-icon svg { width: 100%; height: 100%; }
-    .token-price { text-align: right; font-weight: 900; font-size: 1rem; font-variant-numeric: tabular-nums; }
+    .token-price { text-align: right; font-weight: 900; font-size: 1rem; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
     .token-change { font-size: 0.75rem; font-weight: 800; margin-top: 2px; }
     .up { color: var(--tensor); } .down { color: var(--pink); }
+
+    /* Flash Effects */
+    .flash-up { animation: flashUp 0.6s ease-out; }
+    .flash-down { animation: flashDown 0.6s ease-out; }
+    @keyframes flashUp { 0% { color: #a855f7; text-shadow: 0 0 12px rgba(168,85,247,0.8); transform: scale(1.02); } 100% { color: inherit; text-shadow: none; transform: scale(1); } }
+    @keyframes flashDown { 0% { color: #e11d48; text-shadow: 0 0 12px rgba(225,29,72,0.8); transform: scale(1.02); } 100% { color: inherit; text-shadow: none; transform: scale(1); } }
 
     /* Center Chart Area */
     .chart-area { 
@@ -135,7 +141,7 @@
     .chart-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
     .chart-ticker { display: flex; align-items: baseline; gap: 14px; }
     .chart-ticker h2 { font-size: 1.8rem; font-weight: 900; margin: 0; letter-spacing: -0.04em; }
-    .chart-ticker span { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .chart-ticker span { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; transition: color 0.2s; }
     
     .chart-controls { display: flex; gap: 8px; flex-wrap: wrap; }
     .pill-toggle { display: flex; background: var(--soft); border-radius: 14px; padding: 4px; border: 1px solid var(--glass-border); }
@@ -185,11 +191,13 @@
     .input-box input::placeholder { color: var(--muted2); opacity: 0.6; }
     .input-box span { font-weight: 800; color: var(--muted); font-size: 0.95rem; background: var(--soft); padding: 4px 10px; border-radius: 10px; }
     
-    /* Custom Slider */
+    /* Enhanced Slider */
     .slider-wrap { padding: 16px 0; }
-    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--tensor); cursor: pointer; margin-top: -10px; box-shadow: 0 4px 12px rgba(139,92,246,0.4); border: 2px solid white; }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--border2); border-radius: 3px; }
+    .slider-track-container { position: relative; width: 100%; height: 8px; background: var(--soft); border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; }
+    input[type=range] { -webkit-appearance: none; width: 100%; position: absolute; background: transparent; z-index: 2; height: 100%; margin: 0; outline: none; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: var(--tensor); cursor: pointer; box-shadow: 0 4px 12px rgba(139,92,246,0.5); border: 3px solid var(--solid); transition: transform 0.1s; }
+    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.1); }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 100%; cursor: pointer; background: transparent; }
     
     .order-summary { background: var(--soft); border-radius: 20px; padding: 20px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 12px; }
     .summary-row { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; }
@@ -212,7 +220,6 @@
       
       .terminal-header { position: sticky; top: 0; }
       
-      /* Horizontal Scrollable Token Strip */
       .sidebar { 
         border-right: none; border-bottom: 1px solid var(--border); 
         padding: 12px; background: var(--glass);
@@ -235,7 +242,6 @@
       
       .order-area { border-left: none; padding: 20px 16px; border-bottom: 1px solid var(--border); }
       
-      /* Mobile Card Layout for Positions */
       .positions-area { padding-bottom: calc(40px + var(--safe-bottom)); }
       .pos-head { padding: 16px; }
       .pos-table-wrap { padding: 16px; }
@@ -315,7 +321,9 @@
 
       <div class="field-group slider-wrap">
         <label>Leverage <span style="color:var(--tensor); font-size:0.9rem;" id="levValTxt">10x</span></label>
-        <input type="range" id="orderLeverage" min="1" max="50" value="10" oninput="updateLevUI()" />
+        <div class="slider-track-container" id="sliderTrack">
+          <input type="range" id="orderLeverage" min="1" max="50" value="10" oninput="updateLevUI()" />
+        </div>
       </div>
 
       <div class="order-summary">
@@ -331,7 +339,6 @@
     <section class="positions-area">
       <div class="pos-head">
         <span>Active Trades</span>
-        <button class="small-btn" style="height:30px; font-size:0.75rem; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--solid); color:var(--text);" onclick="fetchMarket()">Refresh</button>
       </div>
       <div class="pos-table-wrap">
         <table class="pos-table">
@@ -356,7 +363,10 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
+    const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
+    const USER_ROLE = "<%= typeof role !== 'undefined' ? role : 'user' %>";
+    const IS_ADMIN = USER_ROLE === 'staff';
+    
     let activeToken = null;
     let tokenData = [];
     let tensorBalancesMap = {};
@@ -371,79 +381,109 @@
     let isDragging = false;
     let lastDragX = 0;
     
+    // Live Animation Vars
+    let targetPrice = 0;
+    let lerpedPrice = 0;
+    let flashTimer = null;
+    let flashIntensity = 0;
+    let priceDirection = 'none'; // 'up' or 'down'
+
     let orderSide = 'long';
     let toastTimer;
 
-    // --- Trading Balance Logic (Combined USDT + Pegged Tensor Tokens) ---
-    // Simulate a local base USDT balance if none is passed, or retrieve from storage
-    let localUsdtBase = Number(localStorage.getItem('blue_base_usdt'));
-    if (!localUsdtBase && localUsdtBase !== 0) localUsdtBase = 5000.00;
+    // --- Trading Balance Logic (Combined Real USDT + Pegged Tensor Tokens) ---
+    let combinedTradingBal = 0;
 
-    function getTradingBalance() {
-      let bal = localUsdtBase;
+    function calculateCombinedBalance() {
+      // 1. Get Tensor Pegged Tokens
+      let tensorStableUsd = 0;
       tokenData.forEach(t => {
         if (t.bias === 'pegged' && tensorBalancesMap[t.id]) {
-          bal += tensorBalancesMap[t.id] * t.price;
+          tensorStableUsd += tensorBalancesMap[t.id] * t.price;
         }
       });
-      return bal;
+
+      // 2. Get Real Crypto USDT from localStorage (Matches Wallet.ejs format)
+      let cryptoUsdt = 0;
+      try {
+        if (IS_ADMIN) {
+          const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || { usdt: 25000 };
+          cryptoUsdt = saved.usdt;
+        } else {
+          const cachedBal = JSON.parse(localStorage.getItem(`blue_bal_${CURRENT_EMAIL}`));
+          if (cachedBal && cachedBal.bal) {
+            cryptoUsdt = cachedBal.bal.filter(b => b.symbol === 'USDT').reduce((sum, b) => sum + Number(b.balance || 0), 0);
+          }
+        }
+      } catch(e) {}
+
+      combinedTradingBal = cryptoUsdt + tensorStableUsd;
     }
 
     function formatUsd(val) { return Number(val).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4, maximumFractionDigits: 6 }); }
     function formatDec(val, dec=2) { return Number(val).toLocaleString(undefined, {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
     function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('active'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('active'), 2500); }
 
-    // --- Custom Canvas Charting Engine ---
+    // --- Custom Canvas Charting Engine with Smooth Animation ---
     function initCustomChart() {
       const cvs = document.getElementById('customChartCanvas');
       if(!cvs) return;
       
-      // Resize observer
       const wrapper = document.getElementById('canvasWrapper');
       new ResizeObserver(() => drawCustomChart()).observe(wrapper);
 
-      // Mouse Events
+      // Mouse/Touch Interaction for Zoom and Pan
       cvs.addEventListener('mousedown', e => { isDragging = true; lastDragX = e.clientX; cvs.style.cursor = 'grabbing'; });
       window.addEventListener('mouseup', () => { isDragging = false; cvs.style.cursor = 'crosshair'; });
       window.addEventListener('mousemove', e => {
         if(!isDragging) return;
         chartOffsetX += (e.clientX - lastDragX);
         lastDragX = e.clientX;
-        drawCustomChart();
       });
 
-      // Touch Events for Mobile Scrolling
       cvs.addEventListener('touchstart', e => { isDragging = true; lastDragX = e.touches[0].clientX; });
       window.addEventListener('touchend', () => { isDragging = false; });
       window.addEventListener('touchmove', e => {
         if(!isDragging) return;
         chartOffsetX += (e.touches[0].clientX - lastDragX);
         lastDragX = e.touches[0].clientX;
-        drawCustomChart();
       }, {passive: false});
 
-      // Zoom via Mouse Wheel
       cvs.addEventListener('wheel', e => {
         e.preventDefault();
         chartZoom -= e.deltaY * 0.002;
         if(chartZoom < 0.2) chartZoom = 0.2;
         if(chartZoom > 5) chartZoom = 5;
-        drawCustomChart();
       }, {passive: false});
+
+      // Start Animation Loop
+      requestAnimationFrame(animationLoop);
+    }
+
+    function animationLoop() {
+      // Smoothly interpolate the price
+      if (lerpedPrice === 0) lerpedPrice = targetPrice;
+      lerpedPrice += (targetPrice - lerpedPrice) * 0.15;
+      
+      // Decrease flash intensity
+      if (flashIntensity > 0) flashIntensity -= 0.05;
+      if (flashIntensity < 0) flashIntensity = 0;
+
+      drawCustomChart();
+      requestAnimationFrame(animationLoop);
     }
 
     function setChartType(type) {
       chartType = type;
       document.getElementById('btnCandle').classList.toggle('active', type === 'candle');
       document.getElementById('btnLine').classList.toggle('active', type === 'line');
-      drawCustomChart();
     }
 
     function setTF(tf, btn) {
       currentTF = tf;
       document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      chartOffsetX = 0; // Reset scroll on TF change
+      chartOffsetX = 0;
       fetchChartData();
     }
 
@@ -454,10 +494,8 @@
         const data = await res.json();
         if(data.candles && data.candles.length) {
           rawCandleData = data.candles;
-          drawCustomChart();
         } else {
           rawCandleData = [];
-          drawCustomChart();
         }
       } catch(e) {}
     }
@@ -496,7 +534,7 @@
       ctx.clearRect(0, 0, rect.width, rect.height);
 
       if(!rawCandleData.length) {
-        ctx.fillStyle = '#94a3b8'; ctx.font = '14px Inter'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px Inter'; ctx.textAlign = 'center';
         ctx.fillText('Awaiting Market Data...', rect.width/2, rect.height/2);
         return;
       }
@@ -506,13 +544,12 @@
 
       const w = rect.width;
       const h = rect.height;
-      const pT = 20, pB = 20, pR = 64, pL = 10;
+      const pT = 20, pB = 30, pR = 64, pL = 10; // pB increased for X axis
 
       const baseCandleWidth = 8 * chartZoom;
       const spacing = 4 * chartZoom;
       const totalCandleWidth = baseCandleWidth + spacing;
       
-      // Calculate viewport
       const visibleCount = Math.floor((w - pL - pR) / totalCandleWidth);
       let maxOffset = processed.length - visibleCount;
       if (maxOffset < 0) maxOffset = 0;
@@ -524,35 +561,49 @@
       const visibleData = processed.slice(currentOffset, currentOffset + visibleCount);
       if(!visibleData.length) return;
 
-      const maxP = Math.max(...visibleData.map(c => c.high));
-      const minP = Math.min(...visibleData.map(c => c.low));
+      const maxP = Math.max(...visibleData.map(c => c.high), lerpedPrice);
+      const minP = Math.min(...visibleData.map(c => c.low), lerpedPrice);
       const range = maxP - minP || maxP * 0.01;
       
       const y = (val) => pT + ((maxP - val) / range) * (h - pT - pB);
 
-      // Draw Horizontal Grid & Price Scale
+      // --- Draw Grid, X & Y Axis ---
       ctx.fillStyle = 'rgba(100,116,139,0.8)';
       ctx.font = '600 11px Inter';
-      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       
+      // Horizontal lines (Y axis)
+      ctx.textAlign = 'left';
       for(let i=0; i<=4; i++) {
         const val = maxP - (i * range / 4);
         const yPos = Math.floor(y(val));
-        
         ctx.beginPath(); ctx.moveTo(pL, yPos); ctx.lineTo(w - pR, yPos); 
         ctx.strokeStyle = 'rgba(2,132,199,0.06)'; ctx.lineWidth = 1; ctx.stroke();
-        
         ctx.fillText(val.toFixed(4), w - pR + 8, yPos);
       }
 
-      // Draw Data
+      // Vertical lines (X axis - Time)
+      ctx.textAlign = 'center';
+      const timeSkip = Math.max(1, Math.floor(visibleData.length / 5));
+      for(let i=0; i<visibleData.length; i+=timeSkip) {
+        const c = visibleData[i];
+        const cx = Math.floor(w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2);
+        
+        ctx.beginPath(); ctx.moveTo(cx, pT); ctx.lineTo(cx, h - pB + 5);
+        ctx.strokeStyle = 'rgba(2,132,199,0.03)'; ctx.lineWidth = 1; ctx.stroke();
+
+        const timeStr = new Date(c.time * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        ctx.fillText(timeStr, cx, h - pB + 16);
+      }
+
+      // --- Draw Candles / Line ---
       if (chartType === 'line') {
         ctx.beginPath();
         visibleData.forEach((c, i) => {
           const cx = w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2;
-          if (i === 0) ctx.moveTo(cx, y(c.close));
-          else ctx.lineTo(cx, y(c.close));
+          const pointY = (i === visibleData.length - 1 && currentOffset === maxOffset) ? y(lerpedPrice) : y(c.close);
+          if (i === 0) ctx.moveTo(cx, pointY);
+          else ctx.lineTo(cx, pointY);
         });
         ctx.strokeStyle = '#8b5cf6'; // Tensor Purple
         ctx.lineWidth = 2.5;
@@ -561,7 +612,10 @@
       } else {
         visibleData.forEach((c, i) => {
           const cx = Math.floor(w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2);
-          const isUp = c.close >= c.open;
+          
+          // Use lerped price for the very last active candle
+          const closeVal = (i === visibleData.length - 1 && currentOffset === maxOffset) ? lerpedPrice : c.close;
+          const isUp = closeVal >= c.open;
           
           // Purple (#8b5cf6) for UP, Pink (#e11d48) for DOWN
           const color = isUp ? '#8b5cf6' : '#e11d48'; 
@@ -570,15 +624,13 @@
           ctx.fillStyle = color;
           ctx.lineWidth = 1.5;
           
-          // Wick
           ctx.beginPath();
-          ctx.moveTo(cx, Math.floor(y(c.high)));
-          ctx.lineTo(cx, Math.floor(y(c.low)));
+          ctx.moveTo(cx, Math.floor(y(Math.max(c.high, closeVal))));
+          ctx.lineTo(cx, Math.floor(y(Math.min(c.low, closeVal))));
           ctx.stroke();
           
-          // Body
-          const top = Math.floor(y(Math.max(c.open, c.close)));
-          const bot = Math.floor(y(Math.min(c.open, c.close)));
+          const top = Math.floor(y(Math.max(c.open, closeVal)));
+          const bot = Math.floor(y(Math.min(c.open, closeVal)));
           const bodyH = Math.max(1, bot - top);
           const cW = Math.max(1, Math.floor(baseCandleWidth));
           
@@ -586,18 +638,29 @@
         });
       }
 
-      // Live Price Line
-      const latest = visibleData[visibleData.length-1];
-      if (currentOffset === maxOffset && latest) {
-         const ly = Math.floor(y(latest.close));
+      // --- Live Price Line & Glow Effect ---
+      if (currentOffset === maxOffset) {
+         const ly = Math.floor(y(lerpedPrice));
+         const flashColor = priceDirection === 'up' ? 'rgba(168,85,247,' : 'rgba(225,29,72,'; // Purple vs Pink
+         
+         ctx.save();
+         // Add Dramatic Glow if intensity > 0
+         if (flashIntensity > 0) {
+            ctx.shadowBlur = 15 * flashIntensity;
+            ctx.shadowColor = flashColor + flashIntensity + ')';
+         }
+
          ctx.beginPath(); ctx.moveTo(pL, ly); ctx.lineTo(w, ly);
-         ctx.setLineDash([4, 4]); ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1; ctx.stroke();
+         ctx.setLineDash([4, 4]); ctx.strokeStyle = flashColor + (0.5 + flashIntensity*0.5) + ')'; 
+         ctx.lineWidth = 1 + flashIntensity; ctx.stroke();
          ctx.setLineDash([]);
          
-         ctx.fillStyle = '#0284c7';
+         ctx.fillStyle = priceDirection === 'up' ? '#8b5cf6' : '#e11d48';
          ctx.fillRect(w - pR + 2, ly - 10, pR - 4, 20);
          ctx.fillStyle = 'white';
-         ctx.fillText(latest.close.toFixed(4), w - pR + 8, ly);
+         ctx.fillText(lerpedPrice.toFixed(4), w - pR + 8, ly);
+         
+         ctx.restore();
       }
     }
 
@@ -611,21 +674,42 @@
         positionsData = data.positions || [];
         tensorBalancesMap = data.balances || {};
         
+        calculateCombinedBalance();
         renderSidebar();
         renderPositions();
-        calcOrder(); // Update balance display
 
         if(!activeToken && tokenData.length > 0) {
           selectToken(tokenData[0].id);
         } else if (activeToken) {
           const updated = tokenData.find(t => t.id === activeToken.id);
           if (updated) {
-            activeToken = updated;
-            updateHeaderUI();
-            calcOrder(); 
+            triggerPriceUpdate(updated);
           }
         }
       } catch(e) {}
+    }
+
+    function triggerPriceUpdate(updatedToken) {
+      const oldPrice = activeToken.price;
+      activeToken = updatedToken;
+      
+      targetPrice = activeToken.price;
+
+      if (activeToken.price !== oldPrice && oldPrice > 0) {
+        priceDirection = activeToken.price > oldPrice ? 'up' : 'down';
+        flashIntensity = 1.0; // Trigger dramatic glow
+        
+        const priceEl = document.getElementById('actPrice');
+        priceEl.textContent = formatUsd(activeToken.price);
+        
+        // CSS Flash
+        priceEl.classList.remove('flash-up', 'flash-down');
+        void priceEl.offsetWidth; // trigger reflow
+        priceEl.classList.add(priceDirection === 'up' ? 'flash-up' : 'flash-down');
+      }
+
+      updateHeaderUI();
+      calcOrder(); 
     }
 
     function renderSidebar() {
@@ -643,7 +727,7 @@
               ${t.symbol}
             </div>
             <div style="text-align:right;">
-              <div class="token-price">${Number(t.price).toFixed(4)}</div>
+              <div class="token-price" id="sidebar_price_${t.id}">${Number(t.price).toFixed(4)}</div>
               <div class="token-change ${diff>=0?'up':'down'}">${diff>=0?'+':''}${diff.toFixed(2)}%</div>
             </div>
           </div>
@@ -654,26 +738,21 @@
     function selectToken(id) {
       activeToken = tokenData.find(t => t.id === id);
       if(!activeToken) return;
+      
+      targetPrice = activeToken.price;
+      lerpedPrice = activeToken.price; // Instant snap on change
+      flashIntensity = 0;
+
       renderSidebar();
       updateHeaderUI();
-      chartOffsetX = 0; // reset scroll
+      chartOffsetX = 0; 
       fetchChartData();
       calcOrder();
     }
 
     function updateHeaderUI() {
       document.getElementById('actSymbol').textContent = activeToken.symbol;
-      
-      const priceEl = document.getElementById('actPrice');
-      const oldPrice = Number(priceEl.dataset.raw || 0);
-      priceEl.textContent = formatUsd(activeToken.price);
-      priceEl.dataset.raw = activeToken.price;
-      
-      if (activeToken.price > oldPrice && oldPrice > 0) {
-          priceEl.style.color = 'var(--tensor)'; setTimeout(()=>priceEl.style.color = 'var(--text)', 300);
-      } else if (activeToken.price < oldPrice && oldPrice > 0) {
-          priceEl.style.color = 'var(--pink)'; setTimeout(()=>priceEl.style.color = 'var(--text)', 300);
-      }
+      document.getElementById('actPrice').textContent = formatUsd(activeToken.price);
 
       const diff = activeToken.startPrice ? (((activeToken.price - activeToken.startPrice)/activeToken.startPrice)*100) : 0;
       const chgEl = document.getElementById('actChange');
@@ -681,7 +760,7 @@
       chgEl.className = diff>=0 ? 'up' : 'down';
     }
 
-    // --- Order Engine ---
+    // --- Order Engine (Enhanced Leverage Slider) ---
     function setOrderSide(side) {
       orderSide = side;
       document.getElementById('btnLong').classList.toggle('active', side === 'long');
@@ -694,14 +773,20 @@
     }
 
     function updateLevUI() {
-      const lev = document.getElementById('orderLeverage').value;
+      const slider = document.getElementById('orderLeverage');
+      const track = document.getElementById('sliderTrack');
+      const lev = slider.value;
+      
       document.getElementById('levValTxt').textContent = `${lev}x`;
+      
+      const pct = ((lev - slider.min) / (slider.max - slider.min)) * 100;
+      track.style.background = `linear-gradient(to right, var(--tensor) ${pct}%, var(--soft) ${pct}%)`;
+      
       calcOrder();
     }
 
     function calcOrder() {
-      const currentBal = getTradingBalance();
-      document.getElementById('availUsdt').textContent = `Bal: ${formatDec(currentBal)} USDT`;
+      document.getElementById('availUsdt').textContent = `Bal: ${formatDec(combinedTradingBal)} USDT`;
       
       if(!activeToken) return;
       
@@ -733,7 +818,7 @@
       const margin = Number(document.getElementById('orderMargin').value || 0);
       const lev = Number(document.getElementById('orderLeverage').value || 1);
       
-      if(margin <= 0 || margin > getTradingBalance()) return toast('Invalid or insufficient margin.');
+      if(margin <= 0 || margin > combinedTradingBal) return toast('Invalid or insufficient margin.');
 
       try {
         const res = await fetch('/api/tensor/trade', {
@@ -741,8 +826,10 @@
           body: JSON.stringify({ tokenId: activeToken.id, marginUsdt: margin, leverage: lev, side: orderSide })
         });
         if(res.ok) {
-           localUsdtBase -= margin;
+           // Assume local base was spent first for simulation smoothness
+           if (localUsdtBase >= margin) localUsdtBase -= margin;
            localStorage.setItem('blue_base_usdt', localUsdtBase);
+           
            document.getElementById('orderMargin').value = '';
            toast('Position Opened Successfully');
            fetchMarket();
@@ -788,7 +875,7 @@
         }
 
         const colorClass = pnl >= 0 ? 'up' : 'down';
-        const sideColor = p.side === 'long' ? 'var(--tensor)' : 'var(--pink)'; // Tensor purple for longs
+        const sideColor = p.side === 'long' ? 'var(--tensor)' : 'var(--pink)'; // Purple for longs
 
         return `
           <tr>
@@ -808,8 +895,9 @@
     window.onload = () => {
       setTheme(localStorage.getItem('blue_theme') || 'light');
       initCustomChart();
+      updateLevUI(); // Init slider style
       fetchMarket();
-      setInterval(fetchMarket, 3500); // Live price & PnL polling
+      setInterval(fetchMarket, 2500); // Live price & PnL polling
     };
     
     function setTheme(t) { document.documentElement.setAttribute('data-theme',t); localStorage.setItem('blue_theme',t); }
