@@ -76,7 +76,7 @@ function getOrCreateUser(email, role = 'user') {
       role: role,
       createdAt: nowIso(),
       lastLogin: nowIso(),
-      savedAddress: null
+      walletData: null // Stores the real encrypted payload/keys
     };
   } else {
     db.users[normEmail].lastLogin = nowIso();
@@ -195,18 +195,19 @@ app.get('/wallet', requireAuth, (req, res) => {
 });
 
 /* API Routes */
-app.get('/api/wallet/status', requireAuthJson, (req, res) => {
+app.get('/api/wallet/keys', requireAuthJson, (req, res) => {
   const db = readDb();
-  res.json({ user: db.users[req.session.user.email], isNew: req.session.user.isNew });
+  res.json({ walletData: db.users[req.session.user.email]?.walletData || null });
 });
 
-app.post('/api/wallet/save-address', requireAuthJson, (req, res) => {
+app.post('/api/wallet/keys', requireAuthJson, (req, res) => {
   const db = readDb();
   if(db.users[req.session.user.email]) {
-    db.users[req.session.user.email].savedAddress = req.body.address;
+    db.users[req.session.user.email].walletData = req.body.walletData;
     writeDb(db);
+    return res.json({ ok: true });
   }
-  res.json({ ok: true });
+  res.status(404).json({ error: 'User not found' });
 });
 
 app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
