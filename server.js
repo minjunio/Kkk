@@ -12,7 +12,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
 
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
-const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluewallet.local';
+const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluecrypto.local';
 
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
@@ -32,7 +32,7 @@ app.use(express.json({ limit: '3mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  name: 'bluewallet.sid',
+  name: 'bluecrypto.sid',
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -42,7 +42,7 @@ app.use(session({
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
   }
 }));
 
@@ -204,7 +204,6 @@ function requireAuthJson(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
-
   next();
 }
 
@@ -218,7 +217,7 @@ function saveOtp(email, otp) {
 
   db.otps[normalizedEmail] = {
     otpHash: sha(otp),
-    expiresAt: Date.now() + 1000 * 60 * 10,
+    expiresAt: Date.now() + 1000 * 60 * 10, // 10 mins
     attempts: 0,
     createdAt: nowIso()
   };
@@ -282,15 +281,15 @@ async function sendOtpEmail(email, otp) {
   }
 
   await transporter.sendMail({
-    from: `"Bluebook Wallet" <${process.env.GMAIL_USER}>`,
+    from: `"BlueCrypto" <${process.env.GMAIL_USER}>`,
     replyTo: process.env.GMAIL_USER,
     to: email,
-    subject: 'Your Bluebook Wallet login code',
-    text: `Your Bluebook Wallet login code is ${otp}. It expires in 10 minutes. If you do not see it, check Spam or Junk.`,
+    subject: 'Your BlueCrypto login code',
+    text: `Your BlueCrypto login code is ${otp}. It expires in 10 minutes. If you do not see it, check Spam or Junk.`,
     html: `
       <div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;">
         <div style="border:1px solid #dbeafe;border-radius:22px;padding:24px;background:#f8fcff;">
-          <h2 style="margin:0 0 10px;font-size:22px;">Bluebook Wallet Login Code</h2>
+          <h2 style="margin:0 0 10px;font-size:22px;">BlueCrypto Login Code</h2>
           <p style="color:#475569;margin:0 0 18px;">Use this code to access your wallet.</p>
           <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:16px;background:#eef6ff;color:#0284c7;text-align:center;">
             ${otp}
@@ -345,7 +344,7 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
       signal: controller.signal,
       headers: {
         accept: 'application/json',
-        'user-agent': 'BluebookWallet/1.0',
+        'user-agent': 'BlueCrypto/1.0',
         ...(options.headers || {})
       }
     });
@@ -516,7 +515,7 @@ app.get('/trading', requireAuth, (req, res) => {
 
 function destroySession(req, res) {
   req.session.destroy(() => {
-    res.clearCookie('bluewallet.sid', {
+    res.clearCookie('bluecrypto.sid', {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production'
@@ -774,8 +773,9 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
   }
 });
 
-/* No-key swap helper */
+/* SWAP API */
 
+// Handles simple deep links for swapping if needed externally
 app.get('/api/swap/link', requireAuthJson, (req, res) => {
   const inputCurrency = String(req.query.inputCurrency || 'ETH').trim();
   const outputCurrency = String(req.query.outputCurrency || '').trim();
@@ -796,6 +796,36 @@ app.get('/api/swap/link', requireAuthJson, (req, res) => {
     provider: 'uniswap',
     url: `https://app.uniswap.org/swap?${params.toString()}`
   });
+});
+
+// Handles the actual API quote requested by the frontend
+app.post('/api/swap/quote', requireAuthJson, (req, res) => {
+  try {
+    const { chainId, network, taker, sellToken, buyToken, sellAmount } = req.body;
+
+    if (!sellToken || !buyToken || !sellAmount) {
+      return res.status(400).json({ error: 'Missing required swap parameters.' });
+    }
+
+    // Creating a mock response formatted correctly for your frontend's parsing logic
+    // In a real production environment, you would proxy this request to the 0x API or 1inch
+    const slippageMockBuyAmount = (BigInt(sellAmount) * 98n / 100n).toString(); // Simulating 2% slippage 
+
+    res.json({
+      sellAmount,
+      buyAmount: slippageMockBuyAmount,
+      gas: '150000',
+      transaction: {
+        to: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', // standard 0x router dummy address
+        data: '0x',
+        value: sellToken === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? sellAmount : '0',
+        gas: '150000'
+      }
+    });
+  } catch (error) {
+    console.error('Swap quote error:', error);
+    res.status(500).json({ error: 'Unable to generate swap quote at this time.' });
+  }
 });
 
 /* Debug */
@@ -849,6 +879,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   ensureDb();
-  console.log(`Bluebook Wallet running on port ${PORT}`);
+  console.log(`BlueCrypto running on port ${PORT}`);
   console.log(`Node version: ${process.version}`);
 });
