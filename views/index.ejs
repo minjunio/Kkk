@@ -12,16 +12,15 @@
   <style>
     :root {
       color-scheme: light;
-      --bg1:#e9f8ff;
+      --bg1:#eaf8ff;
       --bg2:#f8fcff;
-      --bg3:#d7f0ff;
-      --glass:rgba(255,255,255,.84);
-      --glass2:rgba(255,255,255,.66);
+      --bg3:#d7efff;
+      --panel:rgba(255,255,255,.86);
+      --panel2:rgba(255,255,255,.68);
       --solid:#fff;
-      --soft:#f3f9ff;
+      --soft:#f2f8ff;
       --text:#0f172a;
       --muted:#64748b;
-      --muted2:#94a3b8;
       --blue:#0284c7;
       --blue2:#2563eb;
       --cyan:#38bdf8;
@@ -30,8 +29,8 @@
       --orange:#d97706;
       --border:rgba(15,23,42,.08);
       --border2:rgba(2,132,199,.30);
-      --shadow:0 26px 82px rgba(37,99,235,.15);
-      --shadow2:0 14px 38px rgba(15,23,42,.08);
+      --shadow:0 22px 70px rgba(37,99,235,.13);
+      --shadow2:0 10px 30px rgba(15,23,42,.07);
       --safe-top:env(safe-area-inset-top);
       --safe-bottom:env(safe-area-inset-bottom);
     }
@@ -41,18 +40,17 @@
       --bg1:#06111f;
       --bg2:#050816;
       --bg3:#0a2942;
-      --glass:rgba(13,22,40,.86);
-      --glass2:rgba(17,29,51,.70);
+      --panel:rgba(13,22,40,.88);
+      --panel2:rgba(17,29,51,.72);
       --solid:#0d1628;
       --soft:#111d33;
       --text:#f8fafc;
       --muted:#94a3b8;
-      --muted2:#64748b;
       --blue:#38bdf8;
       --border:rgba(125,211,252,.14);
       --border2:rgba(56,189,248,.34);
-      --shadow:0 28px 86px rgba(0,0,0,.42);
-      --shadow2:0 14px 38px rgba(0,0,0,.25);
+      --shadow:0 26px 82px rgba(0,0,0,.40);
+      --shadow2:0 12px 32px rgba(0,0,0,.22);
     }
 
     * {
@@ -73,37 +71,28 @@
       min-height:100vh;
       color:var(--text);
       background:
-        radial-gradient(circle at 8% 5%,rgba(56,189,248,.32),transparent 30%),
-        radial-gradient(circle at 92% 12%,rgba(37,99,235,.18),transparent 24%),
-        radial-gradient(circle at 50% 105%,rgba(14,165,233,.18),transparent 30%),
-        linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
+        radial-gradient(circle at 8% 5%,rgba(56,189,248,.28),transparent 30%),
+        radial-gradient(circle at 92% 12%,rgba(37,99,235,.16),transparent 24%),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 48%,var(--bg3));
       background-attachment:fixed;
       padding-bottom:calc(92px + var(--safe-bottom));
     }
 
-    button,input,select,textarea {
-      font:inherit;
-    }
-
-    button {
-      border:0;
-      cursor:pointer;
-    }
+    button,input,select,textarea { font:inherit; }
+    button { border:0; cursor:pointer; }
+    img { display:block; }
 
     .topbar {
       position:sticky;
       top:0;
       z-index:50;
       padding:calc(10px + var(--safe-top)) 12px 10px;
-      background:rgba(248,251,255,.68);
+      background:rgba(248,251,255,.72);
       border-bottom:1px solid var(--border);
-      backdrop-filter:blur(22px);
-      -webkit-backdrop-filter:blur(22px);
+      backdrop-filter:blur(18px);
     }
 
-    [data-theme="dark"] .topbar {
-      background:rgba(5,8,22,.76);
-    }
+    [data-theme="dark"] .topbar { background:rgba(5,8,22,.76); }
 
     .topbar-inner {
       width:min(980px,100%);
@@ -130,7 +119,7 @@
       color:white;
       font-weight:950;
       background:linear-gradient(135deg,var(--blue2),var(--cyan));
-      box-shadow:0 14px 34px rgba(37,99,235,.24);
+      box-shadow:0 12px 28px rgba(37,99,235,.24);
       flex:0 0 auto;
     }
 
@@ -161,12 +150,10 @@
       display:grid;
       place-items:center;
       border-radius:16px;
-      background:var(--glass);
+      background:var(--panel);
       border:1px solid var(--border);
       color:var(--text);
       box-shadow:var(--shadow2);
-      backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
       font-weight:950;
     }
 
@@ -179,32 +166,27 @@
     .hero {
       position:relative;
       overflow:hidden;
-      border-radius:34px;
-      padding:18px;
-      background:var(--glass);
+      border-radius:32px;
+      padding:17px;
+      background:var(--panel);
       border:1px solid var(--border);
       box-shadow:var(--shadow);
-      backdrop-filter:blur(24px);
-      -webkit-backdrop-filter:blur(24px);
-      contain:layout paint;
+      backdrop-filter:blur(20px);
     }
 
     .hero::before {
       content:"";
       position:absolute;
-      right:-90px;
-      bottom:-130px;
-      width:320px;
-      height:320px;
+      right:-110px;
+      bottom:-140px;
+      width:330px;
+      height:330px;
       border-radius:50%;
-      background:radial-gradient(circle,rgba(2,132,199,.25),transparent 70%);
+      background:radial-gradient(circle,rgba(2,132,199,.22),transparent 70%);
       pointer-events:none;
     }
 
-    .hero-inner {
-      position:relative;
-      z-index:1;
-    }
+    .hero-inner { position:relative; z-index:1; }
 
     .badge {
       display:inline-flex;
@@ -234,13 +216,12 @@
     }
 
     .balance {
-      margin-top:14px;
+      margin-top:13px;
       font-size:clamp(2.55rem,12vw,5.15rem);
       font-weight:950;
       line-height:.93;
       letter-spacing:-.08em;
       font-variant-numeric:tabular-nums;
-      will-change:contents;
     }
 
     .pnl-line {
@@ -250,7 +231,7 @@
       gap:8px;
       padding:8px 11px;
       border-radius:999px;
-      background:var(--glass2);
+      background:var(--panel2);
       border:1px solid var(--border);
       color:var(--muted);
       font-weight:900;
@@ -277,32 +258,26 @@
       scroll-snap-type:x proximity;
       scrollbar-width:none;
       padding:2px 2px 6px;
-      contain:layout paint;
     }
 
-    .market-strip::-webkit-scrollbar {
-      display:none;
-    }
+    .market-strip::-webkit-scrollbar { display:none; }
 
     .market-card {
-      flex:0 0 150px;
+      flex:0 0 146px;
       scroll-snap-align:start;
       padding:12px;
-      border-radius:23px;
-      background:var(--glass2);
+      border-radius:22px;
+      background:var(--panel2);
       border:1px solid var(--border);
       box-shadow:var(--shadow2);
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
       color:var(--text);
       text-align:left;
       min-width:0;
-      contain:layout paint;
     }
 
     .market-card strong {
       display:block;
-      font-size:.88rem;
+      font-size:.87rem;
       font-weight:950;
       margin-top:8px;
     }
@@ -321,13 +296,8 @@
       color:var(--muted);
     }
 
-    .change.up {
-      color:var(--green);
-    }
-
-    .change.down {
-      color:var(--pink);
-    }
+    .change.up { color:var(--green); }
+    .change.down { color:var(--pink); }
 
     .chips {
       display:flex;
@@ -338,21 +308,17 @@
       padding-bottom:2px;
     }
 
-    .chips::-webkit-scrollbar {
-      display:none;
-    }
+    .chips::-webkit-scrollbar { display:none; }
 
     .chip {
       flex:0 0 auto;
       padding:8px 10px;
       border-radius:999px;
       color:var(--muted);
-      background:var(--glass2);
+      background:var(--panel2);
       border:1px solid var(--border);
       font-size:.72rem;
       font-weight:900;
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
     }
 
     .quick {
@@ -363,7 +329,7 @@
     }
 
     .quick-btn {
-      min-height:74px;
+      min-height:72px;
       border-radius:23px;
       padding:10px;
       text-align:center;
@@ -392,28 +358,24 @@
       font-weight:850;
     }
 
-    .quick-btn.primary span {
-      color:rgba(255,255,255,.84);
-    }
+    .quick-btn.primary span { color:rgba(255,255,255,.84); }
 
     .panel {
       margin-top:12px;
-      border-radius:27px;
-      padding:15px;
-      background:var(--glass);
+      border-radius:26px;
+      padding:14px;
+      background:var(--panel);
       border:1px solid var(--border);
       box-shadow:var(--shadow2);
-      backdrop-filter:blur(20px);
-      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(18px);
       overflow:hidden;
       max-width:100%;
-      contain:layout paint;
     }
 
     .panel-head {
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
+      align-items:center;
       gap:10px;
       margin-bottom:12px;
     }
@@ -431,42 +393,36 @@
       scroll-snap-type:x proximity;
       scrollbar-width:none;
       padding:2px 2px 5px;
-      contain:layout paint;
     }
 
-    .asset-scroll::-webkit-scrollbar {
-      display:none;
-    }
+    .asset-scroll::-webkit-scrollbar { display:none; }
 
     .asset-card,
     .staking-card {
-      flex:0 0 178px;
+      flex:0 0 176px;
       scroll-snap-align:start;
       border-radius:24px;
       padding:14px;
-      background:var(--glass2);
+      background:var(--panel2);
       border:1px solid var(--border);
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
       min-width:0;
       color:var(--text);
       text-align:left;
-      box-shadow:0 8px 24px rgba(15,23,42,.05);
-      contain:layout paint;
+      box-shadow:0 8px 22px rgba(15,23,42,.05);
     }
 
     [data-theme="dark"] .asset-card,
     [data-theme="dark"] .staking-card,
     [data-theme="dark"] .market-card {
-      box-shadow:0 10px 28px rgba(0,0,0,.18);
+      box-shadow:0 10px 26px rgba(0,0,0,.18);
     }
 
     .asset-card.watch {
-      background:linear-gradient(180deg,var(--glass2),rgba(255,255,255,.26));
+      background:linear-gradient(180deg,var(--panel2),rgba(255,255,255,.25));
     }
 
     [data-theme="dark"] .asset-card.watch {
-      background:linear-gradient(180deg,var(--glass2),rgba(17,29,51,.35));
+      background:linear-gradient(180deg,var(--panel2),rgba(17,29,51,.35));
     }
 
     .asset-card.selected,
@@ -488,22 +444,21 @@
       display:grid;
       place-items:center;
       border-radius:50%;
-      background:var(--soft);
+      background:var(--solid);
       border:1px solid var(--border);
       color:var(--blue);
       font-size:.7rem;
       font-weight:950;
       overflow:hidden;
       flex:0 0 auto;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+      box-shadow:0 6px 14px rgba(15,23,42,.06);
     }
 
     .coin img {
       width:100%;
       height:100%;
       object-fit:cover;
-      image-rendering:auto;
-      transform:translateZ(0);
+      transform:scale(1.02);
     }
 
     .name {
@@ -553,6 +508,13 @@
       font-weight:850;
     }
 
+    .mini-net span {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
     .apy {
       margin-top:11px;
       font-size:1.7rem;
@@ -580,7 +542,7 @@
     .primary-btn {
       color:white;
       background:linear-gradient(135deg,var(--blue2),var(--blue));
-      box-shadow:0 14px 30px rgba(37,99,235,.20);
+      box-shadow:0 12px 26px rgba(37,99,235,.18);
     }
 
     .secondary-btn {
@@ -594,15 +556,8 @@
       background:linear-gradient(135deg,#be123c,#fb7185);
     }
 
-    .form {
-      display:grid;
-      gap:10px;
-    }
-
-    .field {
-      display:grid;
-      gap:7px;
-    }
+    .form { display:grid; gap:10px; }
+    .field { display:grid; gap:7px; min-width:0; }
 
     label {
       color:var(--muted);
@@ -623,6 +578,7 @@
       outline:none;
       font-weight:850;
       max-width:100%;
+      min-width:0;
     }
 
     .textarea {
@@ -640,15 +596,13 @@
       margin-top:10px;
     }
 
-    .button-row.one {
-      grid-template-columns:1fr;
-    }
+    .button-row.one { grid-template-columns:1fr; }
 
     .box {
       margin-top:10px;
       padding:12px;
       border-radius:19px;
-      background:var(--glass2);
+      background:var(--panel2);
       border:1px solid var(--border);
       max-width:100%;
       min-width:0;
@@ -675,25 +629,12 @@
       background:var(--soft);
       border:1px solid var(--border);
       min-width:0;
-      overflow:hidden;
     }
 
     .receive-main {
       display:grid;
       gap:12px;
       min-width:0;
-    }
-
-    .receive-address-wrap {
-      min-width:0;
-      width:100%;
-    }
-
-    #receiveAddressText,
-    #receiveAddressInput,
-    #receiveContractText {
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
 
     .qr-box {
@@ -707,21 +648,20 @@
       border:1px solid rgba(15,23,42,.08);
       padding:14px;
       overflow:hidden;
-      box-shadow:0 14px 36px rgba(15,23,42,.10);
     }
 
-    .qr-box canvas,
-    .qr-box img {
+    .qr-box canvas {
       width:100% !important;
       height:auto !important;
-      max-width:100%;
-      max-height:100%;
       display:block;
     }
 
     .receive-grid {
       display:grid;
       gap:8px;
+      max-height:270px;
+      overflow:auto;
+      padding-right:2px;
     }
 
     .receive-option {
@@ -735,8 +675,8 @@
       border:1px solid var(--border);
       text-align:left;
       max-width:100%;
-      color:var(--text);
       min-width:0;
+      color:var(--text);
     }
 
     .receive-option > div {
@@ -744,7 +684,9 @@
     }
 
     .receive-option .name,
-    .receive-option .tiny {
+    .receive-option .tiny,
+    #receiveAddressText,
+    #receiveAddressInput {
       overflow:hidden;
       text-overflow:ellipsis;
     }
@@ -752,6 +694,17 @@
     .receive-option.selected {
       border-color:var(--border2);
       box-shadow:0 0 0 4px rgba(2,132,199,.08);
+    }
+
+    @media (min-width:620px) {
+      .receive-card {
+        grid-template-columns:230px minmax(0,1fr);
+        align-items:center;
+      }
+
+      .receive-card .primary-btn {
+        grid-column:1 / -1;
+      }
     }
 
     .fee-box {
@@ -796,7 +749,6 @@
       border:1px solid var(--border);
       overflow:hidden;
       padding:10px;
-      contain:layout paint;
     }
 
     .chart-head {
@@ -821,9 +773,7 @@
       margin:10px 0;
     }
 
-    .timeframe-row::-webkit-scrollbar {
-      display:none;
-    }
+    .timeframe-row::-webkit-scrollbar { display:none; }
 
     .timeframe-btn {
       flex:0 0 auto;
@@ -856,13 +806,10 @@
       display:none;
       background:rgba(15,23,42,.42);
       backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
       padding:10px;
     }
 
-    .modal-overlay.active,.drawer-overlay.active {
-      display:block;
-    }
+    .modal-overlay.active,.drawer-overlay.active { display:block; }
 
     .modal-card {
       width:min(540px,100%);
@@ -894,12 +841,12 @@
     }
 
     @keyframes pop {
-      from { transform:translateY(14px) scale(.985); opacity:0; }
+      from { transform:translateY(16px) scale(.985); opacity:0; }
       to { transform:translateY(0) scale(1); opacity:1; }
     }
 
     @keyframes slide {
-      from { transform:translateX(28px); opacity:0; }
+      from { transform:translateX(32px); opacity:0; }
       to { transform:translateX(0); opacity:1; }
     }
 
@@ -984,16 +931,13 @@
       gap:6px;
       padding:7px;
       border-radius:23px;
-      background:rgba(255,255,255,.9);
+      background:rgba(255,255,255,.92);
       border:1px solid var(--border);
       box-shadow:var(--shadow);
       backdrop-filter:blur(16px);
-      -webkit-backdrop-filter:blur(16px);
     }
 
-    [data-theme="dark"] .bottom-nav {
-      background:rgba(13,22,40,.92);
-    }
+    [data-theme="dark"] .bottom-nav { background:rgba(13,22,40,.94); }
 
     .bottom-nav button {
       min-height:48px;
@@ -1009,17 +953,6 @@
       background:linear-gradient(135deg,var(--blue2),var(--blue));
     }
 
-    @media (min-width:620px) {
-      .receive-card {
-        grid-template-columns:230px minmax(0,1fr);
-        align-items:center;
-      }
-
-      .receive-card .primary-btn {
-        grid-column:1 / -1;
-      }
-    }
-
     @media (max-width:580px) {
       body { padding-bottom:calc(84px + var(--safe-bottom)); }
       .shell { padding:9px; }
@@ -1029,8 +962,8 @@
       .quick-btn strong { font-size:.8rem; }
       .quick-btn span { font-size:.62rem; }
       .panel { padding:12px; border-radius:23px; }
-      .asset-card,.staking-card { flex-basis:160px; }
-      .market-card { flex-basis:138px; }
+      .asset-card,.staking-card { flex-basis:158px; }
+      .market-card { flex-basis:136px; }
       .receive-option { grid-template-columns:1fr; }
       .button-row { grid-template-columns:1fr; }
       .brand-sub { display:none; }
@@ -1100,7 +1033,6 @@
         <h2 class="title">Assets</h2>
         <button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button>
       </div>
-
       <div class="asset-scroll" id="assetCards"></div>
     </section>
 
@@ -1108,7 +1040,6 @@
       <div class="panel-head">
         <h2 class="title">Staking</h2>
       </div>
-
       <div class="asset-scroll" id="stakingCards"></div>
     </section>
   </main>
@@ -1125,7 +1056,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Select the network and asset. EVM tokens such as USDT use your same wallet address on that selected network.</div>
+          <div class="modal-sub">Choose the network and asset. The address is correct for that EVM network.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
@@ -1143,10 +1074,9 @@
             <div>
               <div class="name" id="receiveTitle">Receive</div>
               <div class="tiny" id="receiveAddressText">No wallet address loaded.</div>
-              <div class="tiny" id="receiveContractText"></div>
             </div>
 
-            <div class="field receive-address-wrap">
+            <div class="field">
               <label>Copy / paste address</label>
               <input class="input" id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" />
             </div>
@@ -1596,12 +1526,12 @@
     let toastTimer;
     let countdownTimer = null;
     let priceTimer = null;
+    let balanceTimer = null;
     let sendFeeRefreshAt = 0;
     let swapFeeRefreshAt = 0;
     let currentChartAsset = null;
     let currentChartTf = '5m';
     let chartTimer = null;
-    let lastAssetSignature = '';
 
     function toast(msg) {
       const el = document.getElementById('toast');
@@ -1626,7 +1556,7 @@
       if (converted >= 1_000_000) return `${cfg.symbol}${(converted / 1_000_000).toFixed(2)}M`;
       if (converted >= 1_000) return `${cfg.symbol}${(converted / 1_000).toFixed(2)}K`;
 
-      return money(value);
+      return money(converted / cfg.rate);
     }
 
     function fmt(value, decimals = 6) {
@@ -1638,14 +1568,24 @@
       return `${addr.slice(0,6)}...${addr.slice(-4)}`;
     }
 
-    function icon(symbol) {
-      const clean = String(symbol || '').toLowerCase();
-      return `<div class="coin"><img loading="lazy" decoding="async" src="https://assets.coincap.io/assets/icons/${clean}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0,4)}'" /></div>`;
+    function logoSrc(symbol) {
+      const normalized = String(symbol || '').toLowerCase();
+      return `https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/svg/color/${normalized}.svg`;
     }
 
-    function setText(id, value) {
-      const el = document.getElementById(id);
-      if (el && el.textContent !== String(value)) el.textContent = value;
+    function fallbackLogo(symbol) {
+      return `https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png`;
+    }
+
+    function icon(symbol) {
+      const safe = String(symbol || '').toUpperCase();
+      return `
+        <div class="coin">
+          <img src="${logoSrc(safe)}"
+               onerror="this.onerror=function(){this.remove();this.parentNode.textContent='${safe.slice(0,4)}'};this.src='${fallbackLogo(safe)}';"
+               alt="${safe}" />
+        </div>
+      `;
     }
 
     function openModal(id) {
@@ -1653,7 +1593,7 @@
       renderSelects();
 
       if (id === 'receiveModal') renderReceiveAssets();
-      if (id === 'assetChartModal') setTimeout(refreshChart, 20);
+      if (id === 'assetChartModal') setTimeout(refreshChart, 30);
 
       if (id === 'sendModal' || id === 'swapModal') {
         scheduleImmediateFeeRefresh();
@@ -1727,14 +1667,15 @@
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme',theme);
       localStorage.setItem('blue_theme',theme);
-      renderReceiveAssets();
       toast(`${theme} mode enabled`);
+      renderReceiveAssets();
     }
 
     function setDisplayCurrency(cur) {
       displayCurrency = cur;
       localStorage.setItem('blue_display_currency',cur);
-      renderPriceOnly();
+      document.getElementById('currencyChip').textContent = cur;
+      renderAll();
     }
 
     function rpcUrl(key = activeNetworkKey) {
@@ -1921,7 +1862,6 @@
 
       for (const key of Object.keys(NETWORKS)) {
         ids.add(NATIVE_GECKO[key]);
-
         for (const token of ERC20_TOKENS[key] || []) {
           if (token.gecko) ids.add(token.gecko);
         }
@@ -1956,4 +1896,1186 @@
       if (b?.lastPrice) return Number(b.lastPrice);
 
       if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd || 0;
-      return prices[asset
+      return prices[asset.gecko]?.usd || 0;
+    }
+
+    function changeFor(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b && Number.isFinite(Number(b.priceChangePercent))) return Number(b.priceChangePercent);
+
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd_24h_change || 0;
+      return prices[asset.gecko]?.usd_24h_change || 0;
+    }
+
+    function priceForWatch(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b?.lastPrice) return Number(b.lastPrice);
+      return prices[asset.gecko]?.usd || 0;
+    }
+
+    function changeForWatch(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b && Number.isFinite(Number(b.priceChangePercent))) return Number(b.priceChangePercent);
+      return prices[asset.gecko]?.usd_24h_change || 0;
+    }
+
+    function normalizeSymbol(asset) {
+      if (asset.symbol === 'WETH') return 'ETH';
+      if (asset.symbol === 'WBNB') return 'BNB';
+      if (asset.symbol === 'WMATIC') return 'MATIC';
+      if (asset.symbol === 'WAVAX') return 'AVAX';
+      return asset.symbol;
+    }
+
+    function combineAssets() {
+      const map = new Map();
+
+      for (const watch of WATCH_ASSETS) {
+        map.set(watch.symbol,{
+          symbol:watch.symbol,
+          name:watch.name,
+          gecko:watch.gecko,
+          amount:0,
+          usd:0,
+          weightedPrev:0,
+          positions:[],
+          isWatch:true
+        });
+      }
+
+      for (const asset of allBalances) {
+        const symbol = normalizeSymbol(asset);
+        const usd = Number(asset.balance || 0) * priceFor(asset);
+        const amount = Number(asset.balance || 0);
+
+        if (!map.has(symbol)) {
+          map.set(symbol,{
+            symbol,
+            name:asset.name || symbol,
+            gecko:asset.gecko,
+            amount:0,
+            usd:0,
+            weightedPrev:0,
+            positions:[],
+            isWatch:false
+          });
+        }
+
+        const item = map.get(symbol);
+        item.amount += amount;
+        item.usd += usd;
+
+        const change = changeFor(asset);
+        const previous = change > -99.9 ? usd / (1 + change / 100) : usd;
+        item.weightedPrev += previous;
+
+        if (amount > 0) {
+          item.isWatch = false;
+          item.positions.push({...asset,normalizedSymbol:symbol,usd});
+        }
+      }
+
+      const priority = ['BTC','SOL','ETH','BNB','XRP','USDT','USDC'];
+
+      combinedAssets = [...map.values()].sort((a,b) => {
+        if (b.usd !== a.usd) return b.usd - a.usd;
+        const ap = priority.indexOf(a.symbol);
+        const bp = priority.indexOf(b.symbol);
+        if (ap !== -1 || bp !== -1) return (ap === -1 ? 99 : ap) - (bp === -1 ? 99 : bp);
+        return a.symbol.localeCompare(b.symbol);
+      });
+
+      ownedPositions = allBalances
+        .filter(x => Number(x.balance || 0) > 0)
+        .sort((a,b) => {
+          const bv = Number(b.balance || 0) * priceFor(b);
+          const av = Number(a.balance || 0) * priceFor(a);
+          return bv - av;
+        });
+    }
+
+    function renderTopMarkets() {
+      const box = document.getElementById('topMarketCards');
+      if (!box) return;
+
+      box.innerHTML = TOP_MARKETS.map(symbol => {
+        const asset = WATCH_ASSETS.find(x => x.symbol === symbol);
+        const p = priceForWatch(asset);
+        const ch = changeForWatch(asset);
+        const meta = marketMeta[asset.gecko] || {};
+        const cap = meta.marketCap || 0;
+
+        return `
+          <button class="market-card" onclick="openAssetChart('${symbol}')">
+            ${icon(symbol)}
+            <strong>${symbol}</strong>
+            <div class="market-price">${money(p)}</div>
+            <div class="change ${ch >= 0 ? 'up' : 'down'}">${ch >= 0 ? '+' : ''}${Number(ch || 0).toFixed(2)}% 24h</div>
+            <div class="tiny">Market cap ${compactMoney(cap)}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderTotals() {
+      let total = 0;
+      let prev = 0;
+
+      for (const asset of combinedAssets) {
+        total += asset.usd;
+        prev += asset.weightedPrev || asset.usd;
+      }
+
+      const pnl = total - prev;
+      const roi = prev > 0 ? (pnl / prev) * 100 : 0;
+
+      document.getElementById('totalUsd').textContent = money(total);
+
+      const pnlLine = document.getElementById('pnlLine');
+      pnlLine.textContent = `24h PnL ${pnl >= 0 ? '+' : ''}${money(pnl)} · ROI ${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%`;
+      pnlLine.className = `pnl-line ${pnl > 0 ? 'up' : pnl < 0 ? 'down' : ''}`;
+
+      document.getElementById('tokenCountText').textContent = `${combinedAssets.length} assets`;
+      document.getElementById('currencyChip').textContent = displayCurrency;
+    }
+
+    function renderAssetCards() {
+      const el = document.getElementById('assetCards');
+
+      if (!combinedAssets.length) {
+        el.innerHTML = `<div class="asset-card"><div class="name">Loading</div><div class="tiny">Prices and balances are loading.</div></div>`;
+        return;
+      }
+
+      el.innerHTML = combinedAssets.map(asset => {
+        const live = priceForWatch(asset);
+        const change = changeForWatch(asset);
+
+        return `
+          <button class="asset-card ${asset.usd <= 0 ? 'watch' : ''}" onclick="openAssetChart('${asset.symbol}')">
+            <div class="asset-top">
+              ${icon(asset.symbol)}
+              <div style="min-width:0;text-align:left;">
+                <div class="name">${asset.symbol}</div>
+                <div class="tiny">${asset.positions.length ? `${asset.positions.length} network${asset.positions.length === 1 ? '' : 's'}` : 'Market'}</div>
+              </div>
+            </div>
+
+            <div class="asset-value">${asset.usd > 0 ? money(asset.usd) : money(live)}</div>
+            <div class="asset-sub">${fmt(asset.amount,asset.amount < 1 ? 8 : 6)} ${asset.symbol} · ${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}%</div>
+
+            <div class="network-list">
+              ${
+                asset.positions.length
+                  ? asset.positions.slice(0,3).map(p => `
+                    <div class="mini-net">
+                      <span>${p.networkName}</span>
+                      <span>${fmt(p.balance,p.balance < 1 ? 6 : 4)}</span>
+                    </div>
+                  `).join('')
+                  : `<div class="mini-net"><span>Live price</span><span>${money(live)}</span></div>`
+              }
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderAll() {
+      renderTopMarkets();
+      renderTotals();
+      renderAssetCards();
+      renderSelects();
+      renderStakingCards();
+    }
+
+    async function refreshAllBalances(force = false) {
+      try {
+        const addr = currentAddress();
+
+        if (!addr) {
+          renderAll();
+          return;
+        }
+
+        if (!force) {
+          const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            allBalances = parsed.balances || [];
+            prices = parsed.prices || {};
+            binancePrices = parsed.binancePrices || {};
+            marketMeta = parsed.marketMeta || {};
+            combineAssets();
+            renderAll();
+          }
+        }
+
+        document.getElementById('statusText').textContent = 'Updating...';
+
+        await fetchPricesForAll();
+
+        const networkTasks = Object.entries(NETWORKS).map(async ([networkKey,net]) => {
+          const out = [];
+          const p = provider(networkKey);
+
+          try {
+            const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
+
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:nativeBalance,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null
+            });
+          } catch {
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:0,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null,
+              error:true
+            });
+          }
+
+          const tokenTasks = (ERC20_TOKENS[networkKey] || []).map(async token => {
+            try {
+              const contract = new ethers.Contract(token.address,ERC20_ABI,p);
+              const raw = await contract.balanceOf(addr);
+
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:Number(ethers.formatUnits(raw,token.decimals))
+              };
+            } catch {
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:0,
+                error:true
+              };
+            }
+          });
+
+          out.push(...await Promise.all(tokenTasks));
+          return out;
+        });
+
+        const results = await Promise.allSettled(networkTasks);
+        allBalances = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+        saveLocalCache();
+        combineAssets();
+        renderAll();
+
+        document.getElementById('statusText').textContent = 'Updated';
+      } catch (err) {
+        console.error(err);
+        toast('Could not update');
+      }
+    }
+
+    function saveLocalCache() {
+      localStorage.setItem(`blue_balance_cache_${CURRENT_EMAIL}`,JSON.stringify({
+        updatedAt:Date.now(),
+        balances:allBalances,
+        prices,
+        binancePrices,
+        marketMeta
+      }));
+    }
+
+    function receiveOptionsFor(networkKey) {
+      const net = NETWORKS[networkKey];
+
+      return [
+        {type:'native',symbol:net.symbol,name:`${net.symbol} Native`,address:NATIVE_TOKEN,decimals:18},
+        ...(ERC20_TOKENS[networkKey] || [])
+      ];
+    }
+
+    function renderReceiveSelects() {
+      const select = document.getElementById('receiveNetworkSelect');
+      if (!select) return;
+
+      select.innerHTML = Object.entries(NETWORKS).map(([key,net]) => `<option value="${key}">${net.name}</option>`).join('');
+      select.value = activeNetworkKey;
+      renderReceiveAssets();
+    }
+
+    function renderReceiveAssets() {
+      const box = document.getElementById('receiveAssetsList');
+      if (!box) return;
+
+      const networkKey = document.getElementById('receiveNetworkSelect')?.value || activeNetworkKey;
+      const net = NETWORKS[networkKey];
+      const addr = currentAddress();
+      const assets = receiveOptionsFor(networkKey);
+
+      if (!selectedReceiveAsset || selectedReceiveAsset.networkKey !== networkKey) {
+        selectedReceiveAsset = {...assets[0],networkKey};
+      }
+
+      document.getElementById('receiveTitle').textContent = `${selectedReceiveAsset.symbol} on ${net.name}`;
+      document.getElementById('receiveAddressText').textContent = addr ? `${short(addr)} · full address below` : 'No wallet address loaded.';
+
+      const receiveInput = document.getElementById('receiveAddressInput');
+      if (receiveInput) receiveInput.value = addr || '';
+
+      renderQr(addr || '');
+
+      box.innerHTML = assets.map(asset => {
+        const selected = selectedReceiveAsset?.symbol === asset.symbol && selectedReceiveAsset?.networkKey === networkKey;
+
+        return `
+          <button class="receive-option ${selected ? 'selected' : ''}" onclick="selectReceiveAsset('${networkKey}','${asset.symbol}')">
+            <div>
+              <div class="name">${asset.symbol}</div>
+              <div class="tiny">${asset.name}</div>
+            </div>
+            <span class="small-btn">${selected ? 'Selected' : 'Select'}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectReceiveAsset(networkKey,symbol) {
+      const asset = receiveOptionsFor(networkKey).find(x => x.symbol === symbol);
+      if (!asset) return;
+
+      selectedReceiveAsset = {...asset,networkKey};
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network',networkKey);
+      updateSignerNetwork(networkKey);
+
+      renderReceiveAssets();
+    }
+
+    function renderQr(value) {
+      const box = document.getElementById('qrBox');
+      if (!box) return;
+
+      box.innerHTML = '';
+
+      if (!value || !window.QRCode) {
+        box.innerHTML = '<div class="tiny">QR loading</div>';
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        QRCode.toCanvas(value,{
+          width:210,
+          margin:1,
+          errorCorrectionLevel:'M',
+          color:{dark:'#0f172a',light:'#ffffff'}
+        },(err,canvas) => {
+          box.innerHTML = '';
+
+          if (err) {
+            box.innerHTML = '<div class="tiny">QR unavailable</div>';
+            return;
+          }
+
+          box.appendChild(canvas);
+        });
+      });
+    }
+
+    function copyReceiveAddress() {
+      const addr = currentAddress();
+      if (!addr) return toast('No address');
+
+      navigator.clipboard?.writeText(addr);
+
+      const symbol = selectedReceiveAsset?.symbol || 'Wallet';
+      toast(`${symbol} address copied`);
+    }
+
+    function updateSignerNetwork(networkKey) {
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network',networkKey);
+      activeProvider = provider(networkKey);
+
+      if (ACTIVE_DECRYPTED_WALLET) {
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey,activeProvider);
+      }
+    }
+
+    function renderOwnedCards(targetId,selected,setterName) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+
+      if (!ownedPositions.length) {
+        box.innerHTML = `<div class="asset-card"><div class="name">No assets</div><div class="tiny">Receive crypto first.</div></div>`;
+        return;
+      }
+
+      box.innerHTML = ownedPositions.map((p,index) => {
+        const id = `${p.networkKey}:${p.address || 'native'}:${p.symbol}`;
+        const selectedId = selected ? `${selected.networkKey}:${selected.address || 'native'}:${selected.symbol}` : '';
+
+        return `
+          <button class="asset-card ${id === selectedId ? 'selected' : ''}" onclick="${setterName}(${index})">
+            <div class="asset-top">
+              ${icon(p.symbol)}
+              <div style="min-width:0;text-align:left;">
+                <div class="name">${p.symbol}</div>
+                <div class="tiny">${p.networkName}</div>
+              </div>
+            </div>
+            <div class="asset-value">${money(Number(p.balance || 0) * priceFor(p))}</div>
+            <div class="asset-sub">${fmt(p.balance,p.balance < 1 ? 8 : 6)} ${p.symbol}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setSelectedSend(index) {
+      selectedSend = ownedPositions[index] || null;
+      if (selectedSend) updateSignerNetwork(selectedSend.networkKey);
+      renderSelects();
+      renderSendBalance();
+      scheduleImmediateFeeRefresh();
+    }
+
+    function setSelectedSwapSell(index) {
+      selectedSwapSell = ownedPositions[index] || null;
+      if (selectedSwapSell) updateSignerNetwork(selectedSwapSell.networkKey);
+      renderSelects();
+      renderSwapBalance();
+      scheduleImmediateFeeRefresh();
+    }
+
+    function renderSendBalance() {
+      const el = document.getElementById('sendBalanceText');
+      if (!el) return;
+
+      if (!selectedSend) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
+        return;
+      }
+
+      el.textContent = `${fmt(selectedSend.balance,selectedSend.balance < 1 ? 8 : 6)} ${selectedSend.symbol} on ${selectedSend.networkName} · ${money(Number(selectedSend.balance || 0) * priceFor(selectedSend))}`;
+    }
+
+    function renderSwapBalance() {
+      const el = document.getElementById('swapSellBalanceText');
+      if (!el) return;
+
+      if (!selectedSwapSell) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
+        return;
+      }
+
+      el.textContent = `${fmt(selectedSwapSell.balance,selectedSwapSell.balance < 1 ? 8 : 6)} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName} · ${money(Number(selectedSwapSell.balance || 0) * priceFor(selectedSwapSell))}`;
+    }
+
+    function renderSwapBuyOptions() {
+      const select = document.getElementById('swapBuySelect');
+      if (!select) return;
+
+      const net = NETWORKS[activeNetworkKey];
+
+      select.innerHTML = [
+        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
+        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
+      ].join('');
+    }
+
+    function renderSelects() {
+      if (!selectedSend && ownedPositions.length) selectedSend = ownedPositions[0];
+      if (!selectedSwapSell && ownedPositions.length) selectedSwapSell = ownedPositions[0];
+
+      renderReceiveSelects();
+      renderOwnedCards('sendOwnedAssets',selectedSend,'setSelectedSend');
+      renderOwnedCards('swapOwnedAssets',selectedSwapSell,'setSelectedSwapSell');
+
+      if (selectedSend && document.getElementById('sendModal')?.classList.contains('active')) {
+        updateSignerNetwork(selectedSend.networkKey);
+      }
+
+      if (selectedSwapSell && document.getElementById('swapModal')?.classList.contains('active')) {
+        updateSignerNetwork(selectedSwapSell.networkKey);
+      }
+
+      renderSwapBuyOptions();
+      renderSendBalance();
+      renderSwapBalance();
+    }
+
+    function selectedToSwapToken(position) {
+      if (!position) return null;
+      if (position.type === 'native') return NATIVE_TOKEN;
+      return position.address;
+    }
+
+    async function estimateSendFee() {
+      try {
+        if (!document.getElementById('sendModal')?.classList.contains('active')) return;
+
+        if (!selectedSend) {
+          document.getElementById('sendFeePreview').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSend.networkKey);
+
+        if (!activeSigner) {
+          document.getElementById('sendFeePreview').textContent = 'Wallet is still loading.';
+          return;
+        }
+
+        const to = document.getElementById('sendToInput').value.trim();
+        const amount = document.getElementById('sendAmountInput').value.trim();
+
+        if (!ethers.isAddress(to) || !amount || Number(amount) <= 0) {
+          document.getElementById('sendFeePreview').textContent = 'Enter valid address and amount.';
+          return;
+        }
+
+        let gas;
+
+        if (selectedSend.type === 'native') {
+          gas = await activeSigner.estimateGas({to,value:ethers.parseEther(amount)});
+        } else {
+          const contract = new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner);
+          gas = await contract.transfer.estimateGas(to,ethers.parseUnits(amount,selectedSend.decimals));
+        }
+
+        const feeData = await activeSigner.provider.getFeeData();
+        const gasPrice = feeData.gasPrice || 0n;
+        const totalFee = gas * gasPrice;
+
+        document.getElementById('sendFeePreview').textContent =
+          `Network: ${selectedSend.networkName} · Gas ${gas.toString()} · fee ≈ ${ethers.formatEther(totalFee)} ${NETWORKS[selectedSend.networkKey].symbol}`;
+      } catch (err) {
+        document.getElementById('sendFeePreview').textContent = err.shortMessage || err.message || 'Fee estimate failed';
+      }
+    }
+
+    function openSendConfirm() {
+      if (!selectedSend) return toast('No asset selected');
+
+      const to = document.getElementById('sendToInput').value.trim();
+      const amount = document.getElementById('sendAmountInput').value.trim();
+
+      document.getElementById('sendConfirmText').textContent =
+        `Send ${amount || '0'} ${selectedSend.symbol} on ${selectedSend.networkName} to ${to || 'no address'}.`;
+
+      openModal('sendConfirmModal');
+    }
+
+    async function sendRealTransaction() {
+      try {
+        if (!selectedSend) throw new Error('No asset selected');
+
+        updateSignerNetwork(selectedSend.networkKey);
+
+        const signer = await ensureUnlocked();
+        const to = document.getElementById('sendToInput').value.trim();
+        const amount = document.getElementById('sendAmountInput').value.trim();
+
+        if (!ethers.isAddress(to)) throw new Error('Invalid address');
+        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
+
+        let tx;
+
+        if (selectedSend.type === 'native') {
+          tx = await signer.sendTransaction({to,value:ethers.parseEther(amount)});
+        } else {
+          const contract = new ethers.Contract(selectedSend.address,ERC20_ABI,signer);
+          tx = await contract.transfer(to,ethers.parseUnits(amount,selectedSend.decimals));
+        }
+
+        closeModal('sendConfirmModal');
+        closeModal('sendModal');
+        toast('Transaction sent');
+
+        await tx.wait();
+
+        toast('Transaction confirmed');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Send failed');
+      }
+    }
+
+    async function estimateSwapFee() {
+      try {
+        if (!document.getElementById('swapModal')?.classList.contains('active')) return;
+
+        if (!selectedSwapSell) {
+          document.getElementById('swapQuoteText').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
+
+        const amount = document.getElementById('swapAmount').value.trim();
+
+        if (!amount || Number(amount) <= 0) {
+          document.getElementById('swapQuoteText').textContent = 'Enter amount to estimate route.';
+          return;
+        }
+
+        document.getElementById('swapQuoteText').textContent =
+          `Route: ${amount} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Getting quote...`;
+
+        await getSwapQuote(false);
+      } catch {}
+    }
+
+    async function getSwapQuote(showToast = true) {
+      try {
+        if (!selectedSwapSell) throw new Error('No sell asset selected');
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
+
+        const signer = await ensureUnlocked();
+        const sellToken = selectedToSwapToken(selectedSwapSell);
+        const buyToken = document.getElementById('swapBuySelect').value;
+        const amount = document.getElementById('swapAmount').value.trim();
+
+        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
+
+        const sellAmount = ethers.parseUnits(amount,selectedSwapSell.decimals).toString();
+
+        const res = await fetch('/api/swap/quote',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            chainId:NETWORKS[selectedSwapSell.networkKey].chainId,
+            network:selectedSwapSell.networkKey,
+            taker:await signer.getAddress(),
+            sellToken,
+            buyToken,
+            sellAmount
+          })
+        });
+
+        const quote = await res.json();
+
+        if (!res.ok) throw new Error(quote.error || 'Swap quote failed.');
+
+        window.__BLUE_SWAP_QUOTE = quote;
+
+        const gas = quote.gas || quote.transaction?.gas || 'N/A';
+        const value = quote.value || quote.transaction?.value || '0';
+
+        document.getElementById('swapQuoteText').textContent =
+          `Quote ready on ${selectedSwapSell.networkName}. Gas: ${gas} · value: ${value} · refreshes every 5s.`;
+
+        if (showToast) toast('Quote loaded');
+      } catch (err) {
+        window.__BLUE_SWAP_QUOTE = null;
+        document.getElementById('swapQuoteText').textContent = err.message || 'Quote failed';
+        if (showToast) toast(err.message || 'Quote failed');
+      }
+    }
+
+    function openSwapConfirm() {
+      const quote = window.__BLUE_SWAP_QUOTE;
+
+      if (!quote) return toast('Get a quote first');
+      if (!selectedSwapSell) return toast('No asset selected');
+
+      const gas = quote.gas || quote.transaction?.gas || 'N/A';
+
+      document.getElementById('swapConfirmText').textContent =
+        `Swap ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Gas: ${gas}.`;
+
+      openModal('swapConfirmModal');
+    }
+
+    async function executeSwap() {
+      try {
+        const quote = window.__BLUE_SWAP_QUOTE;
+        if (!quote) throw new Error('Get quote first');
+
+        const signer = await ensureUnlocked();
+        const txData = quote.transaction || quote;
+
+        const tx = await signer.sendTransaction({
+          to:txData.to,
+          data:txData.data,
+          value:txData.value ? BigInt(txData.value) : 0n,
+          gasLimit:txData.gas ? BigInt(txData.gas) : undefined
+        });
+
+        closeModal('swapConfirmModal');
+        closeModal('swapModal');
+        toast('Swap sent');
+
+        await tx.wait();
+
+        toast('Swap confirmed');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Swap failed');
+      }
+    }
+
+    function scheduleImmediateFeeRefresh() {
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+      renderCountdowns();
+    }
+
+    function renderCountdowns() {
+      const now = Date.now();
+
+      const sendRemaining = Math.max(0,Math.ceil((sendFeeRefreshAt - now) / 1000));
+      const swapRemaining = Math.max(0,Math.ceil((swapFeeRefreshAt - now) / 1000));
+
+      const sendRing = document.getElementById('sendCountdown');
+      if (sendRing) {
+        sendRing.style.setProperty('--progress',sendRemaining / 5);
+        sendRing.querySelector('span').textContent = String(sendRemaining || 0);
+      }
+
+      const swapRing = document.getElementById('swapCountdown');
+      if (swapRing) {
+        swapRing.style.setProperty('--progress',swapRemaining / 5);
+        swapRing.querySelector('span').textContent = String(swapRemaining || 0);
+      }
+    }
+
+    function startCountdownLoop() {
+      if (countdownTimer) return;
+
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+
+      countdownTimer = setInterval(async () => {
+        const now = Date.now();
+
+        if (document.getElementById('sendModal')?.classList.contains('active') && now >= sendFeeRefreshAt) {
+          sendFeeRefreshAt = now + 5000;
+          await estimateSendFee();
+        }
+
+        if (document.getElementById('swapModal')?.classList.contains('active') && now >= swapFeeRefreshAt) {
+          swapFeeRefreshAt = now + 5000;
+          await estimateSwapFee();
+        }
+
+        renderCountdowns();
+      },250);
+    }
+
+    function openAssetChart(symbol) {
+      currentChartAsset = combinedAssets.find(x => x.symbol === symbol) || WATCH_ASSETS.find(x => x.symbol === symbol);
+      if (!currentChartAsset) return;
+
+      openModal('assetChartModal');
+
+      clearInterval(chartTimer);
+      chartTimer = setInterval(refreshChart,5000);
+    }
+
+    function setChartTf(tf) {
+      currentChartTf = tf;
+
+      document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+      const el = document.getElementById(`tf${tf}`);
+      if (el) el.classList.add('active');
+
+      refreshChart();
+    }
+
+    function aggregateToCandles(pricesArray,tf) {
+      if (!Array.isArray(pricesArray) || pricesArray.length < 5) return [];
+
+      const minutes = tf === '5m' ? 5 : tf === '15m' ? 15 : 60;
+      const bucketMs = minutes * 60 * 1000;
+      const buckets = new Map();
+
+      for (const [time,price] of pricesArray) {
+        const key = Math.floor(time / bucketMs) * bucketMs;
+        if (!buckets.has(key)) buckets.set(key,[]);
+        buckets.get(key).push(Number(price));
+      }
+
+      return [...buckets.entries()].slice(-44).map(([time,values]) => {
+        const open = values[0];
+        const close = values[values.length - 1];
+        const high = Math.max(...values);
+        const low = Math.min(...values);
+        return {time,open,high,low,close};
+      });
+    }
+
+    function drawCandles(canvas,candles,latestPrice) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr,dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const padL = 48;
+      const padR = 12;
+      const padT = 16;
+      const padB = 28;
+
+      ctx.clearRect(0,0,w,h);
+
+      if (!candles.length) {
+        ctx.fillStyle = 'rgba(100,116,139,.9)';
+        ctx.font = 'bold 12px Inter';
+        ctx.fillText('Chart loading', padL, h / 2);
+        return;
+      }
+
+      const max = Math.max(...candles.map(c => c.high));
+      const min = Math.min(...candles.map(c => c.low));
+      const range = Math.max(max - min,max * .002);
+
+      const y = price => padT + ((max - price) / range) * (h - padT - padB);
+      const xStep = (w - padL - padR) / candles.length;
+      const bodyW = Math.max(4,xStep * .55);
+
+      ctx.strokeStyle = 'rgba(100,116,139,.18)';
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < 4; i++) {
+        const yy = padT + i * ((h - padT - padB) / 3);
+        ctx.beginPath();
+        ctx.moveTo(padL,yy);
+        ctx.lineTo(w - padR,yy);
+        ctx.stroke();
+
+        const price = max - i * (range / 3);
+        ctx.fillStyle = 'rgba(100,116,139,.9)';
+        ctx.font = '10px Inter';
+        ctx.fillText(price >= 1 ? price.toFixed(2) : price.toFixed(5),4,yy + 3);
+      }
+
+      candles.forEach((c,i) => {
+        const cx = padL + i * xStep + xStep / 2;
+        const up = c.close >= c.open;
+        const color = up ? '#0284c7' : '#e11d48';
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.moveTo(cx,y(c.high));
+        ctx.lineTo(cx,y(c.low));
+        ctx.stroke();
+
+        const top = y(Math.max(c.open,c.close));
+        const bottom = y(Math.min(c.open,c.close));
+        const bodyH = Math.max(2,bottom - top);
+
+        ctx.fillRect(cx - bodyW / 2,top,bodyW,bodyH);
+      });
+
+      const latestY = y(latestPrice);
+
+      ctx.strokeStyle = 'rgba(2,132,199,.45)';
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(padL,latestY);
+      ctx.lineTo(w - padR,latestY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#0284c7';
+      ctx.font = 'bold 11px Inter';
+      const label = latestPrice >= 1 ? latestPrice.toFixed(2) : latestPrice.toFixed(6);
+      const labelW = ctx.measureText(label).width + 12;
+
+      ctx.fillRect(w - padR - labelW,latestY - 10,labelW,20);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(label,w - padR - labelW + 6,latestY + 4);
+
+      ctx.fillStyle = 'rgba(100,116,139,.9)';
+      ctx.font = '10px Inter';
+      ctx.fillText(currentChartTf,padL,h - 8);
+      ctx.fillText('Now',w - padR - 24,h - 8);
+    }
+
+    async function refreshChart() {
+      if (!currentChartAsset) return;
+
+      await fetchPricesForAll();
+
+      const id = currentChartAsset.gecko;
+      const live = priceForWatch(currentChartAsset);
+      const change = changeForWatch(currentChartAsset);
+
+      document.getElementById('chartAssetTitle').textContent = `${currentChartAsset.symbol} Chart`;
+      document.getElementById('chartAssetSub').textContent = currentChartAsset.name || currentChartAsset.symbol;
+      document.getElementById('chartLivePrice').textContent = money(live);
+      document.getElementById('chartChangeText').textContent =
+        `${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}% 24h · ${currentChartTf}`;
+
+      try {
+        const binancePair = BINANCE_SYMBOLS[currentChartAsset.symbol] || '';
+        const chartSymbol = binancePair ? currentChartAsset.symbol : '';
+
+        const res = await fetch(
+          `/api/chart?id=${encodeURIComponent(id)}&symbol=${encodeURIComponent(chartSymbol)}&tf=${encodeURIComponent(currentChartTf)}`,
+          {cache:'no-store'}
+        );
+
+        const data = await res.json();
+
+        const candles = Array.isArray(data.candles) && data.candles.length
+          ? data.candles
+          : aggregateToCandles(data.prices || [],currentChartTf);
+
+        const latest = live || candles[candles.length - 1]?.close || 1;
+
+        drawCandles(document.getElementById('assetChartCanvas'),candles,latest);
+      } catch {
+        const latest = live || 1;
+        drawCandles(document.getElementById('assetChartCanvas'),[],latest);
+      }
+    }
+
+    function renderStakingCards() {
+      const box = document.getElementById('stakingCards');
+      if (!box) return;
+
+      const available = STAKING_OPTIONS
+        .filter(option => option.real)
+        .sort((a,b) => b.apy - a.apy);
+
+      box.innerHTML = available.map(option => {
+        const owned = ownedPositions.find(p => normalizeSymbol(p) === option.asset && p.networkKey === option.networkKey);
+
+        return `
+          <div class="staking-card">
+            <div class="asset-top">
+              ${icon(option.asset)}
+              <div style="min-width:0;">
+                <div class="name">${option.title}</div>
+                <div class="tiny">${NETWORKS[option.networkKey].name}</div>
+              </div>
+            </div>
+
+            <div class="apy">${option.apy.toFixed(2)}%</div>
+            <div class="asset-sub">APY · Available</div>
+
+            <div class="tiny" style="margin-top:8px;">${option.description}</div>
+            <div class="tiny" style="margin-top:6px;">
+              Balance: ${owned ? `${fmt(owned.balance,6)} ${owned.symbol}` : `0 ${option.asset}`}
+            </div>
+
+            <button class="primary-btn" style="width:100%;margin-top:10px;" onclick="openStake('${option.id}')">Stake</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openStake(id) {
+      selectedStake = STAKING_OPTIONS.find(x => x.id === id);
+      if (!selectedStake) return;
+
+      const owned = ownedPositions.find(p => normalizeSymbol(p) === selectedStake.asset && p.networkKey === selectedStake.networkKey);
+
+      document.getElementById('stakeTitle').textContent = selectedStake.title;
+      document.getElementById('stakeSub').textContent = `${selectedStake.apy.toFixed(2)}% APY on ${NETWORKS[selectedStake.networkKey].name}`;
+      document.getElementById('stakeBalanceText').textContent = owned
+        ? `${fmt(owned.balance,6)} ${owned.symbol} available`
+        : `0 ${selectedStake.asset} available`;
+
+      document.getElementById('stakeAmountInput').value = '';
+      openModal('stakeModal');
+    }
+
+    async function executeStake() {
+      if (!selectedStake) return toast('No staking option');
+
+      const amount = document.getElementById('stakeAmountInput').value.trim();
+      if (!amount || Number(amount) <= 0) return toast('Invalid amount');
+
+      if (selectedStake.adapter === 'lido') {
+        await stakeEthLido(amount);
+      }
+    }
+
+    async function stakeEthLido(amount) {
+      try {
+        updateSignerNetwork('ethereum');
+
+        const signer = await ensureUnlocked();
+        const lido = new ethers.Contract(LIDO_STETH_CONTRACT,LIDO_ABI,signer);
+
+        const tx = await lido.submit('0x0000000000000000000000000000000000000000',{
+          value:ethers.parseEther(String(amount))
+        });
+
+        closeModal('stakeModal');
+        toast('Staking sent');
+
+        await tx.wait();
+
+        toast('ETH staked');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Staking failed');
+      }
+    }
+
+    async function showSeed() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].phrase;
+      output.classList.add('visible');
+      toast('Seed phrase shown');
+    }
+
+    async function showPrivateKey() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].privateKey;
+      output.classList.add('visible');
+      toast('Private key shown');
+    }
+
+    async function deleteWallet() {
+      const value = document.getElementById('deleteConfirmInput').value.trim();
+
+      if (value !== 'DELETE') return toast('Type DELETE to confirm');
+
+      try {
+        const res = await fetch('/api/wallet/vault',{method:'DELETE'});
+        const body = await res.json().catch(() => ({}));
+
+        if (!res.ok || !body.ok) throw new Error(body.error || 'Delete failed');
+
+        localStorage.removeItem('bluecrypto_public_wallets');
+        localStorage.removeItem(`blue_device_key_${CURRENT_EMAIL}`);
+        localStorage.removeItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+
+        ACTIVE_DECRYPTED_WALLET = null;
+        activeSigner = null;
+        allBalances = [];
+        combinedAssets = [];
+        ownedPositions = [];
+
+        toast('Wallet deleted');
+
+        setTimeout(() => window.location.reload(),800);
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Delete failed');
+      }
+    }
+
+    function saveCustomRpc() {
+      const url = document.getElementById('customRpcInput').value.trim();
+
+      if (!url.startsWith('http')) return toast('Enter a valid RPC URL');
+
+      localStorage.setItem(`blue_rpc_${activeNetworkKey}`,url);
+      updateSignerNetwork(activeNetworkKey);
+
+      toast('RPC saved');
+      refreshAllBalances(true);
+    }
+
+    function renderSettings() {
+      const addr = currentAddress();
+      document.getElementById('settingsAddress').textContent = addr || 'No wallet loaded';
+
+      const currencySelect = document.getElementById('currencySelect');
+      if (currencySelect) currencySelect.value = displayCurrency;
+    }
+
+    function updateUi() {
+      const addr = currentAddress();
+      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
+      document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
+      document.getElementById('currencyChip').textContent = displayCurrency;
+      renderSettings();
+    }
+
+    async function refreshPricesOnly() {
+      await fetchPricesForAll();
+      combineAssets();
+      saveLocalCache();
+      renderAll();
+    }
+
+    async function initialize() {
+      document.documentElement.setAttribute('data-theme',localStorage.getItem('blue_theme') || 'light');
+      displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
+
+      if (SERVER_WALLET?.publicWallets) {
+        localStorage.setItem('bluecrypto_public_wallets',JSON.stringify(SERVER_WALLET.publicWallets));
+      }
+
+      activeProvider = provider(activeNetworkKey);
+      updateUi();
+
+      if (SERVER_WALLET?.encryptedVault) {
+        await unlockDeviceWallet();
+      } else {
+        await createWalletNoPin();
+      }
+
+      const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        allBalances = parsed.balances || [];
+        prices = parsed.prices || {};
+        binancePrices = parsed.binancePrices || {};
+        marketMeta = parsed.marketMeta || {};
+        combineAssets();
+        renderAll();
+      }
+
+      await refreshAllBalances(false);
+
+      startCountdownLoop();
+      setupBottomNavObserver();
+
+      clearInterval(priceTimer);
+      clearInterval(balanceTimer);
+
+      priceTimer = setInterval(refreshPricesOnly,5000);
+      balanceTimer = setInterval(() => refreshAllBalances(true),60000);
+    }
+
+    window.addEventListener('keydown',event => {
+      if (event.key === 'Escape') {
+        closeSettings();
+        document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
+      }
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
