@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -16,14 +16,13 @@
       --card: #ffffff;
       --card-2: #f7fbff;
       --border: rgba(15, 23, 42, 0.08);
-      --border-strong: rgba(2, 132, 199, 0.28);
+      --border-strong: rgba(2, 132, 199, 0.25);
       --text: #0f172a;
       --muted: #64748b;
-      --muted-2: #94a3b8;
       --primary: #0284c7;
       --primary-2: #2563eb;
       --danger: #e11d48;
-      --success: #0284c7;
+      --success: #16a34a;
       --shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
       --shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.08);
       --safe-top: env(safe-area-inset-top);
@@ -43,7 +42,7 @@
       color: var(--text);
       background:
         radial-gradient(circle at top left, rgba(2, 132, 199, 0.12), transparent 28%),
-        radial-gradient(circle at 90% 8%, rgba(225, 29, 72, 0.07), transparent 24%),
+        radial-gradient(circle at 90% 8%, rgba(22, 163, 74, 0.08), transparent 24%),
         linear-gradient(135deg, var(--bg), var(--bg-2));
       overflow-x: hidden;
     }
@@ -137,10 +136,6 @@
       gap: 28px;
     }
 
-    .hero {
-      padding: 20px 0;
-    }
-
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -220,16 +215,12 @@
       width: 100%;
       max-width: 440px;
       justify-self: end;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       border-radius: 28px;
       padding: 22px;
       backdrop-filter: blur(18px);
-    }
-
-    .card-head {
-      margin-bottom: 18px;
     }
 
     .card-title {
@@ -244,9 +235,9 @@
       font-size: 0.86rem;
       line-height: 1.5;
       font-weight: 700;
+      margin-bottom: 18px;
     }
 
-    .connect-btn,
     .primary-btn,
     .secondary-btn {
       width: 100%;
@@ -254,15 +245,7 @@
       border-radius: 16px;
       font-weight: 950;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-
-    .connect-btn {
-      background: #0f172a;
-      color: white;
-      border: 1px solid rgba(15, 23, 42, 0.1);
-      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
-      margin-bottom: 12px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
     }
 
     .primary-btn {
@@ -279,47 +262,17 @@
       border: 1px solid var(--border);
     }
 
-    .connect-btn:hover,
     .primary-btn:hover,
     .secondary-btn:hover {
       transform: translateY(-1px);
       border-color: var(--border-strong);
     }
 
-    .notice {
-      display: none;
-      margin: 10px 0 14px;
-      padding: 11px 12px;
-      border-radius: 14px;
-      background: rgba(225, 29, 72, 0.08);
-      color: var(--danger);
-      font-size: 0.82rem;
-      font-weight: 800;
-      line-height: 1.45;
-    }
-
-    .notice.active {
-      display: block;
-    }
-
-    .divider {
-      position: relative;
-      height: 1px;
-      background: var(--border);
-      margin: 20px 0;
-    }
-
-    .divider span {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      padding: 0 10px;
-      background: rgba(255, 255, 255, 0.92);
-      color: var(--muted);
-      font-size: 0.74rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
+    .primary-btn:disabled,
+    .secondary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .form-group {
@@ -355,9 +308,10 @@
     }
 
     .error-msg,
-    .success-msg {
-      padding: 11px 12px;
-      border-radius: 14px;
+    .success-msg,
+    .hint-msg {
+      padding: 12px;
+      border-radius: 15px;
       font-size: 0.83rem;
       font-weight: 850;
       line-height: 1.45;
@@ -370,8 +324,30 @@
     }
 
     .success-msg {
-      background: rgba(2, 132, 199, 0.08);
+      background: rgba(22, 163, 74, 0.09);
       color: var(--success);
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+    }
+
+    .hint-msg {
+      background: rgba(2, 132, 199, 0.08);
+      color: var(--primary);
+    }
+
+    .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--success);
+      color: white;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-size: 0.85rem;
+      font-weight: 950;
+      margin-top: -1px;
     }
 
     .small-text {
@@ -381,6 +357,10 @@
       font-weight: 700;
       line-height: 1.55;
       text-align: center;
+    }
+
+    .resend-row {
+      margin-top: 10px;
     }
 
     .modal-overlay {
@@ -462,10 +442,6 @@
       .features {
         grid-template-columns: 1fr;
       }
-
-      .hero {
-        padding-bottom: 0;
-      }
     }
 
     @media (max-width: 430px) {
@@ -488,6 +464,7 @@
     }
   </style>
 </head>
+
 <body>
   <header class="topbar">
     <div class="topbar-inner">
@@ -505,50 +482,47 @@
 
   <main class="page">
     <section class="hero">
-      <div class="eyebrow"><span class="pulse"></span> Secure OTP access</div>
+      <div class="eyebrow"><span class="pulse"></span> Secure email access</div>
       <h1>Your crypto wallet terminal.</h1>
       <p>
-        Login with your email to access your saved wallet, assets, staking options, and trading workspace.
-        New accounts automatically receive a generated wallet profile.
+        Login with your email to access your saved wallet. If this is a new email,
+        Blue Wallet will create a new encrypted wallet setup for that account.
       </p>
 
       <div class="features">
         <div class="feature">
-          <strong>Saved wallet</strong>
-          <span>Returning users load their previous wallet profile and assets.</span>
+          <strong>Same email, same wallet</strong>
+          <span>Returning users connect back to their designated wallet record.</span>
         </div>
         <div class="feature">
-          <strong>Multi-asset</strong>
-          <span>Supports BTC, ETH, SOL, DeFi, meme coins, and USDT pairs.</span>
+          <strong>OTP protected</strong>
+          <span>One-time login code sent to your email inbox.</span>
         </div>
         <div class="feature">
           <strong>Trading-ready</strong>
-          <span>Wallet data is shared with wallet.ejs and trading.ejs.</span>
+          <span>Wallet data connects to wallet.ejs and trading.ejs.</span>
         </div>
       </div>
     </section>
 
     <section class="login-card">
-      <div class="card-head">
-        <div class="card-title">Login to wallet</div>
-        <div class="card-subtitle">
-          Enter your email. We will send a one-time code to continue.
-        </div>
+      <div class="card-title">Login to wallet</div>
+      <div class="card-subtitle">
+        Enter your email. We will send a one-time code to continue.
       </div>
-
-      <button class="connect-btn" type="button" onclick="showUnavailable()">Connect Web3 Wallet</button>
-      <div class="notice" id="unavailableText">
-        Web3 wallet connection is not enabled yet. Use email OTP login for now.
-      </div>
-
-      <div class="divider"><span>EMAIL OTP</span></div>
 
       <% if (error) { %>
         <div class="error-msg"><%= error %></div>
       <% } %>
 
       <% if (success) { %>
-        <div class="success-msg"><%= success %></div>
+        <div class="success-msg">
+          <span class="check">✓</span>
+          <div>
+            <strong><%= success %></strong><br>
+            Check your inbox. If you do not see it, check Spam/Junk and mark it as “Not spam”.
+          </div>
+        </div>
       <% } %>
 
       <% if (otpEmail) { %>
@@ -575,10 +549,16 @@
           <button type="submit" class="primary-btn">Verify & Open Wallet</button>
         </form>
 
-        <form action="/send-otp" method="POST" style="margin-top: 10px;">
+        <form action="/send-otp" method="POST" class="resend-row">
           <input type="hidden" name="email" value="<%= otpEmail %>" />
-          <button type="submit" class="secondary-btn">Send New Code</button>
+          <button type="submit" class="secondary-btn" id="resendBtn" disabled>
+            Resend OTP in <span id="countdown">10</span>s
+          </button>
         </form>
+
+        <div class="hint-msg" style="margin-top: 12px;">
+          If this email already has a wallet, it will load that wallet. If not, a new wallet setup will be generated after login.
+        </div>
       <% } else { %>
         <form action="/send-otp" method="POST">
           <div class="form-group">
@@ -631,10 +611,6 @@
   </div>
 
   <script>
-    function showUnavailable() {
-      document.getElementById('unavailableText').classList.add('active');
-    }
-
     function openStaffModal() {
       document.getElementById('staffModal').classList.add('active');
     }
@@ -650,6 +626,24 @@
     window.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') closeStaffModal();
     });
+
+    const resendBtn = document.getElementById('resendBtn');
+    const countdownEl = document.getElementById('countdown');
+
+    if (resendBtn && countdownEl) {
+      let seconds = 10;
+
+      const timer = setInterval(() => {
+        seconds -= 1;
+        countdownEl.textContent = seconds;
+
+        if (seconds <= 0) {
+          clearInterval(timer);
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Resend OTP';
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
