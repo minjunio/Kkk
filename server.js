@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
 const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluewallet.local';
@@ -16,12 +16,15 @@ const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
+const ZEROX_API_KEY = process.env.ZEROX_API_KEY || '';
+const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
+
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '3mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
@@ -38,14 +41,13 @@ app.use(session({
   }
 }));
 
+const priceCache = new Map();
+
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
   if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({
-      users: {},
-      otps: {}
-    }, null, 2));
+    fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {} }, null, 2));
   }
 }
 
@@ -81,24 +83,16 @@ function nowIso() {
 
 function createWalletRecord(email, role = 'user') {
   const normalizedEmail = normalizeEmail(email);
-  const isStaff = role === 'staff';
 
   return {
-    id: `wallet_${sha(normalizedEmail).slice(0, 18)}`,
+    id: `wallet_${sha(normalizedEmail).slice(0, 20)}`,
     email: normalizedEmail,
     role,
     createdAt: nowIso(),
     updatedAt: nowIso(),
     encryptedVault: null,
     publicWallets: [],
-    assets: isStaff
-      ? [
-          { currency: 'BTC', name: 'Bitcoin', amount: 2.75, avgBuyPrice: 42000 },
-          { currency: 'ETH', name: 'Ethereum', amount: 48.5, avgBuyPrice: 2200 },
-          { currency: 'SOL', name: 'Solana', amount: 2400, avgBuyPrice: 72 },
-          { currency: 'USDT', name: 'Tether USD', amount: 250000, avgBuyPrice: 1 }
-        ]
-      : [],
+    assets: [],
     staking: {
       autoStake: false,
       riskMode: 'balanced',
@@ -114,20 +108,11 @@ function getOrCreateUser(email, role = 'user') {
   if (!db.users[normalizedEmail]) {
     db.users[normalizedEmail] = createWalletRecord(normalizedEmail, role);
     writeDb(db);
-    console.log(`Created wallet record for ${normalizedEmail}`);
   }
 
   if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
-    const staff = createWalletRecord(normalizedEmail, 'staff');
-
-    db.users[normalizedEmail] = {
-      ...db.users[normalizedEmail],
-      role: 'staff',
-      assets: staff.assets,
-      staking: staff.staking,
-      updatedAt: nowIso()
-    };
-
+    db.users[normalizedEmail].role = 'staff';
+    db.users[normalizedEmail].updatedAt = nowIso();
     writeDb(db);
   }
 
@@ -172,6 +157,11 @@ function deleteUserWalletVault(email) {
   return db.users[normalizedEmail];
 }
 
+function requireAuth(req, res, next) {
+  if (!req.session.user) return res.redirect('/');
+  next();
+}
+
 function generateOtp() {
   return String(crypto.randomInt(100000, 999999));
 }
@@ -195,20 +185,18 @@ function verifyOtp(email, otp) {
   const db = readDb();
   const record = db.otps[normalizedEmail];
 
-  if (!record) {
-    return { ok: false, reason: 'No OTP found. Please request a new code.' };
-  }
+  if (!record) return { ok: false, reason: 'No OTP found. Request a new code.' };
 
   if (Date.now() > record.expiresAt) {
     delete db.otps[normalizedEmail];
     writeDb(db);
-    return { ok: false, reason: 'OTP expired. Please request a new code.' };
+    return { ok: false, reason: 'OTP expired. Request a new code.' };
   }
 
   if (record.attempts >= 5) {
     delete db.otps[normalizedEmail];
     writeDb(db);
-    return { ok: false, reason: 'Too many attempts. Please request a new code.' };
+    return { ok: false, reason: 'Too many attempts. Request a new code.' };
   }
 
   if (sha(otp) !== record.otpHash) {
@@ -247,30 +235,19 @@ async function sendOtpEmail(email, otp) {
   }
 
   await transporter.sendMail({
-    from: `"Blue Wallet" <${process.env.GMAIL_USER}>`,
+    from: `"Bluebook Wallet" <${process.env.GMAIL_USER}>`,
     replyTo: process.env.GMAIL_USER,
     to: email,
-    subject: 'Your Blue Wallet login code',
-    text: `Your Blue Wallet login code is ${otp}. It expires in 10 minutes.`,
+    subject: 'Your Bluebook Wallet login code',
+    text: `Your Bluebook Wallet login code is ${otp}. It expires in 10 minutes.`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
-        <h2 style="margin: 0 0 12px;">Blue Wallet Login Code</h2>
-        <p style="color: #475569;">Use this code to access your wallet.</p>
-        <div style="
-          font-size: 34px;
-          font-weight: 800;
-          letter-spacing: 7px;
-          padding: 18px;
-          border-radius: 14px;
-          background: #eef6ff;
-          color: #0284c7;
-          text-align: center;
-        ">
+      <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <h2 style="margin:0 0 12px;">Bluebook Wallet Login Code</h2>
+        <p style="color:#475569;">Use this code to access your wallet.</p>
+        <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:14px;background:#eef6ff;color:#0284c7;text-align:center;">
           ${otp}
         </div>
-        <p style="color: #64748b; font-size: 13px;">
-          This code expires in 10 minutes. If you do not see it, check Spam/Junk.
-        </p>
+        <p style="color:#64748b;font-size:13px;">This code expires in 10 minutes. Check Spam/Junk if you do not see it.</p>
       </div>
     `
   });
@@ -278,9 +255,16 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
-function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/');
-  next();
+async function cachedJson(key, ttlMs, fetcher) {
+  const hit = priceCache.get(key);
+
+  if (hit && Date.now() - hit.time < ttlMs) {
+    return hit.data;
+  }
+
+  const data = await fetcher();
+  priceCache.set(key, { time: Date.now(), data });
+  return data;
 }
 
 /* Pages */
@@ -314,9 +298,7 @@ app.post('/send-otp', async (req, res) => {
 
     res.render('index', {
       error: null,
-      success: sent
-        ? 'OTP sent successfully.'
-        : 'OTP generated. Gmail is not configured, so check Render logs.',
+      success: sent ? 'OTP sent successfully. Check your inbox or spam folder.' : 'OTP generated. Gmail is not configured, check Render logs.',
       otpEmail: email
     });
   } catch (error) {
@@ -353,7 +335,7 @@ app.post('/verify-otp', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save((error) => {
+  req.session.save(error => {
     if (error) {
       console.error('Session save error:', error);
 
@@ -364,7 +346,7 @@ app.post('/verify-otp', (req, res) => {
       });
     }
 
-    return res.redirect('/wallet');
+    res.redirect('/wallet');
   });
 });
 
@@ -374,7 +356,7 @@ app.post('/staff-login', (req, res) => {
 
   if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) {
     return res.render('index', {
-      error: 'Invalid staff username or password.',
+      error: 'Invalid staff login.',
       success: null,
       otpEmail: null
     });
@@ -418,7 +400,7 @@ app.post('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-/* Wallet APIs */
+/* Wallet API */
 
 app.get('/api/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
@@ -446,28 +428,127 @@ app.post('/api/wallet/vault', requireAuth, (req, res) => {
 
 app.delete('/api/wallet/vault', requireAuth, (req, res) => {
   const user = deleteUserWalletVault(req.session.user.email);
-
-  res.json({
-    ok: true,
-    wallet: user
-  });
+  res.json({ ok: true, wallet: user });
 });
 
-app.post('/api/wallet/delete', requireAuth, (req, res) => {
-  const user = deleteUserWalletVault(req.session.user.email);
+/* Prices */
 
-  res.json({
-    ok: true,
-    wallet: user
-  });
+app.get('/api/prices', requireAuth, async (req, res) => {
+  try {
+    const ids = String(req.query.ids || '')
+      .split(',')
+      .map(x => x.trim())
+      .filter(Boolean)
+      .slice(0, 120);
+
+    if (!ids.length) return res.json({});
+
+    const key = `prices:${ids.sort().join(',')}`;
+
+    const data = await cachedJson(key, 20_000, async () => {
+      const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(ids.join(','))}&vs_currencies=usd&include_24hr_change=true`;
+      const response = await fetch(url, {
+        headers: {
+          accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error(`CoinGecko failed: ${response.status}`);
+      return response.json();
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error('Price error:', error);
+    res.status(500).json({ error: 'Unable to load prices.' });
+  }
+});
+
+app.get('/api/chart', requireAuth, async (req, res) => {
+  try {
+    const id = String(req.query.id || '').trim();
+    const tf = String(req.query.tf || '5m').trim();
+
+    if (!id) return res.status(400).json({ error: 'Missing id.' });
+
+    const days = tf === '1h' ? '1' : '1';
+    const key = `chart:${id}:${tf}`;
+
+    const data = await cachedJson(key, 20_000, async () => {
+      const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`;
+      const response = await fetch(url, {
+        headers: {
+          accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) throw new Error(`Chart failed: ${response.status}`);
+      return response.json();
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error('Chart error:', error);
+    res.status(500).json({ error: 'Unable to load chart.' });
+  }
+});
+
+/* Swap API */
+
+app.post('/api/swap/quote', requireAuth, async (req, res) => {
+  try {
+    if (!ZEROX_API_KEY) {
+      return res.status(501).json({
+        error: 'Swap API key missing. Add ZEROX_API_KEY in Render environment variables.'
+      });
+    }
+
+    const { chainId, sellToken, buyToken, sellAmount, taker } = req.body;
+
+    if (!chainId || !sellToken || !buyToken || !sellAmount || !taker) {
+      return res.status(400).json({ error: 'Missing swap quote fields.' });
+    }
+
+    const params = new URLSearchParams({
+      chainId: String(chainId),
+      sellToken: String(sellToken),
+      buyToken: String(buyToken),
+      sellAmount: String(sellAmount),
+      taker: String(taker)
+    });
+
+    const url = `https://api.0x.org/swap/allowance-holder/quote?${params.toString()}`;
+
+    const response = await fetch(url, {
+      headers: {
+        '0x-api-key': ZEROX_API_KEY,
+        '0x-version': 'v2',
+        accept: 'application/json'
+      }
+    });
+
+    const body = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: body?.message || body?.reason || 'Swap quote failed.',
+        details: body
+      });
+    }
+
+    res.json(body);
+  } catch (error) {
+    console.error('Swap quote error:', error);
+    res.status(500).json({ error: 'Unable to get swap quote.' });
+  }
 });
 
 /* Debug */
 
 app.get('/debug-session', (req, res) => {
   res.json({
-    session: req.session,
-    user: req.session.user || null
+    user: req.session.user || null,
+    session: req.session
   });
 });
 
@@ -484,5 +565,5 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   ensureDb();
-  console.log(`Blue Wallet running on port ${PORT}`);
+  console.log(`Bluebook Wallet running on port ${PORT}`);
 });
