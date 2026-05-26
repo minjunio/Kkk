@@ -1,804 +1,1995 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueCrypto - Glassmorphism Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Light, Blue, Cloudy Glassmorphism Theme */
-        :root {
-            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-hover: rgba(255, 255, 255, 0.65);
-            --primary: #0284c7; /* Deep Sky Blue for contrast */
-            --primary-glow: rgba(2, 132, 199, 0.3);
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --success: #059669;
-            --success-bg: rgba(5, 150, 105, 0.15);
-            --danger: #e11d48;
-            --danger-bg: rgba(225, 29, 72, 0.15);
-            --radius: 20px;
-            --card-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>BlueCrypto Wallet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />  <style>
+    :root {
+      color-scheme: light;
+      --bg-1: #eaf7ff;
+      --bg-2: #c8ecff;
+      --bg-3: #8fdcff;
+      --bg-4: #f8fdff;
+      --card: rgba(255, 255, 255, 0.68);
+      --card-strong: rgba(255, 255, 255, 0.9);
+      --card-soft: rgba(255, 255, 255, 0.42);
+      --border: rgba(255, 255, 255, 0.72);
+      --border-blue: rgba(2, 132, 199, 0.16);
+      --primary: #0277bd;
+      --primary-2: #0ea5e9;
+      --primary-dark: #075985;
+      --text: #0f172a;
+      --muted: #64748b;
+      --muted-2: #94a3b8;
+      --success: #059669;
+      --success-bg: rgba(5, 150, 105, 0.12);
+      --danger: #e11d48;
+      --danger-bg: rgba(225, 29, 72, 0.12);
+      --warning: #d97706;
+      --warning-bg: rgba(217, 119, 6, 0.12);
+      --shadow: 0 18px 50px rgba(14, 116, 144, 0.14);
+      --shadow-soft: 0 10px 30px rgba(14, 116, 144, 0.1);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        body { 
-            background: var(--bg-gradient); 
-            background-attachment: fixed;
-            color: var(--text-main); 
-            min-height: 100vh;
-            padding-bottom: 60px;
-            overflow-x: hidden;
-        }
+    [data-theme="midnight"] {
+      color-scheme: dark;
+      --bg-1: #020617;
+      --bg-2: #082f49;
+      --bg-3: #075985;
+      --bg-4: #0f172a;
+      --card: rgba(15, 23, 42, 0.68);
+      --card-strong: rgba(15, 23, 42, 0.92);
+      --card-soft: rgba(15, 23, 42, 0.44);
+      --border: rgba(125, 211, 252, 0.18);
+      --border-blue: rgba(125, 211, 252, 0.18);
+      --primary: #38bdf8;
+      --primary-2: #7dd3fc;
+      --primary-dark: #e0f2fe;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --muted-2: #94a3b8;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
 
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            box-shadow: var(--card-shadow);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        /* Animations */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animated { animation: fadeUp 0.6s ease-out forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        /* Top Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-        }
+    body {
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(14,165,233,0.25), transparent 28%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2) 42%, var(--bg-3));
+      background-attachment: fixed;
+      overflow-x: hidden;
+      padding-bottom: calc(86px + var(--safe-bottom));
+    }
 
-        .brand-section { display: flex; align-items: center; gap: 12px; }
-        .logo-box { width: 38px; height: 38px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1.2rem; box-shadow: 0 4px 15px var(--primary-glow); }
-        .brand-name { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
-        
-        .nav-actions { display: flex; align-items: center; gap: 16px; }
-        .user-profile { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #bae6fd, #0284c7); border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      border-radius: 999px;
+      filter: blur(8px);
+      opacity: 0.7;
+      pointer-events: none;
+    }
 
-        /* Icon Buttons */
-        .btn-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-icon:hover { background: var(--glass-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(2, 132, 199, 0.15); }
+    body::before {
+      width: 270px;
+      height: 270px;
+      left: -90px;
+      top: 110px;
+      background: rgba(255, 255, 255, 0.38);
+    }
 
-        /* Layout Grids */
-        .wallet-quick-actions { max-width: 1200px; margin: 24px auto 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .dashboard { max-width: 1200px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 1fr; gap: 28px; }
-        .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    body::after {
+      width: 340px;
+      height: 340px;
+      right: -130px;
+      bottom: 110px;
+      background: rgba(125, 211, 252, 0.36);
+    }
 
-        /* Cards */
-        .card { padding: 28px; position: relative; overflow: hidden; }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #38bdf8, #0284c7); opacity: 0.8; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card-balance { font-size: 2.6rem; font-weight: 800; margin-bottom: 12px; color: var(--primary); letter-spacing: -1px; }
-        
-        /* Badges */
-        .pnl-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; }
-        .pnl-positive { color: var(--success); background: var(--success-bg); }
-        .pnl-negative { color: var(--danger); background: var(--danger-bg); }
+    button,
+    input,
+    select {
+      font: inherit;
+    }
 
-        /* Buttons */
-        .btn { padding: 14px 20px; border-radius: 14px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 8px 20px var(--primary-glow); }
-        .btn-primary:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 10px 25px var(--primary-glow); }
-        .btn-secondary { background: var(--glass-bg); color: var(--primary); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
-        .btn-secondary:hover { background: white; transform: translateY(-2px); }
+    button {
+      border: 0;
+    }
 
-        /* Tables */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 32px 0 16px 0; }
-        .section-header h2 { font-size: 1.35rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
-        
-        .table-container { overflow-x: auto; padding: 8px; margin: -8px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 12px; text-align: left; }
-        th { padding: 0 20px 8px 20px; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 20px; background: var(--glass-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); vertical-align: middle; }
-        td:first-child { border-left: 1px solid var(--glass-border); border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
-        td:last-child { border-right: 1px solid var(--glass-border); border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
-        tr:hover td { background: var(--glass-hover); transform: scale(1.01); }
+    .app-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px 18px 0;
+    }
 
-        /* Cell Content */
-        .asset-cell { display: flex; align-items: center; gap: 14px; }
-        .asset-icon { width: 44px; height: 44px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); padding: 6px; overflow: hidden;}
-        .asset-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .asset-name { font-weight: 700; font-size: 1.05rem; }
-        .asset-symbol { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
 
-        .value-cell { font-weight: 700; font-size: 1.05rem; }
-        .sub-value { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(248, 253, 255, 0.54);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
 
-        .staking-profit-text { color: var(--success); font-weight: 800; font-size: 1.1rem; text-shadow: 0 2px 10px var(--success-bg); }
-        .apy-badge { background: linear-gradient(135deg, #38bdf8, #0284c7); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; box-shadow: 0 4px 12px var(--primary-glow); }
+    [data-theme="midnight"] .topbar {
+      background: rgba(2, 6, 23, 0.56);
+    }
 
-        /* Tabs */
-        .tabs-container { margin-top: 24px; }
-        .tab-bar { display: flex; gap: 12px; border-bottom: 2px solid rgba(2, 132, 199, 0.1); padding-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
-        .tab-bar::-webkit-scrollbar { display: none; }
-        .tab-btn { padding: 12px 24px; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
-        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .topbar-inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-        /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000; padding: 16px; }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); padding: 32px; border-radius: 24px; width: 100%; max-width: 480px; border: 1px solid white; transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; }
-        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
-        .modal-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 24px; color: var(--primary); }
-        
-        .form-group { margin-bottom: 20px; position: relative; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); }
-        .form-group input, .form-group select { width: 100%; padding: 14px 16px; background: white; border: 2px solid rgba(2, 132, 199, 0.1); border-radius: 14px; color: var(--text-main); font-size: 1rem; outline: none; font-weight: 500; transition: border-color 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
-        
-        .search-results-box { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--glass-border); border-radius: 14px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 8px; }
-        .search-item { padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .search-item:hover { background: #f0f9ff; color: var(--primary); }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
 
-        /* Responsive Mobile Adjustments */
-        @media (max-width: 768px) {
-            nav { padding: 12px 16px; }
-            .brand-name, .user-profile span { display: none; }
-            .wallet-quick-actions { grid-template-columns: 1fr; padding: 0 16px; margin-top: 16px; }
-            .dashboard { padding: 16px; gap: 20px; }
-            .card { padding: 20px; }
-            .card-balance { font-size: 2rem; }
-            th { display: none; } /* Hide table headers on pure mobile */
-            td { display: block; padding: 12px 16px; border: none !important; background: transparent !important; }
-            tr { display: block; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 12px; padding: 8px 0; }
-            td:first-child { border-bottom: 1px solid rgba(0,0,0,0.05) !important; }
-            .hide-mobile { display: none !important; }
-            .asset-cell { margin-bottom: 4px; }
-            .value-cell { display: inline-block; }
-            .sub-value { display: inline-block; margin-left: 8px; }
-            td { display: flex; justify-content: space-between; align-items: center; }
-            td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
-        }
-    </style>
-</head>
+    .logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 auto;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      box-shadow: 0 12px 28px rgba(2, 132, 199, 0.28);
+    }
+
+    .brand-text {
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-size: 1.06rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--primary-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 rgba(5,150,105,0.5);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(5,150,105,0.45); }
+      80% { box-shadow: 0 0 0 9px rgba(5,150,105,0); }
+      100% { box-shadow: 0 0 0 0 rgba(5,150,105,0); }
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      flex: 0 0 auto;
+    }
+
+    .icon-button {
+      width: 43px;
+      height: 43px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      color: var(--primary-dark);
+      cursor: pointer;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .icon-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(2, 132, 199, 0.16);
+    }
+
+    .profile-chip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px 7px 8px;
+      border-radius: 999px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #bae6fd, #0284c7 70%);
+      border: 2px solid rgba(255,255,255,0.8);
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      margin-top: 18px;
+      border-radius: 32px;
+      padding: 24px;
+      min-height: 230px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.76), transparent 25%),
+        linear-gradient(135deg, rgba(2,132,199,0.92), rgba(14,165,233,0.72));
+      color: white;
+      box-shadow: 0 24px 68px rgba(2, 132, 199, 0.24);
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -85px;
+      top: -70px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      right: 20px;
+      bottom: -105px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .network-select {
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.16);
+      color: white;
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .network-select option {
+      color: #0f172a;
+    }
+
+    .balance-label {
+      color: rgba(255,255,255,0.82);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .balance-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .balance {
+      font-size: clamp(2.15rem, 8vw, 4.2rem);
+      line-height: 0.95;
+      letter-spacing: -0.08em;
+      font-weight: 900;
+    }
+
+    .pnl-chip,
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .pnl-positive { color: var(--success); background: var(--success-bg); }
+    .pnl-negative { color: var(--danger); background: var(--danger-bg); }
+    .pnl-neutral { color: var(--muted); background: rgba(100, 116, 139, 0.12); }
+
+    .hero-card .pnl-positive,
+    .hero-card .pnl-negative,
+    .hero-card .pnl-neutral {
+      color: white;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+
+    .hero-meta {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .hero-meta-item {
+      padding: 13px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .hero-meta-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.76);
+      margin-bottom: 5px;
+    }
+
+    .hero-meta-value {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: white;
+    }
+
+    .quick-actions {
+      margin-top: -22px;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+      padding: 0 14px;
+    }
+
+    .action-button {
+      min-height: 78px;
+      border-radius: 22px;
+      cursor: pointer;
+      color: var(--primary-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      font-weight: 900;
+      font-size: 0.82rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 17px 34px rgba(2, 132, 199, 0.15);
+    }
+
+    .action-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: rgba(14, 165, 233, 0.12);
+      color: var(--primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 370px;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      color: var(--primary-dark);
+    }
+
+    .panel-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .mini-button {
+      padding: 9px 12px;
+      border-radius: 13px;
+      background: rgba(14,165,233,0.1);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-blue);
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .mini-button.danger {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border-color: rgba(225, 29, 72, 0.16);
+    }
+
+    .asset-list,
+    .market-list,
+    .vault-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .asset-card,
+    .market-card,
+    .vault-card {
+      display: grid;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+      box-shadow: 0 7px 20px rgba(14, 116, 144, 0.07);
+    }
+
+    .asset-card {
+      grid-template-columns: minmax(0, 1.35fr) 0.8fr 0.85fr 0.95fr auto;
+    }
+
+    .market-card {
+      grid-template-columns: minmax(0, 1.2fr) 0.8fr 0.65fr;
+    }
+
+    .vault-card {
+      grid-template-columns: minmax(0, 1fr) 0.75fr 0.68fr;
+    }
+
+    .asset-main {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .coin-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: 0 7px 18px rgba(2, 132, 199, 0.12);
+      font-size: 0.74rem;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+
+    .coin-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .asset-name {
+      font-size: 0.94rem;
+      font-weight: 900;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .asset-symbol {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .cell-label {
+      display: none;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .cell-value {
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .cell-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .market-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-bottom: 12px;
+      padding-bottom: 1px;
+    }
+
+    .market-tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: 0 0 auto;
+      padding: 10px 13px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.32);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .tab.active {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 12px 25px rgba(2, 132, 199, 0.22);
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .insight-card {
+      padding: 15px;
+      border-radius: 20px;
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+    }
+
+    .insight-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .insight-value {
+      color: var(--primary-dark);
+      font-size: 1.15rem;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .empty-state {
+      padding: 26px 18px;
+      border-radius: 22px;
+      background: var(--card-soft);
+      border: 1px dashed var(--border-blue);
+      text-align: center;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + var(--safe-bottom));
+      transform: translateX(-50%);
+      z-index: 75;
+      width: min(430px, calc(100% - 28px));
+      padding: 9px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    [data-theme="midnight"] .bottom-nav {
+      background: rgba(15,23,42,0.74);
+    }
+
+    .bottom-nav button {
+      min-height: 48px;
+      border-radius: 17px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 0.72rem;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+    }
+
+    .bottom-nav button.active {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 10px 22px rgba(2, 132, 199, 0.22);
+    }
+
+    .drawer-overlay,
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      background: rgba(15, 23, 42, 0.36);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .drawer-overlay.active,
+    .modal-overlay.active {
+      display: block;
+    }
+
+    .settings-drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: min(440px, 100%);
+      height: 100%;
+      padding: calc(18px + var(--safe-top)) 16px calc(22px + var(--safe-bottom));
+      background: var(--card-strong);
+      border-left: 1px solid var(--border);
+      box-shadow: -20px 0 50px rgba(15, 23, 42, 0.14);
+      overflow-y: auto;
+      animation: slideIn 0.24s ease both;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .drawer-header,
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .drawer-title,
+    .modal-title {
+      color: var(--primary-dark);
+      font-size: 1.25rem;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .drawer-subtitle,
+    .modal-subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .close-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      cursor: pointer;
+      background: rgba(14,165,233,0.1);
+      color: var(--primary-dark);
+      border: 1px solid var(--border-blue);
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .setting-section {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 22px;
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+    }
+
+    .setting-section h3 {
+      color: var(--primary-dark);
+      font-size: 0.95rem;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 11px;
+    }
+
+    .form-row {
+      display: grid;
+      gap: 7px;
+      position: relative;
+    }
+
+    .form-row label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 13px;
+      border-radius: 15px;
+      outline: none;
+      color: var(--text);
+      background: var(--card-strong);
+      border: 1px solid var(--border-blue);
+      font-weight: 800;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(14,165,233,0.58);
+      box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      min-height: 48px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-weight: 950;
+      letter-spacing: -0.01em;
+    }
+
+    .primary-button {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 14px 28px rgba(2, 132, 199, 0.22);
+    }
+
+    .secondary-button {
+      color: var(--primary-dark);
+      background: var(--card-strong);
+      border: 1px solid var(--border-blue);
+    }
+
+    .asset-manager-list {
+      display: grid;
+      gap: 8px;
+      max-height: 310px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .manager-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 11px;
+      border-radius: 16px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+    }
+
+    .manager-name {
+      font-weight: 950;
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    .manager-balance {
+      color: var(--muted);
+      margin-top: 3px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .manager-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .small-icon-button {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--primary-dark);
+      background: rgba(14,165,233,0.1);
+      border: 1px solid var(--border-blue);
+      font-weight: 950;
+    }
+
+    .small-icon-button.danger {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border-color: rgba(225, 29, 72, 0.16);
+    }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      max-height: 210px;
+      overflow-y: auto;
+      display: none;
+      border-radius: 16px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      z-index: 10;
+    }
+
+    .suggestions.active { display: block; }
+
+    .suggestion {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 850;
+      border-bottom: 1px solid rgba(14,165,233,0.08);
+    }
+
+    .suggestion:hover {
+      background: rgba(14,165,233,0.09);
+    }
+
+    .modal-card {
+      width: min(440px, calc(100% - 28px));
+      max-height: calc(100vh - 28px - var(--safe-top) - var(--safe-bottom));
+      overflow-y: auto;
+      margin: calc(14px + var(--safe-top)) auto 0;
+      border-radius: 26px;
+      padding: 18px;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.22);
+      animation: popIn 0.22s ease both;
+    }
+
+    @keyframes popIn {
+      from { transform: translateY(18px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(92px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(12px);
+      z-index: 140;
+      max-width: min(420px, calc(100% - 28px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      color: white;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.24);
+      opacity: 0;
+      pointer-events: none;
+      font-weight: 850;
+      font-size: 0.85rem;
+      transition: all 0.22s ease;
+    }
+
+    .toast.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .hide-desktop { display: none; }
+
+    @media (max-width: 940px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .profile-chip span { display: none; }
+      .app-shell { padding: 14px 14px 0; }
+      .hero-card { padding: 20px; border-radius: 29px; min-height: 236px; }
+      .hero-top { margin-bottom: 28px; }
+      .quick-actions {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 0 4px;
+        gap: 8px;
+      }
+      .action-button {
+        min-height: 70px;
+        border-radius: 20px;
+        font-size: 0.74rem;
+      }
+      .action-icon { width: 31px; height: 31px; }
+      .hero-meta { grid-template-columns: 1fr; }
+      .hero-meta-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; }
+      .hero-meta-label { margin-bottom: 0; }
+      .panel { padding: 14px; border-radius: 23px; }
+      .asset-card,
+      .market-card,
+      .vault-card {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        padding: 14px;
+      }
+      .asset-card > div:not(.asset-main),
+      .market-card > div:not(.asset-main),
+      .vault-card > div:not(.asset-main) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 9px;
+        border-top: 1px solid rgba(14,165,233,0.09);
+      }
+      .cell-label { display: block; }
+      .cell-value, .cell-sub { text-align: right; }
+      .hide-mobile { display: none !important; }
+      .hide-desktop { display: block; }
+      .insight-grid { grid-template-columns: 1fr 1fr; }
+      .drawer-overlay.active { display: block; }
+      .settings-drawer { width: 100%; }
+      .button-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 410px) {
+      .brand-title { font-size: 0.96rem; }
+      .brand-subtitle { font-size: 0.68rem; }
+      .topbar { padding-left: 10px; padding-right: 10px; }
+      .logo { width: 39px; height: 39px; }
+      .icon-button { width: 40px; height: 40px; border-radius: 14px; }
+      .quick-actions { grid-template-columns: repeat(2, 1fr); margin-top: 12px; }
+      .hero-card { margin-bottom: 0; }
+      .balance { font-size: 2.45rem; }
+      .insight-grid { grid-template-columns: 1fr; }
+    }
+  </style></head>
 <body>
-
-    <nav>
-        <div class="brand-section">
-            <div class="logo-box">B</div>
-            <div class="brand-name">BlueCrypto</div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">B</div>
+        <div class="brand-text">
+          <div class="brand-title">BlueCrypto Wallet</div>
+          <div class="brand-subtitle"><span class="pulse"></span><span id="syncText">Live market sync</span></div>
         </div>
-        <div class="nav-actions">
-            <button class="btn-icon" onclick="openAssetModalForAddition()" title="Manage Portfolio Settings">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-            <div class="user-profile">
-                <span>minjunio</span>
-                <div class="user-avatar"></div>
-            </div>
-        </div>
-    </nav>
+      </div><div class="top-actions">
+    <button class="icon-button" type="button" onclick="refreshPrices(true)" aria-label="Refresh prices" title="Refresh prices">
+      <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 9A8 8 0 006.3 5.1L4 10m16 4l-2.3 4.9A8 8 0 014 15"/></svg>
+    </button>
+    <button class="icon-button" type="button" onclick="openSettings()" aria-label="Open settings" title="Settings">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    <div class="profile-chip">
+      <div class="avatar"></div>
+      <span><%= typeof username !== 'undefined' ? username : 'minjunio' %></span>
+    </div>
+  </div>
+</div>
 
-    <div class="wallet-quick-actions animated">
-        <button class="btn btn-primary" onclick="openModal('sendModal')">Send</button>
-        <button class="btn btn-secondary" onclick="openModal('withdrawModal')">Withdraw</button>
-        <button class="btn btn-secondary" onclick="openModal('swapModal')">Swap</button>
+  </header>  <main class="app-shell">
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-top">
+          <div class="eyebrow"><span class="pulse"></span> Secure demo wallet</div>
+          <select class="network-select" id="currencyMode" onchange="renderDashboard()">
+            <option value="USD">USD</option>
+          </select>
+        </div><div class="balance-label">Total portfolio value</div>
+    <div class="balance-row">
+      <div class="balance" id="totalBalance">$0.00</div>
+      <div class="pnl-chip pnl-neutral" id="totalPnl">$0.00 (0.00%)</div>
     </div>
 
-    <div class="dashboard">
-        <div class="overview-grid">
-            <div class="card glass-panel animated delay-1">
-                <div class="card-header">
-                    <span>Spot Portfolio</span>
-                    <span style="color: var(--primary); font-size: 0.75rem;">● Live Sync</span>
-                </div>
-                <div class="card-balance" id="totalBalance">$0.00</div>
-                <div class="pnl-badge pnl-positive" id="totalPnl">+$0.00 (0.00%) All-Time ROI</div>
-            </div>
-
-            <div class="card glass-panel animated delay-2">
-                <div class="card-header">
-                    <span>Staking Yield Vaults</span>
-                    <span style="color: var(--success); font-size: 0.75rem; font-weight: 800;">AUTO-COMPOUNDING</span>
-                </div>
-                <div class="card-balance" id="stakingBalance">$0.00</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:16px; border-top:1px solid rgba(0,0,0,0.05);">
-                    <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 700;">Earned While Offline</span>
-                    <span class="staking-profit-text" id="stakingProfits">+$0.00</span>
-                </div>
-                <div class="actions">
-                    <button class="btn btn-secondary" style="flex:1;" onclick="openModal('stakeActionModal')">Stake / Unstake Manager</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="section-header animated delay-3">
-            <h2>Spot Holdings</h2>
-        </div>
-        <div class="table-container animated delay-3">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Asset</th>
-                        <th>Market Price</th>
-                        <th>Holdings</th>
-                        <th class="hide-mobile">Avg Cost</th>
-                        <th>Value & ROI (PnL)</th>
-                    </tr>
-                </thead>
-                <tbody id="portfolioList"></tbody>
-            </table>
-        </div>
-
-        <div class="section-header animated delay-3">
-            <h2>Active Validations</h2>
-        </div>
-        <div class="table-container animated delay-3">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Pool Asset</th>
-                        <th>Locked Volume</th>
-                        <th>Network APY</th>
-                        <th>Live Yield Mined</th>
-                    </tr>
-                </thead>
-                <tbody id="stakingList"></tbody>
-            </table>
-        </div>
-
-        <div class="tabs-container animated delay-3">
-            <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchMarketTab('top-crypto', this)">Top Cryptos</button>
-                <button class="tab-btn" onclick="switchMarketTab('alt-coins', this)">Altcoins</button>
-                <button class="tab-btn" onclick="switchMarketTab('stocks', this)">Equities</button>
-            </div>
-            <div class="table-container" style="margin-top: 16px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Ticker</th>
-                            <th>Current Price</th>
-                            <th>24H Trend</th>
-                            <th class="hide-mobile">Market Cap</th>
-                        </tr>
-                    </thead>
-                    <tbody id="marketTabsList"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <div class="hero-meta-label">Spot assets</div>
+        <div class="hero-meta-value" id="spotCount">0</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-label">Staked value</div>
+        <div class="hero-meta-value" id="stakingBalance">$0.00</div>
+      </div>
+      <div class="hero-meta-item">
+        <div class="hero-meta-label">Yield earned</div>
+        <div class="hero-meta-value" id="stakingProfits">+$0.00</div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <div class="modal-overlay" id="assetModal">
-        <div class="modal-content">
-            <h2 class="modal-title" id="assetModalTitle">Manage Asset Ledger</h2>
-            
-            <div class="form-group" id="searchableGroup">
-                <label>Search Directory (Add/Update)</label>
-                <input type="text" id="currencySearchInput" placeholder="Type to filter e.g. BTC, ETH..." autocomplete="off" oninput="filterCurrencySearch(this.value, 'searchSuggestionsBox', selectAssetTicker)">
-                <div class="search-results-box" id="searchSuggestionsBox"></div>
-            </div>
+<section class="quick-actions" aria-label="Wallet actions">
+  <button class="action-button" type="button" onclick="openModal('sendModal')">
+    <span class="action-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+    Send
+  </button>
+  <button class="action-button" type="button" onclick="openModal('receiveModal')">
+    <span class="action-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m6 7l-7-7 7-7"/></svg></span>
+    Receive
+  </button>
+  <button class="action-button" type="button" onclick="openModal('swapModal')">
+    <span class="action-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h11l-4-4m3 14H6l4 4"/></svg></span>
+    Swap
+  </button>
+  <button class="action-button" type="button" onclick="openModal('stakeActionModal')">
+    <span class="action-icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 4v5c0 5-3.4 8.8-8 9-4.6-.2-8-4-8-9V7l8-4z"/></svg></span>
+    Stake
+  </button>
+</section>
 
-            <div class="form-group">
-                <label>Selected Asset Symbol</label>
-                <input type="text" id="currencyInput" readonly style="background: rgba(0,0,0,0.02); font-weight: 700;">
-            </div>
-            <div class="form-group hide-mobile">
-                <label>Asset Display Name</label>
-                <input type="text" id="nameInput" placeholder="E.g. Bitcoin">
-            </div>
-            <div class="form-group">
-                <label>Total Account Balance (Set 0 to Delete)</label>
-                <input type="number" id="amountInput" placeholder="0.00" step="any">
-            </div>
-            <div class="form-group">
-                <label>Average Buy Price (USD) for ROI</label>
-                <input type="number" id="buyPriceInput" placeholder="0.00" step="any">
-            </div>
-            <div style="display: flex; gap: 12px; margin-top: 28px;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('assetModal')">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="saveAssetEntry()">Save Configuration</button>
-            </div>
+<section class="grid">
+  <div class="left-column">
+    <section class="panel glass" id="holdingsSection">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">All assets</h2>
+          <p class="panel-subtitle">Holdings, live market price, average cost and ROI.</p>
         </div>
-    </div>
+        <button class="mini-button" type="button" onclick="openSettings('assetTools')">Manage</button>
+      </div>
+      <div class="asset-list" id="portfolioList"></div>
+    </section>
 
-    <div class="modal-overlay" id="sendModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Transmit Crypto</h2>
-            <div class="form-group"><label>Source Asset</label><select id="sendAssetSelect"></select></div>
-            <div class="form-group"><label>Destination Address</label><input type="text" placeholder="0x..."></div>
-            <div class="form-group"><label>Amount</label><input type="number" id="sendAmountInput" placeholder="0.00" step="any"></div>
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('sendModal')">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="executeSendAction()">Send</button>
-            </div>
+    <section class="panel glass" id="marketsSection" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Live markets</h2>
+          <p class="panel-subtitle">Crypto prices update through CoinGecko with local fallback.</p>
         </div>
-    </div>
+        <button class="mini-button" type="button" onclick="refreshPrices(true)">Refresh</button>
+      </div>
+      <div class="market-tabs">
+        <button class="tab active" type="button" onclick="switchMarketTab('top-crypto', this)">Top crypto</button>
+        <button class="tab" type="button" onclick="switchMarketTab('alt-coins', this)">Altcoins</button>
+        <button class="tab" type="button" onclick="switchMarketTab('watchlist', this)">Watchlist</button>
+      </div>
+      <div class="market-list" id="marketTabsList"></div>
+    </section>
+  </div>
 
-    <div class="modal-overlay" id="withdrawModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Fiat Settlement</h2>
-            <div class="form-group"><label>Sell Asset</label><select id="withdrawAssetSelect"></select></div>
-            <div class="form-group"><label>Withdraw Amount</label><input type="number" id="withdrawAmountInput" placeholder="0.00" step="any"></div>
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('withdrawModal')">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="executeWithdrawAction()">Withdraw Funds</button>
-            </div>
+  <aside class="right-column">
+    <section class="panel glass">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Wallet insights</h2>
+          <p class="panel-subtitle">Fast portfolio details.</p>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="swapModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Instant Swap</h2>
-            <div class="form-group"><label>Pay With</label><select id="swapSrcSelect" onchange="calculateSwapFees()"></select></div>
-            <div class="form-group"><label>Amount to Swap</label><input type="number" id="swapAmountInput" placeholder="0.00" step="any" oninput="calculateSwapFees()"></div>
-            <div class="form-group"><label>Receive</label><select id="swapDestSelect" onchange="calculateSwapFees()"></select></div>
-            <div style="background: rgba(2, 132, 199, 0.05); padding: 16px; border-radius: 12px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 600;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Network Fee:</span><span id="feeNetworkSpan">$0.00</span></div>
-                <div style="display:flex; justify-content:space-between; color: var(--primary);"><span>You Get:</span><span id="swapTargetReceiveSpan">0.00</span></div>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('swapModal')">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="executeSwapAction()">Confirm Swap</button>
-            </div>
+      </div>
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-label">Best asset</div>
+          <div class="insight-value" id="bestAsset">--</div>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="stakeActionModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Validator Engine</h2>
-            <div class="form-group">
-                <label>Action</label>
-                <select id="stakeOperationType">
-                    <option value="STAKE">Stake (Lock Funds)</option>
-                    <option value="UNSTAKE">Unstake (Return Funds)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Search Network</label>
-                <input type="text" id="stakeSearchInput" placeholder="Type to filter..." autocomplete="off" oninput="filterCurrencySearch(this.value, 'stakeSuggestionsBox', selectStakeTicker)">
-                <div class="search-results-box" id="stakeSuggestionsBox"></div>
-            </div>
-            <div class="form-group"><label>Target Asset</label><input type="text" id="stakeAssetTarget" readonly style="background: rgba(0,0,0,0.02); font-weight: 700;"></div>
-            <div class="form-group"><label>Amount</label><input type="number" id="stakeActionAmountInput" placeholder="0.00" step="any"></div>
-            <div style="display: flex; gap: 12px; margin-top: 24px;">
-                <button class="btn btn-secondary" style="flex:1;" onclick="closeModal('stakeActionModal')">Cancel</button>
-                <button class="btn btn-primary" style="flex:1;" onclick="executeStakingModification()">Execute</button>
-            </div>
+        <div class="insight-card">
+          <div class="insight-label">24h change</div>
+          <div class="insight-value" id="dayChange">--</div>
         </div>
+        <div class="insight-card">
+          <div class="insight-label">Total cost</div>
+          <div class="insight-value" id="totalCost">$0.00</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Largest holding</div>
+          <div class="insight-value" id="largestHolding">--</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel glass" id="stakingSection" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Staking vaults</h2>
+          <p class="panel-subtitle">Auto-calculated demo staking yield.</p>
+        </div>
+      </div>
+      <div class="vault-list" id="stakingList"></div>
+    </section>
+  </aside>
+</section>
+
+  </main>  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <button class="active" type="button" onclick="scrollToSection('top', this)">Home</button>
+    <button type="button" onclick="scrollToSection('holdingsSection', this)">Assets</button>
+    <button type="button" onclick="scrollToSection('marketsSection', this)">Markets</button>
+    <button type="button" onclick="openSettings()">Settings</button>
+  </nav>  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event, 'settingsOverlay')">
+    <aside class="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="drawer-header">
+        <div>
+          <h2 class="drawer-title" id="settingsTitle">Wallet settings</h2>
+          <p class="drawer-subtitle">Add, edit, remove and organize all visible wallet assets.</p>
+        </div>
+        <button class="close-button" type="button" onclick="closeSettings()">×</button>
+      </div><section class="setting-section" id="assetTools">
+    <h3>Add or update asset</h3>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Search coin</label>
+        <input class="input" id="assetSearchInput" placeholder="BTC, ETH, Solana..." autocomplete="off" oninput="filterAssetSearch(this.value, 'assetSuggestions', selectAssetTicker)" />
+        <div class="suggestions" id="assetSuggestions"></div>
+      </div>
+      <div class="form-row">
+        <label>Symbol</label>
+        <input class="input" id="currencyInput" placeholder="BTC" />
+      </div>
+      <div class="form-row">
+        <label>Name</label>
+        <input class="input" id="nameInput" placeholder="Bitcoin" />
+      </div>
+      <div class="form-row">
+        <label>Wallet balance</label>
+        <input class="input" type="number" id="amountInput" placeholder="0.00" step="any" />
+      </div>
+      <div class="form-row">
+        <label>Average buy price in USD</label>
+        <input class="input" type="number" id="buyPriceInput" placeholder="0.00" step="any" />
+      </div>
+      <div class="button-row">
+        <button class="secondary-button" type="button" onclick="clearAssetForm()">Clear</button>
+        <button class="primary-button" type="button" onclick="saveAssetEntry()">Save asset</button>
+      </div>
     </div>
+  </section>
 
-    <script>
-        // Data Persistence & Initial State
-        const DEFAULT_PORTFOLIO = [
-            { currency: 'BTC', name: 'Bitcoin', amount: 0.45, avgBuyPrice: 62000.00 },
-            { currency: 'ETH', name: 'Ethereum', amount: 4.25, avgBuyPrice: 2850.50 },
-            { currency: 'SOL', name: 'Solana', amount: 145.5, avgBuyPrice: 85.20 }
-        ];
+  <section class="setting-section">
+    <h3>Visible assets</h3>
+    <div class="asset-manager-list" id="assetManagerList"></div>
+  </section>
 
-        const DEFAULT_VAULTS = [
-            { currency: 'ETH', name: 'Ethereum Validation', stakedAmount: 2.5, apy: 5.5, earnedAmount: 0 },
-            { currency: 'SOL', name: 'Solana Delegation', stakedAmount: 50, apy: 7.2, earnedAmount: 0 }
-        ];
+  <section class="setting-section">
+    <h3>Appearance</h3>
+    <div class="button-row">
+      <button class="secondary-button" type="button" onclick="setTheme('cloud')">Cloud blue</button>
+      <button class="secondary-button" type="button" onclick="setTheme('midnight')">Midnight</button>
+    </div>
+  </section>
 
-        // Load from LocalStorage or fallback to defaults
-        let portfolio = JSON.parse(localStorage.getItem('bc_portfolio')) || DEFAULT_PORTFOLIO;
-        let stakingVaults = JSON.parse(localStorage.getItem('bc_vaults')) || DEFAULT_VAULTS;
-        
-        // Staking Time Calculator Logic
-        let lastTimestamp = parseInt(localStorage.getItem('bc_last_update')) || Date.now();
+  <section class="setting-section">
+    <h3>Price feed</h3>
+    <p class="drawer-subtitle" id="feedStatus">Using live crypto feed when available. Falls back to safe local simulation if blocked.</p>
+    <div class="button-row">
+      <button class="secondary-button" type="button" onclick="refreshPrices(true)">Refresh prices</button>
+      <button class="secondary-button" type="button" onclick="resetDemoData()">Reset demo</button>
+    </div>
+  </section>
+</aside>
 
-        function saveData() {
-            localStorage.setItem('bc_portfolio', JSON.stringify(portfolio));
-            localStorage.setItem('bc_vaults', JSON.stringify(stakingVaults));
-            localStorage.setItem('bc_last_update', Date.now().toString());
-        }
+  </div>  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event, 'sendModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Send crypto</h2>
+          <p class="modal-subtitle">Demo action: subtracts amount from your local wallet only.</p>
+        </div>
+        <button class="close-button" type="button" onclick="closeModal('sendModal')">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Asset</label><select class="select" id="sendAssetSelect"></select></div>
+        <div class="form-row"><label>Destination address</label><input class="input" type="text" placeholder="0x... or wallet address" /></div>
+        <div class="form-row"><label>Amount</label><input class="input" type="number" id="sendAmountInput" placeholder="0.00" step="any" /></div>
+        <div class="button-row"><button class="secondary-button" type="button" onclick="closeModal('sendModal')">Cancel</button><button class="primary-button" type="button" onclick="executeSendAction()">Send</button></div>
+      </div>
+    </div>
+  </div>  <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event, 'receiveModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Receive</h2>
+          <p class="modal-subtitle">Demo deposit address preview.</p>
+        </div>
+        <button class="close-button" type="button" onclick="closeModal('receiveModal')">×</button>
+      </div>
+      <div class="setting-section" style="margin-top:0; text-align:center;">
+        <div style="width:160px;height:160px;margin:4px auto 14px;border-radius:28px;background:linear-gradient(135deg,#fff,#e0f2fe);display:grid;place-items:center;border:1px solid var(--border-blue);color:var(--primary-dark);font-weight:950;">QR</div>
+        <div class="form-row">
+          <label>Your deposit address</label>
+          <input class="input" id="receiveAddress" value="0xBlueCryptoDemoWallet000000000000" readonly />
+        </div>
+        <button class="primary-button" type="button" style="width:100%;margin-top:12px;" onclick="copyReceiveAddress()">Copy address</button>
+      </div>
+    </div>
+  </div>  <div class="modal-overlay" id="swapModal" onclick="overlayClose(event, 'swapModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Instant swap</h2>
+          <p class="modal-subtitle">0.30% demo route fee. Values use current market prices.</p>
+        </div>
+        <button class="close-button" type="button" onclick="closeModal('swapModal')">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Pay with</label><select class="select" id="swapSrcSelect" onchange="calculateSwapFees()"></select></div>
+        <div class="form-row"><label>Amount</label><input class="input" type="number" id="swapAmountInput" placeholder="0.00" step="any" oninput="calculateSwapFees()" /></div>
+        <div class="form-row"><label>Receive</label><select class="select" id="swapDestSelect" onchange="calculateSwapFees()"></select></div>
+        <div class="setting-section" style="margin-top:0;">
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;color:var(--muted);font-weight:850;"><span>Route fee</span><span id="feeNetworkSpan">$0.00</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;color:var(--primary-dark);font-weight:950;"><span>You get</span><span id="swapTargetReceiveSpan">0.00</span></div>
+        </div>
+        <div class="button-row"><button class="secondary-button" type="button" onclick="closeModal('swapModal')">Cancel</button><button class="primary-button" type="button" onclick="executeSwapAction()">Confirm swap</button></div>
+      </div>
+    </div>
+  </div>  <div class="modal-overlay" id="stakeActionModal" onclick="overlayClose(event, 'stakeActionModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Stake manager</h2>
+          <p class="modal-subtitle">Move assets between spot and demo staking vaults.</p>
+        </div>
+        <button class="close-button" type="button" onclick="closeModal('stakeActionModal')">×</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>Action</label><select class="select" id="stakeOperationType"><option value="STAKE">Stake</option><option value="UNSTAKE">Unstake</option></select></div>
+        <div class="form-row">
+          <label>Search network</label>
+          <input class="input" id="stakeSearchInput" placeholder="ETH, SOL, AVAX..." autocomplete="off" oninput="filterAssetSearch(this.value, 'stakeSuggestions', selectStakeTicker)" />
+          <div class="suggestions" id="stakeSuggestions"></div>
+        </div>
+        <div class="form-row"><label>Target asset</label><input class="input" id="stakeAssetTarget" readonly /></div>
+        <div class="form-row"><label>Amount</label><input class="input" type="number" id="stakeActionAmountInput" placeholder="0.00" step="any" /></div>
+        <div class="button-row"><button class="secondary-button" type="button" onclick="closeModal('stakeActionModal')">Cancel</button><button class="primary-button" type="button" onclick="executeStakingModification()">Execute</button></div>
+      </div>
+    </div>
+  </div>  <div class="toast" id="toast"></div>  <script>
+    const COINGECKO_IDS = {
+      BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', BNB: 'binancecoin', XRP: 'ripple',
+      DOGE: 'dogecoin', ADA: 'cardano', AVAX: 'avalanche-2', LINK: 'chainlink', DOT: 'polkadot',
+      MATIC: 'matic-network', TON: 'the-open-network', TRX: 'tron', LTC: 'litecoin', BCH: 'bitcoin-cash',
+      UNI: 'uniswap', APT: 'aptos', ARB: 'arbitrum', OP: 'optimism', NEAR: 'near', INJ: 'injective-protocol',
+      SUI: 'sui', FIL: 'filecoin', ATOM: 'cosmos', ETC: 'ethereum-classic', AAVE: 'aave', PEPE: 'pepe',
+      SHIB: 'shiba-inu', WLD: 'worldcoin-wld', SEI: 'sei-network', FET: 'fetch-ai', RENDER: 'render-token'
+    };
 
-        // Deep Global Dynamic Master Asset Index
-        let marketPrices = {
-            'BTC': { name: 'Bitcoin', price: 67340.50, change24h: 3.45, cap: "$1.32T", type: "top-crypto" },
-            'ETH': { name: 'Ethereum', price: 3420.15, change24h: -1.20, cap: "$410.5B", type: "top-crypto" },
-            'SOL': { name: 'Solana', price: 164.80, change24h: 8.92, cap: "$76.3B", type: "top-crypto" },
-            'BNB': { name: 'BNB', price: 585.30, change24h: 0.85, cap: "$86.1B", type: "top-crypto" },
-            'XRP': { name: 'Ripple', price: 0.52, change24h: -0.40, cap: "$28.9B", type: "top-crypto" },
-            'LINK': { name: 'Chainlink', price: 16.25, change24h: 0.15, cap: "$9.5B", type: "alt-coins" },
-            'ADA': { name: 'Cardano', price: 0.48, change24h: -2.11, cap: "$17.1B", type: "alt-coins" },
-            'DOT': { name: 'Polkadot', price: 6.85, change24h: 4.30, cap: "$9.8B", type: "alt-coins" },
-            'AVAX': { name: 'Avalanche', price: 34.10, change24h: -0.45, cap: "$13.4B", type: "alt-coins" },
-            'AAPL': { name: 'Apple Inc.', price: 189.45, change24h: 1.15, cap: "$2.95T", type: "stocks" },
-            'TSLA': { name: 'Tesla Inc.', price: 174.60, change24h: -3.80, cap: "$556.2B", type: "stocks" },
-            'NVDA': { name: 'NVIDIA Corp.', price: 945.20, change24h: 6.22, cap: "$2.36T", type: "stocks" }
-        };
+    const DEFAULT_MARKETS = {
+      BTC: { name: 'Bitcoin', price: 67340.5, change24h: 3.45, cap: '$1.32T', type: 'top-crypto' },
+      ETH: { name: 'Ethereum', price: 3420.15, change24h: -1.2, cap: '$410.5B', type: 'top-crypto' },
+      SOL: { name: 'Solana', price: 164.8, change24h: 8.92, cap: '$76.3B', type: 'top-crypto' },
+      BNB: { name: 'BNB', price: 585.3, change24h: 0.85, cap: '$86.1B', type: 'top-crypto' },
+      XRP: { name: 'XRP', price: 0.52, change24h: -0.4, cap: '$28.9B', type: 'top-crypto' },
+      DOGE: { name: 'Dogecoin', price: 0.15, change24h: 1.1, cap: '$21.9B', type: 'top-crypto' },
+      ADA: { name: 'Cardano', price: 0.48, change24h: -2.11, cap: '$17.1B', type: 'alt-coins' },
+      AVAX: { name: 'Avalanche', price: 34.1, change24h: -0.45, cap: '$13.4B', type: 'alt-coins' },
+      LINK: { name: 'Chainlink', price: 16.25, change24h: 0.15, cap: '$9.5B', type: 'alt-coins' },
+      DOT: { name: 'Polkadot', price: 6.85, change24h: 4.3, cap: '$9.8B', type: 'alt-coins' },
+      NEAR: { name: 'NEAR Protocol', price: 7.14, change24h: 2.2, cap: '$7.7B', type: 'alt-coins' },
+      ARB: { name: 'Arbitrum', price: 1.18, change24h: -1.3, cap: '$3.2B', type: 'alt-coins' },
+      OP: { name: 'Optimism', price: 2.62, change24h: 1.8, cap: '$2.8B', type: 'alt-coins' },
+      RENDER: { name: 'Render', price: 9.4, change24h: 3.1, cap: '$4.7B', type: 'alt-coins' },
+      PEPE: { name: 'Pepe', price: 0.000012, change24h: 6.5, cap: '$5.1B', type: 'alt-coins' },
+      WLD: { name: 'Worldcoin', price: 5.7, change24h: -4.2, cap: '$1.4B', type: 'alt-coins' }
+    };
 
-        let currentActiveMarketTab = 'top-crypto';
+    const DEFAULT_PORTFOLIO = [
+      { currency: 'BTC', name: 'Bitcoin', amount: 0.45, avgBuyPrice: 62000 },
+      { currency: 'ETH', name: 'Ethereum', amount: 4.25, avgBuyPrice: 2850.5 },
+      { currency: 'SOL', name: 'Solana', amount: 145.5, avgBuyPrice: 85.2 }
+    ];
 
-        function getIconUrl(symbol) {
-            // High quality coincap assets API with fallback
-            return `https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png`;
-        }
+    const DEFAULT_VAULTS = [
+      { currency: 'ETH', name: 'Ethereum Validator', stakedAmount: 2.5, apy: 5.5, earnedAmount: 0 },
+      { currency: 'SOL', name: 'Solana Delegation', stakedAmount: 50, apy: 7.2, earnedAmount: 0 }
+    ];
 
-        function formatUSD(num) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
-        }
+    let marketPrices = JSON.parse(localStorage.getItem('bc_markets_v2')) || structuredClone(DEFAULT_MARKETS);
+    let portfolio = JSON.parse(localStorage.getItem('bc_portfolio_v2')) || structuredClone(DEFAULT_PORTFOLIO);
+    let stakingVaults = JSON.parse(localStorage.getItem('bc_vaults_v2')) || structuredClone(DEFAULT_VAULTS);
+    let currentActiveMarketTab = 'top-crypto';
+    let lastTimestamp = parseInt(localStorage.getItem('bc_last_update_v2') || Date.now(), 10);
+    let toastTimer = null;
 
-        // Offline / Live Staking Yield Calculation Engine
-        function processStakingYield() {
-            const now = Date.now();
-            const elapsedMs = now - lastTimestamp;
-            const elapsedYears = elapsedMs / (1000 * 60 * 60 * 24 * 365.25);
-            
-            stakingVaults.forEach(vault => {
-                const earned = vault.stakedAmount * (vault.apy / 100) * elapsedYears;
-                vault.earnedAmount += earned;
-            });
-            
-            lastTimestamp = now;
-            saveData();
-        }
+    function saveData() {
+      localStorage.setItem('bc_markets_v2', JSON.stringify(marketPrices));
+      localStorage.setItem('bc_portfolio_v2', JSON.stringify(portfolio));
+      localStorage.setItem('bc_vaults_v2', JSON.stringify(stakingVaults));
+      localStorage.setItem('bc_last_update_v2', String(lastTimestamp));
+    }
 
-        // Modal Handlers
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-            if(id === 'sendModal') populateSelectOptions('sendAssetSelect');
-            if(id === 'withdrawModal') populateSelectOptions('withdrawAssetSelect');
-            if(id === 'swapModal') { populateSelectOptions('swapSrcSelect'); populateSelectOptions('swapDestSelect'); calculateSwapFees(); }
-        }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function money(value) {
+      const num = Number(value) || 0;
+      const digits = Math.abs(num) < 1 && num !== 0 ? 6 : 2;
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(num);
+    }
 
-        // Search & Filter Autocomplete
-        function filterCurrencySearch(query, boxId, selectionCallback) {
-            const resultsBox = document.getElementById(boxId);
-            resultsBox.innerHTML = '';
-            if (!query.trim()) { resultsBox.style.display = 'none'; return; }
+    function compactMoney(value) {
+      const num = Number(value) || 0;
+      return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2, style: 'currency', currency: 'USD' }).format(num);
+    }
 
-            const filtered = Object.keys(marketPrices).filter(ticker => 
-                ticker.toLowerCase().includes(query.toLowerCase()) || 
-                marketPrices[ticker].name.toLowerCase().includes(query.toLowerCase())
-            );
+    function amountFmt(value) {
+      return Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 8 });
+    }
 
-            if (filtered.length > 0) {
-                resultsBox.style.display = 'block';
-                filtered.forEach(ticker => {
-                    const item = document.createElement('div');
-                    item.className = 'search-item';
-                    item.innerHTML = `<span><strong>${ticker}</strong> - ${marketPrices[ticker].name}</span>`;
-                    item.onclick = () => {
-                        selectionCallback(ticker);
-                        resultsBox.style.display = 'none';
-                    };
-                    resultsBox.appendChild(item);
-                });
-            } else {
-                resultsBox.style.display = 'none';
-            }
-        }
+    function coinIcon(symbol) {
+      return `https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png`;
+    }
 
-        function selectAssetTicker(ticker) {
-            document.getElementById('currencySearchInput').value = ticker;
-            document.getElementById('currencyInput').value = ticker;
-            document.getElementById('nameInput').value = marketPrices[ticker]?.name || '';
-            // Auto fill if we already own it
-            const existing = portfolio.find(a => a.currency === ticker);
-            if(existing) {
-                document.getElementById('amountInput').value = existing.amount;
-                document.getElementById('buyPriceInput').value = existing.avgBuyPrice;
-            } else {
-                document.getElementById('amountInput').value = '';
-                document.getElementById('buyPriceInput').value = marketPrices[ticker]?.price || '';
-            }
-        }
+    function iconHtml(symbol) {
+      const safe = String(symbol).replace(/[^A-Z0-9]/gi, '').toUpperCase();
+      return `<div class="coin-icon"><img src="${coinIcon(safe)}" alt="${safe}" onerror="this.remove(); this.parentNode.textContent='${safe.slice(0, 3)}';" /></div>`;
+    }
 
-        function selectStakeTicker(ticker) {
-            document.getElementById('stakeSearchInput').value = ticker;
-            document.getElementById('stakeAssetTarget').value = ticker;
-        }
+    function toast(message) {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.classList.add('active');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('active'), 2300);
+    }
 
-        function openAssetModalForAddition() {
-            document.getElementById('currencySearchInput').value = "";
-            document.getElementById('currencyInput').value = "";
-            document.getElementById('nameInput').value = "";
-            document.getElementById('amountInput').value = "";
-            document.getElementById('buyPriceInput').value = "";
-            openModal('assetModal');
-        }
+    function pnlClass(value) {
+      if (value > 0) return 'pnl-positive';
+      if (value < 0) return 'pnl-negative';
+      return 'pnl-neutral';
+    }
 
-        function populateSelectOptions(selectElementId) {
-            const selectEl = document.getElementById(selectElementId);
-            selectEl.innerHTML = '';
-            portfolio.forEach(asset => {
-                const opt = document.createElement('option');
-                opt.value = asset.currency;
-                opt.innerText = `${asset.name} (${asset.currency}) - Bal: ${asset.amount}`;
-                selectEl.appendChild(opt);
-            });
-        }
+    function updateStakingYield() {
+      const now = Date.now();
+      const elapsedMs = Math.max(0, now - lastTimestamp);
+      const elapsedYears = elapsedMs / (1000 * 60 * 60 * 24 * 365.25);
+      stakingVaults.forEach(vault => {
+        vault.earnedAmount = Number(vault.earnedAmount || 0) + (Number(vault.stakedAmount || 0) * (Number(vault.apy || 0) / 100) * elapsedYears);
+      });
+      lastTimestamp = now;
+      saveData();
+    }
 
-        // Logic Actions
-        function saveAssetEntry() {
-            const sym = document.getElementById('currencyInput').value.toUpperCase().trim();
-            const name = document.getElementById('nameInput').value.trim();
-            const amt = parseFloat(document.getElementById('amountInput').value);
-            const buyPrice = parseFloat(document.getElementById('buyPriceInput').value) || 0;
+    async function refreshPrices(manual = false) {
+      const syncText = document.getElementById('syncText');
+      const feedStatus = document.getElementById('feedStatus');
+      const symbols = [...new Set([...Object.keys(DEFAULT_MARKETS), ...portfolio.map(a => a.currency), ...stakingVaults.map(v => v.currency)])]
+        .map(s => String(s).toUpperCase())
+        .filter(s => COINGECKO_IDS[s]);
+      const ids = symbols.map(s => COINGECKO_IDS[s]).join(',');
+      if (!ids) return;
 
-            if (!sym || isNaN(amt)) return alert('Validation Error: Check inputs.');
+      try {
+        syncText.textContent = 'Updating prices...';
+        const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(ids)}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Price feed failed');
+        const data = await res.json();
 
-            if(amt <= 0) {
-                portfolio = portfolio.filter(a => a.currency !== sym);
-            } else {
-                const targetAsset = portfolio.find(a => a.currency === sym);
-                if(targetAsset) {
-                    targetAsset.amount = amt;
-                    targetAsset.avgBuyPrice = buyPrice;
-                } else {
-                    portfolio.push({ currency: sym, name: name || sym, amount: amt, avgBuyPrice: buyPrice });
-                    if(!marketPrices[sym]) marketPrices[sym] = { name: name || sym, price: buyPrice || 1.0, change24h: 0, cap: 'Custom', type: 'alt-coins' };
-                }
-            }
-            saveData();
-            closeModal('assetModal');
-            renderDashboard();
-        }
-
-        function executeSendAction() {
-            const ticker = document.getElementById('sendAssetSelect').value;
-            const amt = parseFloat(document.getElementById('sendAmountInput').value);
-            const asset = portfolio.find(a => a.currency === ticker);
-            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Invalid amount.');
-            asset.amount -= amt;
-            if(asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
-            saveData();
-            closeModal('sendModal');
-            renderDashboard();
-        }
-
-        function executeWithdrawAction() {
-            const ticker = document.getElementById('withdrawAssetSelect').value;
-            const amt = parseFloat(document.getElementById('withdrawAmountInput').value);
-            const asset = portfolio.find(a => a.currency === ticker);
-            if(!asset || isNaN(amt) || amt > asset.amount || amt <= 0) return alert('Invalid amount.');
-            asset.amount -= amt;
-            if(asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
-            saveData();
-            closeModal('withdrawModal');
-            renderDashboard();
-        }
-
-        function calculateSwapFees() {
-            const srcTicker = document.getElementById('swapSrcSelect').value;
-            const destTicker = document.getElementById('swapDestSelect').value;
-            const amt = parseFloat(document.getElementById('swapAmountInput').value) || 0;
-            const srcPrice = marketPrices[srcTicker]?.price || 0;
-            const destPrice = marketPrices[destTicker]?.price || 1;
-            const totalValueUsd = amt * srcPrice;
-            const fee = totalValueUsd * 0.003;
-            const receive = (totalValueUsd - fee) / destPrice;
-            document.getElementById('feeNetworkSpan').innerText = formatUSD(fee);
-            document.getElementById('swapTargetReceiveSpan').innerText = `${receive.toFixed(5)} ${destTicker}`;
-        }
-
-        function executeSwapAction() {
-            const srcTicker = document.getElementById('swapSrcSelect').value;
-            const destTicker = document.getElementById('swapDestSelect').value;
-            const amt = parseFloat(document.getElementById('swapAmountInput').value) || 0;
-            const srcAsset = portfolio.find(a => a.currency === srcTicker);
-            if(!srcAsset || amt > srcAsset.amount || amt <= 0) return alert('Invalid input.');
-            const srcPrice = marketPrices[srcTicker]?.price || 0;
-            const destPrice = marketPrices[destTicker]?.price || 1;
-            const netUsd = (amt * srcPrice) * 0.997; // 0.3% fee
-            const netReceive = netUsd / destPrice;
-
-            srcAsset.amount -= amt;
-            if(srcAsset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== srcTicker);
-            const destAsset = portfolio.find(a => a.currency === destTicker);
-            if(destAsset) destAsset.amount += netReceive;
-            else portfolio.push({ currency: destTicker, name: marketPrices[destTicker]?.name || destTicker, amount: netReceive, avgBuyPrice: destPrice });
-            
-            saveData();
-            closeModal('swapModal');
-            renderDashboard();
-        }
-
-        function executeStakingModification() {
-            const type = document.getElementById('stakeOperationType').value;
-            const ticker = document.getElementById('stakeAssetTarget').value;
-            const amt = parseFloat(document.getElementById('stakeActionAmountInput').value) || 0;
-
-            if(!ticker || amt <= 0 || isNaN(amt)) return alert('Invalid params.');
-
-            if(type === 'STAKE') {
-                const srcAsset = portfolio.find(a => a.currency === ticker);
-                if(!srcAsset || srcAsset.amount < amt) return alert('Insufficient balance.');
-                srcAsset.amount -= amt;
-                if(srcAsset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== ticker);
-
-                const existingVault = stakingVaults.find(v => v.currency === ticker);
-                if(existingVault) existingVault.stakedAmount += amt;
-                else stakingVaults.push({ currency: ticker, name: `${marketPrices[ticker]?.name || ticker} Validator`, stakedAmount: amt, apy: 5.5, earnedAmount: 0 });
-            } else {
-                const vaultIdx = stakingVaults.findIndex(v => v.currency === ticker);
-                if(vaultIdx === -1 || stakingVaults[vaultIdx].stakedAmount < amt) return alert('Exceeds staked amount.');
-                stakingVaults[vaultIdx].stakedAmount -= amt;
-                const destAsset = portfolio.find(a => a.currency === ticker);
-                if(destAsset) destAsset.amount += amt;
-                else portfolio.push({ currency: ticker, name: marketPrices[ticker]?.name || ticker, amount: amt, avgBuyPrice: marketPrices[ticker]?.price || 0 });
-                if(stakingVaults[vaultIdx].stakedAmount <= 0) stakingVaults.splice(vaultIdx, 1);
-            }
-            saveData();
-            closeModal('stakeActionModal');
-            renderDashboard();
-        }
-
-        function switchMarketTab(tabName, element) {
-            currentActiveMarketTab = tabName;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-            renderMarketTabSection();
-        }
-
-        function renderMarketTabSection() {
-            const listContainer = document.getElementById('marketTabsList');
-            listContainer.innerHTML = '';
-            Object.keys(marketPrices).forEach(ticker => {
-                const data = marketPrices[ticker];
-                if(data.type !== currentActiveMarketTab) return;
-                const changeClass = data.change24h >= 0 ? 'pnl-positive' : 'pnl-negative';
-                const sign = data.change24h >= 0 ? '▲' : '▼';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="Asset">
-                        <div class="asset-cell">
-                            <div class="asset-icon"><img src="${getIconUrl(ticker)}" onerror="this.style.display='none'; this.parentNode.innerText='${ticker.substring(0,2)}';"></div>
-                            <div>
-                                <div class="asset-name">${data.name}</div>
-                                <div class="asset-symbol">${ticker}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Price" class="value-cell">${formatUSD(data.price)}</td>
-                    <td data-label="Trend"><span class="pnl-badge ${changeClass}">${sign} ${Math.abs(data.change24h).toFixed(2)}%</span></td>
-                    <td data-label="Cap" class="hide-mobile color-text-muted" style="font-weight:600;">${data.cap}</td>
-                `;
-                listContainer.appendChild(tr);
-            });
-        }
-
-        function renderDashboard() {
-            processStakingYield(); // Ensure time math is current before rendering
-
-            let totalSpotValue = 0;
-            let totalSpotCost = 0;
-            const portfolioList = document.getElementById('portfolioList');
-            portfolioList.innerHTML = '';
-
-            portfolio.forEach(asset => {
-                const live = marketPrices[asset.currency] || { price: 0, change24h: 0 };
-                const totalValue = asset.amount * live.price;
-                const totalCost = asset.amount * asset.avgBuyPrice;
-                totalSpotValue += totalValue;
-                totalSpotCost += totalCost;
-
-                const pnlAbsolute = totalValue - totalCost;
-                const roiPct = totalCost > 0 ? (pnlAbsolute / totalCost) * 100 : 0;
-                const pnlClass = pnlAbsolute >= 0 ? 'pnl-positive' : 'pnl-negative';
-                const sign = pnlAbsolute >= 0 ? '+' : '';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="Asset">
-                        <div class="asset-cell">
-                            <div class="asset-icon"><img src="${getIconUrl(asset.currency)}" onerror="this.style.display='none'; this.parentNode.innerText='${asset.currency.substring(0,2)}';"></div>
-                            <div>
-                                <div class="asset-name">${asset.name}</div>
-                                <div class="asset-symbol">${asset.currency}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Market Price">
-                        <div class="value-cell">${formatUSD(live.price)}</div>
-                        <div class="sub-value ${live.change24h >= 0 ? 'pnl-positive' : 'pnl-negative'}" style="background:transparent; padding:0;">${live.change24h >= 0 ? '▲' : '▼'} ${Math.abs(live.change24h).toFixed(2)}%</div>
-                    </td>
-                    <td data-label="Holdings">
-                        <div class="value-cell">${asset.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 6})}</div>
-                        <div class="sub-value">${asset.currency}</div>
-                    </td>
-                    <td data-label="Avg Cost" class="hide-mobile">
-                        <div class="value-cell">${asset.avgBuyPrice > 0 ? formatUSD(asset.avgBuyPrice) : '--'}</div>
-                    </td>
-                    <td data-label="Value & ROI">
-                        <div class="value-cell">${formatUSD(totalValue)}</div>
-                        <div class="sub-value ${pnlClass}" style="background:transparent; padding:0; font-weight:700;">${sign}${formatUSD(Math.abs(pnlAbsolute))} (${sign}${roiPct.toFixed(2)}%)</div>
-                    </td>
-                `;
-                portfolioList.appendChild(tr);
-            });
-
-            document.getElementById('totalBalance').innerText = formatUSD(totalSpotValue);
-            if(totalSpotCost > 0) {
-                const netPnlUsd = totalSpotValue - totalSpotCost;
-                const netRoiPct = (netPnlUsd / totalSpotCost) * 100;
-                const pnlEl = document.getElementById('totalPnl');
-                pnlEl.className = `pnl-badge ${netPnlUsd >= 0 ? 'pnl-positive' : 'pnl-negative'}`;
-                pnlEl.innerText = `${netPnlUsd >= 0 ? '+' : ''}${formatUSD(Math.abs(netPnlUsd))} (${netPnlUsd >= 0 ? '+' : ''}${netRoiPct.toFixed(2)}%) All-Time ROI`;
-            }
-
-            // Staking Yield Arrays
-            let combinedStakingValueUsd = 0;
-            let aggregatedYieldDistributedUsd = 0;
-            const stakingContainer = document.getElementById('stakingList');
-            stakingContainer.innerHTML = '';
-
-            stakingVaults.forEach(vault => {
-                const livePrice = marketPrices[vault.currency]?.price || 0;
-                const underlyingValueUsd = vault.stakedAmount * livePrice;
-                const distributedYieldValueUsd = vault.earnedAmount * livePrice;
-
-                combinedStakingValueUsd += underlyingValueUsd;
-                aggregatedYieldDistributedUsd += distributedYieldValueUsd;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="Pool Asset">
-                        <div class="asset-cell">
-                            <div class="asset-icon"><img src="${getIconUrl(vault.currency)}" onerror="this.style.display='none'; this.parentNode.innerText='${vault.currency.substring(0,2)}';"></div>
-                            <div>
-                                <div class="asset-name">${vault.name}</div>
-                                <div class="asset-symbol">${vault.currency}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="Locked Volume">
-                        <div class="value-cell">${vault.stakedAmount.toLocaleString()} ${vault.currency}</div>
-                        <div class="sub-value">${formatUSD(underlyingValueUsd)}</div>
-                    </td>
-                    <td data-label="Network APY"><span class="apy-badge">${vault.apy}% APY</span></td>
-                    <td data-label="Live Yield Mined">
-                        <div class="staking-profit-text">+${vault.earnedAmount.toFixed(6)} ${vault.currency}</div>
-                        <div class="sub-value">${formatUSD(distributedYieldValueUsd)}</div>
-                    </td>
-                `;
-                stakingContainer.appendChild(tr);
-            });
-
-            document.getElementById('stakingBalance').innerText = formatUSD(combinedStakingValueUsd);
-            document.getElementById('stakingProfits').innerText = `+${formatUSD(aggregatedYieldDistributedUsd)}`;
-            renderMarketTabSection();
-        }
-
-        // Live Market Flux + Fast Staking Yield Ticker
-        function simulateVolatilityFeed() {
-            Object.keys(marketPrices).forEach(ticker => {
-                const deltaPct = (Math.random() - 0.5) * 0.2;
-                marketPrices[ticker].price *= (1 + (deltaPct / 100));
-            });
-            renderDashboard();
-        }
-
-        // Click outside to close modals
-        window.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active');
-            if (!e.target.closest('.form-group')) document.querySelectorAll('.search-results-box').forEach(box => box.style.display = 'none');
+        symbols.forEach(symbol => {
+          const id = COINGECKO_IDS[symbol];
+          if (!data[id] || typeof data[id].usd !== 'number') return;
+          const current = marketPrices[symbol] || { name: symbol, type: 'watchlist' };
+          marketPrices[symbol] = {
+            ...current,
+            name: current.name || symbol,
+            price: data[id].usd,
+            change24h: data[id].usd_24h_change || 0,
+            cap: data[id].usd_market_cap ? compactMoney(data[id].usd_market_cap) : current.cap || '--',
+            type: current.type || 'watchlist'
+          };
         });
 
-        // Initialize Core Loops
-        renderDashboard();
-        // Update price simulation every 4 seconds
-        setInterval(simulateVolatilityFeed, 4000);
-        // Fast tick to show yield counting in real time (every second)
-        setInterval(renderDashboard, 1000); 
+        syncText.textContent = `Live sync • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        if (feedStatus) feedStatus.textContent = 'Live CoinGecko crypto prices loaded successfully.';
+        saveData();
+        renderDashboard(false);
+        if (manual) toast('Live prices refreshed');
+      } catch (err) {
+        syncText.textContent = 'Local price fallback';
+        if (feedStatus) feedStatus.textContent = 'Live feed was blocked or rate-limited. Local fallback simulation is active.';
+        simulateFallbackPrices();
+        renderDashboard(false);
+        if (manual) toast('Live feed unavailable, using fallback prices');
+      }
+    }
 
-    </script>
-</body>
+    function simulateFallbackPrices() {
+      Object.keys(marketPrices).forEach(symbol => {
+        const data = marketPrices[symbol];
+        const delta = (Math.random() - 0.5) * 0.004;
+        data.price = Math.max(0.0000001, Number(data.price || 1) * (1 + delta));
+        data.change24h = Number(data.change24h || 0) + (Math.random() - 0.5) * 0.18;
+      });
+      saveData();
+    }
+
+    function openSettings(targetId) {
+      document.getElementById('settingsOverlay').classList.add('active');
+      renderAssetManager();
+      if (targetId) setTimeout(() => document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsOverlay').classList.remove('active');
+    }
+
+    function openModal(id) {
+      populateSelects();
+      document.getElementById(id).classList.add('active');
+      if (id === 'swapModal') calculateSwapFees();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function overlayClose(event, id) {
+      if (event.target.id === id) document.getElementById(id).classList.remove('active');
+    }
+
+    function setTheme(theme) {
+      if (theme === 'midnight') document.documentElement.setAttribute('data-theme', 'midnight');
+      else document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('bc_theme_v2', theme);
+      toast(theme === 'midnight' ? 'Midnight theme enabled' : 'Cloud blue theme enabled');
+    }
+
+    function loadTheme() {
+      setTheme(localStorage.getItem('bc_theme_v2') || 'cloud');
+    }
+
+    function clearAssetForm() {
+      ['assetSearchInput', 'currencyInput', 'nameInput', 'amountInput', 'buyPriceInput'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('assetSuggestions').classList.remove('active');
+    }
+
+    function filterAssetSearch(query, boxId, callback) {
+      const box = document.getElementById(boxId);
+      const q = query.trim().toLowerCase();
+      box.innerHTML = '';
+      if (!q) {
+        box.classList.remove('active');
+        return;
+      }
+
+      const matches = Object.keys(marketPrices)
+        .filter(symbol => symbol.toLowerCase().includes(q) || String(marketPrices[symbol].name).toLowerCase().includes(q))
+        .slice(0, 18);
+
+      if (!matches.length) {
+        box.innerHTML = `<div class="suggestion"><span>No match. Type a custom symbol below.</span></div>`;
+        box.classList.add('active');
+        return;
+      }
+
+      matches.forEach(symbol => {
+        const item = document.createElement('div');
+        item.className = 'suggestion';
+        item.innerHTML = `<span><strong>${symbol}</strong> · ${marketPrices[symbol].name}</span><span>${money(marketPrices[symbol].price)}</span>`;
+        item.onclick = () => {
+          callback(symbol);
+          box.classList.remove('active');
+        };
+        box.appendChild(item);
+      });
+      box.classList.add('active');
+    }
+
+    function selectAssetTicker(symbol) {
+      const data = marketPrices[symbol] || { name: symbol, price: 0 };
+      const existing = portfolio.find(a => a.currency === symbol);
+      document.getElementById('assetSearchInput').value = `${symbol} · ${data.name}`;
+      document.getElementById('currencyInput').value = symbol;
+      document.getElementById('nameInput').value = existing?.name || data.name || symbol;
+      document.getElementById('amountInput').value = existing?.amount ?? '';
+      document.getElementById('buyPriceInput').value = existing?.avgBuyPrice ?? data.price ?? '';
+    }
+
+    function selectStakeTicker(symbol) {
+      document.getElementById('stakeSearchInput').value = `${symbol} · ${marketPrices[symbol]?.name || symbol}`;
+      document.getElementById('stakeAssetTarget').value = symbol;
+    }
+
+    function saveAssetEntry() {
+      const symbol = document.getElementById('currencyInput').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const name = document.getElementById('nameInput').value.trim() || marketPrices[symbol]?.name || symbol;
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      const avgBuyPrice = parseFloat(document.getElementById('buyPriceInput').value) || marketPrices[symbol]?.price || 0;
+
+      if (!symbol || Number.isNaN(amount)) {
+        toast('Enter a valid symbol and balance');
+        return;
+      }
+
+      if (!marketPrices[symbol]) {
+        marketPrices[symbol] = { name, price: avgBuyPrice || 1, change24h: 0, cap: 'Custom', type: 'watchlist' };
+      } else {
+        marketPrices[symbol].name = name;
+      }
+
+      if (amount <= 0) {
+        portfolio = portfolio.filter(a => a.currency !== symbol);
+        toast(`${symbol} removed from wallet`);
+      } else {
+        const existing = portfolio.find(a => a.currency === symbol);
+        if (existing) {
+          existing.name = name;
+          existing.amount = amount;
+          existing.avgBuyPrice = avgBuyPrice;
+          toast(`${symbol} updated`);
+        } else {
+          portfolio.push({ currency: symbol, name, amount, avgBuyPrice });
+          toast(`${symbol} added to wallet`);
+        }
+      }
+
+      saveData();
+      clearAssetForm();
+      renderDashboard(false);
+      renderAssetManager();
+      refreshPrices(false);
+    }
+
+    function editAsset(symbol) {
+      selectAssetTicker(symbol);
+      document.getElementById('assetTools').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function removeAsset(symbol) {
+      portfolio = portfolio.filter(a => a.currency !== symbol);
+      saveData();
+      renderDashboard(false);
+      renderAssetManager();
+      toast(`${symbol} removed`);
+    }
+
+    function renderAssetManager() {
+      const list = document.getElementById('assetManagerList');
+      if (!portfolio.length) {
+        list.innerHTML = `<div class="empty-state">No assets yet. Search a coin above and add your balance.</div>`;
+        return;
+      }
+
+      list.innerHTML = portfolio.map(asset => {
+        const live = marketPrices[asset.currency] || { price: 0 };
+        return `
+          <div class="manager-item">
+            <div>
+              <div class="manager-name">${asset.name} · ${asset.currency}</div>
+              <div class="manager-balance">${amountFmt(asset.amount)} ${asset.currency} · ${money(asset.amount * live.price)}</div>
+            </div>
+            <div class="manager-actions">
+              <button class="small-icon-button" type="button" onclick="editAsset('${asset.currency}')">✎</button>
+              <button class="small-icon-button danger" type="button" onclick="removeAsset('${asset.currency}')">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function populateSelects() {
+      const portfolioOptions = portfolio.map(a => `<option value="${a.currency}">${a.name} (${a.currency}) · ${amountFmt(a.amount)}</option>`).join('');
+      const allOptions = Object.keys(marketPrices).sort().map(s => `<option value="${s}">${marketPrices[s].name} (${s})</option>`).join('');
+      ['sendAssetSelect', 'swapSrcSelect'].forEach(id => document.getElementById(id).innerHTML = portfolioOptions || '<option>No assets</option>');
+      document.getElementById('swapDestSelect').innerHTML = allOptions;
+    }
+
+    function executeSendAction() {
+      const symbol = document.getElementById('sendAssetSelect').value;
+      const amount = parseFloat(document.getElementById('sendAmountInput').value);
+      const asset = portfolio.find(a => a.currency === symbol);
+      if (!asset || Number.isNaN(amount) || amount <= 0 || amount > asset.amount) {
+        toast('Invalid send amount');
+        return;
+      }
+      asset.amount -= amount;
+      if (asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== symbol);
+      saveData();
+      closeModal('sendModal');
+      renderDashboard(false);
+      toast(`Sent ${amountFmt(amount)} ${symbol}`);
+    }
+
+    function calculateSwapFees() {
+      const src = document.getElementById('swapSrcSelect').value;
+      const dest = document.getElementById('swapDestSelect').value;
+      const amount = parseFloat(document.getElementById('swapAmountInput').value) || 0;
+      const srcPrice = marketPrices[src]?.price || 0;
+      const destPrice = marketPrices[dest]?.price || 1;
+      const grossUsd = amount * srcPrice;
+      const fee = grossUsd * 0.003;
+      const receive = destPrice > 0 ? (grossUsd - fee) / destPrice : 0;
+      document.getElementById('feeNetworkSpan').textContent = money(fee);
+      document.getElementById('swapTargetReceiveSpan').textContent = `${amountFmt(receive)} ${dest || ''}`;
+    }
+
+    function executeSwapAction() {
+      const src = document.getElementById('swapSrcSelect').value;
+      const dest = document.getElementById('swapDestSelect').value;
+      const amount = parseFloat(document.getElementById('swapAmountInput').value) || 0;
+      const srcAsset = portfolio.find(a => a.currency === src);
+      if (!srcAsset || !dest || src === dest || amount <= 0 || amount > srcAsset.amount) {
+        toast('Invalid swap');
+        return;
+      }
+      const netUsd = amount * (marketPrices[src]?.price || 0) * 0.997;
+      const receive = netUsd / (marketPrices[dest]?.price || 1);
+      srcAsset.amount -= amount;
+      if (srcAsset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== src);
+      const destAsset = portfolio.find(a => a.currency === dest);
+      if (destAsset) destAsset.amount += receive;
+      else portfolio.push({ currency: dest, name: marketPrices[dest]?.name || dest, amount: receive, avgBuyPrice: marketPrices[dest]?.price || 0 });
+      saveData();
+      closeModal('swapModal');
+      renderDashboard(false);
+      toast(`Swapped into ${dest}`);
+    }
+
+    function executeStakingModification() {
+      const type = document.getElementById('stakeOperationType').value;
+      const symbol = document.getElementById('stakeAssetTarget').value.trim().toUpperCase();
+      const amount = parseFloat(document.getElementById('stakeActionAmountInput').value) || 0;
+      if (!symbol || amount <= 0) {
+        toast('Choose an asset and amount');
+        return;
+      }
+
+      if (type === 'STAKE') {
+        const asset = portfolio.find(a => a.currency === symbol);
+        if (!asset || asset.amount < amount) {
+          toast('Insufficient spot balance');
+          return;
+        }
+        asset.amount -= amount;
+        if (asset.amount <= 0) portfolio = portfolio.filter(a => a.currency !== symbol);
+        const vault = stakingVaults.find(v => v.currency === symbol);
+        if (vault) vault.stakedAmount += amount;
+        else stakingVaults.push({ currency: symbol, name: `${marketPrices[symbol]?.name || symbol} Vault`, stakedAmount: amount, apy: 5.5, earnedAmount: 0 });
+        toast(`Staked ${amountFmt(amount)} ${symbol}`);
+      } else {
+        const vault = stakingVaults.find(v => v.currency === symbol);
+        if (!vault || vault.stakedAmount < amount) {
+          toast('Insufficient staked balance');
+          return;
+        }
+        vault.stakedAmount -= amount;
+        const asset = portfolio.find(a => a.currency === symbol);
+        if (asset) asset.amount += amount;
+        else portfolio.push({ currency: symbol, name: marketPrices[symbol]?.name || symbol, amount, avgBuyPrice: marketPrices[symbol]?.price || 0 });
+        stakingVaults = stakingVaults.filter(v => v.stakedAmount > 0);
+        toast(`Unstaked ${amountFmt(amount)} ${symbol}`);
+      }
+      saveData();
+      closeModal('stakeActionModal');
+      renderDashboard(false);
+    }
+
+    function copyReceiveAddress() {
+      const value = document.getElementById('receiveAddress').value;
+      navigator.clipboard?.writeText(value);
+      toast('Address copied');
+    }
+
+    function switchMarketTab(tabName, element) {
+      currentActiveMarketTab = tabName;
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+      renderMarketTabSection();
+    }
+
+    function marketSymbolsForTab() {
+      if (currentActiveMarketTab === 'watchlist') {
+        return [...new Set([...portfolio.map(a => a.currency), ...stakingVaults.map(v => v.currency)])];
+      }
+      return Object.keys(marketPrices).filter(symbol => marketPrices[symbol].type === currentActiveMarketTab);
+    }
+
+    function renderMarketTabSection() {
+      const list = document.getElementById('marketTabsList');
+      const symbols = marketSymbolsForTab();
+      if (!symbols.length) {
+        list.innerHTML = `<div class="empty-state">Your watchlist is empty. Add assets from settings.</div>`;
+        return;
+      }
+      list.innerHTML = symbols.map(symbol => {
+        const data = marketPrices[symbol] || { name: symbol, price: 0, change24h: 0, cap: '--' };
+        const sign = data.change24h >= 0 ? '+' : '';
+        return `
+          <div class="market-card">
+            <div class="asset-main">
+              ${iconHtml(symbol)}
+              <div>
+                <div class="asset-name">${data.name}</div>
+                <div class="asset-symbol">${symbol}</div>
+              </div>
+            </div>
+            <div>
+              <div class="cell-label">Price</div>
+              <div class="cell-value">${money(data.price)}</div>
+              <div class="cell-sub">Cap ${data.cap || '--'}</div>
+            </div>
+            <div>
+              <div class="cell-label">24h</div>
+              <div class="cell-value"><span class="pnl-chip ${pnlClass(data.change24h)}">${sign}${Number(data.change24h || 0).toFixed(2)}%</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDashboard(runYield = true) {
+      if (runYield) updateStakingYield();
+
+      let totalValue = 0;
+      let totalCostValue = 0;
+      let dayWeighted = 0;
+      let best = null;
+      let largest = null;
+      const list = document.getElementById('portfolioList');
+
+      if (!portfolio.length) {
+        list.innerHTML = `<div class="empty-state">No assets added yet. Tap the top-right settings button to add BTC, ETH, SOL or any custom asset.</div>`;
+      } else {
+        list.innerHTML = portfolio.map(asset => {
+          const live = marketPrices[asset.currency] || { price: 0, change24h: 0 };
+          const value = asset.amount * live.price;
+          const cost = asset.amount * (asset.avgBuyPrice || 0);
+          const pnl = value - cost;
+          const roi = cost > 0 ? (pnl / cost) * 100 : 0;
+          totalValue += value;
+          totalCostValue += cost;
+          dayWeighted += value * ((live.change24h || 0) / 100);
+          if (!best || roi > best.roi) best = { symbol: asset.currency, roi };
+          if (!largest || value > largest.value) largest = { symbol: asset.currency, value };
+
+          return `
+            <div class="asset-card">
+              <div class="asset-main">
+                ${iconHtml(asset.currency)}
+                <div>
+                  <div class="asset-name">${asset.name}</div>
+                  <div class="asset-symbol">${asset.currency} · ${amountFmt(asset.amount)}</div>
+                </div>
+              </div>
+              <div>
+                <div class="cell-label">Price</div>
+                <div class="cell-value">${money(live.price)}</div>
+                <div class="cell-sub ${pnlClass(live.change24h)}">${live.change24h >= 0 ? '+' : ''}${Number(live.change24h || 0).toFixed(2)}% 24h</div>
+              </div>
+              <div>
+                <div class="cell-label">Holdings</div>
+                <div class="cell-value">${amountFmt(asset.amount)}</div>
+                <div class="cell-sub">${asset.currency}</div>
+              </div>
+              <div>
+                <div class="cell-label">Value</div>
+                <div class="cell-value">${money(value)}</div>
+                <div class="cell-sub ${pnlClass(pnl)}">${pnl >= 0 ? '+' : ''}${money(Math.abs(pnl))} · ${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
+              </div>
+              <div class="hide-mobile">
+                <button class="small-icon-button" type="button" onclick="openSettings('assetTools'); editAsset('${asset.currency}')">✎</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const totalPnl = totalValue - totalCostValue;
+      const totalRoi = totalCostValue > 0 ? (totalPnl / totalCostValue) * 100 : 0;
+      const dayPct = totalValue > 0 ? (dayWeighted / totalValue) * 100 : 0;
+
+      document.getElementById('totalBalance').textContent = money(totalValue);
+      const totalPnlEl = document.getElementById('totalPnl');
+      totalPnlEl.className = `pnl-chip ${pnlClass(totalPnl)}`;
+      totalPnlEl.textContent = `${totalPnl >= 0 ? '+' : ''}${money(Math.abs(totalPnl))} (${totalPnl >= 0 ? '+' : ''}${totalRoi.toFixed(2)}%)`;
+      document.getElementById('spotCount').textContent = portfolio.length;
+      document.getElementById('totalCost').textContent = money(totalCostValue);
+      document.getElementById('bestAsset').textContent = best ? `${best.symbol} ${best.roi >= 0 ? '+' : ''}${best.roi.toFixed(1)}%` : '--';
+      document.getElementById('largestHolding').textContent = largest ? `${largest.symbol}` : '--';
+      document.getElementById('dayChange').textContent = `${dayPct >= 0 ? '+' : ''}${dayPct.toFixed(2)}%`;
+      document.getElementById('dayChange').style.color = dayPct >= 0 ? 'var(--success)' : 'var(--danger)';
+
+      renderStaking();
+      renderMarketTabSection();
+      renderAssetManager();
+      populateSelects();
+    }
+
+    function renderStaking() {
+      let totalStaking = 0;
+      let totalYieldUsd = 0;
+      const list = document.getElementById('stakingList');
+
+      if (!stakingVaults.length) {
+        list.innerHTML = `<div class="empty-state">No active vaults. Tap Stake to lock an asset into a demo vault.</div>`;
+      } else {
+        list.innerHTML = stakingVaults.map(vault => {
+          const price = marketPrices[vault.currency]?.price || 0;
+          const value = vault.stakedAmount * price;
+          const yieldUsd = (vault.earnedAmount || 0) * price;
+          totalStaking += value;
+          totalYieldUsd += yieldUsd;
+          return `
+            <div class="vault-card">
+              <div class="asset-main">
+                ${iconHtml(vault.currency)}
+                <div>
+                  <div class="asset-name">${vault.name}</div>
+                  <div class="asset-symbol">${vault.currency}</div>
+                </div>
+              </div>
+              <div>
+                <div class="cell-label">Locked</div>
+                <div class="cell-value">${amountFmt(vault.stakedAmount)} ${vault.currency}</div>
+                <div class="cell-sub">${money(value)}</div>
+              </div>
+              <div>
+                <div class="cell-label">Yield</div>
+                <div class="cell-value"><span class="pnl-chip pnl-positive">${vault.apy}% APY</span></div>
+                <div class="cell-sub pnl-positive">+${amountFmt(vault.earnedAmount)} ${vault.currency}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('stakingBalance').textContent = money(totalStaking);
+      document.getElementById('stakingProfits').textContent = `+${money(totalYieldUsd)}`;
+    }
+
+    function scrollToSection(id, button) {
+      document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+      if (id === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
+      else document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetDemoData() {
+      marketPrices = structuredClone(DEFAULT_MARKETS);
+      portfolio = structuredClone(DEFAULT_PORTFOLIO);
+      stakingVaults = structuredClone(DEFAULT_VAULTS);
+      lastTimestamp = Date.now();
+      saveData();
+      renderDashboard(false);
+      toast('Demo wallet reset');
+      refreshPrices(false);
+    }
+
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeSettings();
+        document.querySelectorAll('.modal-overlay.active').forEach(el => el.classList.remove('active'));
+      }
+    });
+
+    window.addEventListener('click', event => {
+      if (!event.target.closest('.form-row')) {
+        document.querySelectorAll('.suggestions').forEach(el => el.classList.remove('active'));
+      }
+    });
+
+    loadTheme();
+    renderDashboard(false);
+    refreshPrices(false);
+    setInterval(() => refreshPrices(false), 60000);
+    setInterval(() => {
+      simulateFallbackPrices();
+      renderDashboard();
+    }, 5000);
+  </script></body>
 </html>
