@@ -12,20 +12,23 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f9ff;
+      --bg: #f4f9ff;
+      --bg2: #e9f4ff;
       --surface: #ffffff;
-      --surface-2: #f7fbff;
-      --surface-3: #eef6ff;
-      --border: rgba(15, 23, 42, 0.08);
-      --border-strong: rgba(2, 132, 199, 0.25);
+      --surface2: #f7fbff;
+      --surface3: #eef6ff;
       --text: #0f172a;
       --muted: #64748b;
-      --primary: #0284c7;
-      --primary-2: #2563eb;
-      --danger: #e11d48;
-      --success: #0284c7;
+      --muted2: #94a3b8;
+      --border: rgba(15, 23, 42, 0.08);
+      --border2: rgba(2, 132, 199, 0.24);
+      --blue: #0284c7;
+      --blue2: #2563eb;
+      --green: #16a34a;
+      --red: #e11d48;
+      --orange: #d97706;
       --shadow: 0 24px 70px rgba(15, 23, 42, 0.09);
-      --soft-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+      --shadow2: 0 12px 32px rgba(15, 23, 42, 0.07);
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
@@ -33,19 +36,21 @@
     [data-theme="dark"] {
       color-scheme: dark;
       --bg: #050816;
+      --bg2: #08111f;
       --surface: #0d1628;
-      --surface-2: #111d33;
-      --surface-3: #15233d;
-      --border: rgba(125, 211, 252, 0.13);
-      --border-strong: rgba(56, 189, 248, 0.3);
+      --surface2: #111d33;
+      --surface3: #15233d;
       --text: #f8fafc;
       --muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-2: #2563eb;
-      --danger: #fb7185;
-      --success: #38bdf8;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-      --soft-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+      --muted2: #64748b;
+      --border: rgba(125, 211, 252, 0.13);
+      --border2: rgba(56, 189, 248, 0.3);
+      --blue: #38bdf8;
+      --blue2: #2563eb;
+      --green: #38bdf8;
+      --red: #fb7185;
+      --shadow: 0 24px 80px rgba(0,0,0,0.36);
+      --shadow2: 0 12px 34px rgba(0,0,0,0.22);
     }
 
     * {
@@ -60,18 +65,14 @@
       min-height: 100vh;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(2, 132, 199, 0.1), transparent 30%),
-        linear-gradient(135deg, var(--bg), #e8f3ff);
-      padding-bottom: calc(92px + var(--safe-bottom));
+        radial-gradient(circle at top left, rgba(2,132,199,.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(22,163,74,.08), transparent 24%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
+      padding-bottom: calc(86px + var(--safe-bottom));
+      overflow-x: hidden;
     }
 
-    [data-theme="dark"] body {
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 30%),
-        linear-gradient(135deg, #050816, #08111f);
-    }
-
-    button, input, select {
+    button, input, select, textarea {
       font: inherit;
     }
 
@@ -83,24 +84,24 @@
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 50;
-      padding: calc(10px + var(--safe-top)) 14px 10px;
-      background: rgba(245, 249, 255, 0.92);
+      z-index: 40;
+      padding: calc(10px + var(--safe-top)) 12px 10px;
+      background: rgba(244,249,255,.9);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(16px);
     }
 
     [data-theme="dark"] .topbar {
-      background: rgba(5, 8, 22, 0.9);
+      background: rgba(5,8,22,.9);
     }
 
     .topbar-inner {
       width: min(1120px, 100%);
       margin: 0 auto;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      gap: 10px;
     }
 
     .brand {
@@ -111,66 +112,56 @@
     }
 
     .logo {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 14px;
       display: grid;
       place-items: center;
       color: white;
       font-weight: 950;
-      letter-spacing: -0.06em;
-      background: linear-gradient(135deg, #2563eb, #38bdf8);
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.2);
+      background: linear-gradient(135deg, var(--blue2), #38bdf8);
+      box-shadow: 0 12px 28px rgba(37,99,235,.2);
+      flex: 0 0 auto;
     }
 
     .brand-title {
+      font-size: 1rem;
       font-weight: 950;
-      letter-spacing: -0.04em;
+      letter-spacing: -.045em;
       white-space: nowrap;
     }
 
     .brand-sub {
+      margin-top: 2px;
       color: var(--muted);
-      font-size: 0.74rem;
+      font-size: .72rem;
       font-weight: 800;
       white-space: nowrap;
     }
 
     .top-actions {
       display: flex;
-      gap: 8px;
       align-items: center;
-    }
-
-    .icon-btn,
-    .small-btn,
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn,
-    .pill-btn {
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      gap: 7px;
     }
 
     .icon-btn {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 14px;
       display: grid;
       place-items: center;
       background: var(--surface);
       color: var(--text);
       border: 1px solid var(--border);
-      box-shadow: var(--soft-shadow);
+      box-shadow: var(--shadow2);
+      font-weight: 950;
+      transition: transform .18s ease, border-color .18s ease;
     }
 
-    .icon-btn:hover,
-    .small-btn:hover,
-    .primary-btn:hover,
-    .secondary-btn:hover,
-    .danger-btn:hover,
-    .pill-btn:hover {
+    .icon-btn:hover {
       transform: translateY(-1px);
-      border-color: var(--border-strong);
+      border-color: var(--border2);
     }
 
     .user-chip {
@@ -181,199 +172,240 @@
       border-radius: 999px;
       background: var(--surface);
       border: 1px solid var(--border);
-      box-shadow: var(--soft-shadow);
-      font-size: 0.8rem;
+      box-shadow: var(--shadow2);
+      font-size: .78rem;
       font-weight: 900;
     }
 
     .avatar {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
     }
 
     .shell {
       width: min(1120px, 100%);
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px;
     }
 
     .hero {
-      border-radius: 28px;
+      border-radius: 26px;
       background: var(--surface);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
-      padding: 22px;
+      padding: 18px;
       overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: -120px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(2,132,199,.12), transparent 68%);
+      pointer-events: none;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1fr 0.8fr;
-      gap: 18px;
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1fr) 370px;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
     }
 
-    .eyebrow {
+    .badge {
       display: inline-flex;
       align-items: center;
       gap: 7px;
       padding: 8px 11px;
       border-radius: 999px;
-      color: var(--primary);
-      background: rgba(2, 132, 199, 0.08);
-      border: 1px solid var(--border-strong);
-      font-size: 0.75rem;
+      color: var(--blue);
+      background: rgba(2,132,199,.08);
+      border: 1px solid var(--border2);
+      font-size: .74rem;
       font-weight: 950;
     }
 
-    .pulse {
+    .dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--blue);
       animation: pulse 1.7s infinite;
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(2,132,199,.4); }
+      0% { box-shadow: 0 0 0 0 rgba(2,132,199,.42); }
       80% { box-shadow: 0 0 0 9px rgba(2,132,199,0); }
       100% { box-shadow: 0 0 0 0 rgba(2,132,199,0); }
     }
 
-    .main-address {
-      margin-top: 18px;
+    .address-line {
+      margin-top: 14px;
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: .8rem;
       font-weight: 800;
       word-break: break-all;
+      line-height: 1.45;
     }
 
     .big-balance {
       margin-top: 10px;
-      font-size: clamp(2.25rem, 7vw, 4.5rem);
-      line-height: 0.95;
-      letter-spacing: -0.07em;
+      font-size: clamp(2.3rem, 9vw, 4.6rem);
+      line-height: .95;
+      letter-spacing: -.075em;
       font-weight: 950;
       font-variant-numeric: tabular-nums;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .meta-chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      font-size: .73rem;
+      font-weight: 850;
     }
 
     .hero-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 9px;
       align-content: end;
     }
 
     .action-card {
-      min-height: 74px;
+      min-height: 78px;
       border-radius: 20px;
       padding: 13px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text);
       text-align: left;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow2);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+
+    .action-card:hover {
+      transform: translateY(-1px);
+      border-color: var(--border2);
     }
 
     .action-card.primary {
       color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
       border-color: transparent;
     }
 
     .action-card strong {
       display: block;
+      font-size: .92rem;
       font-weight: 950;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
     .action-card span {
       color: var(--muted);
-      font-size: 0.74rem;
+      font-size: .72rem;
       font-weight: 800;
+      line-height: 1.3;
     }
 
     .action-card.primary span {
-      color: rgba(255,255,255,0.82);
+      color: rgba(255,255,255,.82);
     }
 
     .grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
-      gap: 16px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 12px;
     }
 
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 22px;
-      box-shadow: var(--soft-shadow);
-      padding: 16px;
+      box-shadow: var(--shadow2);
+      padding: 14px;
+      overflow: hidden;
     }
 
     .panel + .panel {
-      margin-top: 16px;
+      margin-top: 12px;
     }
 
     .panel-head {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 13px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .panel-title {
-      font-size: 1.03rem;
+      font-size: 1rem;
       font-weight: 950;
-      letter-spacing: -0.04em;
+      letter-spacing: -.04em;
     }
 
     .panel-sub {
       margin-top: 3px;
       color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.45;
+      font-size: .76rem;
       font-weight: 750;
+      line-height: 1.45;
     }
 
-    .token-list,
-    .network-list {
+    .list {
       display: grid;
       gap: 8px;
     }
 
     .row {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
       align-items: center;
       padding: 12px;
       border-radius: 17px;
-      background: var(--surface-2);
+      background: var(--surface2);
       border: 1px solid var(--border);
     }
 
     .asset-main {
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
       min-width: 0;
     }
 
     .coin {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: grid;
       place-items: center;
       flex: 0 0 auto;
-      background: var(--surface-3);
+      background: var(--surface3);
       border: 1px solid var(--border);
-      color: var(--primary);
-      font-size: 0.74rem;
+      color: var(--blue);
+      font-size: .72rem;
       font-weight: 950;
       overflow: hidden;
     }
@@ -394,9 +426,10 @@
     .sub {
       margin-top: 3px;
       color: var(--muted);
-      font-size: 0.74rem;
+      font-size: .73rem;
       font-weight: 800;
-      word-break: break-all;
+      word-break: break-word;
+      line-height: 1.45;
     }
 
     .value {
@@ -409,38 +442,38 @@
       margin-top: 3px;
       text-align: right;
       color: var(--muted);
-      font-size: 0.74rem;
+      font-size: .72rem;
       font-weight: 800;
     }
 
-    .small-btn {
-      padding: 9px 12px;
-      border-radius: 13px;
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-size: 0.77rem;
-      font-weight: 950;
-      white-space: nowrap;
-    }
-
+    .small-btn,
     .primary-btn,
     .secondary-btn,
     .danger-btn {
-      min-height: 47px;
-      border-radius: 15px;
+      min-height: 44px;
+      border-radius: 14px;
       font-weight: 950;
+      transition: transform .18s ease, border-color .18s ease, opacity .18s ease;
+    }
+
+    .small-btn {
+      padding: 0 12px;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      font-size: .76rem;
+      white-space: nowrap;
     }
 
     .primary-btn {
       color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-      box-shadow: 0 14px 30px rgba(37,99,235,0.18);
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
+      box-shadow: 0 14px 30px rgba(37,99,235,.18);
     }
 
     .secondary-btn {
-      background: var(--surface);
       color: var(--text);
+      background: var(--surface);
       border: 1px solid var(--border);
     }
 
@@ -449,28 +482,50 @@
       background: linear-gradient(135deg, #be123c, #fb7185);
     }
 
+    .small-btn:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .danger-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border2);
+    }
+
+    .primary-btn:disabled,
+    .secondary-btn:disabled,
+    .danger-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .pill-row {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       overflow-x: auto;
-      padding-bottom: 2px;
-      margin-bottom: 13px;
+      scrollbar-width: none;
+      padding-bottom: 3px;
+      margin-bottom: 10px;
+    }
+
+    .pill-row::-webkit-scrollbar {
+      display: none;
     }
 
     .pill-btn {
       flex: 0 0 auto;
-      padding: 10px 13px;
+      min-height: 39px;
+      padding: 0 13px;
       border-radius: 999px;
-      background: var(--surface-2);
+      background: var(--surface2);
       color: var(--muted);
       border: 1px solid var(--border);
-      font-size: 0.76rem;
+      font-size: .75rem;
       font-weight: 950;
     }
 
     .pill-btn.active {
       color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
       border-color: transparent;
     }
 
@@ -486,29 +541,39 @@
 
     .form-row label {
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: .72rem;
       font-weight: 950;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: .04em;
     }
 
     .input,
-    .select {
+    .select,
+    .textarea {
       width: 100%;
       min-height: 46px;
       border-radius: 14px;
       padding: 12px;
-      background: var(--surface-2);
       color: var(--text);
+      background: var(--surface2);
       border: 1px solid var(--border);
       outline: none;
       font-weight: 850;
     }
 
+    .textarea {
+      min-height: 112px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.5;
+      font-size: .8rem;
+    }
+
     .input:focus,
-    .select:focus {
-      border-color: var(--border-strong);
-      box-shadow: 0 0 0 4px rgba(2,132,199,0.08);
+    .select:focus,
+    .textarea:focus {
+      border-color: var(--border2);
+      box-shadow: 0 0 0 4px rgba(2,132,199,.08);
     }
 
     .button-row {
@@ -518,14 +583,34 @@
       margin-top: 10px;
     }
 
+    .button-row.one {
+      grid-template-columns: 1fr;
+    }
+
+    .section {
+      margin-top: 10px;
+      border-radius: 17px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    .section h3 {
+      font-size: .9rem;
+      font-weight: 950;
+      letter-spacing: -.035em;
+      margin-bottom: 7px;
+    }
+
     .modal-overlay,
     .drawer-overlay {
       position: fixed;
       inset: 0;
       z-index: 100;
       display: none;
-      background: rgba(0,0,0,0.42);
+      background: rgba(0,0,0,.42);
       backdrop-filter: blur(8px);
+      padding: 12px;
     }
 
     .modal-overlay.active,
@@ -534,16 +619,16 @@
     }
 
     .modal-card {
-      width: min(520px, calc(100% - 26px));
-      max-height: calc(100vh - 28px);
+      width: min(530px, 100%);
+      max-height: calc(100vh - 24px - var(--safe-top) - var(--safe-bottom));
       overflow-y: auto;
-      margin: calc(14px + var(--safe-top)) auto 0;
-      padding: 16px;
+      margin: calc(12px + var(--safe-top)) auto 0;
+      padding: 14px;
       border-radius: 22px;
       background: var(--surface);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
-      animation: pop 0.22s ease both;
+      animation: pop .22s ease both;
     }
 
     .drawer {
@@ -553,15 +638,15 @@
       width: min(470px, 100%);
       height: 100%;
       overflow-y: auto;
-      padding: calc(18px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
+      padding: calc(16px + var(--safe-top)) 14px calc(20px + var(--safe-bottom));
       background: var(--surface);
       border-left: 1px solid var(--border);
-      box-shadow: -24px 0 80px rgba(0,0,0,0.22);
-      animation: slide 0.23s ease both;
+      box-shadow: -24px 0 80px rgba(0,0,0,.22);
+      animation: slide .23s ease both;
     }
 
     @keyframes pop {
-      from { transform: translateY(18px) scale(0.98); opacity: 0; }
+      from { transform: translateY(18px) scale(.98); opacity: 0; }
       to { transform: translateY(0) scale(1); opacity: 1; }
     }
 
@@ -575,22 +660,22 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 14px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .modal-title,
     .drawer-title {
-      font-size: 1.25rem;
+      font-size: 1.22rem;
       font-weight: 950;
-      letter-spacing: -0.055em;
+      letter-spacing: -.055em;
     }
 
     .modal-sub,
     .drawer-sub {
       margin-top: 3px;
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: .8rem;
       font-weight: 750;
       line-height: 1.45;
     }
@@ -599,45 +684,31 @@
       width: 40px;
       height: 40px;
       border-radius: 14px;
-      background: var(--surface-2);
       color: var(--text);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 950;
-    }
-
-    .section {
-      margin-top: 12px;
-      border-radius: 19px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 13px;
-    }
-
-    .section h3 {
-      font-size: 0.93rem;
-      font-weight: 950;
-      letter-spacing: -0.035em;
-      margin-bottom: 9px;
+      flex: 0 0 auto;
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(94px + var(--safe-bottom));
+      bottom: calc(92px + var(--safe-bottom));
       transform: translateX(-50%) translateY(12px);
       z-index: 150;
       max-width: min(430px, calc(100% - 28px));
       padding: 12px 14px;
       border-radius: 15px;
-      background: rgba(2,6,23,0.92);
+      background: rgba(2,6,23,.92);
       color: white;
-      box-shadow: var(--soft-shadow);
+      box-shadow: var(--shadow2);
       opacity: 0;
       pointer-events: none;
-      transition: all 0.22s ease;
+      transition: all .22s ease;
       font-weight: 850;
-      font-size: 0.84rem;
+      font-size: .84rem;
     }
 
     .toast.active {
@@ -648,40 +719,58 @@
     .bottom-nav {
       position: fixed;
       left: 50%;
-      bottom: calc(12px + var(--safe-bottom));
+      bottom: calc(10px + var(--safe-bottom));
       transform: translateX(-50%);
       z-index: 70;
-      width: min(430px, calc(100% - 28px));
+      width: min(430px, calc(100% - 24px));
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
-      padding: 8px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.92);
+      padding: 7px;
+      border-radius: 21px;
+      background: rgba(255,255,255,.92);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
     }
 
     [data-theme="dark"] .bottom-nav {
-      background: rgba(13,22,40,0.9);
+      background: rgba(13,22,40,.9);
     }
 
     .bottom-nav button {
-      min-height: 48px;
-      border-radius: 16px;
+      min-height: 47px;
+      border-radius: 15px;
       background: transparent;
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: .71rem;
       font-weight: 950;
     }
 
     .bottom-nav button.active {
       color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
     }
 
-    @media (max-width: 900px) {
+    .warning {
+      color: var(--orange);
+      background: rgba(217,119,6,.1);
+      border: 1px solid rgba(217,119,6,.2);
+    }
+
+    .success {
+      color: var(--green);
+      background: rgba(22,163,74,.09);
+      border: 1px solid rgba(22,163,74,.16);
+    }
+
+    .danger {
+      color: var(--red);
+      background: rgba(225,29,72,.08);
+      border: 1px solid rgba(225,29,72,.14);
+    }
+
+    @media (max-width: 930px) {
       .hero-grid,
       .grid {
         grid-template-columns: 1fr;
@@ -696,22 +785,47 @@
       }
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 650px) {
+      body {
+        padding-bottom: calc(84px + var(--safe-bottom));
+      }
+
+      .topbar {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
       .shell {
-        padding: 13px;
+        padding: 10px;
       }
 
       .hero {
-        padding: 18px;
-        border-radius: 24px;
+        padding: 14px;
+        border-radius: 23px;
       }
 
       .hero-actions {
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .action-card {
+        min-height: 72px;
+        padding: 12px;
+      }
+
+      .grid {
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .panel {
+        padding: 12px;
+        border-radius: 20px;
+      }
+
       .row {
         grid-template-columns: 1fr;
+        gap: 9px;
       }
 
       .value,
@@ -723,8 +837,23 @@
         grid-template-columns: 1fr;
       }
 
+      .brand-sub,
       .user-chip span {
         display: none;
+      }
+
+      .top-actions {
+        gap: 5px;
+      }
+
+      .icon-btn {
+        width: 39px;
+        height: 39px;
+      }
+
+      .drawer,
+      .modal-card {
+        width: 100%;
       }
     }
   </style>
@@ -737,7 +866,7 @@
         <div class="logo">B</div>
         <div>
           <div class="brand-title">Blue Wallet</div>
-          <div class="brand-sub"><span class="pulse"></span><span id="statusText">Secure EVM wallet</span></div>
+          <div class="brand-sub" id="statusText">Secure encrypted EVM wallet</div>
         </div>
       </div>
 
@@ -757,17 +886,33 @@
     <section class="hero">
       <div class="hero-grid">
         <div>
-          <div class="eyebrow"><span class="pulse"></span> Real wallet</div>
-          <div class="main-address" id="walletAddressText">No wallet loaded</div>
-          <div class="big-balance" id="totalBalance">$0.00</div>
-          <div class="main-address" id="activeNetworkText">Network: Ethereum</div>
+          <div class="badge"><span class="dot"></span> Real wallet</div>
+          <div class="address-line" id="walletAddressText">No wallet loaded</div>
+          <div class="big-balance" id="totalBalance">0 assets</div>
+          <div class="hero-meta">
+            <span class="meta-chip" id="activeNetworkText">Network: Ethereum</span>
+            <span class="meta-chip" id="lockStateText">Locked</span>
+            <span class="meta-chip" id="autoStakeStateText">Auto-stake off</span>
+          </div>
         </div>
 
         <div class="hero-actions">
-          <button class="action-card primary" onclick="openModal('receiveModal')"><strong>Receive</strong><span>Show address</span></button>
-          <button class="action-card" onclick="openModal('sendModal')"><strong>Send</strong><span>Native + ERC-20</span></button>
-          <button class="action-card" onclick="openModal('swapModal')"><strong>Swap</strong><span>0x quote route</span></button>
-          <button class="action-card" onclick="openModal('stakeModal')"><strong>Stake</strong><span>ETH via Lido</span></button>
+          <button class="action-card primary" onclick="openModal('receiveModal')">
+            <strong>Receive</strong>
+            <span>Show address</span>
+          </button>
+          <button class="action-card" onclick="openModal('sendModal')">
+            <strong>Send</strong>
+            <span>Native + ERC-20</span>
+          </button>
+          <button class="action-card" onclick="openModal('swapModal')">
+            <strong>Swap</strong>
+            <span>USDT / tokens</span>
+          </button>
+          <button class="action-card" onclick="openModal('stakeModal')">
+            <strong>Stake</strong>
+            <span>Auto APY planner</span>
+          </button>
         </div>
       </div>
     </section>
@@ -777,23 +922,23 @@
         <section class="panel" id="assetsSection">
           <div class="panel-head">
             <div>
-              <h2 class="panel-title">Real balances</h2>
-              <p class="panel-sub">Native EVM coin and selected ERC-20 token balances from RPC.</p>
+              <h2 class="panel-title">Balances</h2>
+              <p class="panel-sub">Real balances from the selected EVM network RPC.</p>
             </div>
             <button class="small-btn" onclick="refreshBalances()">Refresh</button>
           </div>
-          <div class="token-list" id="tokenList"></div>
+          <div class="list" id="tokenList"></div>
         </section>
 
-        <section class="panel">
+        <section class="panel" id="networksSection">
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Networks</h2>
-              <p class="panel-sub">Choose the EVM chain to read balances and send from.</p>
+              <p class="panel-sub">Same EVM address across Ethereum, BNB, Polygon, Base, Arbitrum, Optimism, Avalanche.</p>
             </div>
           </div>
           <div class="pill-row" id="networkPills"></div>
-          <div class="network-list" id="networkInfo"></div>
+          <div class="list" id="networkInfo"></div>
         </section>
       </div>
 
@@ -802,44 +947,37 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Wallet security</h2>
-              <p class="panel-sub">Your key is encrypted client-side. The server stores encrypted vault only.</p>
+              <p class="panel-sub">Create/unlock without browser popups. Keys decrypt locally only.</p>
             </div>
           </div>
           <div class="button-row">
-            <button class="secondary-btn" onclick="unlockExistingWallet()">Unlock</button>
-            <button class="primary-btn" onclick="createNewRealWalletForAccount()">Create</button>
+            <button class="secondary-btn" onclick="openModal('unlockModal')">Unlock</button>
+            <button class="primary-btn" onclick="openModal('createWalletModal')">Create</button>
           </div>
           <div class="button-row">
-            <button class="secondary-btn" onclick="revealSecretPhrase()">Seed</button>
-            <button class="secondary-btn" onclick="revealPrivateKey()">Private key</button>
+            <button class="secondary-btn" onclick="openSettings('securitySection')">View seed</button>
+            <button class="secondary-btn" onclick="openSettings('securitySection')">View key</button>
           </div>
         </section>
 
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2 class="panel-title">Public address</h2>
-              <p class="panel-sub">Use this to receive crypto on selected EVM chains.</p>
+              <h2 class="panel-title">Public wallet</h2>
+              <p class="panel-sub">Use this address to receive supported EVM assets.</p>
             </div>
           </div>
-          <div class="token-list" id="publicWalletList"></div>
+          <div class="list" id="publicWalletList"></div>
         </section>
 
         <section class="panel">
           <div class="panel-head">
             <div>
-              <h2 class="panel-title">Fee estimate</h2>
-              <p class="panel-sub">Fees are estimated before sending/staking.</p>
+              <h2 class="panel-title">Auto staking</h2>
+              <p class="panel-sub">Tracks highest APY and waits 7 days before switching.</p>
             </div>
           </div>
-          <div class="token-list" id="feeBox">
-            <div class="row">
-              <div>
-                <div class="name">Current gas</div>
-                <div class="sub" id="gasText">Load wallet first</div>
-              </div>
-            </div>
-          </div>
+          <div class="list" id="stakingPlannerList"></div>
         </section>
       </aside>
     </section>
@@ -852,12 +990,64 @@
     <button onclick="openSettings()">Settings</button>
   </nav>
 
+  <div class="modal-overlay" id="createWalletModal" onclick="overlayClose(event, 'createWalletModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Create real wallet</div>
+          <div class="modal-sub">Creates a real EVM wallet in your browser and saves only the encrypted vault.</div>
+        </div>
+        <button class="close" onclick="closeModal('createWalletModal')">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Encryption passcode</label>
+          <input class="input" id="createPasscode" type="password" placeholder="At least 8 characters" autocomplete="new-password" />
+        </div>
+        <div class="form-row">
+          <label>Repeat passcode</label>
+          <input class="input" id="createPasscode2" type="password" placeholder="Repeat passcode" autocomplete="new-password" />
+        </div>
+        <div class="section warning">
+          <h3>Backup warning</h3>
+          <div class="sub">After creating your wallet, unlock it and save your seed phrase from Settings. If you lose the passcode and seed phrase, funds cannot be recovered.</div>
+        </div>
+        <div class="button-row one">
+          <button class="primary-btn" onclick="createNewRealWalletForAccount()">Create encrypted wallet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="unlockModal" onclick="overlayClose(event, 'unlockModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Unlock wallet</div>
+          <div class="modal-sub">Unlocking decrypts your wallet locally in this browser session.</div>
+        </div>
+        <button class="close" onclick="closeModal('unlockModal')">×</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Wallet passcode</label>
+          <input class="input" id="unlockPasscode" type="password" placeholder="Enter passcode" autocomplete="current-password" />
+        </div>
+        <div class="button-row one">
+          <button class="primary-btn" onclick="unlockExistingWallet()">Unlock wallet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event, 'receiveModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Send only assets supported by the selected EVM network to this address.</div>
+          <div class="modal-sub">Send only assets on the selected network to this address.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
@@ -890,8 +1080,8 @@
         </div>
 
         <div class="form-row">
-          <label>To address</label>
-          <input class="input" id="sendToInput" placeholder="0x..." />
+          <label>Recipient address</label>
+          <input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" />
         </div>
 
         <div class="form-row">
@@ -900,14 +1090,34 @@
         </div>
 
         <div class="section">
-          <h3>Fee</h3>
-          <div class="sub" id="sendFeePreview">Estimate appears before send.</div>
+          <h3>Fee preview</h3>
+          <div class="sub" id="sendFeePreview">Estimate appears here before sending.</div>
         </div>
 
         <div class="button-row">
           <button class="secondary-btn" onclick="estimateSendFee()">Estimate fee</button>
-          <button class="primary-btn" onclick="sendRealTransaction()">Send</button>
+          <button class="primary-btn" onclick="openSendConfirm()">Send</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="sendConfirmModal" onclick="overlayClose(event, 'sendConfirmModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Confirm send</div>
+          <div class="modal-sub">This is a real blockchain transaction. It cannot be reversed.</div>
+        </div>
+        <button class="close" onclick="closeModal('sendConfirmModal')">×</button>
+      </div>
+      <div class="section danger">
+        <h3>Final check</h3>
+        <div class="sub" id="sendConfirmText">Review transaction details.</div>
+      </div>
+      <div class="button-row">
+        <button class="secondary-btn" onclick="closeModal('sendConfirmModal')">Cancel</button>
+        <button class="primary-btn" onclick="sendRealTransaction()">Confirm send</button>
       </div>
     </div>
   </div>
@@ -917,20 +1127,20 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Swap</div>
-          <div class="modal-sub">Requires your server to proxy 0x Swap API with an API key.</div>
+          <div class="modal-sub">Uses your server-side swap quote route. Supports EVM tokens such as USDT, USDC, WETH, DAI, LINK, UNI and other contract addresses.</div>
         </div>
         <button class="close" onclick="closeModal('swapModal')">×</button>
       </div>
 
       <div class="form-grid">
         <div class="form-row">
-          <label>Sell token address</label>
-          <input class="input" id="swapSellToken" placeholder="Native ETH: 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" />
+          <label>Sell asset</label>
+          <select class="select" id="swapSellSelect" onchange="prefillSwapSell()"></select>
         </div>
 
         <div class="form-row">
           <label>Buy token address</label>
-          <input class="input" id="swapBuyToken" placeholder="USDC / token contract address" />
+          <input class="input" id="swapBuyToken" placeholder="Token contract address, or USDT/USDC from token list" />
         </div>
 
         <div class="form-row">
@@ -945,8 +1155,28 @@
 
         <div class="button-row">
           <button class="secondary-btn" onclick="getSwapQuote()">Get quote</button>
-          <button class="primary-btn" onclick="executeSwap()">Swap</button>
+          <button class="primary-btn" onclick="openSwapConfirm()">Swap</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="swapConfirmModal" onclick="overlayClose(event, 'swapConfirmModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Confirm swap</div>
+          <div class="modal-sub">This will execute a real swap transaction using the loaded quote.</div>
+        </div>
+        <button class="close" onclick="closeModal('swapConfirmModal')">×</button>
+      </div>
+      <div class="section danger">
+        <h3>Final check</h3>
+        <div class="sub" id="swapConfirmText">Review quote details.</div>
+      </div>
+      <div class="button-row">
+        <button class="secondary-btn" onclick="closeModal('swapConfirmModal')">Cancel</button>
+        <button class="primary-btn" onclick="executeSwap()">Confirm swap</button>
       </div>
     </div>
   </div>
@@ -955,27 +1185,38 @@
     <div class="modal-card">
       <div class="modal-head">
         <div>
-          <div class="modal-title">Stake ETH</div>
-          <div class="modal-sub">Stakes ETH into Lido on Ethereum mainnet and receives stETH.</div>
+          <div class="modal-title">Staking</div>
+          <div class="modal-sub">Auto-stake planner monitors highest APY. Real execution needs supported adapters.</div>
         </div>
         <button class="close" onclick="closeModal('stakeModal')">×</button>
       </div>
 
       <div class="form-grid">
         <div class="form-row">
-          <label>ETH amount</label>
-          <input class="input" id="stakeAmountInput" type="number" step="any" placeholder="0.00" />
+          <label>Mode</label>
+          <select class="select" id="autoStakeEnabled" onchange="saveAutoStakeSettings()">
+            <option value="off">Auto-stake off</option>
+            <option value="on">Auto-stake on</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Current staking strategy</label>
+          <select class="select" id="stakeStrategySelect" onchange="saveAutoStakeSettings()"></select>
+        </div>
+
+        <div class="form-row">
+          <label>Amount for supported real stake</label>
+          <input class="input" id="stakeAmountInput" type="number" step="any" placeholder="ETH amount for Lido" />
         </div>
 
         <div class="section">
-          <h3>Important</h3>
-          <div class="sub">
-            This is a real Ethereum mainnet transaction. You need ETH for the stake amount and gas.
-          </div>
+          <h3>7-day switch rule</h3>
+          <div class="sub" id="autoStakeInfo">If a higher APY appears, Blue Wallet starts a 7-day watch. It only switches if the APY is still higher after 7 days.</div>
         </div>
 
         <div class="button-row">
-          <button class="secondary-btn" onclick="estimateStakeFee()">Estimate fee</button>
+          <button class="secondary-btn" onclick="runAutoStakeCheck(true)">Check APY</button>
           <button class="primary-btn" onclick="stakeEthLido()">Stake ETH</button>
         </div>
       </div>
@@ -987,20 +1228,35 @@
       <div class="drawer-head">
         <div>
           <div class="drawer-title">Settings</div>
-          <div class="drawer-sub">RPC, theme, wallet security, and session controls.</div>
+          <div class="drawer-sub">Security, seed phrase, RPC, theme, staking automation and logout.</div>
         </div>
         <button class="close" onclick="closeSettings()">×</button>
       </div>
 
-      <section class="section">
-        <h3>Wallet</h3>
-        <div class="button-row">
-          <button class="secondary-btn" onclick="unlockExistingWallet()">Unlock wallet</button>
-          <button class="primary-btn" onclick="createNewRealWalletForAccount()">Create wallet</button>
-        </div>
-        <div class="button-row">
-          <button class="secondary-btn" onclick="revealSecretPhrase()">Show seed</button>
-          <button class="secondary-btn" onclick="revealPrivateKey()">Show key</button>
+      <section class="section" id="securitySection">
+        <h3>Wallet security</h3>
+        <div class="sub">Unlock your wallet first to reveal seed phrase or private key. These secrets are never sent to the server.</div>
+
+        <div class="form-grid" style="margin-top:10px;">
+          <div class="form-row">
+            <label>Passcode</label>
+            <input class="input" id="settingsPasscode" type="password" placeholder="Enter passcode to reveal secrets" autocomplete="current-password" />
+          </div>
+
+          <div class="button-row">
+            <button class="secondary-btn" onclick="unlockFromSettings()">Unlock</button>
+            <button class="primary-btn" onclick="createFromSettings()">Create wallet</button>
+          </div>
+
+          <div class="button-row">
+            <button class="secondary-btn" onclick="showSeedInSettings()">Show seed</button>
+            <button class="secondary-btn" onclick="showKeyInSettings()">Show key</button>
+          </div>
+
+          <div class="form-row">
+            <label>Secret output</label>
+            <textarea class="textarea" id="secretOutput" readonly placeholder="Seed phrase or private key appears here after unlocking."></textarea>
+          </div>
         </div>
       </section>
 
@@ -1016,10 +1272,27 @@
         <h3>RPC</h3>
         <div class="form-grid">
           <div class="form-row">
-            <label>Custom RPC URL for current network</label>
+            <label>Custom RPC for current network</label>
             <input class="input" id="customRpcInput" placeholder="https://..." />
           </div>
           <button class="primary-btn" onclick="saveCustomRpc()">Save RPC</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Auto staking</h3>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Auto-stake mode</label>
+            <select class="select" id="settingsAutoStake" onchange="syncAutoStakeFromSettings()">
+              <option value="off">Off</option>
+              <option value="on">On</option>
+            </select>
+          </div>
+          <div class="button-row">
+            <button class="secondary-btn" onclick="runAutoStakeCheck(true)">Check now</button>
+            <button class="secondary-btn" onclick="clearStakeCandidate()">Clear pending</button>
+          </div>
         </div>
       </section>
 
@@ -1042,6 +1315,8 @@
 
     const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
     const LIDO_STETH_CONTRACT = '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84';
+    const LIDO_REFERRAL = '0x0000000000000000000000000000000000000000';
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
     const NETWORKS = {
       ethereum: {
@@ -1049,49 +1324,56 @@
         chainId: 1,
         symbol: 'ETH',
         rpc: 'https://cloudflare-eth.com',
-        explorer: 'https://etherscan.io/tx/'
-      },
-      polygon: {
-        name: 'Polygon',
-        chainId: 137,
-        symbol: 'MATIC',
-        rpc: 'https://polygon-rpc.com',
-        explorer: 'https://polygonscan.com/tx/'
+        explorer: 'https://etherscan.io/tx/',
+        oxChain: 'ethereum'
       },
       bsc: {
         name: 'BNB Chain',
         chainId: 56,
         symbol: 'BNB',
         rpc: 'https://bsc-dataseed.binance.org',
-        explorer: 'https://bscscan.com/tx/'
+        explorer: 'https://bscscan.com/tx/',
+        oxChain: 'bsc'
       },
-      avalanche: {
-        name: 'Avalanche C-Chain',
-        chainId: 43114,
-        symbol: 'AVAX',
-        rpc: 'https://api.avax.network/ext/bc/C/rpc',
-        explorer: 'https://snowtrace.io/tx/'
+      polygon: {
+        name: 'Polygon',
+        chainId: 137,
+        symbol: 'MATIC',
+        rpc: 'https://polygon-rpc.com',
+        explorer: 'https://polygonscan.com/tx/',
+        oxChain: 'polygon'
       },
       arbitrum: {
         name: 'Arbitrum',
         chainId: 42161,
         symbol: 'ETH',
         rpc: 'https://arb1.arbitrum.io/rpc',
-        explorer: 'https://arbiscan.io/tx/'
+        explorer: 'https://arbiscan.io/tx/',
+        oxChain: 'arbitrum'
       },
       optimism: {
         name: 'Optimism',
         chainId: 10,
         symbol: 'ETH',
         rpc: 'https://mainnet.optimism.io',
-        explorer: 'https://optimistic.etherscan.io/tx/'
+        explorer: 'https://optimistic.etherscan.io/tx/',
+        oxChain: 'optimism'
       },
       base: {
         name: 'Base',
         chainId: 8453,
         symbol: 'ETH',
         rpc: 'https://mainnet.base.org',
-        explorer: 'https://basescan.org/tx/'
+        explorer: 'https://basescan.org/tx/',
+        oxChain: 'base'
+      },
+      avalanche: {
+        name: 'Avalanche C-Chain',
+        chainId: 43114,
+        symbol: 'AVAX',
+        rpc: 'https://api.avax.network/ext/bc/C/rpc',
+        explorer: 'https://snowtrace.io/tx/',
+        oxChain: 'avalanche'
       }
     };
 
@@ -1099,34 +1381,57 @@
       ethereum: [
         { symbol: 'USDT', name: 'Tether USD', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', decimals: 6 },
         { symbol: 'USDC', name: 'USD Coin', address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals: 6 },
+        { symbol: 'DAI', name: 'Dai Stablecoin', address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', decimals: 18 },
+        { symbol: 'WETH', name: 'Wrapped Ether', address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', decimals: 18 },
         { symbol: 'LINK', name: 'Chainlink', address: '0x514910771AF9Ca656af840dff83E8264EcF986CA', decimals: 18 },
         { symbol: 'UNI', name: 'Uniswap', address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', decimals: 18 },
+        { symbol: 'AAVE', name: 'Aave', address: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', decimals: 18 },
         { symbol: 'stETH', name: 'Lido stETH', address: LIDO_STETH_CONTRACT, decimals: 18 }
-      ],
-      polygon: [
-        { symbol: 'USDT', name: 'Tether USD', address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6 },
-        { symbol: 'USDC', name: 'USD Coin', address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', decimals: 6 }
       ],
       bsc: [
         { symbol: 'USDT', name: 'Tether USD', address: '0x55d398326f99059fF775485246999027B3197955', decimals: 18 },
-        { symbol: 'USDC', name: 'USD Coin', address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', decimals: 18 }
+        { symbol: 'USDC', name: 'USD Coin', address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', decimals: 18 },
+        { symbol: 'WBNB', name: 'Wrapped BNB', address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', decimals: 18 },
+        { symbol: 'CAKE', name: 'PancakeSwap', address: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82', decimals: 18 }
       ],
-      avalanche: [
-        { symbol: 'USDT', name: 'Tether USD', address: '0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7', decimals: 6 },
-        { symbol: 'USDC', name: 'USD Coin', address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', decimals: 6 }
+      polygon: [
+        { symbol: 'USDT', name: 'Tether USD', address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6 },
+        { symbol: 'USDC', name: 'USD Coin', address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', decimals: 6 },
+        { symbol: 'DAI', name: 'Dai Stablecoin', address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', decimals: 18 },
+        { symbol: 'WMATIC', name: 'Wrapped MATIC', address: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', decimals: 18 },
+        { symbol: 'AAVE', name: 'Aave', address: '0xD6DF932A45C0f255f85145f286eA0b292B21C90B', decimals: 18 }
       ],
       arbitrum: [
         { symbol: 'USDT', name: 'Tether USD', address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', decimals: 6 },
-        { symbol: 'USDC', name: 'USD Coin', address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', decimals: 6 }
+        { symbol: 'USDC', name: 'USD Coin', address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', decimals: 6 },
+        { symbol: 'WETH', name: 'Wrapped Ether', address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', decimals: 18 },
+        { symbol: 'ARB', name: 'Arbitrum', address: '0x912CE59144191C1204E64559FE8253a0e49E6548', decimals: 18 }
       ],
       optimism: [
         { symbol: 'USDT', name: 'Tether USD', address: '0x94b008aD8eD3f9fE1ef8bE45b16bB2fF12a2bA8a', decimals: 6 },
-        { symbol: 'USDC', name: 'USD Coin', address: '0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85', decimals: 6 }
+        { symbol: 'USDC', name: 'USD Coin', address: '0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85', decimals: 6 },
+        { symbol: 'WETH', name: 'Wrapped Ether', address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+        { symbol: 'OP', name: 'Optimism', address: '0x4200000000000000000000000000000000000042', decimals: 18 }
       ],
       base: [
-        { symbol: 'USDC', name: 'USD Coin', address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6 }
+        { symbol: 'USDC', name: 'USD Coin', address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6 },
+        { symbol: 'WETH', name: 'Wrapped Ether', address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+        { symbol: 'DAI', name: 'Dai Stablecoin', address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', decimals: 18 }
+      ],
+      avalanche: [
+        { symbol: 'USDT', name: 'Tether USD', address: '0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7', decimals: 6 },
+        { symbol: 'USDC', name: 'USD Coin', address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', decimals: 6 },
+        { symbol: 'WAVAX', name: 'Wrapped AVAX', address: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', decimals: 18 }
       ]
     };
+
+    const STAKE_OPTIONS = [
+      { id: 'lido-eth', label: 'Lido ETH staking', network: 'ethereum', asset: 'ETH', apy: 3.4, real: true, adapter: 'lido' },
+      { id: 'aave-usdc-eth', label: 'Aave USDC Ethereum', network: 'ethereum', asset: 'USDC', apy: 4.1, real: false, adapter: 'aave' },
+      { id: 'aave-usdt-poly', label: 'Aave USDT Polygon', network: 'polygon', asset: 'USDT', apy: 5.2, real: false, adapter: 'aave' },
+      { id: 'venus-usdt-bsc', label: 'Venus USDT BNB Chain', network: 'bsc', asset: 'USDT', apy: 6.1, real: false, adapter: 'venus' },
+      { id: 'curve-stable-eth', label: 'Curve stable pool', network: 'ethereum', asset: 'USDT/USDC/DAI', apy: 4.8, real: false, adapter: 'curve' }
+    ];
 
     const ERC20_ABI = [
       'function balanceOf(address owner) view returns (uint256)',
@@ -1147,27 +1452,23 @@
     let activeProvider = null;
     let activeBalances = [];
     let toastTimer = null;
+    let autoStakeSettings = JSON.parse(localStorage.getItem('blue_auto_stake') || 'null') || {
+      enabled: false,
+      currentStrategy: 'lido-eth',
+      candidate: null,
+      lastCheck: null
+    };
 
     function toast(message) {
       const el = document.getElementById('toast');
       el.textContent = message;
       el.classList.add('active');
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('active'), 2500);
-    }
-
-    function money(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 2
-      }).format(Number(value || 0));
+      toastTimer = setTimeout(() => el.classList.remove('active'), 2600);
     }
 
     function fmt(value, decimals = 6) {
-      return Number(value || 0).toLocaleString(undefined, {
-        maximumFractionDigits: decimals
-      });
+      return Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: decimals });
     }
 
     function shortAddress(address) {
@@ -1176,41 +1477,19 @@
     }
 
     function tokenIcon(symbol) {
-      return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0, 4)}'" /></div>`;
+      return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0,4)}'" /></div>`;
     }
 
     function getRpcUrl(networkKey = activeNetworkKey) {
-      const custom = localStorage.getItem(`blue_rpc_${networkKey}`);
-      return custom || NETWORKS[networkKey].rpc;
+      return localStorage.getItem(`blue_rpc_${networkKey}`) || NETWORKS[networkKey].rpc;
     }
 
     function getProvider(networkKey = activeNetworkKey) {
       return new ethers.JsonRpcProvider(getRpcUrl(networkKey), NETWORKS[networkKey].chainId);
     }
 
-    async function ensureUnlocked() {
-      if (ACTIVE_DECRYPTED_WALLET && activeSigner) return activeSigner;
-      const unlocked = await unlockExistingWallet();
-      if (!unlocked) throw new Error('Wallet not unlocked');
-      return activeSigner;
-    }
-
-    function updateWalletUi() {
-      const publicWallet = getPublicWallet();
-      const address = publicWallet?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address || null;
-      const network = NETWORKS[activeNetworkKey];
-
-      document.getElementById('walletAddressText').textContent = address
-        ? `${network.name}: ${address}`
-        : 'No wallet loaded';
-
-      document.getElementById('receiveAddressText').textContent = address || 'No wallet loaded';
-      document.getElementById('receiveNetworkTitle').textContent = `${network.name} receive address`;
-      document.getElementById('activeNetworkText').textContent = `Network: ${network.name}`;
-
-      renderPublicWallets();
-      renderNetworks();
-      renderSendAssets();
+    function getTokenByAddress(address) {
+      return (ERC20_TOKENS[activeNetworkKey] || []).find(t => t.address.toLowerCase() === String(address).toLowerCase());
     }
 
     function getPublicWallet() {
@@ -1218,12 +1497,38 @@
       return wallets[0] || SERVER_WALLET?.publicWallets?.[0] || null;
     }
 
+    async function ensureUnlocked() {
+      if (ACTIVE_DECRYPTED_WALLET && activeSigner) return activeSigner;
+      openModal('unlockModal');
+      throw new Error('Unlock wallet first');
+    }
+
+    function updateWalletUi() {
+      const publicWallet = getPublicWallet();
+      const address = publicWallet?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address || null;
+      const network = NETWORKS[activeNetworkKey];
+
+      document.getElementById('walletAddressText').textContent = address ? `${network.name}: ${address}` : 'No wallet loaded';
+      document.getElementById('receiveAddressText').textContent = address || 'No wallet loaded';
+      document.getElementById('receiveNetworkTitle').textContent = `${network.name} receive address`;
+      document.getElementById('activeNetworkText').textContent = `Network: ${network.name}`;
+      document.getElementById('lockStateText').textContent = activeSigner ? 'Unlocked' : 'Locked';
+      document.getElementById('autoStakeStateText').textContent = autoStakeSettings.enabled ? 'Auto-stake on' : 'Auto-stake off';
+
+      renderPublicWallets();
+      renderNetworks();
+      renderSendAssets();
+      renderSwapAssets();
+      renderStakeStrategySelects();
+      renderAutoStakePlanner();
+    }
+
     function renderPublicWallets() {
       const list = document.getElementById('publicWalletList');
       const wallet = getPublicWallet();
 
       if (!wallet) {
-        list.innerHTML = `<div class="row"><div><div class="name">No wallet</div><div class="sub">Create or unlock a wallet first.</div></div></div>`;
+        list.innerHTML = `<div class="row"><div><div class="name">No wallet</div><div class="sub">Create a wallet to receive crypto.</div></div></div>`;
         return;
       }
 
@@ -1240,11 +1545,13 @@
 
     function renderNetworks() {
       const pills = document.getElementById('networkPills');
+
       pills.innerHTML = Object.entries(NETWORKS).map(([key, net]) => `
         <button class="pill-btn ${key === activeNetworkKey ? 'active' : ''}" onclick="setNetwork('${key}')">${net.name}</button>
       `).join('');
 
       const net = NETWORKS[activeNetworkKey];
+
       document.getElementById('networkInfo').innerHTML = `
         <div class="row">
           <div>
@@ -1271,6 +1578,8 @@
 
     function renderSendAssets() {
       const select = document.getElementById('sendAssetSelect');
+      if (!select) return;
+
       const net = NETWORKS[activeNetworkKey];
       const tokens = ERC20_TOKENS[activeNetworkKey] || [];
 
@@ -1280,13 +1589,94 @@
       ].join('');
     }
 
+    function renderSwapAssets() {
+      const select = document.getElementById('swapSellSelect');
+      if (!select) return;
+
+      const net = NETWORKS[activeNetworkKey];
+      const tokens = ERC20_TOKENS[activeNetworkKey] || [];
+
+      select.innerHTML = [
+        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
+        ...tokens.map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
+      ].join('');
+    }
+
+    function prefillSwapSell() {}
+
+    function renderStakeStrategySelects() {
+      const selects = [
+        document.getElementById('stakeStrategySelect')
+      ].filter(Boolean);
+
+      selects.forEach(select => {
+        select.innerHTML = STAKE_OPTIONS
+          .slice()
+          .sort((a, b) => b.apy - a.apy)
+          .map(o => `<option value="${o.id}">${o.label} · ${o.apy.toFixed(2)}% APY${o.real ? ' · real adapter' : ' · adapter needed'}</option>`)
+          .join('');
+        select.value = autoStakeSettings.currentStrategy || 'lido-eth';
+      });
+
+      const enabled = document.getElementById('autoStakeEnabled');
+      if (enabled) enabled.value = autoStakeSettings.enabled ? 'on' : 'off';
+
+      const settingsEnabled = document.getElementById('settingsAutoStake');
+      if (settingsEnabled) settingsEnabled.value = autoStakeSettings.enabled ? 'on' : 'off';
+    }
+
+    function renderAutoStakePlanner() {
+      const box = document.getElementById('stakingPlannerList');
+      if (!box) return;
+
+      const current = STAKE_OPTIONS.find(o => o.id === autoStakeSettings.currentStrategy) || STAKE_OPTIONS[0];
+      const best = STAKE_OPTIONS.slice().sort((a, b) => b.apy - a.apy)[0];
+      const candidate = autoStakeSettings.candidate;
+      const now = Date.now();
+
+      let candidateHtml = '';
+
+      if (candidate) {
+        const remaining = Math.max(0, candidate.readyAt - now);
+        const days = Math.ceil(remaining / (24 * 60 * 60 * 1000));
+
+        candidateHtml = `
+          <div class="row">
+            <div>
+              <div class="name">Pending switch</div>
+              <div class="sub">${candidate.label} · ${candidate.apy.toFixed(2)}% APY · ready in ${days} day${days === 1 ? '' : 's'}</div>
+            </div>
+            <button class="small-btn" onclick="clearStakeCandidate()">Clear</button>
+          </div>
+        `;
+      }
+
+      box.innerHTML = `
+        <div class="row">
+          <div>
+            <div class="name">Current strategy</div>
+            <div class="sub">${current.label} · ${current.apy.toFixed(2)}% APY</div>
+          </div>
+          <span class="value">${autoStakeSettings.enabled ? 'ON' : 'OFF'}</span>
+        </div>
+        <div class="row">
+          <div>
+            <div class="name">Highest APY now</div>
+            <div class="sub">${best.label} · ${best.apy.toFixed(2)}% APY</div>
+          </div>
+          <button class="small-btn" onclick="runAutoStakeCheck(true)">Check</button>
+        </div>
+        ${candidateHtml || ''}
+      `;
+    }
+
     async function refreshBalances() {
       try {
         const wallet = getPublicWallet();
 
         if (!wallet?.address) {
           renderTokenList([]);
-          document.getElementById('totalBalance').textContent = '$0.00';
+          document.getElementById('totalBalance').textContent = '0 assets';
           toast('Create or unlock wallet first');
           return;
         }
@@ -1322,7 +1712,7 @@
         activeBalances = balances;
         renderTokenList(balances);
         renderSendAssets();
-        updateGasInfo();
+        renderSwapAssets();
 
         document.getElementById('statusText').textContent = 'Balances updated';
       } catch (error) {
@@ -1336,7 +1726,7 @@
       const list = document.getElementById('tokenList');
 
       if (!balances.length) {
-        list.innerHTML = `<div class="row"><div><div class="name">No balances loaded</div><div class="sub">Create wallet then refresh.</div></div></div>`;
+        list.innerHTML = `<div class="row"><div><div class="name">No balances loaded</div><div class="sub">Create or unlock a wallet, then refresh balances.</div></div></div>`;
         return;
       }
 
@@ -1356,18 +1746,8 @@
         </div>
       `).join('');
 
-      document.getElementById('totalBalance').textContent = `${balances.length} assets`;
-    }
-
-    async function updateGasInfo() {
-      try {
-        const provider = getProvider();
-        const fee = await provider.getFeeData();
-        const gasPrice = fee.gasPrice ? ethers.formatUnits(fee.gasPrice, 'gwei') : 'N/A';
-        document.getElementById('gasText').textContent = `${Number(gasPrice).toFixed(3)} gwei on ${NETWORKS[activeNetworkKey].name}`;
-      } catch {
-        document.getElementById('gasText').textContent = 'Unable to estimate gas';
-      }
+      const nonZero = balances.filter(b => Number(b.balance) > 0).length;
+      document.getElementById('totalBalance').textContent = `${nonZero}/${balances.length} assets`;
     }
 
     async function estimateSendFee() {
@@ -1377,16 +1757,13 @@
         const to = document.getElementById('sendToInput').value.trim();
         const amount = document.getElementById('sendAmountInput').value.trim();
 
-        if (!ethers.isAddress(to)) throw new Error('Invalid recipient');
+        if (!ethers.isAddress(to)) throw new Error('Invalid recipient address');
         if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
 
         let gas;
 
         if (asset === 'native') {
-          gas = await signer.estimateGas({
-            to,
-            value: ethers.parseEther(amount)
-          });
+          gas = await signer.estimateGas({ to, value: ethers.parseEther(amount) });
         } else {
           const token = getTokenByAddress(asset);
           const contract = new ethers.Contract(asset, ERC20_ABI, signer);
@@ -1402,43 +1779,51 @@
 
         return gas;
       } catch (error) {
-        document.getElementById('sendFeePreview').textContent = error.message || 'Fee estimate failed';
-        toast(error.message || 'Fee estimate failed');
+        document.getElementById('sendFeePreview').textContent = error.shortMessage || error.message || 'Fee estimate failed';
+        toast(error.shortMessage || error.message || 'Fee estimate failed');
         return null;
       }
     }
 
+    function openSendConfirm() {
+      const asset = document.getElementById('sendAssetSelect').selectedOptions[0]?.textContent || '';
+      const to = document.getElementById('sendToInput').value.trim();
+      const amount = document.getElementById('sendAmountInput').value.trim();
+
+      document.getElementById('sendConfirmText').textContent =
+        `Send ${amount || '0'} ${asset} to ${to || 'no address'} on ${NETWORKS[activeNetworkKey].name}.`;
+
+      openModal('sendConfirmModal');
+    }
+
     async function sendRealTransaction() {
       try {
-        const confirmed = confirm('This will send a real on-chain transaction. Continue?');
-        if (!confirmed) return;
-
         const signer = await ensureUnlocked();
         const asset = document.getElementById('sendAssetSelect').value;
         const to = document.getElementById('sendToInput').value.trim();
         const amount = document.getElementById('sendAmountInput').value.trim();
 
-        if (!ethers.isAddress(to)) throw new Error('Invalid recipient');
+        if (!ethers.isAddress(to)) throw new Error('Invalid recipient address');
         if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
 
         let tx;
 
         if (asset === 'native') {
-          tx = await signer.sendTransaction({
-            to,
-            value: ethers.parseEther(amount)
-          });
+          tx = await signer.sendTransaction({ to, value: ethers.parseEther(amount) });
         } else {
           const token = getTokenByAddress(asset);
           const contract = new ethers.Contract(asset, ERC20_ABI, signer);
           tx = await contract.transfer(to, ethers.parseUnits(amount, token.decimals));
         }
 
+        closeModal('sendConfirmModal');
+        closeModal('sendModal');
         toast('Transaction sent');
-        document.getElementById('sendFeePreview').innerHTML =
-          `TX sent: <a href="${NETWORKS[activeNetworkKey].explorer}${tx.hash}" target="_blank" rel="noopener">${tx.hash}</a>`;
+
+        document.getElementById('statusText').textContent = `TX sent: ${tx.hash.slice(0, 10)}...`;
 
         await tx.wait();
+
         toast('Transaction confirmed');
         refreshBalances();
       } catch (error) {
@@ -1447,90 +1832,30 @@
       }
     }
 
-    function getTokenByAddress(address) {
-      return (ERC20_TOKENS[activeNetworkKey] || []).find(t => t.address.toLowerCase() === address.toLowerCase());
-    }
-
-    async function estimateStakeFee() {
-      try {
-        if (activeNetworkKey !== 'ethereum') {
-          toast('Lido staking is Ethereum mainnet only');
-          return;
-        }
-
-        const signer = await ensureUnlocked();
-        const amount = document.getElementById('stakeAmountInput').value.trim();
-
-        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
-
-        const lido = new ethers.Contract(LIDO_STETH_CONTRACT, LIDO_ABI, signer);
-
-        const gas = await lido.submit.estimateGas(ethers.ZeroAddress, {
-          value: ethers.parseEther(amount)
-        });
-
-        const fee = await signer.provider.getFeeData();
-        const estimatedWei = gas * (fee.gasPrice || 0n);
-
-        toast(`Estimated fee: ${ethers.formatEther(estimatedWei)} ETH`);
-      } catch (error) {
-        toast(error.shortMessage || error.message || 'Stake fee estimate failed');
-      }
-    }
-
-    async function stakeEthLido() {
-      try {
-        if (activeNetworkKey !== 'ethereum') {
-          toast('Switch to Ethereum first');
-          return;
-        }
-
-        const confirmed = confirm('This will stake real ETH through Lido and receive stETH. Continue?');
-        if (!confirmed) return;
-
-        const signer = await ensureUnlocked();
-        const amount = document.getElementById('stakeAmountInput').value.trim();
-
-        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
-
-        const lido = new ethers.Contract(LIDO_STETH_CONTRACT, LIDO_ABI, signer);
-
-        const tx = await lido.submit(ethers.ZeroAddress, {
-          value: ethers.parseEther(amount)
-        });
-
-        toast('Stake transaction sent');
-        await tx.wait();
-
-        toast('ETH staked. stETH should appear after refresh.');
-        refreshBalances();
-      } catch (error) {
-        console.error(error);
-        toast(error.shortMessage || error.message || 'Staking failed');
-      }
-    }
-
     async function getSwapQuote() {
       try {
         const signer = await ensureUnlocked();
-        const sellToken = document.getElementById('swapSellToken').value.trim() || NATIVE_TOKEN;
-        const buyToken = document.getElementById('swapBuyToken').value.trim();
+        const sellToken = document.getElementById('swapSellSelect').value;
+        const buyTokenRaw = document.getElementById('swapBuyToken').value.trim();
         const amount = document.getElementById('swapAmount').value.trim();
 
-        if (!buyToken) throw new Error('Enter buy token address');
+        if (!buyTokenRaw) throw new Error('Enter buy token contract address');
         if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
 
-        const sellAmountWei = ethers.parseEther(amount).toString();
+        const sellTokenMeta = sellToken === NATIVE_TOKEN ? null : getTokenByAddress(sellToken);
+        const decimals = sellToken === NATIVE_TOKEN ? 18 : sellTokenMeta.decimals;
+        const sellAmount = ethers.parseUnits(amount, decimals).toString();
 
         const response = await fetch('/api/swap/quote', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chainId: NETWORKS[activeNetworkKey].chainId,
+            network: activeNetworkKey,
             taker: await signer.getAddress(),
             sellToken,
-            buyToken,
-            sellAmount: sellAmountWei
+            buyToken: buyTokenRaw,
+            sellAmount
           })
         });
 
@@ -1540,12 +1865,27 @@
         window.__BLUE_SWAP_QUOTE = quote;
 
         document.getElementById('swapQuoteText').textContent =
-          `Quote loaded. Estimated gas: ${quote.gas || 'N/A'}. Ready to execute.`;
+          `Quote loaded. Estimated gas: ${quote.gas || 'N/A'}. Review before swapping.`;
+
+        toast('Swap quote loaded');
       } catch (error) {
         console.error(error);
         document.getElementById('swapQuoteText').textContent = error.message || 'Quote failed';
         toast(error.message || 'Quote failed');
       }
+    }
+
+    function openSwapConfirm() {
+      const quote = window.__BLUE_SWAP_QUOTE;
+      if (!quote) {
+        toast('Get a quote first');
+        return;
+      }
+
+      document.getElementById('swapConfirmText').textContent =
+        `Execute swap on ${NETWORKS[activeNetworkKey].name}. Estimated gas: ${quote.gas || 'N/A'}.`;
+
+      openModal('swapConfirmModal');
     }
 
     async function executeSwap() {
@@ -1555,9 +1895,6 @@
 
         const signer = await ensureUnlocked();
 
-        const confirmed = confirm('This will execute a real swap transaction. Continue?');
-        if (!confirmed) return;
-
         const tx = await signer.sendTransaction({
           to: quote.to,
           data: quote.data,
@@ -1565,11 +1902,13 @@
           gasLimit: quote.gas ? BigInt(quote.gas) : undefined
         });
 
+        closeModal('swapConfirmModal');
+        closeModal('swapModal');
+
         toast('Swap transaction sent');
-        document.getElementById('swapQuoteText').innerHTML =
-          `TX sent: <a href="${NETWORKS[activeNetworkKey].explorer}${tx.hash}" target="_blank" rel="noopener">${tx.hash}</a>`;
 
         await tx.wait();
+
         toast('Swap confirmed');
         refreshBalances();
       } catch (error) {
@@ -1578,8 +1917,123 @@
       }
     }
 
-    function openSettings() {
+    async function stakeEthLido() {
+      try {
+        if (activeNetworkKey !== 'ethereum') {
+          toast('Switch to Ethereum for Lido staking');
+          return;
+        }
+
+        const signer = await ensureUnlocked();
+        const amount = document.getElementById('stakeAmountInput').value.trim();
+
+        if (!amount || Number(amount) <= 0) throw new Error('Invalid ETH amount');
+
+        const lido = new ethers.Contract(LIDO_STETH_CONTRACT, LIDO_ABI, signer);
+        const tx = await lido.submit(LIDO_REFERRAL, { value: ethers.parseEther(amount) });
+
+        toast('Stake transaction sent');
+
+        await tx.wait();
+
+        toast('ETH staked. Refresh to see stETH.');
+        refreshBalances();
+      } catch (error) {
+        console.error(error);
+        toast(error.shortMessage || error.message || 'Staking failed');
+      }
+    }
+
+    function saveAutoStakeSettings() {
+      const enabled = document.getElementById('autoStakeEnabled')?.value === 'on';
+      const strategy = document.getElementById('stakeStrategySelect')?.value || autoStakeSettings.currentStrategy;
+
+      autoStakeSettings.enabled = enabled;
+      autoStakeSettings.currentStrategy = strategy;
+
+      localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+      updateWalletUi();
+      toast('Auto-stake settings saved');
+    }
+
+    function syncAutoStakeFromSettings() {
+      const value = document.getElementById('settingsAutoStake').value;
+      autoStakeSettings.enabled = value === 'on';
+      localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+      updateWalletUi();
+      toast('Auto-stake updated');
+    }
+
+    function runAutoStakeCheck(manual = false) {
+      const current = STAKE_OPTIONS.find(o => o.id === autoStakeSettings.currentStrategy) || STAKE_OPTIONS[0];
+      const best = STAKE_OPTIONS.slice().sort((a, b) => b.apy - a.apy)[0];
+
+      autoStakeSettings.lastCheck = Date.now();
+
+      if (!autoStakeSettings.enabled) {
+        localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+        if (manual) toast('Auto-stake is off');
+        updateWalletUi();
+        return;
+      }
+
+      if (best.apy <= current.apy || best.id === current.id) {
+        autoStakeSettings.candidate = null;
+        localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+        if (manual) toast('Current strategy is still best');
+        updateWalletUi();
+        return;
+      }
+
+      if (!autoStakeSettings.candidate || autoStakeSettings.candidate.id !== best.id) {
+        autoStakeSettings.candidate = {
+          ...best,
+          detectedAt: Date.now(),
+          readyAt: Date.now() + SEVEN_DAYS_MS
+        };
+
+        localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+        if (manual) toast('Higher APY found. 7-day watch started.');
+        updateWalletUi();
+        return;
+      }
+
+      if (Date.now() >= autoStakeSettings.candidate.readyAt) {
+        if (best.id === autoStakeSettings.candidate.id && best.apy > current.apy) {
+          autoStakeSettings.currentStrategy = best.id;
+          autoStakeSettings.candidate = null;
+          localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+
+          if (best.real && best.adapter === 'lido') {
+            toast('7-day APY confirmed. Use Stake ETH to execute Lido staking.');
+          } else {
+            toast('7-day APY confirmed. Adapter required for real auto-switch.');
+          }
+
+          updateWalletUi();
+          return;
+        }
+      }
+
+      localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+      if (manual) toast('APY watch updated');
+      updateWalletUi();
+    }
+
+    function clearStakeCandidate() {
+      autoStakeSettings.candidate = null;
+      localStorage.setItem('blue_auto_stake', JSON.stringify(autoStakeSettings));
+      updateWalletUi();
+      toast('Pending APY switch cleared');
+    }
+
+    function openSettings(target) {
       document.getElementById('settingsOverlay').classList.add('active');
+      renderStakeStrategySelects();
+
+      if (target) {
+        setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+      }
     }
 
     function closeSettings() {
@@ -1589,6 +2043,8 @@
     function openModal(id) {
       document.getElementById(id).classList.add('active');
       renderSendAssets();
+      renderSwapAssets();
+      renderStakeStrategySelects();
     }
 
     function closeModal(id) {
@@ -1615,19 +2071,30 @@
 
     function copyAddress() {
       const address = getPublicWallet()?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address;
-      if (!address) return toast('No address');
+      if (!address) {
+        toast('No address available');
+        return;
+      }
+
       navigator.clipboard?.writeText(address);
       toast('Address copied');
     }
 
     function saveCustomRpc() {
       const value = document.getElementById('customRpcInput').value.trim();
-      if (!value.startsWith('http')) return toast('Enter a valid RPC URL');
+
+      if (!value.startsWith('http')) {
+        toast('Enter a valid RPC URL');
+        return;
+      }
+
       localStorage.setItem(`blue_rpc_${activeNetworkKey}`, value);
       activeProvider = getProvider();
+
       if (ACTIVE_DECRYPTED_WALLET) {
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
       }
+
       toast('RPC saved');
       refreshBalances();
     }
@@ -1672,7 +2139,6 @@
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const iv = crypto.getRandomValues(new Uint8Array(12));
       const saltBase64 = bytesToBase64(salt);
-
       const key = await deriveAesKey(secret, saltBase64);
 
       const encrypted = await crypto.subtle.encrypt(
@@ -1728,66 +2194,84 @@
       });
 
       if (!response.ok) throw new Error('Unable to save encrypted wallet');
+
       return response.json();
     }
 
     async function createNewRealWalletForAccount() {
-      const passcode = prompt('Create a wallet encryption passcode. Use at least 8 characters.');
-      if (!passcode || passcode.length < 8) return toast('Passcode must be at least 8 characters');
+      try {
+        const passcode = document.getElementById('createPasscode').value;
+        const passcode2 = document.getElementById('createPasscode2').value;
 
-      const confirmed = confirm(
-        'This creates a real wallet. Save your seed phrase. If you lose your passcode and seed phrase, funds cannot be recovered. Continue?'
-      );
+        if (!passcode || passcode.length < 8) {
+          toast('Passcode must be at least 8 characters');
+          return;
+        }
 
-      if (!confirmed) return;
+        if (passcode !== passcode2) {
+          toast('Passcodes do not match');
+          return;
+        }
 
-      const realWallet = generateRealEvmWallet();
+        const realWallet = generateRealEvmWallet();
 
-      const vaultObject = {
-        wallets: [realWallet],
-        createdAt: new Date().toISOString()
-      };
+        const vaultObject = {
+          wallets: [realWallet],
+          createdAt: new Date().toISOString()
+        };
 
-      const secret = `${CURRENT_EMAIL}:${passcode}`;
-      const encryptedVault = await encryptVault(vaultObject, secret);
+        const secret = `${CURRENT_EMAIL}:${passcode}`;
+        const encryptedVault = await encryptVault(vaultObject, secret);
 
-      const publicWallets = [{
-        type: 'evm',
-        address: realWallet.address,
-        networks: realWallet.networks,
-        createdAt: realWallet.createdAt
-      }];
+        const publicWallets = [{
+          type: 'evm',
+          address: realWallet.address,
+          networks: realWallet.networks,
+          createdAt: realWallet.createdAt
+        }];
 
-      await saveEncryptedWalletToServer(encryptedVault, publicWallets);
+        await saveEncryptedWalletToServer(encryptedVault, publicWallets);
 
-      localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
+        localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
 
-      ACTIVE_DECRYPTED_WALLET = vaultObject;
-      activeProvider = getProvider();
-      activeSigner = new ethers.Wallet(realWallet.privateKey, activeProvider);
+        ACTIVE_DECRYPTED_WALLET = vaultObject;
+        activeProvider = getProvider();
+        activeSigner = new ethers.Wallet(realWallet.privateKey, activeProvider);
 
-      toast('Wallet created and encrypted');
-      updateWalletUi();
-      refreshBalances();
+        closeModal('createWalletModal');
+        toast('Wallet created and encrypted');
+
+        updateWalletUi();
+        refreshBalances();
+      } catch (error) {
+        console.error(error);
+        toast(error.message || 'Wallet creation failed');
+      }
     }
 
-    async function unlockExistingWallet() {
-      if (!SERVER_WALLET || !SERVER_WALLET.encryptedVault) {
-        toast('No encrypted wallet exists yet');
-        return null;
-      }
-
-      const passcode = prompt('Enter your wallet encryption passcode');
-      if (!passcode) return null;
-
+    async function unlockExistingWallet(passcodeOverride = null) {
       try {
+        if (!SERVER_WALLET || !SERVER_WALLET.encryptedVault) {
+          toast('No encrypted wallet exists yet');
+          return null;
+        }
+
+        const passcode = passcodeOverride || document.getElementById('unlockPasscode').value;
+
+        if (!passcode) {
+          toast('Enter your passcode');
+          return null;
+        }
+
         const secret = `${CURRENT_EMAIL}:${passcode}`;
         ACTIVE_DECRYPTED_WALLET = await decryptVault(SERVER_WALLET.encryptedVault, secret);
 
         activeProvider = getProvider();
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
 
+        closeModal('unlockModal');
         toast('Wallet unlocked');
+
         updateWalletUi();
         refreshBalances();
 
@@ -1799,30 +2283,54 @@
       }
     }
 
-    async function revealSecretPhrase() {
-      const unlocked = ACTIVE_DECRYPTED_WALLET || await unlockExistingWallet();
-      if (!unlocked) return;
-
-      const firstWallet = unlocked.wallets.find(w => w.type === 'evm');
-      if (!firstWallet) return toast('No EVM wallet found');
-
-      const confirmed = confirm('Your seed phrase controls real funds. Never share it. Show it now?');
-      if (!confirmed) return;
-
-      alert(`Seed phrase:\n\n${firstWallet.phrase}`);
+    async function unlockFromSettings() {
+      const passcode = document.getElementById('settingsPasscode').value;
+      await unlockExistingWallet(passcode);
     }
 
-    async function revealPrivateKey() {
-      const unlocked = ACTIVE_DECRYPTED_WALLET || await unlockExistingWallet();
-      if (!unlocked) return;
+    function createFromSettings() {
+      closeSettings();
+      openModal('createWalletModal');
+    }
 
-      const firstWallet = unlocked.wallets.find(w => w.type === 'evm');
-      if (!firstWallet) return toast('No EVM wallet found');
+    async function showSeedInSettings() {
+      const passcode = document.getElementById('settingsPasscode').value;
 
-      const confirmed = confirm('Your private key controls real funds. Never share it. Show it now?');
-      if (!confirmed) return;
+      if (!ACTIVE_DECRYPTED_WALLET) {
+        await unlockExistingWallet(passcode);
+      }
 
-      alert(`Private key:\n\n${firstWallet.privateKey}`);
+      if (!ACTIVE_DECRYPTED_WALLET) return;
+
+      const firstWallet = ACTIVE_DECRYPTED_WALLET.wallets.find(w => w.type === 'evm');
+
+      if (!firstWallet) {
+        toast('No EVM wallet found');
+        return;
+      }
+
+      document.getElementById('secretOutput').value = firstWallet.phrase;
+      toast('Seed phrase shown in settings');
+    }
+
+    async function showKeyInSettings() {
+      const passcode = document.getElementById('settingsPasscode').value;
+
+      if (!ACTIVE_DECRYPTED_WALLET) {
+        await unlockExistingWallet(passcode);
+      }
+
+      if (!ACTIVE_DECRYPTED_WALLET) return;
+
+      const firstWallet = ACTIVE_DECRYPTED_WALLET.wallets.find(w => w.type === 'evm');
+
+      if (!firstWallet) {
+        toast('No EVM wallet found');
+        return;
+      }
+
+      document.getElementById('secretOutput').value = firstWallet.privateKey;
+      toast('Private key shown in settings');
     }
 
     function initializeFromServer() {
@@ -1831,15 +2339,18 @@
       }
 
       activeProvider = getProvider();
+
       updateWalletUi();
       refreshBalances();
 
       if (!SERVER_WALLET?.encryptedVault) {
         setTimeout(() => {
-          const make = confirm('No real wallet exists for this account yet. Create one now?');
-          if (make) createNewRealWalletForAccount();
-        }, 600);
+          openModal('createWalletModal');
+          toast('Create a wallet for this email account');
+        }, 500);
       }
+
+      setInterval(() => runAutoStakeCheck(false), 60 * 60 * 1000);
     }
 
     window.addEventListener('keydown', event => {
@@ -1853,6 +2364,9 @@
 
     renderNetworks();
     renderSendAssets();
+    renderSwapAssets();
+    renderStakeStrategySelects();
+    renderAutoStakePlanner();
     initializeFromServer();
   </script>
 </body>
