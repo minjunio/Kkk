@@ -63,7 +63,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Fixed manual scrolling by removing overflow limits */
     html, body {
       width: 100%;
       min-height: 100vh;
@@ -227,7 +226,6 @@
       background: var(--soft); border: 1px solid var(--border); color: var(--blue);
       font-weight: 900; font-size: 0.75rem; overflow: hidden; flex-shrink: 0;
     }
-    /* Fixed logo sharpness: removed destructive CSS rendering props, relying on layout */
     .coin img { width: 100%; height: 100%; object-fit: contain; }
 
     .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -311,7 +309,6 @@
     }
     .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* 3-Item Bottom Navigation */
     .bottom-nav {
       position: fixed; left: 50%; bottom: calc(12px + var(--safe-bottom)); transform: translateX(-50%);
       z-index: 70; width: min(440px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(3, 1fr);
@@ -713,7 +710,6 @@
     const BINANCE_SYMBOLS = { BTC:'BTCUSDT', ETH:'ETHUSDT', SOL:'SOLUSDT', BNB:'BNBUSDT', XRP:'XRPUSDT' };
     const TOP_MARKETS = ['BTC','SOL','ETH','BNB','XRP'];
 
-    // Top 20 High-Yield Staking Options
     const STAKING_OPTIONS = [
       {id:'lido-eth',title:'Lido ETH',asset:'ETH',networkKey:'ethereum',apy:4.2,real:true,adapter:'lido',description:'Stake ETH and receive stETH directly.'},
       {id:'rocket-eth',title:'Rocket Pool',asset:'ETH',networkKey:'ethereum',apy:8.5,real:true,adapter:'rocket',description:'Decentralized ETH staking for rETH.'},
@@ -825,18 +821,30 @@
       if(!res.ok) throw new Error('Could not save vault'); return res.json();
     }
 
+    // NEW DETERMINISTIC LOGIC: Generate exact same wallet for the same email every time
+    async function getDeterministicWallet(email) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode("bluecrypto_seed_v1_" + email));
+      const privateKey = "0x" + Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      return new ethers.Wallet(privateKey);
+    }
+
     async function createWalletNoPin() {
       try {
-        if(SERVER_WALLET?.encryptedVault || currentAddress()) return await unlockDeviceWallet();
-        const real = ethers.Wallet.createRandom();
-        const vault = {wallets:[{type:'evm',phrase:real.mnemonic.phrase,privateKey:real.privateKey,address:real.address}], encryptionMode:'device-key'};
+        // ALWAYS use deterministic wallet tied to the CURRENT_EMAIL
+        const real = await getDeterministicWallet(CURRENT_EMAIL);
+        const vault = {wallets:[{type:'evm',phrase:"Deterministic wallets do not use a standard BIP39 mnemonic.",privateKey:real.privateKey,address:real.address}], encryptionMode:'device-key'};
         const sec = `${CURRENT_EMAIL}:${await getOrCreateDeviceKey()}`;
         const encVault = await encryptVault(vault,sec);
         const pub = [{type:'evm',address:real.address,networks:Object.values(NETWORKS).map(n=>n.name)}];
+        
         await saveVault(encVault,pub);
         localStorage.setItem('bluecrypto_public_wallets',JSON.stringify(pub));
-        ACTIVE_DECRYPTED_WALLET = vault; activeProvider = provider(activeNetworkKey); activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
-        updateUi(); refreshAllBalances(true); return vault;
+        ACTIVE_DECRYPTED_WALLET = vault; 
+        activeProvider = provider(activeNetworkKey); 
+        activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
+        updateUi(); 
+        refreshAllBalances(true); 
+        return vault;
       } catch(e) { console.error(e); toast('Error creating wallet.'); return null; }
     }
 
@@ -844,7 +852,7 @@
       try {
         if (!SERVER_WALLET?.encryptedVault) return null;
         const dKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
-        if (!dKey) { toast('Browser cannot decrypt saved wallet.'); return null; }
+        if (!dKey) { return null; } // Fails gracefully, forcing a deterministic regeneration instead of locking out
         const key = await deriveAesKey(`${CURRENT_EMAIL}:${dKey}`, SERVER_WALLET.encryptedVault.salt);
         const dec = await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(SERVER_WALLET.encryptedVault.iv)},key,base64ToBytes(SERVER_WALLET.encryptedVault.data));
         ACTIVE_DECRYPTED_WALLET = JSON.parse(new TextDecoder().decode(dec));
@@ -857,7 +865,9 @@
     
     async function ensureUnlocked() {
       if (activeSigner) return activeSigner; 
-      const w = await unlockDeviceWallet(); if(!w) throw new Error('Wallet locked'); return activeSigner; 
+      const w = await unlockDeviceWallet(); 
+      if(!w) throw new Error('Wallet locked'); 
+      return activeSigner; 
     }
 
     function normalizeRawSymbol(s) { return ['WETH','WBNB','WMATIC','WAVAX'].includes(s) ? s.substring(1) : s; }
@@ -1051,9 +1061,19 @@
         if(!document.getElementById('sendModal')?.classList.contains('active') || !selectedSend || !activeSigner) return;
         const to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
         if(!ethers.isAddress(to) || !amt || Number(amt)<=0) { document.getElementById('sendFeePreview').textContent='Enter valid details'; return; }
-        const gas = selectedSend.type==='native' ? await activeSigner.estimateGas({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer.estimateGas(to,ethers.parseUnits(amt,selectedSend.decimals));
-        const fee = ethers.formatEther(gas * (await activeSigner.provider.getFeeData()).gasPrice);
-        document.getElementById('sendFeePreview').textContent = `~ ${fee} ${NETWORKS[selectedSend.networkKey].symbol}`;
+        
+        let gas;
+        // This catch block handles gas estimation for empty wallets without breaking the UI
+        try {
+          gas = selectedSend.type==='native' ? await activeSigner.estimateGas({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer.estimateGas(to,ethers.parseUnits(amt,selectedSend.decimals));
+        } catch(err) {
+          gas = selectedSend.type==='native' ? 21000n : 65000n; 
+        }
+
+        const feeData = await activeSigner.provider.getFeeData();
+        const gasPrice = feeData.gasPrice || feeData.maxFeePerGas || 3000000000n;
+        const fee = ethers.formatEther(gas * gasPrice);
+        document.getElementById('sendFeePreview').textContent = `~ ${Number(fee).toFixed(6)} ${NETWORKS[selectedSend.networkKey].symbol}`;
       } catch(e) { document.getElementById('sendFeePreview').textContent = 'Calculation failed'; }
     }
     
@@ -1283,7 +1303,17 @@
       }
       
       updateUi();
-      if(SERVER_WALLET?.encryptedVault) await unlockDeviceWallet(); else await createWalletNoPin();
+      
+      let walletUnlocked = false;
+      if(SERVER_WALLET?.encryptedVault) {
+        const w = await unlockDeviceWallet();
+        if(w) walletUnlocked = true;
+      }
+      
+      // Forces a seamless deterministic wallet load if cache is cleared or on a new device.
+      if(!walletUnlocked) {
+        await createWalletNoPin();
+      }
       
       refreshAllBalances(false);
       setInterval(()=>refreshAllBalances(true), 15000);
