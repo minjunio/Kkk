@@ -12,893 +12,770 @@
   <style>
     :root {
       color-scheme: light;
-      --bg1: #e8f7ff;
-      --bg2: #f8fbff;
-      --bg3: #d5efff;
-      --glass: rgba(255,255,255,.72);
-      --glass2: rgba(255,255,255,.52);
-      --solid: #ffffff;
-      --soft: #f4f9ff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --muted2: #94a3b8;
-      --blue: #0284c7;
-      --blue2: #2563eb;
-      --cyan: #38bdf8;
-      --pink: #e11d48;
-      --green: #16a34a;
-      --orange: #d97706;
-      --border: rgba(15,23,42,.08);
-      --border2: rgba(2,132,199,.25);
-      --shadow: 0 24px 80px rgba(37,99,235,.14);
-      --shadow2: 0 12px 34px rgba(15,23,42,.08);
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
+      --bg1:#e8f7ff;
+      --bg2:#f8fbff;
+      --bg3:#d5efff;
+      --glass:rgba(255,255,255,.72);
+      --glass2:rgba(255,255,255,.56);
+      --solid:#fff;
+      --soft:#f4f9ff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --blue:#0284c7;
+      --blue2:#2563eb;
+      --cyan:#38bdf8;
+      --pink:#e11d48;
+      --green:#16a34a;
+      --orange:#d97706;
+      --border:rgba(15,23,42,.08);
+      --border2:rgba(2,132,199,.25);
+      --shadow:0 24px 80px rgba(37,99,235,.14);
+      --shadow2:0 12px 34px rgba(15,23,42,.08);
+      --safe-top:env(safe-area-inset-top);
+      --safe-bottom:env(safe-area-inset-bottom);
     }
 
     [data-theme="dark"] {
       color-scheme: dark;
-      --bg1: #06111f;
-      --bg2: #050816;
-      --bg3: #0b2940;
-      --glass: rgba(13,22,40,.78);
-      --glass2: rgba(17,29,51,.58);
-      --solid: #0d1628;
-      --soft: #111d33;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --muted2: #64748b;
-      --blue: #38bdf8;
-      --border: rgba(125,211,252,.13);
-      --border2: rgba(56,189,248,.3);
-      --shadow: 0 24px 80px rgba(0,0,0,.36);
-      --shadow2: 0 12px 34px rgba(0,0,0,.22);
+      --bg1:#06111f;
+      --bg2:#050816;
+      --bg3:#0b2940;
+      --glass:rgba(13,22,40,.78);
+      --glass2:rgba(17,29,51,.58);
+      --solid:#0d1628;
+      --soft:#111d33;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --blue:#38bdf8;
+      --border:rgba(125,211,252,.13);
+      --border2:rgba(56,189,248,.3);
+      --shadow:0 24px 80px rgba(0,0,0,.36);
+      --shadow2:0 12px 34px rgba(0,0,0,.22);
     }
 
     * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      -webkit-tap-highlight-color: transparent;
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-tap-highlight-color:transparent;
     }
 
-    html, body {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: hidden;
+    html,body {
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
     }
 
     body {
-      min-height: 100vh;
-      color: var(--text);
+      min-height:100vh;
+      color:var(--text);
       background:
-        radial-gradient(circle at 8% 5%, rgba(56,189,248,.30), transparent 30%),
-        radial-gradient(circle at 92% 12%, rgba(37,99,235,.16), transparent 24%),
-        radial-gradient(circle at 50% 105%, rgba(14,165,233,.18), transparent 30%),
-        linear-gradient(135deg, var(--bg1), var(--bg2) 46%, var(--bg3));
-      background-attachment: fixed;
-      padding-bottom: calc(88px + var(--safe-bottom));
+        radial-gradient(circle at 8% 5%,rgba(56,189,248,.30),transparent 30%),
+        radial-gradient(circle at 92% 12%,rgba(37,99,235,.16),transparent 24%),
+        radial-gradient(circle at 50% 105%,rgba(14,165,233,.18),transparent 30%),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
+      background-attachment:fixed;
+      padding-bottom:calc(88px + var(--safe-bottom));
     }
 
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-    }
+    button,input,select,textarea { font:inherit; }
+    button { border:0; cursor:pointer; }
 
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: calc(10px + var(--safe-top)) 12px 10px;
-      background: rgba(248,251,255,.58);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px);
+      position:sticky;
+      top:0;
+      z-index:50;
+      padding:calc(10px + var(--safe-top)) 12px 10px;
+      background:rgba(248,251,255,.58);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(20px);
     }
 
-    [data-theme="dark"] .topbar {
-      background: rgba(5,8,22,.68);
-    }
+    [data-theme="dark"] .topbar { background:rgba(5,8,22,.68); }
 
     .topbar-inner {
-      width: min(940px, 100%);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      width:min(940px,100%);
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
     }
 
     .brand {
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
     .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 950;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      box-shadow: 0 14px 34px rgba(37,99,235,.22);
-      flex: 0 0 auto;
+      width:42px;
+      height:42px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:950;
+      background:linear-gradient(135deg,var(--blue2),var(--cyan));
+      box-shadow:0 14px 34px rgba(37,99,235,.22);
+      flex:0 0 auto;
     }
 
     .brand-title {
-      font-weight: 950;
-      letter-spacing: -.05em;
-      font-size: 1rem;
-      white-space: nowrap;
+      font-weight:950;
+      letter-spacing:-.05em;
+      font-size:1rem;
+      white-space:nowrap;
     }
 
     .brand-sub {
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 800;
-      white-space: nowrap;
+      margin-top:2px;
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+      white-space:nowrap;
     }
 
     .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
     }
 
     .icon-btn {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 15px;
-      background: var(--glass);
-      border: 1px solid var(--border);
-      color: var(--text);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(16px);
-      font-weight: 950;
-      transition: .18s ease;
-    }
-
-    .icon-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border2);
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border-radius:15px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      color:var(--text);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(16px);
+      font-weight:950;
     }
 
     .shell {
-      width: min(940px, 100%);
-      margin: 0 auto;
-      padding: 12px;
+      width:min(940px,100%);
+      margin:0 auto;
+      padding:12px;
     }
 
     .hero {
-      position: relative;
-      overflow: hidden;
-      border-radius: 32px;
-      padding: 18px;
-      background: var(--glass);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
+      position:relative;
+      overflow:hidden;
+      border-radius:32px;
+      padding:18px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(24px);
     }
 
     .hero::before {
-      content: "";
-      position: absolute;
-      right: -90px;
-      bottom: -130px;
-      width: 310px;
-      height: 310px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(2,132,199,.24), transparent 70%);
-      pointer-events: none;
+      content:"";
+      position:absolute;
+      right:-90px;
+      bottom:-130px;
+      width:310px;
+      height:310px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(2,132,199,.24),transparent 70%);
+      pointer-events:none;
     }
 
     .hero-inner {
-      position: relative;
-      z-index: 1;
+      position:relative;
+      z-index:1;
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      color: var(--blue);
-      background: rgba(2,132,199,.08);
-      border: 1px solid var(--border2);
-      font-size: .74rem;
-      font-weight: 950;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 11px;
+      border-radius:999px;
+      color:var(--blue);
+      background:rgba(2,132,199,.08);
+      border:1px solid var(--border2);
+      font-size:.74rem;
+      font-weight:950;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--blue);
-      animation: pulse 1.8s infinite;
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--blue);
+      animation:pulse 1.8s infinite;
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(2,132,199,.42); }
-      80% { box-shadow: 0 0 0 9px rgba(2,132,199,0); }
-      100% { box-shadow: 0 0 0 0 rgba(2,132,199,0); }
+      0% { box-shadow:0 0 0 0 rgba(2,132,199,.42); }
+      80% { box-shadow:0 0 0 9px rgba(2,132,199,0); }
+      100% { box-shadow:0 0 0 0 rgba(2,132,199,0); }
     }
 
     .balance {
-      margin-top: 12px;
-      font-size: clamp(2.45rem, 12vw, 5rem);
-      font-weight: 950;
-      line-height: .93;
-      letter-spacing: -.08em;
-      font-variant-numeric: tabular-nums;
+      margin-top:12px;
+      font-size:clamp(2.45rem,12vw,5rem);
+      font-weight:950;
+      line-height:.93;
+      letter-spacing:-.08em;
+      font-variant-numeric:tabular-nums;
     }
 
     .pnl-line {
-      margin-top: 9px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: var(--glass2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-weight: 900;
-      font-size: .76rem;
+      margin-top:9px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 11px;
+      border-radius:999px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-weight:900;
+      font-size:.76rem;
     }
 
     .pnl-line.up {
-      color: var(--green);
-      background: rgba(22,163,74,.09);
-      border-color: rgba(22,163,74,.16);
+      color:var(--green);
+      background:rgba(22,163,74,.09);
+      border-color:rgba(22,163,74,.16);
     }
 
     .pnl-line.down {
-      color: var(--pink);
-      background: rgba(225,29,72,.08);
-      border-color: rgba(225,29,72,.14);
+      color:var(--pink);
+      background:rgba(225,29,72,.08);
+      border-color:rgba(225,29,72,.14);
     }
 
     .chips {
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      margin-top: 13px;
-      padding-bottom: 2px;
+      display:flex;
+      gap:7px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      margin-top:13px;
+      padding-bottom:2px;
     }
 
-    .chips::-webkit-scrollbar {
-      display: none;
-    }
+    .chips::-webkit-scrollbar { display:none; }
 
     .chip {
-      flex: 0 0 auto;
-      padding: 8px 10px;
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--glass2);
-      border: 1px solid var(--border);
-      font-size: .72rem;
-      font-weight: 900;
-      backdrop-filter: blur(14px);
+      flex:0 0 auto;
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      background:var(--glass2);
+      border:1px solid var(--border);
+      font-size:.72rem;
+      font-weight:900;
+      backdrop-filter:blur(14px);
     }
 
     .quick {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 15px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:15px;
     }
 
     .quick-btn {
-      min-height: 72px;
-      border-radius: 22px;
-      padding: 10px;
-      text-align: center;
-      color: var(--text);
-      background: var(--solid);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow2);
-      transition: .18s ease;
+      min-height:70px;
+      border-radius:22px;
+      padding:10px;
+      text-align:center;
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
     }
 
     .quick-btn.primary {
-      color: white;
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
-      border-color: transparent;
-    }
-
-    .quick-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border2);
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      border-color:transparent;
     }
 
     .quick-btn strong {
-      display: block;
-      font-size: .88rem;
-      font-weight: 950;
-      margin-bottom: 4px;
+      display:block;
+      font-size:.86rem;
+      font-weight:950;
+      margin-bottom:4px;
     }
 
     .quick-btn span {
-      color: var(--muted);
-      font-size: .68rem;
-      font-weight: 850;
+      color:var(--muted);
+      font-size:.66rem;
+      font-weight:850;
     }
 
-    .quick-btn.primary span {
-      color: rgba(255,255,255,.82);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
-      margin-top: 12px;
-    }
+    .quick-btn.primary span { color:rgba(255,255,255,.82); }
 
     .panel {
-      border-radius: 25px;
-      padding: 14px;
-      background: var(--glass);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(20px);
-      overflow: hidden;
-      max-width: 100%;
+      margin-top:12px;
+      border-radius:25px;
+      padding:14px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(20px);
+      overflow:hidden;
+      max-width:100%;
     }
 
     .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:12px;
     }
 
     .title {
-      font-size: 1rem;
-      font-weight: 950;
-      letter-spacing: -.04em;
+      font-size:1rem;
+      font-weight:950;
+      letter-spacing:-.04em;
     }
 
     .sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: .75rem;
-      line-height: 1.45;
-      font-weight: 760;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.75rem;
+      line-height:1.45;
+      font-weight:760;
     }
 
-    .list {
-      display: grid;
-      gap: 8px;
+    .asset-scroll {
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scrollbar-width:none;
+      padding:2px 2px 4px;
     }
 
-    .row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px;
-      border-radius: 18px;
-      background: var(--glass2);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-      max-width: 100%;
-      min-width: 0;
+    .asset-scroll::-webkit-scrollbar { display:none; }
+
+    .asset-card {
+      flex:0 0 168px;
+      scroll-snap-align:start;
+      border-radius:22px;
+      padding:13px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      backdrop-filter:blur(14px);
+      min-width:0;
     }
 
-    .asset {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
+    .asset-card.selected {
+      border-color:var(--border2);
+      box-shadow:0 0 0 4px rgba(2,132,199,.08);
+    }
+
+    .asset-top {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      min-width:0;
     }
 
     .coin {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--soft);
-      border: 1px solid var(--border);
-      color: var(--blue);
-      font-size: .72rem;
-      font-weight: 950;
-      overflow: hidden;
-      flex: 0 0 auto;
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:var(--soft);
+      border:1px solid var(--border);
+      color:var(--blue);
+      font-size:.7rem;
+      font-weight:950;
+      overflow:hidden;
+      flex:0 0 auto;
     }
 
     .coin img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
 
     .name {
-      font-weight: 950;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
+      font-weight:950;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      min-width:0;
     }
 
     .tiny {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: .72rem;
-      line-height: 1.45;
-      font-weight: 800;
-      overflow-wrap: anywhere;
-      word-break: break-word;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.72rem;
+      line-height:1.45;
+      font-weight:800;
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
 
-    .value {
-      text-align: right;
-      font-weight: 950;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+    .asset-value {
+      margin-top:11px;
+      font-size:1.05rem;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
     }
 
-    .value-sub {
-      margin-top: 3px;
-      text-align: right;
-      color: var(--muted);
-      font-size: .72rem;
-      font-weight: 800;
-      white-space: nowrap;
+    .asset-sub {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
     }
 
-    .small-btn,
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn {
-      min-height: 44px;
-      border-radius: 15px;
-      font-weight: 950;
-      transition: .18s ease;
+    .network-list {
+      display:grid;
+      gap:6px;
+      margin-top:8px;
+    }
+
+    .mini-net {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      color:var(--muted);
+      font-size:.68rem;
+      font-weight:850;
+    }
+
+    .small-btn,.primary-btn,.secondary-btn,.danger-btn {
+      min-height:44px;
+      border-radius:15px;
+      font-weight:950;
     }
 
     .small-btn {
-      padding: 0 12px;
-      color: var(--text);
-      background: var(--solid);
-      border: 1px solid var(--border);
-      font-size: .75rem;
-      white-space: nowrap;
+      padding:0 12px;
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
+      font-size:.75rem;
+      white-space:nowrap;
     }
 
     .primary-btn {
-      color: white;
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
-      box-shadow: 0 14px 30px rgba(37,99,235,.18);
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      box-shadow:0 14px 30px rgba(37,99,235,.18);
     }
 
     .secondary-btn {
-      color: var(--text);
-      background: var(--solid);
-      border: 1px solid var(--border);
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
     }
 
     .danger-btn {
-      color: white;
-      background: linear-gradient(135deg, #be123c, #fb7185);
-    }
-
-    .pills {
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      margin-bottom: 10px;
-    }
-
-    .pills::-webkit-scrollbar {
-      display: none;
-    }
-
-    .pill {
-      flex: 0 0 auto;
-      min-height: 39px;
-      padding: 0 13px;
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--solid);
-      border: 1px solid var(--border);
-      font-size: .74rem;
-      font-weight: 950;
-    }
-
-    .pill.active {
-      color: white;
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
-      border-color: transparent;
+      color:white;
+      background:linear-gradient(135deg,#be123c,#fb7185);
     }
 
     .form {
-      display: grid;
-      gap: 10px;
+      display:grid;
+      gap:10px;
     }
 
     .field {
-      display: grid;
-      gap: 7px;
+      display:grid;
+      gap:7px;
     }
 
     label {
-      color: var(--muted);
-      font-size: .7rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+      color:var(--muted);
+      font-size:.7rem;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
-    .input,
-    .select,
-    .textarea {
-      width: 100%;
-      min-height: 46px;
-      padding: 12px;
-      border-radius: 15px;
-      color: var(--text);
-      background: var(--soft);
-      border: 1px solid var(--border);
-      outline: none;
-      font-weight: 850;
-      max-width: 100%;
+    .input,.select,.textarea {
+      width:100%;
+      min-height:46px;
+      padding:12px;
+      border-radius:15px;
+      color:var(--text);
+      background:var(--soft);
+      border:1px solid var(--border);
+      outline:none;
+      font-weight:850;
+      max-width:100%;
     }
 
     .textarea {
-      min-height: 112px;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: .8rem;
-      line-height: 1.5;
-    }
-
-    .input:focus,
-    .select:focus,
-    .textarea:focus {
-      border-color: var(--border2);
-      box-shadow: 0 0 0 4px rgba(2,132,199,.08);
+      min-height:112px;
+      resize:vertical;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:.8rem;
+      line-height:1.5;
     }
 
     .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 10px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:10px;
     }
 
-    .button-row.one {
-      grid-template-columns: 1fr;
-    }
+    .button-row.one { grid-template-columns:1fr; }
 
     .box {
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 18px;
-      background: var(--glass2);
-      border: 1px solid var(--border);
-      max-width: 100%;
-      min-width: 0;
+      margin-top:10px;
+      padding:12px;
+      border-radius:18px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      max-width:100%;
+      min-width:0;
     }
 
     .box.warn {
-      color: var(--orange);
-      background: rgba(217,119,6,.1);
-      border-color: rgba(217,119,6,.18);
-    }
-
-    .box.good {
-      color: var(--green);
-      background: rgba(22,163,74,.09);
-      border-color: rgba(22,163,74,.14);
+      color:var(--orange);
+      background:rgba(217,119,6,.1);
+      border-color:rgba(217,119,6,.18);
     }
 
     .box.bad {
-      color: var(--pink);
-      background: rgba(225,29,72,.08);
-      border-color: rgba(225,29,72,.14);
+      color:var(--pink);
+      background:rgba(225,29,72,.08);
+      border-color:rgba(225,29,72,.14);
     }
 
     .receive-grid {
-      display: grid;
-      gap: 8px;
+      display:grid;
+      gap:8px;
     }
 
     .receive-option {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: center;
-      padding: 12px;
-      border-radius: 18px;
-      background: var(--soft);
-      border: 1px solid var(--border);
-      text-align: left;
-      max-width: 100%;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      padding:12px;
+      border-radius:18px;
+      background:var(--soft);
+      border:1px solid var(--border);
+      text-align:left;
+      max-width:100%;
     }
 
     .fee-box {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 42px;
-      align-items: center;
-      gap: 10px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 42px;
+      align-items:center;
+      gap:10px;
     }
 
     .countdown-ring {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background:
-        conic-gradient(var(--blue) calc(var(--progress, 1) * 360deg), rgba(100,116,139,.16) 0deg);
-      position: relative;
-      flex: 0 0 auto;
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:conic-gradient(var(--blue) calc(var(--progress,1) * 360deg),rgba(100,116,139,.16) 0deg);
+      position:relative;
+      flex:0 0 auto;
     }
 
     .countdown-ring::before {
-      content: "";
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--solid);
-      position: absolute;
+      content:"";
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      background:var(--solid);
+      position:absolute;
     }
 
     .countdown-ring span {
-      position: relative;
-      font-size: .72rem;
-      font-weight: 950;
-      color: var(--blue);
-      z-index: 1;
+      position:relative;
+      font-size:.72rem;
+      font-weight:950;
+      color:var(--blue);
+      z-index:1;
     }
 
-    .modal-overlay,
-    .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      background: rgba(15,23,42,.42);
-      backdrop-filter: blur(10px);
-      padding: 10px;
+    .modal-overlay,.drawer-overlay {
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      background:rgba(15,23,42,.42);
+      backdrop-filter:blur(10px);
+      padding:10px;
     }
 
-    .modal-overlay.active,
-    .drawer-overlay.active {
-      display: block;
-    }
+    .modal-overlay.active,.drawer-overlay.active { display:block; }
 
     .modal-card {
-      width: min(520px, 100%);
-      max-height: calc(100vh - 20px - var(--safe-top) - var(--safe-bottom));
-      overflow-y: auto;
-      margin: calc(10px + var(--safe-top)) auto 0;
-      padding: 14px;
-      border-radius: 26px;
-      background: var(--solid);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      animation: pop .22s ease both;
-      max-width: 100%;
+      width:min(520px,100%);
+      max-height:calc(100vh - 20px - var(--safe-top) - var(--safe-bottom));
+      overflow-y:auto;
+      margin:calc(10px + var(--safe-top)) auto 0;
+      padding:14px;
+      border-radius:26px;
+      background:var(--solid);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      animation:pop .22s ease both;
+      max-width:100%;
     }
 
     .drawer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: min(470px, 100%);
-      height: 100%;
-      overflow-y: auto;
-      padding: calc(16px + var(--safe-top)) 14px calc(18px + var(--safe-bottom));
-      background: var(--solid);
-      border-left: 1px solid var(--border);
-      box-shadow: -24px 0 80px rgba(0,0,0,.22);
-      animation: slide .23s ease both;
-      max-width: 100%;
+      position:absolute;
+      top:0;
+      right:0;
+      width:min(470px,100%);
+      height:100%;
+      overflow-y:auto;
+      padding:calc(16px + var(--safe-top)) 14px calc(18px + var(--safe-bottom));
+      background:var(--solid);
+      border-left:1px solid var(--border);
+      box-shadow:-24px 0 80px rgba(0,0,0,.22);
+      animation:slide .23s ease both;
+      max-width:100%;
     }
 
     @keyframes pop {
-      from { transform: translateY(18px) scale(.98); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
+      from { transform:translateY(18px) scale(.98); opacity:0; }
+      to { transform:translateY(0) scale(1); opacity:1; }
     }
 
     @keyframes slide {
-      from { transform: translateX(36px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from { transform:translateX(36px); opacity:0; }
+      to { transform:translateX(0); opacity:1; }
     }
 
-    .modal-head,
-    .drawer-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 12px;
+    .modal-head,.drawer-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:12px;
     }
 
-    .modal-title,
-    .drawer-title {
-      font-size: 1.22rem;
-      font-weight: 950;
-      letter-spacing: -.055em;
+    .modal-title,.drawer-title {
+      font-size:1.22rem;
+      font-weight:950;
+      letter-spacing:-.055em;
     }
 
-    .modal-sub,
-    .drawer-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: .8rem;
-      font-weight: 760;
-      line-height: 1.45;
+    .modal-sub,.drawer-sub {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.8rem;
+      font-weight:760;
+      line-height:1.45;
     }
 
     .close {
-      width: 40px;
-      height: 40px;
-      border-radius: 15px;
-      color: var(--text);
-      background: var(--soft);
-      border: 1px solid var(--border);
-      font-size: 1.2rem;
-      font-weight: 950;
-      flex: 0 0 auto;
+      width:40px;
+      height:40px;
+      border-radius:15px;
+      color:var(--text);
+      background:var(--soft);
+      border:1px solid var(--border);
+      font-size:1.2rem;
+      font-weight:950;
+      flex:0 0 auto;
     }
 
     .secret-card {
-      filter: blur(5px);
-      user-select: none;
-      transition: filter .2s ease;
+      filter:blur(5px);
+      user-select:none;
+      transition:filter .2s ease;
     }
 
     .secret-card.visible {
-      filter: none;
-      user-select: text;
+      filter:none;
+      user-select:text;
     }
 
     .toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(92px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(12px);
-      z-index: 150;
-      max-width: min(430px, calc(100% - 28px));
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(2,6,23,.92);
-      color: white;
-      box-shadow: var(--shadow2);
-      opacity: 0;
-      pointer-events: none;
-      transition: all .22s ease;
-      font-weight: 850;
-      font-size: .84rem;
+      position:fixed;
+      left:50%;
+      bottom:calc(92px + var(--safe-bottom));
+      transform:translateX(-50%) translateY(12px);
+      z-index:150;
+      max-width:min(430px,calc(100% - 28px));
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(2,6,23,.92);
+      color:white;
+      box-shadow:var(--shadow2);
+      opacity:0;
+      pointer-events:none;
+      transition:all .22s ease;
+      font-weight:850;
+      font-size:.84rem;
     }
 
     .toast.active {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
     }
 
     .bottom-nav {
-      position: fixed;
-      left: 50%;
-      bottom: calc(10px + var(--safe-bottom));
-      transform: translateX(-50%);
-      z-index: 70;
-      width: min(430px, calc(100% - 24px));
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      padding: 7px;
-      border-radius: 22px;
-      background: rgba(255,255,255,.9);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
+      position:fixed;
+      left:50%;
+      bottom:calc(10px + var(--safe-bottom));
+      transform:translateX(-50%);
+      z-index:70;
+      width:min(430px,calc(100% - 24px));
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:6px;
+      padding:7px;
+      border-radius:22px;
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
     }
 
-    [data-theme="dark"] .bottom-nav {
-      background: rgba(13,22,40,.9);
-    }
+    [data-theme="dark"] .bottom-nav { background:rgba(13,22,40,.9); }
 
     .bottom-nav button {
-      min-height: 47px;
-      border-radius: 16px;
-      color: var(--muted);
-      background: transparent;
-      font-size: .7rem;
-      font-weight: 950;
+      min-height:47px;
+      border-radius:16px;
+      color:var(--muted);
+      background:transparent;
+      font-size:.7rem;
+      font-weight:950;
     }
 
     .bottom-nav button.active {
-      color: white;
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
     }
 
-    @media (max-width: 580px) {
-      body {
-        padding-bottom: calc(82px + var(--safe-bottom));
-      }
-
-      .shell {
-        padding: 9px;
-      }
-
-      .hero {
-        padding: 14px;
-        border-radius: 27px;
-      }
-
-      .quick {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .quick-btn {
-        min-height: 64px;
-        padding: 9px 6px;
-      }
-
-      .quick-btn strong {
-        font-size: .82rem;
-      }
-
-      .quick-btn span {
-        font-size: .64rem;
-      }
-
-      .panel {
-        padding: 12px;
-        border-radius: 22px;
-      }
-
-      .row,
-      .receive-option {
-        grid-template-columns: 1fr;
-      }
-
-      .value,
-      .value-sub {
-        text-align: left;
-      }
-
-      .button-row {
-        grid-template-columns: 1fr;
-      }
-
-      .brand-sub {
-        display: none;
-      }
-
-      .drawer {
-        width: 100%;
-      }
-
-      .modal-card {
-        width: 100%;
-        margin-top: calc(8px + var(--safe-top));
-      }
-
-      .fee-box {
-        grid-template-columns: 1fr 42px;
-      }
+    @media (max-width:580px) {
+      body { padding-bottom:calc(82px + var(--safe-bottom)); }
+      .shell { padding:9px; }
+      .hero { padding:14px; border-radius:27px; }
+      .quick { grid-template-columns:repeat(3,1fr); }
+      .quick-btn { min-height:62px; padding:8px 6px; border-radius:19px; }
+      .quick-btn strong { font-size:.8rem; }
+      .quick-btn span { font-size:.62rem; }
+      .panel { padding:12px; border-radius:22px; }
+      .asset-card { flex-basis:150px; }
+      .receive-option { grid-template-columns:1fr; }
+      .button-row { grid-template-columns:1fr; }
+      .brand-sub { display:none; }
+      .drawer { width:100%; }
+      .modal-card { width:100%; margin-top:calc(8px + var(--safe-top)); }
     }
   </style>
 </head>
@@ -915,7 +792,7 @@
       </div>
 
       <div class="top-actions">
-        <button class="icon-btn" onclick="refreshAllBalances()">⟳</button>
+        <button class="icon-btn" onclick="refreshAllBalances(true)">⟳</button>
         <button class="icon-btn" onclick="openSettings()">⚙</button>
       </div>
     </div>
@@ -929,7 +806,7 @@
         <div class="pnl-line" id="pnlLine">24h PnL $0.00 · ROI 0.00%</div>
 
         <div class="chips">
-          <span class="chip" id="activeNetworkText">All networks</span>
+          <span class="chip">All networks</span>
           <span class="chip" id="tokenCountText">0 assets</span>
           <span class="chip" id="securityText">Auto encrypted</span>
         </div>
@@ -942,29 +819,27 @@
 
           <button class="quick-btn" onclick="openModal('sendModal')">
             <strong>Send</strong>
-            <span>Auto fee</span>
+            <span>Owned assets</span>
           </button>
 
           <button class="quick-btn" onclick="openModal('swapModal')">
             <strong>Swap</strong>
-            <span>Live quote</span>
+            <span>Owned assets</span>
           </button>
         </div>
       </div>
     </section>
 
-    <section class="grid">
-      <section class="panel" id="assetsSection">
-        <div class="panel-head">
-          <div>
-            <h2 class="title">My assets</h2>
-            <p class="sub">All balances across supported EVM networks.</p>
-          </div>
-          <button class="small-btn" onclick="refreshAllBalances()">Refresh</button>
+    <section class="panel" id="assetsSection">
+      <div class="panel-head">
+        <div>
+          <h2 class="title">My assets</h2>
+          <p class="sub">Combined totals across every supported EVM network.</p>
         </div>
+        <button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button>
+      </div>
 
-        <div class="list" id="tokenList"></div>
-      </section>
+      <div class="asset-scroll" id="assetCards"></div>
     </section>
   </main>
 
@@ -975,12 +850,12 @@
     <button onclick="openSettings()">Settings</button>
   </nav>
 
-  <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event, 'receiveModal')">
+  <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event,'receiveModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Select the network first, then copy the address for the asset you want to receive.</div>
+          <div class="modal-sub">Choose a network first. Then copy the address for the asset you want.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
@@ -996,30 +871,25 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event, 'sendModal')">
+  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event,'sendModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Send</div>
-          <div class="modal-sub">Fee auto-refreshes every 5 seconds.</div>
+          <div class="modal-sub">Only assets you own are shown. Network auto-matches your selected asset.</div>
         </div>
         <button class="close" onclick="closeModal('sendModal')">×</button>
       </div>
 
       <div class="form">
         <div class="field">
-          <label>Network</label>
-          <select class="select" id="sendNetworkSelect" onchange="setSendNetwork(this.value)"></select>
-        </div>
-
-        <div class="field">
-          <label>Asset</label>
-          <select class="select" id="sendAssetSelect" onchange="renderSendBalance(); scheduleImmediateFeeRefresh();"></select>
+          <label>Your asset</label>
+          <div class="asset-scroll" id="sendOwnedAssets"></div>
         </div>
 
         <div class="box">
-          <div class="name">Available balance</div>
-          <div class="tiny" id="sendBalanceText">Select asset.</div>
+          <div class="name">Selected balance</div>
+          <div class="tiny" id="sendBalanceText">Select an asset.</div>
         </div>
 
         <div class="field">
@@ -1029,7 +899,7 @@
 
         <div class="field">
           <label>Amount</label>
-          <input class="input" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh(); renderSendBalance();" />
+          <input class="input" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" />
         </div>
 
         <div class="box">
@@ -1049,7 +919,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="sendConfirmModal" onclick="overlayClose(event, 'sendConfirmModal')">
+  <div class="modal-overlay" id="sendConfirmModal" onclick="overlayClose(event,'sendConfirmModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
@@ -1071,30 +941,25 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="swapModal" onclick="overlayClose(event, 'swapModal')">
+  <div class="modal-overlay" id="swapModal" onclick="overlayClose(event,'swapModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
           <div class="modal-title">Swap</div>
-          <div class="modal-sub">Swap quote auto-refreshes every 5 seconds.</div>
+          <div class="modal-sub">Choose an asset you own, then pick what you want to receive.</div>
         </div>
         <button class="close" onclick="closeModal('swapModal')">×</button>
       </div>
 
       <div class="form">
         <div class="field">
-          <label>Network</label>
-          <select class="select" id="swapNetworkSelect" onchange="setSwapNetwork(this.value)"></select>
-        </div>
-
-        <div class="field">
           <label>Sell asset</label>
-          <select class="select" id="swapSellSelect" onchange="renderSwapBalances(); scheduleImmediateFeeRefresh();"></select>
+          <div class="asset-scroll" id="swapOwnedAssets"></div>
         </div>
 
         <div class="box">
           <div class="name">Your sell balance</div>
-          <div class="tiny" id="swapSellBalanceText">Select asset.</div>
+          <div class="tiny" id="swapSellBalanceText">Select an asset.</div>
         </div>
 
         <div class="field">
@@ -1104,7 +969,7 @@
 
         <div class="field">
           <label>Sell amount</label>
-          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" oninput="renderSwapBalances(); scheduleImmediateFeeRefresh()" />
+          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" />
         </div>
 
         <div class="box">
@@ -1124,7 +989,7 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="swapConfirmModal" onclick="overlayClose(event, 'swapConfirmModal')">
+  <div class="modal-overlay" id="swapConfirmModal" onclick="overlayClose(event,'swapConfirmModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
@@ -1146,7 +1011,7 @@
     </div>
   </div>
 
-  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event, 'settingsOverlay')">
+  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event,'settingsOverlay')">
     <aside class="drawer">
       <div class="drawer-head">
         <div>
@@ -1178,7 +1043,7 @@
 
       <div class="box">
         <div class="name">Custom RPC</div>
-        <div class="tiny">Applies to the active network.</div>
+        <div class="tiny">Applies to the selected network while sending or swapping.</div>
         <div class="field" style="margin-top:10px;">
           <input class="input" id="customRpcInput" placeholder="https://..." />
         </div>
@@ -1225,68 +1090,68 @@
     const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
     const NETWORKS = {
-      ethereum: { name:'Ethereum', chainId:1, symbol:'ETH', rpc:'https://cloudflare-eth.com', explorer:'https://etherscan.io/tx/' },
-      bsc: { name:'BNB Chain', chainId:56, symbol:'BNB', rpc:'https://bsc-dataseed.binance.org', explorer:'https://bscscan.com/tx/' },
-      polygon: { name:'Polygon', chainId:137, symbol:'MATIC', rpc:'https://polygon-rpc.com', explorer:'https://polygonscan.com/tx/' },
-      base: { name:'Base', chainId:8453, symbol:'ETH', rpc:'https://mainnet.base.org', explorer:'https://basescan.org/tx/' },
-      arbitrum: { name:'Arbitrum', chainId:42161, symbol:'ETH', rpc:'https://arb1.arbitrum.io/rpc', explorer:'https://arbiscan.io/tx/' },
-      optimism: { name:'Optimism', chainId:10, symbol:'ETH', rpc:'https://mainnet.optimism.io', explorer:'https://optimistic.etherscan.io/tx/' },
-      avalanche: { name:'Avalanche', chainId:43114, symbol:'AVAX', rpc:'https://api.avax.network/ext/bc/C/rpc', explorer:'https://snowtrace.io/tx/' }
+      ethereum:{name:'Ethereum',chainId:1,symbol:'ETH',rpc:'https://cloudflare-eth.com',explorer:'https://etherscan.io/tx/'},
+      bsc:{name:'BNB Chain',chainId:56,symbol:'BNB',rpc:'https://bsc-dataseed.binance.org',explorer:'https://bscscan.com/tx/'},
+      polygon:{name:'Polygon',chainId:137,symbol:'MATIC',rpc:'https://polygon-rpc.com',explorer:'https://polygonscan.com/tx/'},
+      base:{name:'Base',chainId:8453,symbol:'ETH',rpc:'https://mainnet.base.org',explorer:'https://basescan.org/tx/'},
+      arbitrum:{name:'Arbitrum',chainId:42161,symbol:'ETH',rpc:'https://arb1.arbitrum.io/rpc',explorer:'https://arbiscan.io/tx/'},
+      optimism:{name:'Optimism',chainId:10,symbol:'ETH',rpc:'https://mainnet.optimism.io',explorer:'https://optimistic.etherscan.io/tx/'},
+      avalanche:{name:'Avalanche',chainId:43114,symbol:'AVAX',rpc:'https://api.avax.network/ext/bc/C/rpc',explorer:'https://snowtrace.io/tx/'}
     };
 
     const ERC20_TOKENS = {
-      ethereum: [
-        { symbol:'USDT', name:'Tether USD', address:'0xdAC17F958D2ee523a2206206994597C13D831ec7', decimals:6, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals:6, gecko:'usd-coin' },
-        { symbol:'DAI', name:'Dai', address:'0x6B175474E89094C44Da98b954EedeAC495271d0F', decimals:18, gecko:'dai' },
-        { symbol:'WETH', name:'Wrapped ETH', address:'0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', decimals:18, gecko:'weth' },
-        { symbol:'LINK', name:'Chainlink', address:'0x514910771AF9Ca656af840dff83E8264EcF986CA', decimals:18, gecko:'chainlink' },
-        { symbol:'UNI', name:'Uniswap', address:'0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', decimals:18, gecko:'uniswap' }
+      ethereum:[
+        {symbol:'USDT',name:'Tether USD',address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',decimals:6,gecko:'usd-coin'},
+        {symbol:'DAI',name:'Dai',address:'0x6B175474E89094C44Da98b954EedeAC495271d0F',decimals:18,gecko:'dai'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0xC02aaA39b223FE8D2e9c53441d0F',decimals:18,gecko:'weth'},
+        {symbol:'LINK',name:'Chainlink',address:'0x514910771AF9Ca656af840dff83E8264EcF986CA',decimals:18,gecko:'chainlink'},
+        {symbol:'UNI',name:'Uniswap',address:'0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',decimals:18,gecko:'uniswap'}
       ],
-      bsc: [
-        { symbol:'USDT', name:'Tether USD', address:'0x55d398326f99059fF775485246999027B3197955', decimals:18, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', decimals:18, gecko:'usd-coin' },
-        { symbol:'WBNB', name:'Wrapped BNB', address:'0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', decimals:18, gecko:'wbnb' },
-        { symbol:'CAKE', name:'PancakeSwap', address:'0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82', decimals:18, gecko:'pancakeswap-token' }
+      bsc:[
+        {symbol:'USDT',name:'Tether USD',address:'0x55d398326f99059fF775485246999027B3197955',decimals:18,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',decimals:18,gecko:'usd-coin'},
+        {symbol:'WBNB',name:'Wrapped BNB',address:'0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',decimals:18,gecko:'wbnb'},
+        {symbol:'CAKE',name:'PancakeSwap',address:'0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',decimals:18,gecko:'pancakeswap-token'}
       ],
-      polygon: [
-        { symbol:'USDT', name:'Tether USD', address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals:6, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', decimals:6, gecko:'usd-coin' },
-        { symbol:'DAI', name:'Dai', address:'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', decimals:18, gecko:'dai' },
-        { symbol:'WMATIC', name:'Wrapped MATIC', address:'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', decimals:18, gecko:'wmatic' }
+      polygon:[
+        {symbol:'USDT',name:'Tether USD',address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',decimals:6,gecko:'usd-coin'},
+        {symbol:'DAI',name:'Dai',address:'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',decimals:18,gecko:'dai'},
+        {symbol:'WMATIC',name:'Wrapped MATIC',address:'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',decimals:18,gecko:'wmatic'}
       ],
-      base: [
-        { symbol:'USDC', name:'USD Coin', address:'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals:6, gecko:'usd-coin' },
-        { symbol:'WETH', name:'Wrapped ETH', address:'0x4200000000000000000000000000000000000006', decimals:18, gecko:'weth' },
-        { symbol:'DAI', name:'Dai', address:'0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', decimals:18, gecko:'dai' }
+      base:[
+        {symbol:'USDC',name:'USD Coin',address:'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'DAI',name:'Dai',address:'0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',decimals:18,gecko:'dai'}
       ],
-      arbitrum: [
-        { symbol:'USDT', name:'Tether USD', address:'0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', decimals:6, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0xaf88d065e77c8cC2239327C5EDb3A432268e5831', decimals:6, gecko:'usd-coin' },
-        { symbol:'WETH', name:'Wrapped ETH', address:'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', decimals:18, gecko:'weth' },
-        { symbol:'ARB', name:'Arbitrum', address:'0x912CE59144191C1204E64559FE8253a0e49E6548', decimals:18, gecko:'arbitrum' }
+      arbitrum:[
+        {symbol:'USDT',name:'Tether USD',address:'0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xaf88d065e77c8cC2239327C5EDb3A432268e5831',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',decimals:18,gecko:'weth'},
+        {symbol:'ARB',name:'Arbitrum',address:'0x912CE59144191C1204E64559FE8253a0e49E6548',decimals:18,gecko:'arbitrum'}
       ],
-      optimism: [
-        { symbol:'USDT', name:'Tether USD', address:'0x94b008aD8eD3f9fE1ef8bE45b16bB2fF12a2bA8a', decimals:6, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85', decimals:6, gecko:'usd-coin' },
-        { symbol:'WETH', name:'Wrapped ETH', address:'0x4200000000000000000000000000000000000006', decimals:18, gecko:'weth' },
-        { symbol:'OP', name:'Optimism', address:'0x4200000000000000000000000000000000000042', decimals:18, gecko:'optimism' }
+      optimism:[
+        {symbol:'USDT',name:'Tether USD',address:'0x94b008aD8eD3f9fE1ef8bE45b16bB2fF12a2bA8a',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'OP',name:'Optimism',address:'0x4200000000000000000000000000000000000042',decimals:18,gecko:'optimism'}
       ],
-      avalanche: [
-        { symbol:'USDT', name:'Tether USD', address:'0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7', decimals:6, gecko:'tether' },
-        { symbol:'USDC', name:'USD Coin', address:'0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', decimals:6, gecko:'usd-coin' },
-        { symbol:'WAVAX', name:'Wrapped AVAX', address:'0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', decimals:18, gecko:'wrapped-avax' }
+      avalanche:[
+        {symbol:'USDT',name:'Tether USD',address:'0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',decimals:6,gecko:'usd-coin'},
+        {symbol:'WAVAX',name:'Wrapped AVAX',address:'0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',decimals:18,gecko:'wrapped-avax'}
       ]
     };
 
     const NATIVE_GECKO = {
-      ethereum: 'ethereum',
-      bsc: 'binancecoin',
-      polygon: 'matic-network',
-      base: 'ethereum',
-      arbitrum: 'ethereum',
-      optimism: 'ethereum',
-      avalanche: 'avalanche-2'
+      ethereum:'ethereum',
+      bsc:'binancecoin',
+      polygon:'matic-network',
+      base:'ethereum',
+      arbitrum:'ethereum',
+      optimism:'ethereum',
+      avalanche:'avalanche-2'
     };
 
     const ERC20_ABI = [
@@ -1299,11 +1164,15 @@
     let activeProvider = null;
     let activeSigner = null;
     let allBalances = [];
+    let combinedAssets = [];
+    let ownedPositions = [];
+    let selectedSend = null;
+    let selectedSwapSell = null;
     let prices = {};
     let toastTimer;
+    let countdownTimer = null;
     let sendFeeRefreshAt = 0;
     let swapFeeRefreshAt = 0;
-    let countdownTimer = null;
 
     function toast(msg) {
       const el = document.getElementById('toast');
@@ -1314,25 +1183,53 @@
     }
 
     function money(value) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(Number(value || 0));
+      return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format(Number(value || 0));
     }
 
     function fmt(value, decimals = 6) {
-      return Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: decimals });
+      return Number(value || 0).toLocaleString(undefined, { maximumFractionDigits:decimals });
     }
 
     function short(addr) {
       if (!addr) return 'No wallet';
-      return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+      return `${addr.slice(0,6)}...${addr.slice(-4)}`;
     }
 
     function icon(symbol) {
       return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0,4)}'" /></div>`;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      renderSelects();
+
+      if (id === 'sendModal' || id === 'swapModal') {
+        scheduleImmediateFeeRefresh();
+        startCountdownLoop();
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function overlayClose(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    function openSettings() {
+      document.getElementById('settingsOverlay').classList.add('active');
+      renderSettings();
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsOverlay').classList.remove('active');
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('blue_theme', theme);
+      toast(`${theme} mode enabled`);
     }
 
     function rpcUrl(key = activeNetworkKey) {
@@ -1352,40 +1249,6 @@
       return getPublicWallet()?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address || null;
     }
 
-    function openModal(id) {
-      document.getElementById(id).classList.add('active');
-      renderSelects();
-      renderReceiveAssets();
-
-      if (id === 'sendModal' || id === 'swapModal') {
-        scheduleImmediateFeeRefresh();
-        startCountdownLoop();
-      }
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-
-    function overlayClose(e, id) {
-      if (e.target.id === id) document.getElementById(id).classList.remove('active');
-    }
-
-    function openSettings() {
-      document.getElementById('settingsOverlay').classList.add('active');
-      renderSettings();
-    }
-
-    function closeSettings() {
-      document.getElementById('settingsOverlay').classList.remove('active');
-    }
-
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('blue_theme', theme);
-      toast(`${theme} mode enabled`);
-    }
-
     function bytesToBase64(bytes) {
       return btoa(String.fromCharCode(...new Uint8Array(bytes)));
     }
@@ -1396,32 +1259,23 @@
 
     async function getOrCreateDeviceKey() {
       let key = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
-
       if (!key) {
         const bytes = crypto.getRandomValues(new Uint8Array(32));
         key = bytesToBase64(bytes);
         localStorage.setItem(`blue_device_key_${CURRENT_EMAIL}`, key);
       }
-
       return key;
     }
 
     async function deriveAesKey(secret, saltBase64) {
       const salt = base64ToBytes(saltBase64);
-      const keyMaterial = await crypto.subtle.importKey(
-        'raw',
-        new TextEncoder().encode(secret),
-        'PBKDF2',
-        false,
-        ['deriveKey']
-      );
-
+      const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveKey']);
       return crypto.subtle.deriveKey(
-        { name: 'PBKDF2', salt, iterations: 250000, hash: 'SHA-256' },
+        { name:'PBKDF2', salt, iterations:250000, hash:'SHA-256' },
         keyMaterial,
-        { name: 'AES-GCM', length: 256 },
+        { name:'AES-GCM', length:256 },
         false,
-        ['encrypt', 'decrypt']
+        ['encrypt','decrypt']
       );
     }
 
@@ -1430,22 +1284,17 @@
       const iv = crypto.getRandomValues(new Uint8Array(12));
       const saltBase64 = bytesToBase64(salt);
       const key = await deriveAesKey(secret, saltBase64);
-
-      const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
-        key,
-        new TextEncoder().encode(JSON.stringify(vaultObject))
-      );
+      const encrypted = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(vaultObject)));
 
       return {
-        version: 1,
-        encryptionMode: 'device-key',
-        kdf: 'PBKDF2-SHA256',
-        cipher: 'AES-GCM',
-        iterations: 250000,
-        salt: saltBase64,
-        iv: bytesToBase64(iv),
-        data: bytesToBase64(encrypted)
+        version:1,
+        encryptionMode:'device-key',
+        kdf:'PBKDF2-SHA256',
+        cipher:'AES-GCM',
+        iterations:250000,
+        salt:saltBase64,
+        iv:bytesToBase64(iv),
+        data:bytesToBase64(encrypted)
       };
     }
 
@@ -1453,59 +1302,49 @@
       const key = await deriveAesKey(secret, encryptedVault.salt);
       const iv = base64ToBytes(encryptedVault.iv);
       const encryptedData = base64ToBytes(encryptedVault.data);
-      const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encryptedData);
+      const decrypted = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, encryptedData);
       return JSON.parse(new TextDecoder().decode(decrypted));
     }
 
     function generateWallet() {
       const wallet = ethers.Wallet.createRandom();
-
       return {
-        type: 'evm',
-        phrase: wallet.mnemonic.phrase,
-        privateKey: wallet.privateKey,
-        address: wallet.address,
-        createdAt: new Date().toISOString()
+        type:'evm',
+        phrase:wallet.mnemonic.phrase,
+        privateKey:wallet.privateKey,
+        address:wallet.address,
+        createdAt:new Date().toISOString()
       };
     }
 
     async function saveVault(encryptedVault, publicWallets) {
       const res = await fetch('/api/wallet/vault', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ encryptedVault, publicWallets })
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify({ encryptedVault, publicWallets })
       });
-
       if (!res.ok) throw new Error('Could not save wallet vault');
       return res.json();
     }
 
     async function createWalletNoPin() {
       try {
-        if (SERVER_WALLET?.encryptedVault || getPublicWallet()) {
-          return await unlockDeviceWallet();
-        }
+        if (SERVER_WALLET?.encryptedVault || getPublicWallet()) return await unlockDeviceWallet();
 
         const real = generateWallet();
-        const vault = {
-          wallets: [real],
-          createdAt: new Date().toISOString(),
-          encryptionMode: 'device-key'
-        };
-
+        const vault = { wallets:[real], createdAt:new Date().toISOString(), encryptionMode:'device-key' };
         const deviceKey = await getOrCreateDeviceKey();
         const secret = `${CURRENT_EMAIL}:${deviceKey}`;
         const encryptedVault = await encryptVault(vault, secret);
 
         const publicWallets = [{
-          type: 'evm',
-          address: real.address,
-          networks: Object.values(NETWORKS).map(n => n.name),
-          createdAt: real.createdAt
+          type:'evm',
+          address:real.address,
+          networks:Object.values(NETWORKS).map(n => n.name),
+          createdAt:real.createdAt
         }];
 
         await saveVault(encryptedVault, publicWallets);
-
         localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
 
         ACTIVE_DECRYPTED_WALLET = vault;
@@ -1513,7 +1352,7 @@
         activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
 
         updateUi();
-        refreshAllBalances();
+        refreshAllBalances(true);
         return vault;
       } catch (err) {
         console.error(err);
@@ -1524,9 +1363,7 @@
 
     async function unlockDeviceWallet() {
       try {
-        if (!SERVER_WALLET?.encryptedVault) {
-          return await createWalletNoPin();
-        }
+        if (!SERVER_WALLET?.encryptedVault) return await createWalletNoPin();
 
         const deviceKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
         if (!deviceKey) {
@@ -1541,7 +1378,6 @@
         activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
 
         updateUi();
-        refreshAllBalances();
         return ACTIVE_DECRYPTED_WALLET;
       } catch (err) {
         console.error(err);
@@ -1559,7 +1395,6 @@
 
     async function fetchPricesForAll() {
       const ids = new Set();
-
       for (const key of Object.keys(NETWORKS)) {
         ids.add(NATIVE_GECKO[key]);
         for (const token of ERC20_TOKENS[key] || []) {
@@ -1568,7 +1403,7 @@
       }
 
       try {
-        const res = await fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`, { cache: 'no-store' });
+        const res = await fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`, { cache:'no-store' });
         if (!res.ok) throw new Error('Price error');
         prices = await res.json();
       } catch {
@@ -1586,189 +1421,225 @@
       return prices[asset.gecko]?.usd_24h_change || 0;
     }
 
-    function renderTotals() {
-      let total = 0;
-      let previous = 0;
+    function normalizeSymbol(asset) {
+      if (asset.symbol === 'WETH') return 'ETH';
+      if (asset.symbol === 'WBNB') return 'BNB';
+      if (asset.symbol === 'WMATIC') return 'MATIC';
+      if (asset.symbol === 'WAVAX') return 'AVAX';
+      return asset.symbol;
+    }
+
+    function combineAssets() {
+      const map = new Map();
 
       for (const asset of allBalances) {
-        const value = Number(asset.balance || 0) * priceFor(asset);
-        const ch = Number(changeFor(asset) || 0);
-        total += value;
+        const symbol = normalizeSymbol(asset);
+        const key = symbol;
+        const usd = Number(asset.balance || 0) * priceFor(asset);
+        const amount = Number(asset.balance || 0);
 
-        if (ch > -99.9) {
-          previous += value / (1 + ch / 100);
-        } else {
-          previous += value;
+        if (!map.has(key)) {
+          map.set(key, {
+            symbol,
+            amount:0,
+            usd:0,
+            weightedPrev:0,
+            positions:[]
+          });
+        }
+
+        const item = map.get(key);
+        item.amount += amount;
+        item.usd += usd;
+
+        const change = changeFor(asset);
+        const previous = change > -99.9 ? usd / (1 + change / 100) : usd;
+        item.weightedPrev += previous;
+
+        if (amount > 0) {
+          item.positions.push({ ...asset, normalizedSymbol:symbol, usd });
         }
       }
 
-      const pnl = total - previous;
-      const roi = previous > 0 ? (pnl / previous) * 100 : 0;
+      combinedAssets = [...map.values()]
+        .filter(x => x.amount > 0 || x.usd > 0)
+        .sort((a, b) => b.usd - a.usd);
+
+      ownedPositions = allBalances
+        .filter(x => Number(x.balance || 0) > 0)
+        .sort((a, b) => (Number(b.balance || 0) * priceFor(b)) - (Number(a.balance || 0) * priceFor(a)));
+    }
+
+    function renderTotals() {
+      let total = 0;
+      let prev = 0;
+
+      for (const asset of combinedAssets) {
+        total += asset.usd;
+        prev += asset.weightedPrev || asset.usd;
+      }
+
+      const pnl = total - prev;
+      const roi = prev > 0 ? (pnl / prev) * 100 : 0;
 
       document.getElementById('totalUsd').textContent = money(total);
 
       const pnlLine = document.getElementById('pnlLine');
       pnlLine.textContent = `24h PnL ${pnl >= 0 ? '+' : ''}${money(pnl)} · ROI ${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%`;
       pnlLine.className = `pnl-line ${pnl > 0 ? 'up' : pnl < 0 ? 'down' : ''}`;
+
+      document.getElementById('tokenCountText').textContent = `${combinedAssets.length} assets`;
     }
 
-    async function refreshAllBalances() {
+    function renderAssetCards() {
+      const el = document.getElementById('assetCards');
+
+      if (!combinedAssets.length) {
+        el.innerHTML = `
+          <div class="asset-card">
+            <div class="name">No funded assets</div>
+            <div class="tiny">Receive crypto to this wallet and refresh.</div>
+          </div>
+        `;
+        return;
+      }
+
+      el.innerHTML = combinedAssets.map(asset => `
+        <div class="asset-card">
+          <div class="asset-top">
+            ${icon(asset.symbol)}
+            <div style="min-width:0;">
+              <div class="name">${asset.symbol}</div>
+              <div class="tiny">${asset.positions.length} network${asset.positions.length === 1 ? '' : 's'}</div>
+            </div>
+          </div>
+
+          <div class="asset-value">${money(asset.usd)}</div>
+          <div class="asset-sub">${fmt(asset.amount, asset.amount < 1 ? 8 : 6)} ${asset.symbol}</div>
+
+          <div class="network-list">
+            ${asset.positions.slice(0, 3).map(p => `
+              <div class="mini-net">
+                <span>${p.networkName}</span>
+                <span>${fmt(p.balance, p.balance < 1 ? 6 : 4)}</span>
+              </div>
+            `).join('')}
+            ${asset.positions.length > 3 ? `<div class="mini-net"><span>More</span><span>+${asset.positions.length - 3}</span></div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function refreshAllBalances(force = false) {
       try {
         const addr = currentAddress();
-
         if (!addr) {
-          renderTokenList([]);
+          renderAssetCards();
           renderTotals();
           return;
         }
 
-        document.getElementById('statusText').textContent = 'Reading all assets...';
-
-        await fetchPricesForAll();
-
-        const output = [];
-
-        for (const [networkKey, net] of Object.entries(NETWORKS)) {
-          try {
-            const p = provider(networkKey);
-            const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
-
-            output.push({
-              networkKey,
-              networkName: net.name,
-              type: 'native',
-              symbol: net.symbol,
-              name: `${net.name} Native`,
-              balance: nativeBalance,
-              decimals: 18,
-              gecko: NATIVE_GECKO[networkKey],
-              address: null
-            });
-
-            for (const token of ERC20_TOKENS[networkKey] || []) {
-              try {
-                const contract = new ethers.Contract(token.address, ERC20_ABI, p);
-                const raw = await contract.balanceOf(addr);
-
-                output.push({
-                  ...token,
-                  networkKey,
-                  networkName: net.name,
-                  type: 'erc20',
-                  balance: Number(ethers.formatUnits(raw, token.decimals))
-                });
-              } catch {
-                output.push({
-                  ...token,
-                  networkKey,
-                  networkName: net.name,
-                  type: 'erc20',
-                  balance: 0,
-                  error: true
-                });
-              }
-            }
-          } catch {
-            output.push({
-              networkKey,
-              networkName: net.name,
-              type: 'native',
-              symbol: net.symbol,
-              name: `${net.name} Native`,
-              balance: 0,
-              decimals: 18,
-              gecko: NATIVE_GECKO[networkKey],
-              address: null,
-              error: true
-            });
+        if (!force) {
+          const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            allBalances = parsed.balances || [];
+            prices = parsed.prices || {};
+            combineAssets();
+            renderTotals();
+            renderAssetCards();
+            renderSelects();
           }
         }
 
-        allBalances = output;
-        renderTokenList(output);
-        renderTotals();
-        await updateGas();
+        document.getElementById('statusText').textContent = 'Updating assets...';
 
-        document.getElementById('statusText').textContent = 'All balances updated';
+        await fetchPricesForAll();
+
+        const networkTasks = Object.entries(NETWORKS).map(async ([networkKey, net]) => {
+          const out = [];
+          const p = provider(networkKey);
+
+          try {
+            const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:nativeBalance,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null
+            });
+          } catch {
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:0,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null,
+              error:true
+            });
+          }
+
+          const tokenTasks = (ERC20_TOKENS[networkKey] || []).map(async token => {
+            try {
+              const contract = new ethers.Contract(token.address, ERC20_ABI, p);
+              const raw = await contract.balanceOf(addr);
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:Number(ethers.formatUnits(raw, token.decimals))
+              };
+            } catch {
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:0,
+                error:true
+              };
+            }
+          });
+
+          out.push(...await Promise.all(tokenTasks));
+          return out;
+        });
+
+        const results = await Promise.allSettled(networkTasks);
+        allBalances = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+        localStorage.setItem(`blue_balance_cache_${CURRENT_EMAIL}`, JSON.stringify({
+          updatedAt:Date.now(),
+          balances:allBalances,
+          prices
+        }));
+
+        combineAssets();
+        renderTotals();
+        renderAssetCards();
+        renderSelects();
+
+        document.getElementById('statusText').textContent = 'Assets updated';
       } catch (err) {
         console.error(err);
-        toast('Could not read balances');
-        document.getElementById('statusText').textContent = 'RPC error';
+        toast('Could not update assets');
       }
-    }
-
-    function renderTokenList(list) {
-      const el = document.getElementById('tokenList');
-
-      if (!list.length) {
-        el.innerHTML = `
-          <div class="row">
-            <div>
-              <div class="name">Creating wallet...</div>
-              <div class="tiny">Your wallet is being created for this email.</div>
-            </div>
-          </div>
-        `;
-        document.getElementById('tokenCountText').textContent = '0 assets';
-        return;
-      }
-
-      const sorted = [...list].sort((a, b) => {
-        const av = Number(a.balance || 0) * priceFor(a);
-        const bv = Number(b.balance || 0) * priceFor(b);
-        return bv - av;
-      });
-
-      el.innerHTML = sorted.map(asset => {
-        const usd = Number(asset.balance || 0) * priceFor(asset);
-        const change = changeFor(asset);
-
-        return `
-          <div class="row">
-            <div class="asset">
-              ${icon(asset.symbol)}
-              <div>
-                <div class="name">${asset.symbol}</div>
-                <div class="tiny">${asset.networkName} · ${asset.name}${asset.error ? ' · read error' : ''}</div>
-              </div>
-            </div>
-            <div>
-              <div class="value">${money(usd)}</div>
-              <div class="value-sub">${fmt(asset.balance, asset.balance < 1 ? 8 : 6)} ${asset.symbol} · ${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}%</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      const nonZero = list.filter(x => Number(x.balance) > 0).length;
-      document.getElementById('tokenCountText').textContent = `${nonZero}/${list.length} assets`;
-    }
-
-    function setSendNetwork(key) {
-      activeNetworkKey = key;
-      localStorage.setItem('blue_active_network', key);
-      activeProvider = provider(key);
-
-      if (ACTIVE_DECRYPTED_WALLET) {
-        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
-      }
-
-      updateUi();
-      renderSelects();
-      renderSendBalance();
-      scheduleImmediateFeeRefresh();
-    }
-
-    function setSwapNetwork(key) {
-      setSendNetwork(key);
-      renderSwapBalances();
     }
 
     function receiveOptionsFor(networkKey) {
       const net = NETWORKS[networkKey];
-
       return [
-        { type: 'native', symbol: net.symbol, name: `${net.symbol} Native`, address: NATIVE_TOKEN, decimals: 18 },
+        { type:'native', symbol:net.symbol, name:`${net.symbol} Native`, address:NATIVE_TOKEN, decimals:18 },
         ...(ERC20_TOKENS[networkKey] || [])
       ];
     }
@@ -1794,7 +1665,7 @@
       const addr = currentAddress();
 
       box.innerHTML = receiveOptionsFor(networkKey).map(asset => `
-        <button class="receive-option" onclick="copySpecificReceive('${networkKey}', '${asset.symbol}')">
+        <button class="receive-option" onclick="copySpecificReceive('${networkKey}','${asset.symbol}')">
           <div>
             <div class="name">${asset.symbol}</div>
             <div class="tiny">${asset.name} on ${net.name} · ${addr ? short(addr) : 'No address'}</div>
@@ -1806,129 +1677,152 @@
 
     function copySpecificReceive(networkKey, symbol) {
       const addr = currentAddress();
-
-      if (!addr) {
-        toast('No address available');
-        return;
-      }
+      if (!addr) return toast('No address available');
 
       navigator.clipboard?.writeText(addr);
       activeNetworkKey = networkKey;
       localStorage.setItem('blue_active_network', networkKey);
-      updateUi();
+      updateSignerNetwork(networkKey);
       toast(`${symbol} ${NETWORKS[networkKey].name} address copied`);
     }
 
-    function renderAssetSelects() {
-      const networkOptions = Object.entries(NETWORKS)
-        .map(([key, net]) => `<option value="${key}">${net.name}</option>`)
-        .join('');
+    function updateSignerNetwork(networkKey) {
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network', networkKey);
+      activeProvider = provider(networkKey);
+      if (ACTIVE_DECRYPTED_WALLET) {
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
+      }
+    }
 
-      const sendNet = document.getElementById('sendNetworkSelect');
-      if (sendNet) {
-        sendNet.innerHTML = networkOptions;
-        sendNet.value = activeNetworkKey;
+    function renderOwnedCards(targetId, selected, setterName) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+
+      if (!ownedPositions.length) {
+        box.innerHTML = `
+          <div class="asset-card">
+            <div class="name">No assets</div>
+            <div class="tiny">Receive crypto first.</div>
+          </div>
+        `;
+        return;
       }
 
-      const swapNet = document.getElementById('swapNetworkSelect');
-      if (swapNet) {
-        swapNet.innerHTML = networkOptions;
-        swapNet.value = activeNetworkKey;
-      }
+      box.innerHTML = ownedPositions.map((p, index) => {
+        const id = `${p.networkKey}:${p.address || 'native'}:${p.symbol}`;
+        const selectedId = selected ? `${selected.networkKey}:${selected.address || 'native'}:${selected.symbol}` : '';
+        return `
+          <button class="asset-card ${id === selectedId ? 'selected' : ''}" onclick="${setterName}(${index})">
+            <div class="asset-top">
+              ${icon(p.symbol)}
+              <div style="min-width:0;text-align:left;">
+                <div class="name">${p.symbol}</div>
+                <div class="tiny">${p.networkName}</div>
+              </div>
+            </div>
+            <div class="asset-value">${money(Number(p.balance || 0) * priceFor(p))}</div>
+            <div class="asset-sub">${fmt(p.balance, p.balance < 1 ? 8 : 6)} ${p.symbol}</div>
+          </button>
+        `;
+      }).join('');
+    }
 
-      const net = NETWORKS[activeNetworkKey];
-
-      const sendOptions = [
-        `<option value="native">${net.symbol} · Native</option>`,
-        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
-      ].join('');
-
-      const send = document.getElementById('sendAssetSelect');
-      if (send) send.innerHTML = sendOptions;
-
-      const sell = document.getElementById('swapSellSelect');
-      if (sell) sell.innerHTML = [
-        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
-        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
-      ].join('');
-
-      const buy = document.getElementById('swapBuySelect');
-      if (buy) buy.innerHTML = [
-        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`),
-        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`
-      ].join('');
-
+    function setSelectedSend(index) {
+      selectedSend = ownedPositions[index] || null;
+      if (selectedSend) updateSignerNetwork(selectedSend.networkKey);
+      renderSelects();
       renderSendBalance();
-      renderSwapBalances();
+      scheduleImmediateFeeRefresh();
     }
 
-    function renderSelects() {
-      renderReceiveSelects();
-      renderAssetSelects();
-    }
-
-    function tokenByAddress(address) {
-      return (ERC20_TOKENS[activeNetworkKey] || []).find(t => t.address.toLowerCase() === String(address).toLowerCase());
-    }
-
-    function selectedBalance(networkKey, assetValue) {
-      if (assetValue === 'native' || assetValue === NATIVE_TOKEN) {
-        return allBalances.find(x => x.networkKey === networkKey && x.type === 'native');
-      }
-
-      return allBalances.find(x => x.networkKey === networkKey && x.address && x.address.toLowerCase() === String(assetValue).toLowerCase());
+    function setSelectedSwapSell(index) {
+      selectedSwapSell = ownedPositions[index] || null;
+      if (selectedSwapSell) updateSignerNetwork(selectedSwapSell.networkKey);
+      renderSelects();
+      renderSwapBalance();
+      scheduleImmediateFeeRefresh();
     }
 
     function renderSendBalance() {
-      const asset = document.getElementById('sendAssetSelect')?.value;
-      const item = selectedBalance(activeNetworkKey, asset);
       const el = document.getElementById('sendBalanceText');
-
       if (!el) return;
 
-      if (!item) {
-        el.textContent = 'Balance unavailable. Refresh assets.';
+      if (!selectedSend) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
         return;
       }
 
-      el.textContent = `${fmt(item.balance, item.balance < 1 ? 8 : 6)} ${item.symbol} · ${money(Number(item.balance || 0) * priceFor(item))}`;
+      el.textContent = `${fmt(selectedSend.balance, selectedSend.balance < 1 ? 8 : 6)} ${selectedSend.symbol} on ${selectedSend.networkName} · ${money(Number(selectedSend.balance || 0) * priceFor(selectedSend))}`;
     }
 
-    function renderSwapBalances() {
-      const asset = document.getElementById('swapSellSelect')?.value;
-      const item = selectedBalance(activeNetworkKey, asset);
+    function renderSwapBalance() {
       const el = document.getElementById('swapSellBalanceText');
-
       if (!el) return;
 
-      if (!item) {
-        el.textContent = 'Balance unavailable. Refresh assets.';
+      if (!selectedSwapSell) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
         return;
       }
 
-      el.textContent = `${fmt(item.balance, item.balance < 1 ? 8 : 6)} ${item.symbol} · ${money(Number(item.balance || 0) * priceFor(item))}`;
+      el.textContent = `${fmt(selectedSwapSell.balance, selectedSwapSell.balance < 1 ? 8 : 6)} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName} · ${money(Number(selectedSwapSell.balance || 0) * priceFor(selectedSwapSell))}`;
     }
 
-    async function updateGas() {
-      try {
-        const fee = await provider(activeNetworkKey).getFeeData();
-        const gasPrice = fee.gasPrice ? Number(ethers.formatUnits(fee.gasPrice, 'gwei')) : 0;
-        return `${gasPrice.toFixed(3)} gwei on ${NETWORKS[activeNetworkKey].name}`;
-      } catch {
-        return 'Gas unavailable. Check RPC.';
+    function renderSwapBuyOptions() {
+      const select = document.getElementById('swapBuySelect');
+      if (!select) return;
+
+      const net = NETWORKS[activeNetworkKey];
+
+      select.innerHTML = [
+        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
+        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
+      ].join('');
+    }
+
+    function renderSelects() {
+      if (!selectedSend && ownedPositions.length) selectedSend = ownedPositions[0];
+      if (!selectedSwapSell && ownedPositions.length) selectedSwapSell = ownedPositions[0];
+
+      renderReceiveSelects();
+      renderOwnedCards('sendOwnedAssets', selectedSend, 'setSelectedSend');
+      renderOwnedCards('swapOwnedAssets', selectedSwapSell, 'setSelectedSwapSell');
+
+      if (selectedSend) updateSignerNetwork(selectedSend.networkKey);
+      if (selectedSwapSell && document.getElementById('swapModal')?.classList.contains('active')) {
+        updateSignerNetwork(selectedSwapSell.networkKey);
       }
+
+      renderSwapBuyOptions();
+      renderSendBalance();
+      renderSwapBalance();
+    }
+
+    function tokenByAddress(networkKey, address) {
+      return (ERC20_TOKENS[networkKey] || []).find(t => t.address.toLowerCase() === String(address).toLowerCase());
+    }
+
+    function selectedToSwapToken(position) {
+      if (!position) return null;
+      if (position.type === 'native') return NATIVE_TOKEN;
+      return position.address;
     }
 
     async function estimateSendFee() {
       try {
-        if (!document.getElementById('sendModal').classList.contains('active')) return;
+        if (!document.getElementById('sendModal')?.classList.contains('active')) return;
+        if (!selectedSend) {
+          document.getElementById('sendFeePreview').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSend.networkKey);
 
         if (!activeSigner) {
           document.getElementById('sendFeePreview').textContent = 'Wallet is still loading.';
           return;
         }
 
-        const asset = document.getElementById('sendAssetSelect').value;
         const to = document.getElementById('sendToInput').value.trim();
         const amount = document.getElementById('sendAmountInput').value.trim();
 
@@ -1939,12 +1833,11 @@
 
         let gas;
 
-        if (asset === 'native') {
-          gas = await activeSigner.estimateGas({ to, value: ethers.parseEther(amount) });
+        if (selectedSend.type === 'native') {
+          gas = await activeSigner.estimateGas({ to, value:ethers.parseEther(amount) });
         } else {
-          const token = tokenByAddress(asset);
-          const contract = new ethers.Contract(asset, ERC20_ABI, activeSigner);
-          gas = await contract.transfer.estimateGas(to, ethers.parseUnits(amount, token.decimals));
+          const contract = new ethers.Contract(selectedSend.address, ERC20_ABI, activeSigner);
+          gas = await contract.transfer.estimateGas(to, ethers.parseUnits(amount, selectedSend.decimals));
         }
 
         const feeData = await activeSigner.provider.getFeeData();
@@ -1952,27 +1845,31 @@
         const totalFee = gas * gasPrice;
 
         document.getElementById('sendFeePreview').textContent =
-          `Gas ${gas.toString()} · fee ≈ ${ethers.formatEther(totalFee)} ${NETWORKS[activeNetworkKey].symbol}`;
+          `Network: ${selectedSend.networkName} · Gas ${gas.toString()} · fee ≈ ${ethers.formatEther(totalFee)} ${NETWORKS[selectedSend.networkKey].symbol}`;
       } catch (err) {
         document.getElementById('sendFeePreview').textContent = err.shortMessage || err.message || 'Fee estimate failed';
       }
     }
 
     function openSendConfirm() {
-      const asset = document.getElementById('sendAssetSelect').selectedOptions[0]?.textContent || '';
+      if (!selectedSend) return toast('No asset selected');
+
       const to = document.getElementById('sendToInput').value.trim();
       const amount = document.getElementById('sendAmountInput').value.trim();
 
       document.getElementById('sendConfirmText').textContent =
-        `Send ${amount || '0'} ${asset} to ${to || 'no address'} on ${NETWORKS[activeNetworkKey].name}.`;
+        `Send ${amount || '0'} ${selectedSend.symbol} on ${selectedSend.networkName} to ${to || 'no address'}.`;
 
       openModal('sendConfirmModal');
     }
 
     async function sendRealTransaction() {
       try {
+        if (!selectedSend) throw new Error('No asset selected');
+
+        updateSignerNetwork(selectedSend.networkKey);
+
         const signer = await ensureUnlocked();
-        const asset = document.getElementById('sendAssetSelect').value;
         const to = document.getElementById('sendToInput').value.trim();
         const amount = document.getElementById('sendAmountInput').value.trim();
 
@@ -1981,12 +1878,11 @@
 
         let tx;
 
-        if (asset === 'native') {
-          tx = await signer.sendTransaction({ to, value: ethers.parseEther(amount) });
+        if (selectedSend.type === 'native') {
+          tx = await signer.sendTransaction({ to, value:ethers.parseEther(amount) });
         } else {
-          const token = tokenByAddress(asset);
-          const contract = new ethers.Contract(asset, ERC20_ABI, signer);
-          tx = await contract.transfer(to, ethers.parseUnits(amount, token.decimals));
+          const contract = new ethers.Contract(selectedSend.address, ERC20_ABI, signer);
+          tx = await contract.transfer(to, ethers.parseUnits(amount, selectedSend.decimals));
         }
 
         closeModal('sendConfirmModal');
@@ -1996,33 +1892,25 @@
         await tx.wait();
 
         toast('Transaction confirmed');
-        refreshAllBalances();
+        refreshAllBalances(true);
       } catch (err) {
         console.error(err);
         toast(err.shortMessage || err.message || 'Send failed');
       }
     }
 
-    function sellTokenMeta() {
-      const value = document.getElementById('swapSellSelect').value;
-
-      if (value === NATIVE_TOKEN) {
-        return { symbol: NETWORKS[activeNetworkKey].symbol, decimals: 18, address: NATIVE_TOKEN };
-      }
-
-      return tokenByAddress(value);
-    }
-
     async function estimateSwapFee() {
       try {
-        if (!document.getElementById('swapModal').classList.contains('active')) return;
+        if (!document.getElementById('swapModal')?.classList.contains('active')) return;
+
+        if (!selectedSwapSell) {
+          document.getElementById('swapQuoteText').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
 
         const amount = document.getElementById('swapAmount').value.trim();
-        const sell = sellTokenMeta();
-        const buyRaw = document.getElementById('swapBuySelect').value;
-        const buy = buyRaw === NATIVE_TOKEN
-          ? { symbol: NETWORKS[activeNetworkKey].symbol }
-          : tokenByAddress(buyRaw);
 
         if (!amount || Number(amount) <= 0) {
           document.getElementById('swapQuoteText').textContent = 'Enter amount to estimate route.';
@@ -2030,33 +1918,34 @@
         }
 
         document.getElementById('swapQuoteText').textContent =
-          `Route preview: ${amount} ${sell?.symbol || 'SELL'} → ${buy?.symbol || 'BUY'} on ${NETWORKS[activeNetworkKey].name}. Getting exact quote...`;
+          `Route: ${amount} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Getting quote...`;
 
         await getSwapQuote(false);
-      } catch {
-        // getSwapQuote writes its own message
-      }
+      } catch {}
     }
 
     async function getSwapQuote(showToast = true) {
       try {
+        if (!selectedSwapSell) throw new Error('No sell asset selected');
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
+
         const signer = await ensureUnlocked();
-        const sellToken = document.getElementById('swapSellSelect').value;
+        const sellToken = selectedToSwapToken(selectedSwapSell);
         const buyToken = document.getElementById('swapBuySelect').value;
         const amount = document.getElementById('swapAmount').value.trim();
-        const sell = sellTokenMeta();
 
         if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
 
-        const sellAmount = ethers.parseUnits(amount, sell.decimals).toString();
+        const sellAmount = ethers.parseUnits(amount, selectedSwapSell.decimals).toString();
 
         const res = await fetch('/api/swap/quote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chainId: NETWORKS[activeNetworkKey].chainId,
-            network: activeNetworkKey,
-            taker: await signer.getAddress(),
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body:JSON.stringify({
+            chainId:NETWORKS[selectedSwapSell.networkKey].chainId,
+            network:selectedSwapSell.networkKey,
+            taker:await signer.getAddress(),
             sellToken,
             buyToken,
             sellAmount
@@ -2069,7 +1958,7 @@
         window.__BLUE_SWAP_QUOTE = quote;
 
         document.getElementById('swapQuoteText').textContent =
-          `Quote ready. Gas: ${quote.gas || 'N/A'} · value: ${quote.value || '0'} · refreshes every 5s.`;
+          `Quote ready on ${selectedSwapSell.networkName}. Gas: ${quote.gas || 'N/A'} · value: ${quote.value || '0'} · refreshes every 5s.`;
 
         if (showToast) toast('Quote loaded');
       } catch (err) {
@@ -2082,13 +1971,11 @@
     function openSwapConfirm() {
       const quote = window.__BLUE_SWAP_QUOTE;
 
-      if (!quote) {
-        toast('Get a quote first');
-        return;
-      }
+      if (!quote) return toast('Get a quote first');
+      if (!selectedSwapSell) return toast('No asset selected');
 
       document.getElementById('swapConfirmText').textContent =
-        `Execute swap on ${NETWORKS[activeNetworkKey].name}. Gas: ${quote.gas || 'N/A'}.`;
+        `Swap ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Gas: ${quote.gas || 'N/A'}.`;
 
       openModal('swapConfirmModal');
     }
@@ -2101,10 +1988,10 @@
         const signer = await ensureUnlocked();
 
         const tx = await signer.sendTransaction({
-          to: quote.to,
-          data: quote.data,
-          value: quote.value ? BigInt(quote.value) : 0n,
-          gasLimit: quote.gas ? BigInt(quote.gas) : undefined
+          to:quote.to,
+          data:quote.data,
+          value:quote.value ? BigInt(quote.value) : 0n,
+          gasLimit:quote.gas ? BigInt(quote.gas) : undefined
         });
 
         closeModal('swapConfirmModal');
@@ -2114,7 +2001,7 @@
         await tx.wait();
 
         toast('Swap confirmed');
-        refreshAllBalances();
+        refreshAllBalances(true);
       } catch (err) {
         console.error(err);
         toast(err.shortMessage || err.message || 'Swap failed');
@@ -2135,15 +2022,13 @@
 
       const sendRing = document.getElementById('sendCountdown');
       if (sendRing) {
-        const pct = sendRemaining / 5;
-        sendRing.style.setProperty('--progress', pct);
+        sendRing.style.setProperty('--progress', sendRemaining / 5);
         sendRing.querySelector('span').textContent = String(sendRemaining || 0);
       }
 
       const swapRing = document.getElementById('swapCountdown');
       if (swapRing) {
-        const pct = swapRemaining / 5;
-        swapRing.style.setProperty('--progress', pct);
+        swapRing.style.setProperty('--progress', swapRemaining / 5);
         swapRing.querySelector('span').textContent = String(swapRemaining || 0);
       }
     }
@@ -2194,21 +2079,21 @@
     async function deleteWallet() {
       const value = document.getElementById('deleteConfirmInput').value.trim();
 
-      if (value !== 'DELETE') {
-        toast('Type DELETE to confirm');
-        return;
-      }
+      if (value !== 'DELETE') return toast('Type DELETE to confirm');
 
       try {
-        const res = await fetch('/api/wallet/vault', { method: 'DELETE' });
+        const res = await fetch('/api/wallet/vault', { method:'DELETE' });
         if (!res.ok) throw new Error('Delete failed');
 
         localStorage.removeItem('bluecrypto_public_wallets');
         localStorage.removeItem(`blue_device_key_${CURRENT_EMAIL}`);
+        localStorage.removeItem(`blue_balance_cache_${CURRENT_EMAIL}`);
 
         ACTIVE_DECRYPTED_WALLET = null;
         activeSigner = null;
         allBalances = [];
+        combinedAssets = [];
+        ownedPositions = [];
 
         toast('Wallet deleted');
         setTimeout(() => window.location.reload(), 800);
@@ -2221,20 +2106,13 @@
     function saveCustomRpc() {
       const url = document.getElementById('customRpcInput').value.trim();
 
-      if (!url.startsWith('http')) {
-        toast('Enter a valid RPC URL');
-        return;
-      }
+      if (!url.startsWith('http')) return toast('Enter a valid RPC URL');
 
       localStorage.setItem(`blue_rpc_${activeNetworkKey}`, url);
-      activeProvider = provider(activeNetworkKey);
-
-      if (ACTIVE_DECRYPTED_WALLET) {
-        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
-      }
+      updateSignerNetwork(activeNetworkKey);
 
       toast('RPC saved');
-      refreshAllBalances();
+      refreshAllBalances(true);
     }
 
     function renderSettings() {
@@ -2244,12 +2122,8 @@
 
     function updateUi() {
       const addr = currentAddress();
-
       document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
-      document.getElementById('activeNetworkText').textContent = 'All networks';
       document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
-
-      renderSelects();
       renderSettings();
     }
 
@@ -2261,7 +2135,6 @@
       }
 
       activeProvider = provider(activeNetworkKey);
-
       updateUi();
 
       if (SERVER_WALLET?.encryptedVault) {
@@ -2270,6 +2143,18 @@
         await createWalletNoPin();
       }
 
+      const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        allBalances = parsed.balances || [];
+        prices = parsed.prices || {};
+        combineAssets();
+        renderTotals();
+        renderAssetCards();
+        renderSelects();
+      }
+
+      refreshAllBalances(false);
       startCountdownLoop();
     }
 
