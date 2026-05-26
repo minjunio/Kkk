@@ -76,11 +76,11 @@ function createWalletRecord(email, role = 'user') {
     email, role, 
     createdAt: nowIso(), 
     updatedAt: nowIso(), 
-    encryptedVault: null, // Standard Crypto Wallet Seed
+    encryptedVault: null, 
     publicWallets: [], 
     assets: [],
     tensorAddress: `T0x${hash.slice(0, 40)}`,
-    tensorVault: null, // Dedicated Tensor Network Seed
+    tensorVault: null, 
     tensorBalances: {}
   };
 }
@@ -150,13 +150,15 @@ function initializeCandlesForToken(tokenId, startPrice) {
   if (tensorCandleHistory[tokenId]) return;
   tensorCandleHistory[tokenId] = [];
   let currentBase = startPrice;
-  let timeCursor = Date.now() - (80 * 60 * 1000); 
+  
+  // Generate 24 hours of history (1,440 minutes) to allow 1hr and 1day charts to function
+  let timeCursor = Date.now() - (1440 * 60 * 1000); 
 
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 1440; i++) {
     const open = currentBase;
-    const close = currentBase * (1 + (Math.random() - 0.5) * 0.02);
-    const high = Math.max(open, close) * (1 + Math.random() * 0.01);
-    const low = Math.min(open, close) * (1 - Math.random() * 0.01);
+    const close = currentBase * (1 + (Math.random() - 0.5) * 0.005);
+    const high = Math.max(open, close) * (1 + Math.random() * 0.002);
+    const low = Math.min(open, close) * (1 - Math.random() * 0.002);
     
     tensorCandleHistory[tokenId].push({ time: timeCursor, open, high, low, close });
     currentBase = close;
@@ -182,7 +184,7 @@ setInterval(() => {
     db.tensorRegistry.forEach(t => {
       t.dominance = totalMarketCap > 0 ? (t.marketCap / totalMarketCap) * 100 : 0;
       if (t.dominance > 30 && t.bias !== 'pegged') {
-        const momentum = (Math.random() - 0.5) * (t.bias === 'random' ? 0.04 : 0.01);
+        const momentum = (Math.random() - 0.5) * 0.02;
         alphaDrift += momentum * (t.dominance / 100);
       }
     });
@@ -194,15 +196,15 @@ setInterval(() => {
         t.price = t.startPrice; 
       } else {
         const r = Math.random();
-        let direction = 1; // 1 = up, -1 = down
         
-        if (t.bias === 'bull') direction = r < 0.65 ? 1 : -1;
-        else if (t.bias === 'bear') direction = r < 0.65 ? -1 : 1;
-        else direction = r < 0.5 ? 1 : -1; // random
-
-        // Enforce the custom percentage interval (e.g., 3% to 6%)
-        const minPct = t.minPct || 0.01;
-        const maxPct = t.maxPct || 0.05;
+        // Translate the Bull % (e.g., 60) into a drop threshold
+        // If bullChance is 60%, then chanceToDrop is 40% (0.4)
+        const chanceToDrop = (100 - (t.bullChance !== undefined ? t.bullChance : 50)) / 100;
+        
+        // Execute the probability interval bounds
+        const direction = r < chanceToDrop ? -1 : 1;
+        const minPct = t.minPct !== undefined ? t.minPct : 0.01;
+        const maxPct = t.maxPct !== undefined ? t.maxPct : 0.05;
         const magnitude = minPct + (Math.random() * (maxPct - minPct));
         
         const nativeChange = direction * magnitude;
@@ -229,7 +231,8 @@ setInterval(() => {
         if (t.price < lastCandle.low) lastCandle.low = t.price;
       } else {
         history.push({ time: now, open: oldPrice, high: Math.max(oldPrice, t.price), low: Math.min(oldPrice, t.price), close: t.price });
-        if (history.length > 150) history.shift();
+        // Retain enough data for a 24h cycle
+        if (history.length > 2000) history.shift();
       }
     });
 
@@ -292,7 +295,6 @@ app.post('/logout', (req, res) => res.redirect('/logout'));
 
 app.get('/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  // Do not expose raw unencrypted server data to the frontend template, only basic configs
   res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
@@ -311,15 +313,6 @@ app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
   res.status(400).json({ error: 'No vault data provided.' });
 });
 
-app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
-  const db = readDb();
-  db.users[req.session.user.email].encryptedVault = null;
-  db.users[req.session.user.email].publicWallets = [];
-  db.users[req.session.user.email].updatedAt = nowIso();
-  writeDb(db);
-  res.json({ ok: true });
-});
-
 /* --- Tensor Network APIs --- */
 app.get('/api/tensor', requireAuthJson, (req, res) => {
   const db = readDb();
@@ -327,7 +320,6 @@ app.get('/api/tensor', requireAuthJson, (req, res) => {
   res.json({ registry: db.tensorRegistry || [], address: user.tensorAddress, balances: user.tensorBalances || {} });
 });
 
-// Tensor Network Seed Phrase Vault
 app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
   const db = readDb();
   if (req.body.tensorVault) {
@@ -339,9 +331,8 @@ app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
   res.status(400).json({ error: 'No Tensor vault data provided.' });
 });
 
-// Admin: Deploy a new token
 app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
-  const { name, symbol, price, bias, minPct, maxPct, icon, supply } = req.body;
+  const { name, symbol, price, bias, bullChance, minPct, maxPct, icon, supply } = req.body;
   if (!name || !symbol || !price || !bias || !icon || !supply) return res.status(400).json({ error: 'Missing parameters' });
 
   const db = readDb();
@@ -350,8 +341,9 @@ app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
   db.tensorRegistry.push({
     id, name, symbol: symbol.toUpperCase(),
     price: Number(price), startPrice: Number(price),
-    bias, // 'bull', 'bear', 'random', 'pegged'
-    minPct: Number(minPct) / 100, // Convert whole number % to decimal
+    bias, 
+    bullChance: Number(bullChance) || 50,
+    minPct: Number(minPct) / 100, 
     maxPct: Number(maxPct) / 100,
     icon, supply: Number(supply), marketCap: Number(price) * Number(supply),
     volume: 0, dominance: 0
@@ -362,15 +354,15 @@ app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
   res.json({ ok: true, id });
 });
 
-// Admin: Update existing token configuration
 app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
-  const { bias, minPct, maxPct, supply } = req.body;
+  const { bias, bullChance, minPct, maxPct, supply } = req.body;
   const db = readDb();
   
   const token = db.tensorRegistry.find(t => t.id === req.params.id);
   if (!token) return res.status(404).json({ error: 'Token not found.' });
 
   if (bias) token.bias = bias;
+  if (bullChance !== undefined) token.bullChance = Number(bullChance);
   if (minPct !== undefined) token.minPct = Number(minPct) / 100;
   if (maxPct !== undefined) token.maxPct = Number(maxPct) / 100;
   if (supply) {
@@ -382,7 +374,6 @@ app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
   res.json({ ok: true, token });
 });
 
-// Admin: Delete a Tensor Token
 app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
   const db = readDb();
   const index = db.tensorRegistry.findIndex(t => t.id === req.params.id);
@@ -390,13 +381,27 @@ app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
   if (index === -1) return res.status(404).json({ error: 'Token not found.' });
   
   db.tensorRegistry.splice(index, 1);
-  delete tensorCandleHistory[req.params.id]; // Free up memory
+  delete tensorCandleHistory[req.params.id];
   
   writeDb(db);
   res.json({ ok: true });
 });
 
-// User: Tensor Network AMM Swap Execution
+// Admin Minting directly into server database
+app.post('/api/tensor/admin-mint', requireAdminJson, (req, res) => {
+  const { tokenId, amount } = req.body;
+  const mintAmt = Number(amount);
+  if (!tokenId || !mintAmt || mintAmt <= 0) return res.status(400).json({ error: 'Invalid parameters.' });
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  
+  user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + mintAmt;
+  
+  writeDb(db);
+  res.json({ ok: true, newBalance: user.tensorBalances[tokenId] });
+});
+
 app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   const { tokenId, usdtAmount } = req.body;
   const spend = Number(usdtAmount);
@@ -406,7 +411,6 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   const token = db.tensorRegistry.find(t => t.id === tokenId);
   if (!token) return res.status(404).json({ error: 'Token missing' });
 
-  // Deduct 0.0001% Swap Fee from input
   const feeRate = 0.000001;
   const feeAmount = spend * feeRate;
   const netSpend = spend - feeAmount;
@@ -414,11 +418,10 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
   db.treasury.collectedFeesUsdt += feeAmount;
 
-  // Compute Slippage / Impact (Ignore if Pegged Stablecoin)
   let priceImpact = 0;
   if (token.bias !== 'pegged') {
     const impactMultiplier = netSpend / (token.marketCap + 100);
-    priceImpact = Math.min(0.5, impactMultiplier * (token.bias === 'random' ? 2.5 : 0.8));
+    priceImpact = Math.min(0.5, impactMultiplier * 0.8);
   }
   
   const originalPrice = token.price;
@@ -446,7 +449,6 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   res.json({ ok: true, received: mintAmount, impactPercent: (priceImpact * 100).toFixed(2), feePaid: feeAmount });
 });
 
-// User: Tensor P2P Transfer
 app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   const { tokenId, amount, toAddress } = req.body;
   const sendAmt = Number(amount);
@@ -467,7 +469,6 @@ app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-// Global: Tensor Chart Data Source
 app.get('/api/tensor/chart', (req, res) => {
   const { tokenId } = req.query;
   if (!tokenId || !tensorCandleHistory[tokenId]) return res.json({ candles: [] });
