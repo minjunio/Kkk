@@ -19,7 +19,10 @@ const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
 const ZEROX_API_KEY = process.env.ZEROX_API_KEY || '';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
-const BINANCE_BASE = 'https://api.binance.com';
+const BINANCE_ENDPOINTS = [
+  'https://api.binance.com',
+  'https://data-api.binance.vision'
+];
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -34,6 +37,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   proxy: true,
   cookie: {
     httpOnly: true,
@@ -59,13 +63,15 @@ function readDb() {
   ensureDb();
 
   try {
-    const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    const raw = fs.readFileSync(DB_PATH, 'utf8');
+    const db = JSON.parse(raw || '{}');
 
-    if (!db.users) db.users = {};
-    if (!db.otps) db.otps = {};
+    if (!db.users || typeof db.users !== 'object') db.users = {};
+    if (!db.otps || typeof db.otps !== 'object') db.otps = {};
 
     return db;
-  } catch {
+  } catch (error) {
+    console.error('DB read error:', error);
     return { users: {}, otps: {} };
   }
 }
@@ -107,6 +113,25 @@ function createWalletRecord(email, role = 'user') {
   };
 }
 
+function normalizeWalletRecord(record, email, role = 'user') {
+  const base = createWalletRecord(email, role);
+
+  return {
+    ...base,
+    ...record,
+    email: normalizeEmail(record?.email || email),
+    role: record?.role || role,
+    encryptedVault: record?.encryptedVault || null,
+    publicWallets: Array.isArray(record?.publicWallets) ? record.publicWallets : [],
+    assets: Array.isArray(record?.assets) ? record.assets : [],
+    staking: {
+      autoStake: Boolean(record?.staking?.autoStake),
+      riskMode: record?.staking?.riskMode || 'balanced',
+      vaults: Array.isArray(record?.staking?.vaults) ? record.staking.vaults : []
+    }
+  };
+}
+
 function getOrCreateUser(email, role = 'user') {
   const normalizedEmail = normalizeEmail(email);
   const db = readDb();
@@ -114,13 +139,17 @@ function getOrCreateUser(email, role = 'user') {
   if (!db.users[normalizedEmail]) {
     db.users[normalizedEmail] = createWalletRecord(normalizedEmail, role);
     writeDb(db);
+    return db.users[normalizedEmail];
   }
+
+  db.users[normalizedEmail] = normalizeWalletRecord(db.users[normalizedEmail], normalizedEmail, role);
 
   if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
     db.users[normalizedEmail].role = 'staff';
-    db.users[normalizedEmail].updatedAt = nowIso();
-    writeDb(db);
   }
+
+  db.users[normalizedEmail].updatedAt = db.users[normalizedEmail].updatedAt || nowIso();
+  writeDb(db);
 
   return db.users[normalizedEmail];
 }
@@ -133,11 +162,11 @@ function updateUserWallet(email, patch) {
     db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
   }
 
-  db.users[normalizedEmail] = {
+  db.users[normalizedEmail] = normalizeWalletRecord({
     ...db.users[normalizedEmail],
     ...patch,
     updatedAt: nowIso()
-  };
+  }, normalizedEmail, db.users[normalizedEmail].role || 'user');
 
   writeDb(db);
   return db.users[normalizedEmail];
@@ -147,7 +176,9 @@ function deleteUserWalletVault(email) {
   const normalizedEmail = normalizeEmail(email);
   const db = readDb();
 
-  if (!db.users[normalizedEmail]) return null;
+  if (!db.users[normalizedEmail]) {
+    db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
+  }
 
   db.users[normalizedEmail].encryptedVault = null;
   db.users[normalizedEmail].publicWallets = [];
@@ -224,6 +255,7 @@ function verifyOtp(email, otp) {
 
   delete db.otps[normalizedEmail];
   writeDb(db);
+
   return { ok: true };
 }
 
@@ -305,6 +337,41 @@ function cleanCache(maxAgeMs = 1000 * 60 * 15) {
 }
 
 setInterval(cleanCache, 1000 * 60 * 5);
+
+async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'BluebookWallet/1.0',
+        ...(options.headers || {})
+      }
+    });
+
+    const text = await response.text();
+
+    let body = null;
+    try {
+      body = text ? JSON.parse(text) : null;
+    } catch {
+      body = text;
+    }
+
+    if (!response.ok) {
+      const msg = typeof body === 'string' ? body.slice(0, 200) : JSON.stringify(body).slice(0, 200);
+      throw new Error(`HTTP ${response.status}: ${msg}`);
+    }
+
+    return body;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 /* Pages */
 
@@ -449,9 +516,19 @@ app.get('/trading', requireAuth, (req, res) => {
   });
 });
 
-app.post('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
-});
+function destroySession(req, res) {
+  req.session.destroy(() => {
+    res.clearCookie('bluewallet.sid', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production'
+    });
+    res.redirect('/');
+  });
+}
+
+app.get('/logout', destroySession);
+app.post('/logout', destroySession);
 
 /* Wallet API */
 
@@ -491,6 +568,26 @@ app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
   });
 });
 
+app.post('/api/wallet/repair', requireAuthJson, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  if (!user.encryptedVault || !user.publicWallets?.length) {
+    const repaired = deleteUserWalletVault(req.session.user.email);
+
+    return res.json({
+      ok: true,
+      repaired: true,
+      wallet: repaired
+    });
+  }
+
+  res.json({
+    ok: true,
+    repaired: false,
+    wallet: user
+  });
+});
+
 /* Prices */
 
 app.get('/api/prices', requireAuthJson, async (req, res) => {
@@ -506,26 +603,15 @@ app.get('/api/prices', requireAuthJson, async (req, res) => {
     const sortedIds = [...new Set(ids)].sort();
     const key = `coingecko-prices:${sortedIds.join(',')}`;
 
-    const data = await cachedJson(key, 20_000, async () => {
+    const data = await cachedJson(key, 15_000, async () => {
       const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(sortedIds.join(','))}&vs_currencies=usd&include_24hr_change=true`;
-
-      const response = await fetch(url, {
-        headers: {
-          accept: 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`CoinGecko failed: ${response.status}`);
-      }
-
-      return response.json();
+      return fetchJsonWithTimeout(url, {}, 8000);
     });
 
     res.json(data);
   } catch (error) {
-    console.error('Price error:', error);
-    res.status(500).json({ error: 'Unable to load prices.' });
+    console.error('Price error:', error.message);
+    res.json({});
   }
 });
 
@@ -544,21 +630,11 @@ app.get('/api/market-meta', requireAuthJson, async (req, res) => {
 
     const data = await cachedJson(key, 30_000, async () => {
       const url = `${COINGECKO_BASE}/coins/markets?vs_currency=usd&ids=${encodeURIComponent(uniqueIds.join(','))}&order=market_cap_desc&per_page=120&page=1&sparkline=false&price_change_percentage=24h`;
+      const rows = await fetchJsonWithTimeout(url, {}, 8000);
 
-      const response = await fetch(url, {
-        headers: {
-          accept: 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`CoinGecko market meta failed: ${response.status}`);
-      }
-
-      const rows = await response.json();
       const output = {};
 
-      for (const row of rows) {
+      for (const row of Array.isArray(rows) ? rows : []) {
         output[row.id] = {
           id: row.id,
           symbol: String(row.symbol || '').toUpperCase(),
@@ -574,8 +650,8 @@ app.get('/api/market-meta', requireAuthJson, async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error('Market meta error:', error);
-    res.status(500).json({ error: 'Unable to load market metadata.' });
+    console.error('Market meta error:', error.message);
+    res.json({});
   }
 });
 
@@ -593,33 +669,31 @@ app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
     const key = `binance-prices-batch:${uniqueSymbols.join(',')}`;
 
     const data = await cachedJson(key, 4_000, async () => {
+      const wanted = new Set(uniqueSymbols);
       const output = {};
 
-      const response = await fetch(`${BINANCE_BASE}/api/v3/ticker/24hr`, {
-        headers: {
-          accept: 'application/json'
+      for (const base of BINANCE_ENDPOINTS) {
+        try {
+          const rows = await fetchJsonWithTimeout(`${base}/api/v3/ticker/24hr`, {}, 8000);
+
+          for (const row of Array.isArray(rows) ? rows : []) {
+            if (!wanted.has(row.symbol)) continue;
+
+            output[row.symbol] = {
+              symbol: row.symbol,
+              lastPrice: Number(row.lastPrice || 0),
+              priceChangePercent: Number(row.priceChangePercent || 0),
+              priceChange: Number(row.priceChange || 0),
+              quoteVolume: Number(row.quoteVolume || 0),
+              highPrice: Number(row.highPrice || 0),
+              lowPrice: Number(row.lowPrice || 0)
+            };
+          }
+
+          if (Object.keys(output).length) return output;
+        } catch (error) {
+          console.error('Binance endpoint failed:', base, error.message);
         }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Binance failed: ${response.status}`);
-      }
-
-      const rows = await response.json();
-      const wanted = new Set(uniqueSymbols);
-
-      for (const row of rows) {
-        if (!wanted.has(row.symbol)) continue;
-
-        output[row.symbol] = {
-          symbol: row.symbol,
-          lastPrice: Number(row.lastPrice || 0),
-          priceChangePercent: Number(row.priceChangePercent || 0),
-          priceChange: Number(row.priceChange || 0),
-          quoteVolume: Number(row.quoteVolume || 0),
-          highPrice: Number(row.highPrice || 0),
-          lowPrice: Number(row.lowPrice || 0)
-        };
       }
 
       return output;
@@ -627,8 +701,8 @@ app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error('Binance price error:', error);
-    res.status(500).json({ error: 'Unable to load Binance prices.' });
+    console.error('Binance price error:', error.message);
+    res.json({});
   }
 });
 
@@ -646,43 +720,34 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
     const binanceSymbol = symbol ? `${symbol}USDT` : '';
 
     if (binanceSymbol) {
-      try {
-        const key = `binance-chart:${binanceSymbol}:${interval}`;
+      for (const base of BINANCE_ENDPOINTS) {
+        try {
+          const key = `binance-chart:${base}:${binanceSymbol}:${interval}`;
 
-        const data = await cachedJson(key, 4_000, async () => {
-          const url = `${BINANCE_BASE}/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=80`;
+          const data = await cachedJson(key, 4_000, async () => {
+            const url = `${base}/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=80`;
+            const rows = await fetchJsonWithTimeout(url, {}, 8000);
 
-          const response = await fetch(url, {
-            headers: {
-              accept: 'application/json'
-            }
+            return {
+              source: 'binance',
+              symbol: binanceSymbol,
+              interval,
+              prices: rows.map(k => [Number(k[0]), Number(k[4])]),
+              candles: rows.map(k => ({
+                time: Number(k[0]),
+                open: Number(k[1]),
+                high: Number(k[2]),
+                low: Number(k[3]),
+                close: Number(k[4]),
+                volume: Number(k[5])
+              }))
+            };
           });
 
-          if (!response.ok) {
-            throw new Error(`Binance chart failed: ${response.status}`);
-          }
-
-          const rows = await response.json();
-
-          return {
-            source: 'binance',
-            symbol: binanceSymbol,
-            interval,
-            prices: rows.map(k => [Number(k[0]), Number(k[4])]),
-            candles: rows.map(k => ({
-              time: Number(k[0]),
-              open: Number(k[1]),
-              high: Number(k[2]),
-              low: Number(k[3]),
-              close: Number(k[4]),
-              volume: Number(k[5])
-            }))
-          };
-        });
-
-        return res.json(data);
-      } catch {
-        // fallback to CoinGecko below
+          return res.json(data);
+        } catch (error) {
+          console.error('Binance chart failed:', base, binanceSymbol, error.message);
+        }
       }
     }
 
@@ -694,18 +759,7 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
 
     const data = await cachedJson(key, 20_000, async () => {
       const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=1`;
-
-      const response = await fetch(url, {
-        headers: {
-          accept: 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`CoinGecko chart failed: ${response.status}`);
-      }
-
-      const body = await response.json();
+      const body = await fetchJsonWithTimeout(url, {}, 8000);
 
       return {
         source: 'coingecko',
@@ -717,7 +771,7 @@ app.get('/api/chart', requireAuthJson, async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error('Chart error:', error);
+    console.error('Chart error:', error.message);
     res.status(500).json({ error: 'Unable to load chart.' });
   }
 });
@@ -752,7 +806,8 @@ app.post('/api/swap/quote', requireAuthJson, async (req, res) => {
       headers: {
         '0x-api-key': ZEROX_API_KEY,
         '0x-version': 'v2',
-        accept: 'application/json'
+        accept: 'application/json',
+        'user-agent': 'BluebookWallet/1.0'
       }
     });
 
@@ -767,12 +822,51 @@ app.post('/api/swap/quote', requireAuthJson, async (req, res) => {
 
     res.json(body);
   } catch (error) {
-    console.error('Swap quote error:', error);
+    console.error('Swap quote error:', error.message);
     res.status(500).json({ error: 'Unable to get swap quote.' });
   }
 });
 
 /* Debug */
+
+app.get('/api/debug-prices', requireAuthJson, async (req, res) => {
+  const result = {
+    node: process.version,
+    hasFetch: typeof fetch !== 'undefined',
+    binance: null,
+    coingecko: null,
+    sessionUser: req.session.user || null,
+    time: nowIso()
+  };
+
+  try {
+    const body = await fetchJsonWithTimeout('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', {}, 8000);
+    result.binance = {
+      ok: true,
+      sample: body
+    };
+  } catch (e) {
+    result.binance = {
+      ok: false,
+      error: e.message
+    };
+  }
+
+  try {
+    const body = await fetchJsonWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd', {}, 8000);
+    result.coingecko = {
+      ok: true,
+      sample: body
+    };
+  } catch (e) {
+    result.coingecko = {
+      ok: false,
+      error: e.message
+    };
+  }
+
+  res.json(result);
+});
 
 app.get('/debug-session', (req, res) => {
   res.json({
@@ -784,6 +878,8 @@ app.get('/debug-session', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({
     ok: true,
+    node: process.version,
+    hasFetch: typeof fetch !== 'undefined',
     time: nowIso()
   });
 });
@@ -795,4 +891,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   ensureDb();
   console.log(`Bluebook Wallet running on port ${PORT}`);
+  console.log(`Node version: ${process.version}`);
 });
