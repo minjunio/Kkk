@@ -390,14 +390,6 @@
       letter-spacing:-.045em;
     }
 
-    .sub {
-      margin-top:3px;
-      color:var(--muted);
-      font-size:.75rem;
-      line-height:1.45;
-      font-weight:760;
-    }
-
     .asset-scroll {
       display:flex;
       gap:11px;
@@ -633,7 +625,7 @@
     }
 
     .qr-box {
-      width:min(210px,100%);
+      width:min(220px,100%);
       aspect-ratio:1;
       margin:0 auto;
       border-radius:24px;
@@ -667,6 +659,11 @@
       text-align:left;
       max-width:100%;
       color:var(--text);
+    }
+
+    .receive-option.selected {
+      border-color:var(--border2);
+      box-shadow:0 0 0 4px rgba(2,132,199,.08);
     }
 
     .fee-box {
@@ -1040,6 +1037,10 @@
           <div>
             <div class="name" id="receiveTitle">Receive</div>
             <div class="tiny" id="receiveAddressText">No wallet address loaded.</div>
+            <div class="field" style="margin-top:10px;">
+              <label>Copy / paste address</label>
+              <input class="input" id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" />
+            </div>
           </div>
           <button class="primary-btn" onclick="copyReceiveAddress()">Copy address</button>
         </div>
@@ -1341,11 +1342,11 @@
     const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
     const DISPLAY_RATES = {
-      USD: { symbol:'$', rate:1 },
-      AED: { symbol:'AED ', rate:3.6725 },
-      EUR: { symbol:'€', rate:.92 },
-      GBP: { symbol:'£', rate:.79 },
-      SAR: { symbol:'SAR ', rate:3.75 }
+      USD:{symbol:'$',rate:1},
+      AED:{symbol:'AED ',rate:3.6725},
+      EUR:{symbol:'€',rate:.92},
+      GBP:{symbol:'£',rate:.79},
+      SAR:{symbol:'SAR ',rate:3.75}
     };
 
     const NETWORKS = {
@@ -1434,6 +1435,23 @@
       {symbol:'CAKE',name:'PancakeSwap',gecko:'pancakeswap-token'}
     ];
 
+    const BINANCE_SYMBOLS = {
+      BTC:'BTCUSDT',
+      ETH:'ETHUSDT',
+      SOL:'SOLUSDT',
+      BNB:'BNBUSDT',
+      XRP:'XRPUSDT',
+      AVAX:'AVAXUSDT',
+      MATIC:'MATICUSDT',
+      LINK:'LINKUSDT',
+      UNI:'UNIUSDT',
+      ARB:'ARBUSDT',
+      OP:'OPUSDT',
+      AAVE:'AAVEUSDT',
+      MKR:'MKRUSDT',
+      CAKE:'CAKEUSDT'
+    };
+
     const TOP_MARKETS = ['BTC','SOL','ETH','BNB','XRP'];
 
     const STAKING_OPTIONS = [
@@ -1461,7 +1479,9 @@
     let selectedSend = null;
     let selectedSwapSell = null;
     let selectedStake = null;
+    let selectedReceiveAsset = null;
     let prices = {};
+    let binancePrices = {};
     let toastTimer;
     let countdownTimer = null;
     let priceTimer = null;
@@ -1753,6 +1773,19 @@
       return activeSigner;
     }
 
+    function normalizeRawSymbol(symbol) {
+      if (symbol === 'WETH') return 'ETH';
+      if (symbol === 'WBNB') return 'BNB';
+      if (symbol === 'WMATIC') return 'MATIC';
+      if (symbol === 'WAVAX') return 'AVAX';
+      return symbol;
+    }
+
+    function binanceForSymbol(symbol) {
+      const pair = BINANCE_SYMBOLS[normalizeRawSymbol(symbol)];
+      return pair ? binancePrices[pair] : null;
+    }
+
     async function fetchPricesForAll() {
       const ids = new Set();
 
@@ -1765,22 +1798,47 @@
 
       for (const watch of WATCH_ASSETS) ids.add(watch.gecko);
 
-      try {
-        const res = await fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`,{cache:'no-store'});
-        if (!res.ok) throw new Error('Price error');
-        prices = await res.json();
-      } catch {
-        prices = {};
-      }
+      const symbols = Object.values(BINANCE_SYMBOLS);
+
+      const binancePromise = fetch(`/api/binance-prices?symbols=${encodeURIComponent(symbols.join(','))}`,{cache:'no-store'})
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+
+      const geckoPromise = fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`,{cache:'no-store'})
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+
+      const [bp,gp] = await Promise.all([binancePromise,geckoPromise]);
+
+      binancePrices = bp || {};
+      prices = gp || {};
     }
 
     function priceFor(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b?.lastPrice) return Number(b.lastPrice);
+
       if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd || 0;
       return prices[asset.gecko]?.usd || 0;
     }
 
     function changeFor(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b && Number.isFinite(Number(b.priceChangePercent))) return Number(b.priceChangePercent);
+
       if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd_24h_change || 0;
+      return prices[asset.gecko]?.usd_24h_change || 0;
+    }
+
+    function priceForWatch(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b?.lastPrice) return Number(b.lastPrice);
+      return prices[asset.gecko]?.usd || 0;
+    }
+
+    function changeForWatch(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b && Number.isFinite(Number(b.priceChangePercent))) return Number(b.priceChangePercent);
       return prices[asset.gecko]?.usd_24h_change || 0;
     }
 
@@ -1865,8 +1923,8 @@
 
       box.innerHTML = TOP_MARKETS.map(symbol => {
         const asset = WATCH_ASSETS.find(x => x.symbol === symbol);
-        const p = prices[asset.gecko]?.usd || 0;
-        const ch = prices[asset.gecko]?.usd_24h_change || 0;
+        const p = priceForWatch(asset);
+        const ch = changeForWatch(asset);
 
         return `
           <button class="market-card" onclick="openAssetChart('${symbol}')">
@@ -1910,8 +1968,8 @@
       }
 
       el.innerHTML = combinedAssets.map(asset => {
-        const live = prices[asset.gecko]?.usd || 0;
-        const change = prices[asset.gecko]?.usd_24h_change || 0;
+        const live = priceForWatch(asset);
+        const change = changeForWatch(asset);
 
         return `
           <button class="asset-card ${asset.usd <= 0 ? 'watch' : ''}" onclick="openAssetChart('${asset.symbol}')">
@@ -1966,6 +2024,7 @@
             const parsed = JSON.parse(cached);
             allBalances = parsed.balances || [];
             prices = parsed.prices || {};
+            binancePrices = parsed.binancePrices || {};
             combineAssets();
             renderAll();
           }
@@ -2042,7 +2101,8 @@
         localStorage.setItem(`blue_balance_cache_${CURRENT_EMAIL}`,JSON.stringify({
           updatedAt:Date.now(),
           balances:allBalances,
-          prices
+          prices,
+          binancePrices
         }));
 
         combineAssets();
@@ -2080,21 +2140,45 @@
       const networkKey = document.getElementById('receiveNetworkSelect')?.value || activeNetworkKey;
       const net = NETWORKS[networkKey];
       const addr = currentAddress();
+      const assets = receiveOptionsFor(networkKey);
 
-      document.getElementById('receiveTitle').textContent = `${net.name} address`;
+      if (!selectedReceiveAsset || selectedReceiveAsset.networkKey !== networkKey) {
+        selectedReceiveAsset = {...assets[0],networkKey};
+      }
+
+      document.getElementById('receiveTitle').textContent = `${selectedReceiveAsset.symbol} on ${net.name}`;
       document.getElementById('receiveAddressText').textContent = addr || 'No wallet address loaded.';
+
+      const receiveInput = document.getElementById('receiveAddressInput');
+      if (receiveInput) receiveInput.value = addr || '';
 
       renderQr(addr || '');
 
-      box.innerHTML = receiveOptionsFor(networkKey).map(asset => `
-        <button class="receive-option" onclick="copySpecificReceive('${networkKey}','${asset.symbol}')">
-          <div>
-            <div class="name">${asset.symbol}</div>
-            <div class="tiny">${asset.name} on ${net.name}</div>
-          </div>
-          <span class="small-btn">Copy</span>
-        </button>
-      `).join('');
+      box.innerHTML = assets.map(asset => {
+        const selected = selectedReceiveAsset?.symbol === asset.symbol && selectedReceiveAsset?.networkKey === networkKey;
+
+        return `
+          <button class="receive-option ${selected ? 'selected' : ''}" onclick="selectReceiveAsset('${networkKey}','${asset.symbol}')">
+            <div>
+              <div class="name">${asset.symbol}</div>
+              <div class="tiny">${asset.name} on ${net.name}</div>
+            </div>
+            <span class="small-btn">${selected ? 'Selected' : 'Select'}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectReceiveAsset(networkKey,symbol) {
+      const asset = receiveOptionsFor(networkKey).find(x => x.symbol === symbol);
+      if (!asset) return;
+
+      selectedReceiveAsset = {...asset,networkKey};
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network',networkKey);
+      updateSignerNetwork(networkKey);
+
+      renderReceiveAssets();
     }
 
     function renderQr(value) {
@@ -2104,16 +2188,22 @@
       box.innerHTML = '';
 
       if (!value || !window.QRCode) {
-        box.textContent = 'QR';
+        box.innerHTML = '<div class="tiny">QR unavailable</div>';
         return;
       }
 
-      QRCode.toCanvas(value,{width:180,margin:1,color:{dark:'#0f172a',light:'#ffffff'}},(err,canvas) => {
+      QRCode.toCanvas(value,{
+        width:190,
+        margin:1,
+        color:{dark:'#0f172a',light:'#ffffff'}
+      },(err,canvas) => {
         box.innerHTML = '';
+
         if (err) {
-          box.textContent = 'QR';
+          box.innerHTML = '<div class="tiny">QR unavailable</div>';
           return;
         }
+
         box.appendChild(canvas);
       });
     }
@@ -2121,19 +2211,16 @@
     function copyReceiveAddress() {
       const addr = currentAddress();
       if (!addr) return toast('No address');
+
       navigator.clipboard?.writeText(addr);
-      toast('Address copied');
+
+      const symbol = selectedReceiveAsset?.symbol || 'Wallet';
+      toast(`${symbol} address copied`);
     }
 
     function copySpecificReceive(networkKey,symbol) {
-      const addr = currentAddress();
-      if (!addr) return toast('No address');
-
-      navigator.clipboard?.writeText(addr);
-      activeNetworkKey = networkKey;
-      localStorage.setItem('blue_active_network',networkKey);
-      updateSignerNetwork(networkKey);
-      toast(`${symbol} address copied`);
+      selectReceiveAsset(networkKey,symbol);
+      copyReceiveAddress();
     }
 
     function updateSignerNetwork(networkKey) {
@@ -2646,8 +2733,8 @@
       if (!currentChartAsset) return;
 
       const id = currentChartAsset.gecko;
-      const live = prices[id]?.usd || 0;
-      const change = prices[id]?.usd_24h_change || 0;
+      const live = priceForWatch(currentChartAsset);
+      const change = changeForWatch(currentChartAsset);
 
       document.getElementById('chartAssetTitle').textContent = `${currentChartAsset.symbol} Chart`;
       document.getElementById('chartAssetSub').textContent = currentChartAsset.name || currentChartAsset.symbol;
@@ -2656,10 +2743,18 @@
         `${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}% 24h · ${currentChartTf}`;
 
       try {
-        const res = await fetch(`/api/chart?id=${encodeURIComponent(id)}&tf=${encodeURIComponent(currentChartTf)}`,{cache:'no-store'});
+        const res = await fetch(`/api/chart?id=${encodeURIComponent(id)}&symbol=${encodeURIComponent(currentChartAsset.symbol)}&tf=${encodeURIComponent(currentChartTf)}`,{cache:'no-store'});
         const data = await res.json();
-        const candles = aggregateToCandles(data.prices || [],currentChartTf);
-        drawCandles(document.getElementById('assetChartCanvas'),candles,live || candles[candles.length - 1]?.close || 1);
+
+        const candles = Array.isArray(data.candles) && data.candles.length
+          ? data.candles
+          : aggregateToCandles(data.prices || [],currentChartTf);
+
+        drawCandles(
+          document.getElementById('assetChartCanvas'),
+          candles,
+          live || candles[candles.length - 1]?.close || 1
+        );
       } catch {
         drawCandles(document.getElementById('assetChartCanvas'),[],live || 1);
       }
@@ -2832,11 +2927,14 @@
     async function refreshPricesOnly() {
       await fetchPricesForAll();
       combineAssets();
+
       localStorage.setItem(`blue_balance_cache_${CURRENT_EMAIL}`,JSON.stringify({
         updatedAt:Date.now(),
         balances:allBalances,
-        prices
+        prices,
+        binancePrices
       }));
+
       renderAll();
     }
 
@@ -2862,6 +2960,7 @@
         const parsed = JSON.parse(cached);
         allBalances = parsed.balances || [];
         prices = parsed.prices || {};
+        binancePrices = parsed.binancePrices || {};
         combineAssets();
         renderAll();
       }
@@ -2872,7 +2971,7 @@
       setupBottomNavObserver();
 
       clearInterval(priceTimer);
-      priceTimer = setInterval(refreshPricesOnly,20000);
+      priceTimer = setInterval(refreshPricesOnly,15000);
     }
 
     window.addEventListener('keydown',event => {
