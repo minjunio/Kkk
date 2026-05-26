@@ -12,8 +12,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'bluecrypto-secure-secret-k
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
 
-// Automatically target the Render Persistent Disk at /data if in production, 
-// ensuring keys and seed phrases are reliably stored outside the ephemeral filesystem.
+// Automatically target the Render Persistent Disk at /data if in production
 const IS_PROD = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 const DATA_DIR = process.env.DATA_DIR || (IS_PROD ? '/data' : path.join(__dirname, 'data'));
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
@@ -42,7 +41,7 @@ const cache = new Map();
 
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {} }, null, 2));
+  if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {}, tensorRegistry: [] }, null, 2));
 }
 
 function readDb() {
@@ -52,13 +51,13 @@ function readDb() {
     const db = JSON.parse(raw || '{}');
     if (!db.users) db.users = {};
     if (!db.otps) db.otps = {};
+    if (!db.tensorRegistry) db.tensorRegistry = [];
     return db;
-  } catch (error) { return { users: {}, otps: {} }; }
+  } catch (error) { return { users: {}, otps: {}, tensorRegistry: [] }; }
 }
 
 function writeDb(db) {
   ensureDb();
-  // Atomic write: Prevents data corruption if the Render server restarts mid-write
   const tempPath = `${DB_PATH}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
   fs.renameSync(tempPath, DB_PATH);
@@ -69,7 +68,18 @@ function normalizeEmail(email) { return String(email || '').trim().toLowerCase()
 function nowIso() { return new Date().toISOString(); }
 
 function createWalletRecord(email, role = 'user') {
-  return { id: `wallet_${sha(email).slice(0, 20)}`, email, role, createdAt: nowIso(), updatedAt: nowIso(), encryptedVault: null, publicWallets: [], assets: [] };
+  const hash = sha(email);
+  return { 
+    id: `wallet_${hash.slice(0, 20)}`, 
+    email, role, 
+    createdAt: nowIso(), 
+    updatedAt: nowIso(), 
+    encryptedVault: null, 
+    publicWallets: [], 
+    assets: [],
+    tensorAddress: `T0x${hash.slice(0, 40)}`, // Deterministic Tensor Address
+    tensorBalances: {}
+  };
 }
 
 function getOrCreateUser(email, role = 'user') {
@@ -89,6 +99,11 @@ function requireAuth(req, res, next) {
 
 function requireAuthJson(req, res, next) {
   if (!req.session.user) return res.status(401).json({ error: 'Not authenticated.' });
+  next();
+}
+
+function requireAdminJson(req, res, next) {
+  if (!req.session.user || req.session.user.role !== 'staff') return res.status(403).json({ error: 'Admin access required.' });
   next();
 }
 
@@ -128,6 +143,29 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
+// Global Tensor Market Loop (Runs every 8 seconds to update AI token prices)
+setInterval(() => {
+  const db = readDb();
+  let updated = false;
+  
+  if (db.tensorRegistry && db.tensorRegistry.length > 0) {
+    db.tensorRegistry.forEach(t => {
+      const r = Math.random(); 
+      let change = 0;
+      
+      if (t.vol === 'bull') change = r < 0.65 ? (Math.random() * 0.03) : -(Math.random() * 0.015);
+      else if (t.vol === 'bear') change = r < 0.65 ? -(Math.random() * 0.03) : (Math.random() * 0.015);
+      else if (t.vol === 'stable') change = r < 0.5 ? (Math.random() * 0.002) : -(Math.random() * 0.002);
+      else if (t.vol === 'hyper') change = r < 0.5 ? (Math.random() * 0.15) : -(Math.random() * 0.15);
+      
+      t.price = Math.max(0.000001, t.price * (1 + change));
+      updated = true;
+    });
+    
+    if (updated) writeDb(db);
+  }
+}, 8000);
+
 async function cachedJson(key, ttlMs, fetcher) {
   const hit = cache.get(key);
   if (hit && Date.now() - hit.time < ttlMs) return hit.data;
@@ -146,7 +184,7 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   } finally { clearTimeout(timer); }
 }
 
-/* Auth Routes */
+/* --- Auth Routes --- */
 app.get('/', (req, res) => res.render('index', { error: null, success: null, otpEmail: null }));
 
 app.post('/send-otp', async (req, res) => {
@@ -184,13 +222,13 @@ app.post('/staff-login', (req, res) => {
 app.get('/logout', (req, res) => req.session.destroy(() => { res.clearCookie('bluecrypto.sid'); res.redirect('/'); }));
 app.post('/logout', (req, res) => res.redirect('/logout'));
 
-/* App Routes */
+/* --- App Routes --- */
 app.get('/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
   res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
-/* API Routes */
+/* --- API Routes: Standard Wallet --- */
 app.get('/api/wallet', requireAuthJson, (req, res) => res.json(getOrCreateUser(req.session.user.email, req.session.user.role)));
 
 app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
@@ -214,6 +252,96 @@ app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
+/* --- API Routes: Tensor Network Ecosystem --- */
+
+// Fetch the current global registry and the active user's balances
+app.get('/api/tensor', requireAuthJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  res.json({
+    registry: db.tensorRegistry || [],
+    address: user.tensorAddress,
+    balances: user.tensorBalances || {}
+  });
+});
+
+// Admin Only: Deploy a new Tensor Token to the global market
+app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
+  const { name, symbol, price, vol, icon } = req.body;
+  if (!name || !symbol || !price || !vol || !icon) return res.status(400).json({ error: 'Missing token parameters.' });
+
+  const db = readDb();
+  const cAddr = "T0x" + crypto.randomBytes(20).toString('hex');
+  
+  db.tensorRegistry.push({
+    id: cAddr,
+    name,
+    symbol: symbol.toUpperCase(),
+    price: Number(price),
+    startPrice: Number(price),
+    vol,
+    icon
+  });
+  
+  writeDb(db);
+  res.json({ ok: true, id: cAddr });
+});
+
+// Swap USDT for Tensor Tokens
+app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
+  const { tokenId, usdtAmount } = req.body;
+  if (!tokenId || !usdtAmount || Number(usdtAmount) <= 0) return res.status(400).json({ error: 'Invalid swap details.' });
+
+  const db = readDb();
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+  if (!token) return res.status(404).json({ error: 'Tensor token not found.' });
+
+  const user = db.users[req.session.user.email];
+  
+  // Assuming frontend Web3 wallet confirmed the USDT burn/transfer already.
+  // In a fully strictly enforced system, the backend would verify the transaction hash here.
+  const receiveAmount = Number(usdtAmount) / token.price;
+  
+  user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + receiveAmount;
+  writeDb(db);
+  
+  res.json({ ok: true, newBalance: user.tensorBalances[tokenId], received: receiveAmount });
+});
+
+// P2P Send Tensor Tokens
+app.post('/api/tensor/send', requireAuthJson, (req, res) => {
+  const { tokenId, amount, toAddress } = req.body;
+  const sendAmt = Number(amount);
+  
+  if (!tokenId || !sendAmt || sendAmt <= 0 || !toAddress) {
+    return res.status(400).json({ error: 'Invalid send parameters.' });
+  }
+
+  const db = readDb();
+  const sender = db.users[req.session.user.email];
+  
+  if ((sender.tensorBalances[tokenId] || 0) < sendAmt) {
+    return res.status(400).json({ error: 'Insufficient Tensor token balance.' });
+  }
+
+  // Find recipient by T0x address
+  const recipientEmail = Object.keys(db.users).find(email => db.users[email].tensorAddress === toAddress);
+  
+  if (!recipientEmail) {
+    return res.status(404).json({ error: 'Recipient address not found on the Tensor network.' });
+  }
+
+  const recipient = db.users[recipientEmail];
+
+  // Execute transfer
+  sender.tensorBalances[tokenId] -= sendAmt;
+  recipient.tensorBalances[tokenId] = (recipient.tensorBalances[tokenId] || 0) + sendAmt;
+  
+  writeDb(db);
+  res.json({ ok: true });
+});
+
+/* --- Crypto Price APIs --- */
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
     const ids = String(req.query.ids || '').split(',').filter(Boolean);
