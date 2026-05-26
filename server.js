@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'bluecrypto-secure-secret-key';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'tensorwallet-secure-secret-key';
 
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
@@ -18,7 +18,6 @@ const DATA_DIR = process.env.DATA_DIR || (IS_PROD ? '/data' : path.join(__dirnam
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
-const BINANCE_ENDPOINTS = ['https://data-api.binance.vision', 'https://api.binance.com'];
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -28,17 +27,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Prevent caching for API calls to ensure global real-time synchronization
+app.use('/api', (req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
+
 app.use(session({
-  name: 'bluecrypto.sid',
+  name: 'tensorwallet.sid',
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: { httpOnly: true, sameSite: 'lax', secure: IS_PROD, maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
-
-const cache = new Map();
-const tensorCandleHistory = {}; 
 
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -110,63 +112,7 @@ function requireAdminJson(req, res, next) {
   next();
 }
 
-function generateOtp() { return String(crypto.randomInt(100000, 999999)); }
-
-function saveOtp(email, otp) {
-  const normEmail = normalizeEmail(email);
-  const db = readDb();
-  db.otps[normEmail] = { otpHash: sha(otp), expiresAt: Date.now() + 600000, attempts: 0 };
-  writeDb(db);
-}
-
-function verifyOtp(email, otp) {
-  const normEmail = normalizeEmail(email);
-  const db = readDb();
-  const record = db.otps[normEmail];
-
-  if (!record) return { ok: false, reason: 'No OTP found.' };
-  if (Date.now() > record.expiresAt) { delete db.otps[normEmail]; writeDb(db); return { ok: false, reason: 'OTP expired.' }; }
-  if (record.attempts >= 5) { delete db.otps[normEmail]; writeDb(db); return { ok: false, reason: 'Too many attempts.' }; }
-  if (sha(otp) !== record.otpHash) { record.attempts++; db.otps[normEmail] = record; writeDb(db); return { ok: false, reason: 'Invalid code.' }; }
-
-  delete db.otps[normEmail]; writeDb(db);
-  return { ok: true };
-}
-
-async function sendOtpEmail(email, otp) {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
-  if (!gmailUser || !gmailPass) { console.log(`DEV OTP for ${email}: ${otp}`); return false; }
-  
-  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailPass } });
-  await transporter.sendMail({
-    from: `"BlueCrypto" <${gmailUser}>`, to: email, subject: 'Your BlueCrypto login code',
-    text: `Your login code is ${otp}. It expires in 10 minutes.`, html: `<h3>Your BlueCrypto login code is <b>${otp}</b>.</h3>`
-  });
-  return true;
-}
-
-function initializeCandlesForToken(tokenId, startPrice) {
-  if (tensorCandleHistory[tokenId]) return;
-  tensorCandleHistory[tokenId] = [];
-  let currentBase = startPrice;
-  
-  // Generate 24 hours of history (1,440 minutes) to allow 1hr and 1day charts to function
-  let timeCursor = Date.now() - (1440 * 60 * 1000); 
-
-  for (let i = 0; i < 1440; i++) {
-    const open = currentBase;
-    const close = currentBase * (1 + (Math.random() - 0.5) * 0.005);
-    const high = Math.max(open, close) * (1 + Math.random() * 0.002);
-    const low = Math.min(open, close) * (1 - Math.random() * 0.002);
-    
-    tensorCandleHistory[tokenId].push({ time: timeCursor, open, high, low, close });
-    currentBase = close;
-    timeCursor += 60 * 1000;
-  }
-}
-
-// Global Tensor Market Loop
+// Global Tensor Market Loop (Server Truth for Pricing)
 setInterval(() => {
   try {
     if (!fs.existsSync(DB_PATH)) return;
@@ -190,63 +136,28 @@ setInterval(() => {
     });
 
     db.tensorRegistry.forEach(t => {
-      const oldPrice = t.price;
-      
       if (t.bias === 'pegged') {
         t.price = t.startPrice; 
       } else {
         const r = Math.random();
-        
-        // Translate the Bull % (e.g., 60) into a drop threshold
-        // If bullChance is 60%, then chanceToDrop is 40% (0.4)
         const chanceToDrop = (100 - (t.bullChance !== undefined ? t.bullChance : 50)) / 100;
-        
-        // Execute the probability interval bounds
         const direction = r < chanceToDrop ? -1 : 1;
         const minPct = t.minPct !== undefined ? t.minPct : 0.01;
         const maxPct = t.maxPct !== undefined ? t.maxPct : 0.05;
         const magnitude = minPct + (Math.random() * (maxPct - minPct));
         
         const nativeChange = direction * magnitude;
-
-        // Apply Market Dominance Beta Drag
         const betaFactor = t.dominance > 35 ? 0.1 : (1 - (t.dominance / 100));
         const totalChange = nativeChange + (alphaDrift * betaFactor);
         
         t.price = Math.max(0.000001, t.price * (1 + totalChange));
       }
-
       t.marketCap = t.price * t.supply;
-      if (!t.volume) t.volume = 0;
-      t.volume = t.volume * 0.95 + (Math.abs(t.price - oldPrice) * t.supply * 0.05);
-
-      initializeCandlesForToken(t.id, oldPrice);
-      const history = tensorCandleHistory[t.id];
-      const now = Date.now();
-      const lastCandle = history[history.length - 1];
-
-      if (lastCandle && now - lastCandle.time < 60000) {
-        lastCandle.close = t.price;
-        if (t.price > lastCandle.high) lastCandle.high = t.price;
-        if (t.price < lastCandle.low) lastCandle.low = t.price;
-      } else {
-        history.push({ time: now, open: oldPrice, high: Math.max(oldPrice, t.price), low: Math.min(oldPrice, t.price), close: t.price });
-        // Retain enough data for a 24h cycle
-        if (history.length > 2000) history.shift();
-      }
     });
 
     fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
   } catch (err) { console.error('Tensor loop error:', err); }
 }, 8000);
-
-async function cachedJson(key, ttlMs, fetcher) {
-  const hit = cache.get(key);
-  if (hit && Date.now() - hit.time < ttlMs) return hit.data;
-  const data = await fetcher();
-  cache.set(key, { time: Date.now(), data });
-  return data;
-}
 
 async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   const controller = new AbortController();
@@ -261,36 +172,17 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
 /* --- Auth & Views --- */
 app.get('/', (req, res) => res.render('index', { error: null, success: null, otpEmail: null }));
 
-app.post('/send-otp', async (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  if (!email || !email.includes('@')) return res.render('index', { error: 'Enter a valid email.', success: null, otpEmail: null });
-  const otp = generateOtp();
-  saveOtp(email, otp);
-  const sent = await sendOtpEmail(email, otp);
-  res.render('index', { error: null, success: sent ? 'OTP sent. Check your inbox.' : 'OTP generated (Check console). Gmail missing.', otpEmail: email });
-});
-
-app.post('/verify-otp', (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  const otp = String(req.body.otp || '').trim();
-  const result = verifyOtp(email, otp);
-  if (!result.ok) return res.render('index', { error: result.reason, success: null, otpEmail: email });
-  const user = getOrCreateUser(email, 'user');
-  req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id };
-  req.session.save(() => res.redirect('/wallet'));
-});
-
 app.post('/staff-login', (req, res) => {
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
   if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) return res.render('index', { error: 'Invalid staff login.', success: null, otpEmail: null });
-  const adminEmail = `admin@bluecrypto.local`;
+  const adminEmail = `admin@tensorwallet.local`;
   const user = getOrCreateUser(adminEmail, 'staff');
   req.session.user = { email: adminEmail, username: 'admin', role: 'staff', walletId: user.id };
   req.session.save(() => res.redirect('/wallet'));
 });
 
-app.get('/logout', (req, res) => req.session.destroy(() => { res.clearCookie('bluecrypto.sid'); res.redirect('/'); }));
+app.get('/logout', (req, res) => req.session.destroy(() => { res.clearCookie('tensorwallet.sid'); res.redirect('/'); }));
 app.post('/logout', (req, res) => res.redirect('/logout'));
 
 app.get('/wallet', requireAuth, (req, res) => {
@@ -298,19 +190,19 @@ app.get('/wallet', requireAuth, (req, res) => {
   res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
-/* --- Crypto Wallet APIs --- */
+/* --- Standard Crypto Wallet APIs --- */
 app.get('/api/wallet', requireAuthJson, (req, res) => res.json(getOrCreateUser(req.session.user.email, req.session.user.role)));
 
-app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
-  const db = readDb();
-  if (req.body.encryptedVault) {
-    db.users[req.session.user.email].encryptedVault = req.body.encryptedVault;
-    db.users[req.session.user.email].publicWallets = req.body.publicWallets || [];
-    db.users[req.session.user.email].updatedAt = nowIso();
-    writeDb(db);
-    return res.json({ ok: true });
-  }
-  res.status(400).json({ error: 'No vault data provided.' });
+app.post('/api/wallet/send', requireAuthJson, (req, res) => {
+  const { network, asset, amount, toAddress } = req.body;
+  if(!network || !asset || !amount || !toAddress) return res.status(400).json({error: 'Invalid Request'});
+
+  // In a full production environment, this is where you serialize the transaction, sign it 
+  // via RPC nodes, and broadcast it to the actual blockchain network using ethers.js/web3.js.
+  // For the platform scope, we simulate a successful transaction:
+  const txHash = '0x' + crypto.randomBytes(32).toString('hex');
+
+  res.json({ ok: true, txHash });
 });
 
 /* --- Tensor Network APIs --- */
@@ -318,88 +210,6 @@ app.get('/api/tensor', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email];
   res.json({ registry: db.tensorRegistry || [], address: user.tensorAddress, balances: user.tensorBalances || {} });
-});
-
-app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
-  const db = readDb();
-  if (req.body.tensorVault) {
-    db.users[req.session.user.email].tensorVault = req.body.tensorVault;
-    db.users[req.session.user.email].updatedAt = nowIso();
-    writeDb(db);
-    return res.json({ ok: true });
-  }
-  res.status(400).json({ error: 'No Tensor vault data provided.' });
-});
-
-app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
-  const { name, symbol, price, bias, bullChance, minPct, maxPct, icon, supply } = req.body;
-  if (!name || !symbol || !price || !bias || !icon || !supply) return res.status(400).json({ error: 'Missing parameters' });
-
-  const db = readDb();
-  const id = "T0x" + crypto.randomBytes(20).toString('hex');
-  
-  db.tensorRegistry.push({
-    id, name, symbol: symbol.toUpperCase(),
-    price: Number(price), startPrice: Number(price),
-    bias, 
-    bullChance: Number(bullChance) || 50,
-    minPct: Number(minPct) / 100, 
-    maxPct: Number(maxPct) / 100,
-    icon, supply: Number(supply), marketCap: Number(price) * Number(supply),
-    volume: 0, dominance: 0
-  });
-  
-  writeDb(db);
-  initializeCandlesForToken(id, Number(price));
-  res.json({ ok: true, id });
-});
-
-app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
-  const { bias, bullChance, minPct, maxPct, supply } = req.body;
-  const db = readDb();
-  
-  const token = db.tensorRegistry.find(t => t.id === req.params.id);
-  if (!token) return res.status(404).json({ error: 'Token not found.' });
-
-  if (bias) token.bias = bias;
-  if (bullChance !== undefined) token.bullChance = Number(bullChance);
-  if (minPct !== undefined) token.minPct = Number(minPct) / 100;
-  if (maxPct !== undefined) token.maxPct = Number(maxPct) / 100;
-  if (supply) {
-    token.supply = Number(supply);
-    token.marketCap = token.price * token.supply;
-  }
-
-  writeDb(db);
-  res.json({ ok: true, token });
-});
-
-app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const index = db.tensorRegistry.findIndex(t => t.id === req.params.id);
-  
-  if (index === -1) return res.status(404).json({ error: 'Token not found.' });
-  
-  db.tensorRegistry.splice(index, 1);
-  delete tensorCandleHistory[req.params.id];
-  
-  writeDb(db);
-  res.json({ ok: true });
-});
-
-// Admin Minting directly into server database
-app.post('/api/tensor/admin-mint', requireAdminJson, (req, res) => {
-  const { tokenId, amount } = req.body;
-  const mintAmt = Number(amount);
-  if (!tokenId || !mintAmt || mintAmt <= 0) return res.status(400).json({ error: 'Invalid parameters.' });
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + mintAmt;
-  
-  writeDb(db);
-  res.json({ ok: true, newBalance: user.tensorBalances[tokenId] });
 });
 
 app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
@@ -418,35 +228,14 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
   db.treasury.collectedFeesUsdt += feeAmount;
 
-  let priceImpact = 0;
-  if (token.bias !== 'pegged') {
-    const impactMultiplier = netSpend / (token.marketCap + 100);
-    priceImpact = Math.min(0.5, impactMultiplier * 0.8);
-  }
-  
-  const originalPrice = token.price;
-  const executionPrice = originalPrice * (1 + (priceImpact / 2)); 
+  const executionPrice = token.price; 
   const mintAmount = netSpend / executionPrice;
-
-  if (token.bias !== 'pegged') {
-    token.price = originalPrice * (1 + priceImpact);
-    token.marketCap = token.price * token.supply;
-  }
-  token.volume = (token.volume || 0) + spend;
-
-  initializeCandlesForToken(tokenId, originalPrice);
-  const history = tensorCandleHistory[tokenId];
-  if (history && history.length) {
-    const last = history[history.length - 1];
-    last.close = token.price;
-    if (token.price > last.high) last.high = token.price;
-  }
 
   const user = db.users[req.session.user.email];
   user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + mintAmount;
   
   writeDb(db);
-  res.json({ ok: true, received: mintAmount, impactPercent: (priceImpact * 100).toFixed(2), feePaid: feeAmount });
+  res.json({ ok: true, received: mintAmount, feePaid: feeAmount });
 });
 
 app.post('/api/tensor/send', requireAuthJson, (req, res) => {
@@ -469,32 +258,15 @@ app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/tensor/chart', (req, res) => {
-  const { tokenId } = req.query;
-  if (!tokenId || !tensorCandleHistory[tokenId]) return res.json({ candles: [] });
-  res.json({ candles: tensorCandleHistory[tokenId] });
-});
-
 /* --- Standard Market Endpoints --- */
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
     const ids = String(req.query.ids || '').split(',').filter(Boolean);
     if (!ids.length) return res.json({});
-    res.json(await cachedJson(`cg-prices:${ids.join(',')}`, 15000, () => fetchJsonWithTimeout(`${COINGECKO_BASE}/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`)));
+    // Fetch directly to ensure users get exact real-time prices without server-memory caching delays.
+    const priceData = await fetchJsonWithTimeout(`${COINGECKO_BASE}/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`);
+    res.json(priceData);
   } catch { res.json({}); }
 });
 
-app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
-  try {
-    const symbols = new Set(String(req.query.symbols || '').split(',').filter(Boolean));
-    if (!symbols.size) return res.json({});
-    res.json(await cachedJson(`binance-prices`, 4000, async () => {
-      const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/ticker/24hr`);
-      const output = {};
-      for (const row of rows || []) if (symbols.has(row.symbol)) output[row.symbol] = { lastPrice: Number(row.lastPrice), priceChangePercent: Number(row.priceChangePercent) };
-      return output;
-    }));
-  } catch { res.json({}); }
-});
-
-app.listen(PORT, () => { ensureDb(); console.log(`BlueCrypto running on port ${PORT} - Disk: ${DATA_DIR}`); });
+app.listen(PORT, () => { ensureDb(); console.log(`Tensor Wallet running on port ${PORT} - Disk: ${DATA_DIR}`); });
