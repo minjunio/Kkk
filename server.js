@@ -38,10 +38,11 @@ app.use(session({
 }));
 
 const cache = new Map();
+const tensorCandleHistory = {}; 
 
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {}, tensorRegistry: [] }, null, 2));
+  if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {}, tensorRegistry: [], treasury: { collectedFeesUsdt: 0 } }, null, 2));
 }
 
 function readDb() {
@@ -52,8 +53,9 @@ function readDb() {
     if (!db.users) db.users = {};
     if (!db.otps) db.otps = {};
     if (!db.tensorRegistry) db.tensorRegistry = [];
+    if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
     return db;
-  } catch (error) { return { users: {}, otps: {}, tensorRegistry: [] }; }
+  } catch (error) { return { users: {}, otps: {}, tensorRegistry: [], treasury: { collectedFeesUsdt: 0 } }; }
 }
 
 function writeDb(db) {
@@ -77,7 +79,7 @@ function createWalletRecord(email, role = 'user') {
     encryptedVault: null, 
     publicWallets: [], 
     assets: [],
-    tensorAddress: `T0x${hash.slice(0, 40)}`, // Deterministic Tensor Address
+    tensorAddress: `T0x${hash.slice(0, 40)}`,
     tensorBalances: {}
   };
 }
@@ -143,27 +145,90 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
-// Global Tensor Market Loop (Runs every 8 seconds to update AI token prices)
-setInterval(() => {
-  const db = readDb();
-  let updated = false;
-  
-  if (db.tensorRegistry && db.tensorRegistry.length > 0) {
-    db.tensorRegistry.forEach(t => {
-      const r = Math.random(); 
-      let change = 0;
-      
-      if (t.vol === 'bull') change = r < 0.65 ? (Math.random() * 0.03) : -(Math.random() * 0.015);
-      else if (t.vol === 'bear') change = r < 0.65 ? -(Math.random() * 0.03) : (Math.random() * 0.015);
-      else if (t.vol === 'stable') change = r < 0.5 ? (Math.random() * 0.002) : -(Math.random() * 0.002);
-      else if (t.vol === 'hyper') change = r < 0.5 ? (Math.random() * 0.15) : -(Math.random() * 0.15);
-      
-      t.price = Math.max(0.000001, t.price * (1 + change));
-      updated = true;
-    });
+function initializeCandlesForToken(tokenId, startPrice) {
+  if (tensorCandleHistory[tokenId]) return;
+  tensorCandleHistory[tokenId] = [];
+  let currentBase = startPrice;
+  let timeCursor = Date.now() - (80 * 60 * 1000); 
+
+  for (let i = 0; i < 80; i++) {
+    const volatility = 0.02;
+    const open = currentBase;
+    const close = currentBase * (1 + (Math.random() - 0.5) * volatility);
+    const high = Math.max(open, close) * (1 + Math.random() * 0.01);
+    const low = Math.min(open, close) * (1 - Math.random() * 0.01);
     
-    if (updated) writeDb(db);
+    tensorCandleHistory[tokenId].push({ time: timeCursor, open, high, low, close });
+    currentBase = close;
+    timeCursor += 60 * 1000;
   }
+}
+
+// Global Tensor Market Loop
+setInterval(() => {
+  try {
+    if (!fs.existsSync(DB_PATH)) return;
+    const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8') || '{}');
+    if (!db.tensorRegistry || !db.tensorRegistry.length) return;
+
+    let totalMarketCap = 0;
+    db.tensorRegistry.forEach(t => {
+      if (!t.supply) t.supply = 10000000;
+      t.marketCap = t.price * t.supply;
+      totalMarketCap += t.marketCap;
+    });
+
+    let alphaDrift = 0;
+    db.tensorRegistry.forEach(t => {
+      t.dominance = totalMarketCap > 0 ? (t.marketCap / totalMarketCap) * 100 : 0;
+      if (t.dominance > 30 && t.vol !== 'pegged') {
+        const momentum = (Math.random() - 0.5) * (t.vol === 'hyper' ? 0.04 : 0.01);
+        alphaDrift += momentum * (t.dominance / 100);
+      }
+    });
+
+    db.tensorRegistry.forEach(t => {
+      const oldPrice = t.price;
+      
+      // Stablecoins ignore beta drift and random price walks entirely
+      if (t.vol === 'pegged') {
+        t.price = t.startPrice; 
+      } else {
+        const r = Math.random();
+        let nativeChange = 0;
+        
+        if (t.vol === 'bull') nativeChange = r < 0.62 ? (Math.random() * 0.025) : -(Math.random() * 0.015);
+        else if (t.vol === 'bear') nativeChange = r < 0.62 ? -(Math.random() * 0.025) : (Math.random() * 0.015);
+        else if (t.vol === 'stable') nativeChange = (Math.random() - 0.5) * 0.002;
+        else if (t.vol === 'hyper') nativeChange = (Math.random() - 0.5) * 0.12;
+
+        const betaFactor = t.dominance > 35 ? 0.1 : (1 - (t.dominance / 100));
+        const totalChange = nativeChange + (alphaDrift * betaFactor);
+        
+        t.price = Math.max(0.000001, t.price * (1 + totalChange));
+      }
+
+      t.marketCap = t.price * t.supply;
+      if (!t.volume) t.volume = 0;
+      t.volume = t.volume * 0.95 + (Math.abs(t.price - oldPrice) * t.supply * 0.05);
+
+      initializeCandlesForToken(t.id, oldPrice);
+      const history = tensorCandleHistory[t.id];
+      const now = Date.now();
+      const lastCandle = history[history.length - 1];
+
+      if (lastCandle && now - lastCandle.time < 60000) {
+        lastCandle.close = t.price;
+        if (t.price > lastCandle.high) lastCandle.high = t.price;
+        if (t.price < lastCandle.low) lastCandle.low = t.price;
+      } else {
+        history.push({ time: now, open: oldPrice, high: Math.max(oldPrice, t.price), low: Math.min(oldPrice, t.price), close: t.price });
+        if (history.length > 150) history.shift();
+      }
+    });
+
+    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  } catch (err) { console.error('Tensor loop error:', err); }
 }, 8000);
 
 async function cachedJson(key, ttlMs, fetcher) {
@@ -184,7 +249,7 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   } finally { clearTimeout(timer); }
 }
 
-/* --- Auth Routes --- */
+/* --- Auth & Views --- */
 app.get('/', (req, res) => res.render('index', { error: null, success: null, otpEmail: null }));
 
 app.post('/send-otp', async (req, res) => {
@@ -200,9 +265,7 @@ app.post('/verify-otp', (req, res) => {
   const email = normalizeEmail(req.body.email);
   const otp = String(req.body.otp || '').trim();
   const result = verifyOtp(email, otp);
-  
   if (!result.ok) return res.render('index', { error: result.reason, success: null, otpEmail: email });
-
   const user = getOrCreateUser(email, 'user');
   req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id };
   req.session.save(() => res.redirect('/wallet'));
@@ -212,7 +275,6 @@ app.post('/staff-login', (req, res) => {
   const username = String(req.body.username || '').trim();
   const password = String(req.body.password || '');
   if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) return res.render('index', { error: 'Invalid staff login.', success: null, otpEmail: null });
-
   const adminEmail = `admin@bluecrypto.local`;
   const user = getOrCreateUser(adminEmail, 'staff');
   req.session.user = { email: adminEmail, username: 'admin', role: 'staff', walletId: user.id };
@@ -222,13 +284,12 @@ app.post('/staff-login', (req, res) => {
 app.get('/logout', (req, res) => req.session.destroy(() => { res.clearCookie('bluecrypto.sid'); res.redirect('/'); }));
 app.post('/logout', (req, res) => res.redirect('/logout'));
 
-/* --- App Routes --- */
 app.get('/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
   res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
-/* --- API Routes: Standard Wallet --- */
+/* --- Crypto Wallet APIs --- */
 app.get('/api/wallet', requireAuthJson, (req, res) => res.json(getOrCreateUser(req.session.user.email, req.session.user.role)));
 
 app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
@@ -252,88 +313,98 @@ app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-/* --- API Routes: Tensor Network Ecosystem --- */
-
-// Fetch the current global registry and the active user's balances
+/* --- Tensor Network APIs --- */
 app.get('/api/tensor', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email];
-  res.json({
-    registry: db.tensorRegistry || [],
-    address: user.tensorAddress,
-    balances: user.tensorBalances || {}
-  });
+  res.json({ registry: db.tensorRegistry || [], address: user.tensorAddress, balances: user.tensorBalances || {} });
 });
 
-// Admin Only: Deploy a new Tensor Token to the global market
 app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
-  const { name, symbol, price, vol, icon } = req.body;
-  if (!name || !symbol || !price || !vol || !icon) return res.status(400).json({ error: 'Missing token parameters.' });
+  const { name, symbol, price, vol, icon, supply } = req.body;
+  if (!name || !symbol || !price || !vol || !icon || !supply) return res.status(400).json({ error: 'Missing parameters' });
 
   const db = readDb();
-  const cAddr = "T0x" + crypto.randomBytes(20).toString('hex');
+  const id = "T0x" + crypto.randomBytes(20).toString('hex');
   
   db.tensorRegistry.push({
-    id: cAddr,
-    name,
-    symbol: symbol.toUpperCase(),
-    price: Number(price),
-    startPrice: Number(price),
-    vol,
-    icon
+    id, name, symbol: symbol.toUpperCase(),
+    price: Number(price), startPrice: Number(price),
+    vol, icon, supply: Number(supply), marketCap: Number(price) * Number(supply),
+    volume: 0, dominance: 0
   });
   
   writeDb(db);
-  res.json({ ok: true, id: cAddr });
+  initializeCandlesForToken(id, Number(price));
+  res.json({ ok: true, id });
 });
 
-// Swap USDT for Tensor Tokens
 app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   const { tokenId, usdtAmount } = req.body;
-  if (!tokenId || !usdtAmount || Number(usdtAmount) <= 0) return res.status(400).json({ error: 'Invalid swap details.' });
+  const spend = Number(usdtAmount);
+  if (!tokenId || spend <= 0) return res.status(400).json({ error: 'Invalid payload' });
 
   const db = readDb();
   const token = db.tensorRegistry.find(t => t.id === tokenId);
-  if (!token) return res.status(404).json({ error: 'Tensor token not found.' });
+  if (!token) return res.status(404).json({ error: 'Token missing' });
 
+  // Deduct 0.0001% Swap Fee from input
+  const feeRate = 0.000001;
+  const feeAmount = spend * feeRate;
+  const netSpend = spend - feeAmount;
+
+  // Track global fees
+  if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
+  db.treasury.collectedFeesUsdt += feeAmount;
+
+  // Compute Slippage / Impact (Ignore if Pegged Stablecoin)
+  let priceImpact = 0;
+  if (token.vol !== 'pegged') {
+    const impactMultiplier = netSpend / (token.marketCap + 100);
+    priceImpact = Math.min(0.5, impactMultiplier * (token.vol === 'hyper' ? 2.5 : 0.8));
+  }
+  
+  const originalPrice = token.price;
+  const executionPrice = originalPrice * (1 + (priceImpact / 2)); 
+  const mintAmount = netSpend / executionPrice;
+
+  // Apply market changes
+  if (token.vol !== 'pegged') {
+    token.price = originalPrice * (1 + priceImpact);
+    token.marketCap = token.price * token.supply;
+  }
+  token.volume = (token.volume || 0) + spend;
+
+  // Fast-track Candle update
+  initializeCandlesForToken(tokenId, originalPrice);
+  const history = tensorCandleHistory[tokenId];
+  if (history && history.length) {
+    const last = history[history.length - 1];
+    last.close = token.price;
+    if (token.price > last.high) last.high = token.price;
+  }
+
+  // Finalize Swap
   const user = db.users[req.session.user.email];
+  user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + mintAmount;
   
-  // Assuming frontend Web3 wallet confirmed the USDT burn/transfer already.
-  // In a fully strictly enforced system, the backend would verify the transaction hash here.
-  const receiveAmount = Number(usdtAmount) / token.price;
-  
-  user.tensorBalances[tokenId] = (user.tensorBalances[tokenId] || 0) + receiveAmount;
   writeDb(db);
-  
-  res.json({ ok: true, newBalance: user.tensorBalances[tokenId], received: receiveAmount });
+  res.json({ ok: true, received: mintAmount, impactPercent: (priceImpact * 100).toFixed(2), feePaid: feeAmount });
 });
 
-// P2P Send Tensor Tokens
 app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   const { tokenId, amount, toAddress } = req.body;
   const sendAmt = Number(amount);
-  
-  if (!tokenId || !sendAmt || sendAmt <= 0 || !toAddress) {
-    return res.status(400).json({ error: 'Invalid send parameters.' });
-  }
+  if (!tokenId || !sendAmt || sendAmt <= 0 || !toAddress) return res.status(400).json({ error: 'Invalid parameters.' });
 
   const db = readDb();
   const sender = db.users[req.session.user.email];
-  
-  if ((sender.tensorBalances[tokenId] || 0) < sendAmt) {
-    return res.status(400).json({ error: 'Insufficient Tensor token balance.' });
-  }
+  if ((sender.tensorBalances[tokenId] || 0) < sendAmt) return res.status(400).json({ error: 'Insufficient balance.' });
 
-  // Find recipient by T0x address
   const recipientEmail = Object.keys(db.users).find(email => db.users[email].tensorAddress === toAddress);
-  
-  if (!recipientEmail) {
-    return res.status(404).json({ error: 'Recipient address not found on the Tensor network.' });
-  }
+  if (!recipientEmail) return res.status(404).json({ error: 'Recipient not found.' });
 
   const recipient = db.users[recipientEmail];
-
-  // Execute transfer
   sender.tensorBalances[tokenId] -= sendAmt;
   recipient.tensorBalances[tokenId] = (recipient.tensorBalances[tokenId] || 0) + sendAmt;
   
@@ -341,7 +412,13 @@ app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-/* --- Crypto Price APIs --- */
+app.get('/api/tensor/chart', (req, res) => {
+  const { tokenId } = req.query;
+  if (!tokenId || !tensorCandleHistory[tokenId]) return res.json({ candles: [] });
+  res.json({ candles: tensorCandleHistory[tokenId] });
+});
+
+/* --- Standard Market Endpoints --- */
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
     const ids = String(req.query.ids || '').split(',').filter(Boolean);
@@ -361,19 +438,6 @@ app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
       return output;
     }));
   } catch { res.json({}); }
-});
-
-app.get('/api/chart', requireAuthJson, async (req, res) => {
-  try {
-    const { id, symbol, tf = '5m' } = req.query;
-    if (symbol) {
-      const data = await cachedJson(`binance-chart:${symbol}:${tf}`, 4000, async () => {
-        const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/klines?symbol=${symbol}USDT&interval=${tf}&limit=80`);
-        return { candles: rows.map(k => ({ time: Number(k[0]), open: Number(k[1]), high: Number(k[2]), low: Number(k[3]), close: Number(k[4]) })) };
-      });
-      return res.json(data);
-    }
-  } catch { res.status(500).json({ error: 'Failed' }); }
 });
 
 app.listen(PORT, () => { ensureDb(); console.log(`BlueCrypto running on port ${PORT} - Disk: ${DATA_DIR}`); });
