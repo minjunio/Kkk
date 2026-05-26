@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Bluebook Wallet Login</title>
+  <title>BlueCrypto Login</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,752 +11,170 @@
 
   <style>
     :root {
-      --bg1:#eaf8ff;
-      --bg2:#f8fcff;
-      --bg3:#d7efff;
-      --panel:rgba(255,255,255,.88);
-      --panel2:rgba(255,255,255,.70);
-      --solid:#fff;
-      --soft:#f2f8ff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --blue:#0284c7;
-      --blue2:#2563eb;
-      --cyan:#38bdf8;
-      --green:#16a34a;
-      --red:#e11d48;
-      --orange:#d97706;
-      --border:rgba(15,23,42,.08);
-      --border2:rgba(2,132,199,.28);
-      --shadow:0 28px 90px rgba(37,99,235,.15);
-      --shadow2:0 14px 34px rgba(15,23,42,.08);
-      --safe-top:env(safe-area-inset-top);
-      --safe-bottom:env(safe-area-inset-bottom);
+      --bg1: #eaf8ff;
+      --bg2: #f8fcff;
+      --bg3: #d7efff;
+      --panel: rgba(255, 255, 255, 0.9);
+      --soft: #f0f7ff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #0284c7;
+      --blue2: #2563eb;
+      --cyan: #38bdf8;
+      --red: #e11d48;
+      --green: #16a34a;
+      --border: rgba(15, 23, 42, 0.08);
+      --shadow: 0 24px 64px rgba(37, 99, 235, 0.12);
+      --shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.05);
     }
 
-    * {
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html, body {
-      width:100%;
-      min-height:100%;
-      overflow-x:hidden;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, sans-serif; }
+    
     body {
-      min-height:100vh;
-      color:var(--text);
+      min-height: 100vh;
+      color: var(--text);
       background:
-        radial-gradient(circle at 8% 5%,rgba(56,189,248,.30),transparent 30%),
-        radial-gradient(circle at 95% 12%,rgba(37,99,235,.18),transparent 25%),
-        radial-gradient(circle at 50% 105%,rgba(14,165,233,.16),transparent 32%),
-        linear-gradient(135deg,var(--bg1),var(--bg2) 48%,var(--bg3));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:calc(18px + var(--safe-top)) 14px calc(18px + var(--safe-bottom));
+        radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.25), transparent 35%),
+        radial-gradient(circle at 90% 15%, rgba(37, 99, 235, 0.15), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.2), transparent 40%),
+        linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
     }
 
-    button,input {
-      font:inherit;
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
     }
 
-    button {
-      border:0;
-      cursor:pointer;
-    }
-
-    .shell {
-      width:min(1040px,100%);
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .hero {
-      position:relative;
-      overflow:hidden;
-      min-height:640px;
-      border-radius:36px;
-      padding:28px;
-      background:var(--panel);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(22px);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-
-    .hero::before {
-      content:"";
-      position:absolute;
-      right:-120px;
-      bottom:-150px;
-      width:380px;
-      height:380px;
-      border-radius:50%;
-      background:radial-gradient(circle,rgba(2,132,199,.25),transparent 70%);
-      pointer-events:none;
-    }
-
-    .hero-inner {
-      position:relative;
-      z-index:1;
-    }
-
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:34px;
-    }
-
+    .header { text-align: center; margin-bottom: 24px; }
     .logo {
-      width:52px;
-      height:52px;
-      border-radius:20px;
-      display:grid;
-      place-items:center;
-      color:white;
-      font-weight:950;
-      font-size:1.25rem;
-      background:linear-gradient(135deg,var(--blue2),var(--cyan));
-      box-shadow:0 16px 34px rgba(37,99,235,.25);
-      flex:0 0 auto;
+      width: 56px; height: 56px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 20px; display: grid; place-items: center;
+      color: white; font-size: 1.5rem; font-weight: 900;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
     }
-
-    .brand-title {
-      font-size:1.1rem;
-      font-weight:950;
-      letter-spacing:-.05em;
-    }
-
-    .brand-sub {
-      color:var(--muted);
-      font-size:.78rem;
-      font-weight:800;
-      margin-top:3px;
-    }
-
-    .badge {
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      color:var(--blue);
-      background:rgba(2,132,199,.08);
-      border:1px solid var(--border2);
-      font-size:.76rem;
-      font-weight:950;
-      margin-bottom:15px;
-    }
-
-    .dot {
-      width:7px;
-      height:7px;
-      border-radius:50%;
-      background:var(--blue);
-      animation:pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow:0 0 0 0 rgba(2,132,199,.38); }
-      80% { box-shadow:0 0 0 9px rgba(2,132,199,0); }
-      100% { box-shadow:0 0 0 0 rgba(2,132,199,0); }
-    }
-
-    h1 {
-      max-width:620px;
-      font-size:clamp(2.4rem,7vw,5rem);
-      line-height:.92;
-      letter-spacing:-.08em;
-      font-weight:950;
-      margin-bottom:15px;
-    }
-
-    .lead {
-      max-width:540px;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.65;
-      font-weight:750;
-    }
-
-    .features {
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-top:26px;
-    }
-
-    .feature {
-      min-height:112px;
-      border-radius:24px;
-      background:var(--panel2);
-      border:1px solid var(--border);
-      padding:14px;
-      box-shadow:var(--shadow2);
-    }
-
-    .feature strong {
-      display:block;
-      font-size:.92rem;
-      font-weight:950;
-      margin-bottom:6px;
-    }
-
-    .feature span {
-      color:var(--muted);
-      font-size:.75rem;
-      line-height:1.5;
-      font-weight:760;
-    }
-
-    .login-card {
-      min-height:640px;
-      border-radius:36px;
-      padding:18px;
-      background:var(--panel);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(22px);
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
+    .title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.04em; }
+    .subtitle { color: var(--muted); font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
 
     .tabs {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      padding:6px;
-      border-radius:22px;
-      background:var(--soft);
-      border:1px solid var(--border);
+      display: flex; gap: 8px; background: var(--soft);
+      padding: 6px; border-radius: 20px; margin-bottom: 24px; border: 1px solid var(--border);
     }
-
     .tab {
-      min-height:46px;
-      border-radius:17px;
-      background:transparent;
-      color:var(--muted);
-      font-weight:950;
-      font-size:.86rem;
+      flex: 1; min-height: 42px; border-radius: 14px; border: none;
+      background: transparent; color: var(--muted); font-weight: 800;
+      font-size: 0.85rem; cursor: pointer; transition: 0.2s;
     }
-
     .tab.active {
-      color:white;
-      background:linear-gradient(135deg,var(--blue2),var(--blue));
-      box-shadow:0 12px 24px rgba(37,99,235,.18);
+      background: white; color: var(--blue2); box-shadow: var(--shadow-sm);
     }
 
-    .panel {
-      flex:1;
-      display:none;
-      flex-direction:column;
-      justify-content:center;
-      gap:14px;
-      padding:16px 4px 4px;
-    }
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    .panel.active {
-      display:flex;
-    }
-
-    .section-title {
-      font-size:1.58rem;
-      font-weight:950;
-      letter-spacing:-.06em;
-    }
-
-    .section-sub {
-      color:var(--muted);
-      font-size:.88rem;
-      line-height:1.55;
-      font-weight:760;
-    }
-
-    .form {
-      display:grid;
-      gap:12px;
-      margin-top:8px;
-    }
-
-    .field {
-      display:grid;
-      gap:7px;
-    }
-
-    label {
-      color:var(--muted);
-      font-size:.72rem;
-      font-weight:950;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em; }
+    
     .input {
-      width:100%;
-      min-height:52px;
-      padding:13px 14px;
-      border-radius:17px;
-      border:1px solid var(--border);
-      outline:none;
-      background:var(--soft);
-      color:var(--text);
-      font-weight:850;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+      width: 100%; min-height: 54px; padding: 0 16px; border-radius: 18px;
+      background: var(--soft); border: 1px solid var(--border);
+      font-size: 0.95rem; font-weight: 600; color: var(--text); outline: none; transition: 0.2s;
     }
-
-    .input:focus {
-      border-color:var(--border2);
-      box-shadow:0 0 0 4px rgba(2,132,199,.08);
-    }
-
-    .otp-row {
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:8px;
-    }
+    .input:focus { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
 
     .btn {
-      min-height:52px;
-      border-radius:17px;
-      padding:0 15px;
-      font-weight:950;
-      white-space:nowrap;
+      width: 100%; min-height: 54px; border-radius: 18px; border: none;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      color: white; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2); transition: transform 0.1s;
     }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .btn-primary {
-      color:white;
-      background:linear-gradient(135deg,var(--blue2),var(--blue));
-      box-shadow:0 14px 28px rgba(37,99,235,.20);
+    .alert {
+      padding: 12px 16px; border-radius: 16px; font-size: 0.85rem; font-weight: 700; margin-bottom: 20px;
     }
+    .alert.error { background: rgba(225, 29, 72, 0.08); color: var(--red); border: 1px solid rgba(225, 29, 72, 0.2); }
+    .alert.success { background: rgba(22, 163, 74, 0.08); color: var(--green); border: 1px solid rgba(22, 163, 74, 0.2); }
 
-    .btn-secondary {
-      color:var(--text);
-      background:var(--solid);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow2);
-    }
-
-    .btn:disabled {
-      opacity:.55;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
-
-    .msg {
-      display:flex;
-      align-items:flex-start;
-      gap:9px;
-      border-radius:18px;
-      padding:12px;
-      font-size:.83rem;
-      line-height:1.5;
-      font-weight:820;
-      border:1px solid var(--border);
-    }
-
-    .msg.success {
-      background:rgba(22,163,74,.09);
-      color:var(--green);
-      border-color:rgba(22,163,74,.18);
-    }
-
-    .msg.error {
-      background:rgba(225,29,72,.08);
-      color:var(--red);
-      border-color:rgba(225,29,72,.16);
-    }
-
-    .msg.info {
-      background:rgba(2,132,199,.08);
-      color:var(--blue);
-      border-color:rgba(2,132,199,.16);
-    }
-
-    .status-line {
-      min-height:22px;
-      color:var(--muted);
-      font-size:.78rem;
-      font-weight:800;
-      line-height:1.5;
-    }
-
-    .check {
-      display:none;
-      color:var(--green);
-      font-weight:950;
-    }
-
-    .check.active {
-      display:inline;
-    }
-
-    .divider {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:var(--muted);
-      font-size:.76rem;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-      margin:4px 0;
-    }
-
-    .divider::before,
-    .divider::after {
-      content:"";
-      height:1px;
-      background:var(--border);
-      flex:1;
-    }
-
-    .small-note {
-      color:var(--muted);
-      font-size:.76rem;
-      line-height:1.55;
-      font-weight:760;
-    }
-
-    .staff-box {
-      padding:14px;
-      border-radius:22px;
-      background:var(--soft);
-      border:1px solid var(--border);
-    }
-
-    @media (max-width:860px) {
-      body {
-        align-items:flex-start;
-      }
-
-      .shell {
-        grid-template-columns:1fr;
-      }
-
-      .hero,
-      .login-card {
-        min-height:auto;
-        border-radius:30px;
-      }
-
-      .hero {
-        padding:22px;
-      }
-
-      .features {
-        grid-template-columns:1fr;
-      }
-
-      .feature {
-        min-height:auto;
-      }
-    }
-
-    @media (max-width:520px) {
-      body {
-        padding:calc(10px + var(--safe-top)) 10px calc(10px + var(--safe-bottom));
-      }
-
-      .hero {
-        padding:18px;
-        border-radius:26px;
-      }
-
-      .login-card {
-        padding:13px;
-        border-radius:26px;
-      }
-
-      .otp-row {
-        grid-template-columns:1fr;
-      }
-
-      .brand-sub {
-        display:none;
-      }
-
-      h1 {
-        font-size:2.45rem;
-      }
-    }
+    .footer-text { text-align: center; color: var(--muted); font-size: 0.75rem; font-weight: 600; margin-top: 20px; line-height: 1.5; }
   </style>
 </head>
-
 <body>
-  <main class="shell">
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="brand">
-          <div class="logo">B</div>
-          <div>
-            <div class="brand-title">Bluebook Wallet</div>
-            <div class="brand-sub">Secure wallet and trading access</div>
+
+  <div class="card">
+    <div class="header">
+      <div class="logo">B</div>
+      <div class="title">BlueCrypto</div>
+      <div class="subtitle">Secure Web3 Access</div>
+    </div>
+
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+    <% if (success) { %><div class="alert success"><%= success %></div><% } %>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-user" onclick="switchTab('user')">User Login</button>
+      <button class="tab" id="tab-admin" onclick="switchTab('admin')">Staff Login</button>
+    </div>
+
+    <div class="panel active" id="panel-user">
+      <% if (!otpEmail) { %>
+        <form action="/send-otp" method="POST">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input class="input" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
           </div>
-        </div>
-
-        <div class="badge"><span class="dot"></span>Email verified wallet access</div>
-
-        <h1>Your wallet, loaded by email.</h1>
-
-        <p class="lead">
-          Enter your email, verify the OTP code, then Bluebook loads your saved encrypted wallet.
-          New accounts create a wallet automatically after login.
-        </p>
-      </div>
-
-      <div class="features">
-        <div class="feature">
-          <strong>Encrypted vault</strong>
-          <span>Your wallet vault is saved encrypted and linked to your verified email session.</span>
-        </div>
-
-        <div class="feature">
-          <strong>Auto wallet load</strong>
-          <span>If your email already has a wallet, it loads the same wallet after OTP verification.</span>
-        </div>
-
-        <div class="feature">
-          <strong>Staff access</strong>
-          <span>Admin staff login is separated from normal email OTP login.</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="login-card">
-      <div class="tabs">
-        <button class="tab active" id="userTab" type="button" onclick="showPanel('user')">Email login</button>
-        <button class="tab" id="staffTab" type="button" onclick="showPanel('staff')">Staff login</button>
-      </div>
-
-      <div class="panel active" id="userPanel">
-        <div>
-          <h2 class="section-title">Verify your email</h2>
-          <p class="section-sub">
-            We send a 6-digit login code. After verification, you will be redirected to your wallet.
-          </p>
-        </div>
-
-        <% if (success) { %>
-          <div class="msg success">✓ <span><%= success %></span></div>
-        <% } %>
-
-        <% if (error) { %>
-          <div class="msg error">! <span><%= error %></span></div>
-        <% } %>
-
-        <form class="form" action="/send-otp" method="POST" id="sendOtpForm">
-          <div class="field">
-            <label>Email address <span class="check" id="emailCheck">✓</span></label>
-            <input
-              class="input"
-              id="emailInput"
-              type="email"
-              name="email"
-              placeholder="you@gmail.com"
-              value="<%= otpEmail || '' %>"
-              autocomplete="email"
-              required
-              oninput="syncEmailState()"
-            />
-          </div>
-
-          <button class="btn btn-primary" id="sendOtpBtn" type="submit">
-            Send verification code
-          </button>
-
-          <div class="status-line" id="sendStatus">
-            Check your inbox. If the code is missing, check spam or junk.
-          </div>
+          <button class="btn" type="submit">Send Login Code</button>
         </form>
-
-        <div class="divider">Code</div>
-
-        <form class="form" action="/verify-otp" method="POST" id="verifyOtpForm">
-          <input type="hidden" id="verifyEmailInput" name="email" value="<%= otpEmail || '' %>" />
-
-          <div class="otp-row">
-            <div class="field">
-              <label>6-digit code</label>
-              <input
-                class="input"
-                id="otpInput"
-                type="text"
-                name="otp"
-                inputmode="numeric"
-                pattern="[0-9]{6}"
-                maxlength="6"
-                placeholder="123456"
-                autocomplete="one-time-code"
-                required
-              />
-            </div>
-
-            <button class="btn btn-primary" type="submit">
-              Verify
-            </button>
+        <div class="footer-text">New wallets are generated automatically upon first login. Returning users will load their existing wallet.</div>
+      <% } else { %>
+        <form action="/verify-otp" method="POST">
+          <input type="hidden" name="email" value="<%= otpEmail %>" />
+          <div class="form-group">
+            <label>6-Digit Code for <%= otpEmail %></label>
+            <input class="input" type="text" name="otp" inputmode="numeric" maxlength="6" placeholder="123456" required autocomplete="one-time-code" autofocus />
           </div>
-
-          <p class="small-note">
-            New email? A wallet will be generated automatically after successful verification.
-            Existing email? Your saved wallet loads from the encrypted vault.
-          </p>
+          <button class="btn" type="submit">Verify & Access Wallet</button>
         </form>
+        <div class="footer-text">Check your inbox and spam folder for the code. It expires in 10 minutes.</div>
+      <% } %>
+    </div>
 
-        <div class="msg info">
-          i
-          <span>
-            OTP expires in 10 minutes. Resend is locked for 10 seconds after sending to avoid duplicate emails.
-          </span>
+    <div class="panel" id="panel-admin">
+      <form action="/staff-login" method="POST">
+        <div class="form-group">
+          <label>Username</label>
+          <input class="input" type="text" name="username" placeholder="admin" required autocomplete="username" />
         </div>
-      </div>
-
-      <div class="panel" id="staffPanel">
-        <div>
-          <h2 class="section-title">Staff login</h2>
-          <p class="section-sub">
-            Staff access uses the admin username and password from your server environment variables.
-          </p>
+        <div class="form-group">
+          <label>Password</label>
+          <input class="input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
         </div>
-
-        <div class="staff-box">
-          <form class="form" action="/staff-login" method="POST">
-            <div class="field">
-              <label>Username</label>
-              <input
-                class="input"
-                type="text"
-                name="username"
-                placeholder="admin"
-                autocomplete="username"
-                required
-              />
-            </div>
-
-            <div class="field">
-              <label>Password</label>
-              <input
-                class="input"
-                type="password"
-                name="password"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                required
-              />
-            </div>
-
-            <button class="btn btn-primary" type="submit">
-              Staff login
-            </button>
-          </form>
-        </div>
-
-        <p class="small-note">
-          Recommended Render variables:
-          <br>
-          <strong>STAFF_USERNAME</strong>, <strong>STAFF_PASSWORD</strong>, <strong>STAFF_EMAIL</strong>,
-          <strong>GMAIL_USER</strong>, <strong>GMAIL_APP_PASSWORD</strong>.
-        </p>
-      </div>
-    </section>
-  </main>
+        <button class="btn" type="submit">Staff Login</button>
+      </form>
+      <div class="footer-text">Staff logins automatically generate a fresh, temporary wallet session for testing purposes.</div>
+    </div>
+  </div>
 
   <script>
-    const emailInput = document.getElementById('emailInput');
-    const verifyEmailInput = document.getElementById('verifyEmailInput');
-    const emailCheck = document.getElementById('emailCheck');
-    const sendOtpForm = document.getElementById('sendOtpForm');
-    const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const sendStatus = document.getElementById('sendStatus');
-    const otpInput = document.getElementById('otpInput');
-
-    function showPanel(type) {
-      const userPanel = document.getElementById('userPanel');
-      const staffPanel = document.getElementById('staffPanel');
-      const userTab = document.getElementById('userTab');
-      const staffTab = document.getElementById('staffTab');
-
-      if (type === 'staff') {
-        userPanel.classList.remove('active');
-        staffPanel.classList.add('active');
-        userTab.classList.remove('active');
-        staffTab.classList.add('active');
-      } else {
-        staffPanel.classList.remove('active');
-        userPanel.classList.add('active');
-        staffTab.classList.remove('active');
-        userTab.classList.add('active');
-      }
+    function switchTab(target) {
+      document.getElementById('tab-user').classList.remove('active');
+      document.getElementById('tab-admin').classList.remove('active');
+      document.getElementById('panel-user').classList.remove('active');
+      document.getElementById('panel-admin').classList.remove('active');
+      
+      document.getElementById('tab-' + target).classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
     }
-
-    function isValidEmail(value) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
-    }
-
-    function syncEmailState() {
-      const email = emailInput.value.trim();
-
-      verifyEmailInput.value = email;
-
-      if (isValidEmail(email)) {
-        emailCheck.classList.add('active');
-      } else {
-        emailCheck.classList.remove('active');
-      }
-    }
-
-    function startResendCooldown(seconds = 10) {
-      let remaining = seconds;
-
-      sendOtpBtn.disabled = true;
-      sendOtpBtn.textContent = `Resend in ${remaining}s`;
-      sendStatus.textContent = 'Verification code sending. Check inbox and spam folder.';
-
-      const timer = setInterval(() => {
-        remaining -= 1;
-
-        if (remaining <= 0) {
-          clearInterval(timer);
-          sendOtpBtn.disabled = false;
-          sendOtpBtn.textContent = 'Send verification code';
-          sendStatus.textContent = 'You can resend the OTP code now.';
-          return;
-        }
-
-        sendOtpBtn.textContent = `Resend in ${remaining}s`;
-      }, 1000);
-    }
-
-    sendOtpForm.addEventListener('submit', () => {
-      syncEmailState();
-      startResendCooldown(10);
-    });
-
-    otpInput?.addEventListener('input', () => {
-      otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
-    });
-
-    syncEmailState();
-
-    <% if (otpEmail) { %>
-      document.addEventListener('DOMContentLoaded', () => {
-        const input = document.getElementById('otpInput');
-        if (input) input.focus();
-      });
-    <% } %>
   </script>
 </body>
 </html>
