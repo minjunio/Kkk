@@ -1,3046 +1,887 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>BlueCrypto Wallet</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #f4f9ff;
-      --bg-2: #e8f3ff;
-      --surface: #ffffff;
-      --surface-2: #f7fbff;
-      --surface-3: #eef6ff;
-      --surface-hover: #e9f5ff;
-      --border: rgba(15, 23, 42, 0.08);
-      --border-strong: rgba(2, 132, 199, 0.24);
-      --text: #0f172a;
-      --muted: #64748b;
-      --muted-2: #94a3b8;
-      --primary: #0284c7;
-      --primary-2: #2563eb;
-      --blue-candle: #0284c7;
-      --pink-candle: #e11d48;
-      --success: #0284c7;
-      --danger: #e11d48;
-      --warning: #d97706;
-      --shadow: 0 22px 70px rgba(15, 23, 42, 0.08);
-      --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.06);
-      --radius: 22px;
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
-    }
-
-    [data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #050816;
-      --bg-2: #08111f;
-      --surface: #0d1628;
-      --surface-2: #111d33;
-      --surface-3: #15233d;
-      --surface-hover: #192947;
-      --border: rgba(125, 211, 252, 0.13);
-      --border-strong: rgba(56, 189, 248, 0.3);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --muted-2: #64748b;
-      --primary: #38bdf8;
-      --primary-2: #2563eb;
-      --blue-candle: #38bdf8;
-      --pink-candle: #fb7185;
-      --success: #38bdf8;
-      --danger: #fb7185;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-      --shadow-soft: 0 12px 34px rgba(0, 0, 0, 0.22);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(2, 132, 199, 0.1), transparent 28%),
-        radial-gradient(circle at 90% 6%, rgba(225, 29, 72, 0.07), transparent 23%),
-        linear-gradient(135deg, var(--bg), var(--bg-2));
-      overflow-x: hidden;
-      padding-bottom: calc(92px + var(--safe-bottom));
-    }
-
-    [data-theme="dark"] body {
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 28%),
-        radial-gradient(circle at 90% 6%, rgba(251, 113, 133, 0.09), transparent 23%),
-        linear-gradient(135deg, var(--bg), var(--bg-2));
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-    }
-
-    .shell {
-      width: min(1240px, 100%);
-      margin: 0 auto;
-      padding: 16px 16px 0;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 80;
-      padding: calc(10px + var(--safe-top)) 14px 10px;
-      background: rgba(244, 249, 255, 0.92);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-    }
-
-    [data-theme="dark"] .topbar {
-      background: rgba(5, 8, 22, 0.9);
-    }
-
-    .topbar-inner {
-      width: min(1240px, 100%);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 950;
-      letter-spacing: -0.06em;
-      background: linear-gradient(135deg, #2563eb, #38bdf8);
-      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
-    }
-
-    .brand-title {
-      color: var(--text);
-      font-weight: 950;
-      letter-spacing: -0.045em;
-      font-size: 1.04rem;
-      white-space: nowrap;
-    }
-
-    .brand-sub {
-      color: var(--muted);
-      font-size: 0.73rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .pulse {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 0 rgba(2, 132, 199, 0.45);
-      animation: pulse 1.7s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(2,132,199,.42); }
-      80% { box-shadow: 0 0 0 9px rgba(2,132,199,0); }
-      100% { box-shadow: 0 0 0 0 rgba(2,132,199,0); }
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .icon-btn,
-    .small-btn,
-    .tab-btn,
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn,
-    .action-btn,
-    .trade-btn {
-      cursor: pointer;
-      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .icon-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .icon-btn:hover,
-    .small-btn:hover,
-    .primary-btn:hover,
-    .secondary-btn:hover,
-    .trade-btn:hover {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-    }
-
-    .user-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px 7px 7px;
-      border-radius: 999px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-weight: 900;
-      font-size: 0.8rem;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-    }
-
-    .hero {
-      margin-top: 16px;
-      border-radius: 28px;
-      padding: 24px;
-      background: linear-gradient(135deg, #ffffff, #eff8ff 48%, #e6f1ff);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      position: relative;
-    }
-
-    [data-theme="dark"] .hero {
-      background: linear-gradient(135deg, #0b1220, #10213c 48%, #0b3954);
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: auto -110px -130px auto;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(2,132,199,.14), transparent 68%);
-    }
-
-    .hero-grid {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      color: var(--primary);
-      background: rgba(2, 132, 199, 0.08);
-      border: 1px solid var(--border-strong);
-      font-size: 0.75rem;
-      font-weight: 950;
-    }
-
-    .balance-label {
-      margin-top: 22px;
-      color: var(--muted);
-      font-weight: 850;
-      font-size: 0.88rem;
-    }
-
-    .balance {
-      margin-top: 7px;
-      font-weight: 950;
-      letter-spacing: -0.07em;
-      line-height: 0.95;
-      font-size: clamp(2.55rem, 8vw, 5rem);
-      font-variant-numeric: tabular-nums;
-      color: var(--text);
-      transition: color 0.24s ease, text-shadow 0.24s ease;
-      will-change: color, text-shadow;
-    }
-
-    .balance.balance-up {
-      color: var(--blue-candle);
-      text-shadow: 0 0 20px rgba(2, 132, 199, 0.16);
-    }
-
-    .balance.balance-down {
-      color: var(--pink-candle);
-      text-shadow: 0 0 20px rgba(225, 29, 72, 0.14);
-    }
-
-    .pnl-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 950;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .pos {
-      color: var(--success);
-      background: rgba(2, 132, 199, 0.08);
-    }
-
-    .neg {
-      color: var(--danger);
-      background: rgba(225, 29, 72, 0.08);
-    }
-
-    .neu {
-      color: var(--muted);
-      background: rgba(148, 163, 184, 0.11);
-    }
-
-    .hero-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .stat-card {
-      padding: 13px;
-      border-radius: 18px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 0.7rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .stat-value {
-      margin-top: 6px;
-      color: var(--text);
-      font-size: 0.98rem;
-      font-weight: 950;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .hero-actions {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      align-content: end;
-    }
-
-    .action-btn,
-    .trade-btn {
-      min-height: 74px;
-      border-radius: 20px;
-      padding: 13px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      text-align: left;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .trade-btn {
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-      color: white;
-      border-color: transparent;
-    }
-
-    .action-btn strong,
-    .trade-btn strong {
-      display: block;
-      font-size: 0.95rem;
-      font-weight: 950;
-      margin-bottom: 4px;
-    }
-
-    .action-btn span,
-    .trade-btn span {
-      color: var(--muted);
-      font-size: 0.73rem;
-      font-weight: 800;
-    }
-
-    .trade-btn span {
-      color: rgba(255,255,255,0.82);
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 390px;
-      gap: 16px;
-      margin-top: 16px;
-    }
-
-    .panel {
-      border-radius: var(--radius);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-soft);
-      padding: 16px;
-      overflow: hidden;
-    }
-
-    .panel + .panel {
-      margin-top: 16px;
-    }
-
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 13px;
-    }
-
-    .panel-title {
-      color: var(--text);
-      font-size: 1.02rem;
-      font-weight: 950;
-      letter-spacing: -0.04em;
-    }
-
-    .panel-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.77rem;
-      font-weight: 750;
-      line-height: 1.45;
-    }
-
-    .small-btn {
-      padding: 9px 12px;
-      border-radius: 13px;
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-size: 0.77rem;
-      font-weight: 950;
-      white-space: nowrap;
-    }
-
-    .small-btn.primary {
-      color: #fff;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-      border-color: transparent;
-    }
-
-    .asset-list,
-    .market-list,
-    .stake-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .row-card {
-      display: grid;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 17px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    }
-
-    .row-card:hover {
-      transform: translateY(-1px);
-      border-color: var(--border-strong);
-      background: var(--surface-hover);
-    }
-
-    .asset-row {
-      grid-template-columns: minmax(0, 1.4fr) 0.8fr 0.9fr;
-      cursor: pointer;
-    }
-
-    .market-row {
-      grid-template-columns: minmax(0, 1.2fr) 0.85fr 0.7fr;
-    }
-
-    .stake-row {
-      grid-template-columns: minmax(0, 1.05fr) 0.65fr 0.65fr 0.65fr auto;
-    }
-
-    .asset-main {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
-    }
-
-    .coin {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      background: var(--surface-3);
-      border: 1px solid var(--border);
-      color: var(--primary);
-      font-weight: 950;
-      font-size: 0.72rem;
-    }
-
-    .coin img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .name {
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 950;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .sym {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.74rem;
-      font-weight: 850;
-    }
-
-    .cell-label {
-      display: none;
-      color: var(--muted);
-      font-size: 0.68rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .cell-value {
-      text-align: right;
-      color: var(--text);
-      font-size: 0.88rem;
-      font-weight: 950;
-      font-variant-numeric: tabular-nums;
-      transition: color 0.22s ease, text-shadow 0.22s ease;
-    }
-
-    .cell-value.up {
-      animation: priceUp 0.5s ease;
-    }
-
-    .cell-value.down {
-      animation: priceDown 0.5s ease;
-    }
-
-    @keyframes priceUp {
-      0% { color: var(--text); }
-      35% { color: var(--blue-candle); text-shadow: 0 0 14px rgba(2,132,199,.22); }
-      100% { color: var(--text); text-shadow: none; }
-    }
-
-    @keyframes priceDown {
-      0% { color: var(--text); }
-      35% { color: var(--pink-candle); text-shadow: 0 0 14px rgba(225,29,72,.2); }
-      100% { color: var(--text); text-shadow: none; }
-    }
-
-    .cell-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.73rem;
-      font-weight: 800;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .empty {
-      padding: 24px 16px;
-      border-radius: 18px;
-      border: 1px dashed var(--border-strong);
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.86rem;
-      font-weight: 800;
-      line-height: 1.55;
-      background: var(--surface-2);
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      margin-bottom: 12px;
-      padding-bottom: 2px;
-    }
-
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-btn {
-      flex: 0 0 auto;
-      padding: 10px 13px;
-      border-radius: 999px;
-      background: var(--surface-2);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      font-size: 0.76rem;
-      font-weight: 950;
-    }
-
-    .tab-btn.active {
-      color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-      border-color: transparent;
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.16);
-    }
-
-    .global-search {
-      margin-top: 12px;
-      display: grid;
-      gap: 8px;
-    }
-
-    .global-search-card {
-      border-radius: 17px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 12px;
-    }
-
-    .global-results {
-      display: grid;
-      gap: 8px;
-      max-height: 260px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-
-    .insight-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-    }
-
-    .insight {
-      border-radius: 17px;
-      padding: 13px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-
-    .insight-label {
-      color: var(--muted);
-      font-size: 0.68rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .insight-value {
-      margin-top: 7px;
-      color: var(--text);
-      font-size: 1.02rem;
-      font-weight: 950;
-      letter-spacing: -0.04em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .drawer-overlay,
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: none;
-      background: rgba(0,0,0,0.42);
-      backdrop-filter: blur(8px);
-    }
-
-    .drawer-overlay.active,
-    .modal-overlay.active {
-      display: block;
-    }
-
-    .drawer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: min(470px, 100%);
-      height: 100%;
-      overflow-y: auto;
-      padding: calc(18px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      box-shadow: -24px 0 80px rgba(0,0,0,0.22);
-      animation: slide 0.23s ease both;
-    }
-
-    @keyframes slide {
-      from { transform: translateX(36px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    .drawer-head,
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .drawer-title,
-    .modal-title {
-      color: var(--text);
-      font-size: 1.25rem;
-      font-weight: 950;
-      letter-spacing: -0.055em;
-    }
-
-    .drawer-sub,
-    .modal-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 750;
-      line-height: 1.45;
-    }
-
-    .close {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 1.25rem;
-      font-weight: 950;
-    }
-
-    .section {
-      margin-top: 12px;
-      border-radius: 19px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      padding: 13px;
-    }
-
-    .section h3 {
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 950;
-      letter-spacing: -0.035em;
-      margin-bottom: 10px;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .form-row {
-      position: relative;
-      display: grid;
-      gap: 7px;
-    }
-
-    .form-row label {
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 950;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .input,
-    .select {
-      width: 100%;
-      min-height: 46px;
-      border-radius: 14px;
-      padding: 12px;
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      outline: none;
-      font-weight: 850;
-    }
-
-    .input:focus,
-    .select:focus {
-      border-color: var(--border-strong);
-      box-shadow: 0 0 0 4px rgba(2,132,199,0.08);
-    }
-
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 10px;
-    }
-
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn {
-      min-height: 47px;
-      border-radius: 15px;
-      font-weight: 950;
-    }
-
-    .primary-btn {
-      color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-      box-shadow: 0 14px 30px rgba(37,99,235,0.18);
-    }
-
-    .secondary-btn {
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-    }
-
-    .danger-btn {
-      color: white;
-      background: linear-gradient(135deg, #be123c, #fb7185);
-    }
-
-    .combo {
-      position: relative;
-    }
-
-    .suggestions {
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      right: 0;
-      z-index: 20;
-      display: none;
-      max-height: 280px;
-      overflow-y: auto;
-      border-radius: 15px;
-      background: var(--surface);
-      border: 1px solid var(--border-strong);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .suggestions.active {
-      display: block;
-    }
-
-    .suggestion {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 850;
-    }
-
-    .suggestion:hover {
-      background: var(--surface-hover);
-    }
-
-    .manager-list {
-      display: grid;
-      gap: 8px;
-      max-height: 320px;
-      overflow-y: auto;
-    }
-
-    .manager-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-      padding: 11px;
-      border-radius: 15px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-    }
-
-    .manager-name {
-      color: var(--text);
-      font-size: 0.85rem;
-      font-weight: 950;
-    }
-
-    .manager-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 0.73rem;
-      font-weight: 800;
-      word-break: break-all;
-    }
-
-    .mini-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .mini-icon {
-      min-width: 34px;
-      height: 34px;
-      padding: 0 9px;
-      border-radius: 11px;
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-weight: 950;
-      font-size: 0.72rem;
-    }
-
-    .mini-icon.danger {
-      color: var(--danger);
-    }
-
-    .modal-card {
-      width: min(560px, calc(100% - 26px));
-      max-height: calc(100vh - 28px - var(--safe-top) - var(--safe-bottom));
-      overflow-y: auto;
-      margin: calc(14px + var(--safe-top)) auto 0;
-      padding: 16px;
-      border-radius: 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      animation: pop 0.22s ease both;
-    }
-
-    .modal-card.chart {
-      width: min(940px, calc(100% - 22px));
-    }
-
-    @keyframes pop {
-      from { transform: translateY(18px) scale(0.98); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
-    }
-
-    .chart-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .chart-price {
-      color: var(--text);
-      font-size: 2rem;
-      font-weight: 950;
-      letter-spacing: -0.06em;
-      font-variant-numeric: tabular-nums;
-      transition: color 0.25s ease, text-shadow 0.25s ease;
-    }
-
-    .chart-price.up {
-      color: var(--blue-candle);
-      text-shadow: 0 0 18px rgba(2,132,199,0.2);
-    }
-
-    .chart-price.down {
-      color: var(--pink-candle);
-      text-shadow: 0 0 18px rgba(225,29,72,0.18);
-    }
-
-    .range-row {
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-    }
-
-    .range-row button {
-      flex: 0 0 auto;
-      padding: 9px 12px;
-      border-radius: 999px;
-      color: var(--muted);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 0.74rem;
-      font-weight: 950;
-    }
-
-    .range-row button.active {
-      color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-    }
-
-    .chart-wrap {
-      height: 390px;
-      border-radius: 18px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      position: relative;
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(94px + var(--safe-bottom));
-      transform: translateX(-50%) translateY(12px);
-      z-index: 150;
-      max-width: min(430px, calc(100% - 28px));
-      padding: 12px 14px;
-      border-radius: 15px;
-      background: rgba(2,6,23,0.92);
-      color: white;
-      box-shadow: var(--shadow-soft);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.22s ease;
-      font-weight: 850;
-      font-size: 0.84rem;
-    }
-
-    .toast.active {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 50%;
-      bottom: calc(12px + var(--safe-bottom));
-      transform: translateX(-50%);
-      z-index: 70;
-      width: min(430px, calc(100% - 28px));
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      padding: 8px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-    }
-
-    [data-theme="dark"] .bottom-nav {
-      background: rgba(13,22,40,0.9);
-    }
-
-    .bottom-nav button {
-      min-height: 48px;
-      border-radius: 16px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 0.72rem;
-      font-weight: 950;
-    }
-
-    .bottom-nav button.active {
-      color: white;
-      background: linear-gradient(135deg, var(--primary-2), var(--primary));
-    }
-
-    @media (max-width: 980px) {
-      .hero-grid,
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-actions {
-        grid-template-columns: repeat(4, 1fr);
-      }
-
-      .action-btn,
-      .trade-btn {
-        text-align: center;
-        min-height: 70px;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .user-chip span {
-        display: none;
-      }
-
-      .shell {
-        padding: 13px 13px 0;
-      }
-
-      .hero {
-        padding: 19px;
-        border-radius: 25px;
-      }
-
-      .hero-actions {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .hero-stats {
-        grid-template-columns: 1fr;
-      }
-
-      .stat-card {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-      }
-
-      .stat-value {
-        margin-top: 0;
-      }
-
-      .panel {
-        padding: 13px;
-        border-radius: 20px;
-      }
-
-      .asset-row,
-      .market-row,
-      .stake-row {
-        grid-template-columns: 1fr;
-      }
-
-      .row-card > div:not(.asset-main) {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding-top: 8px;
-        border-top: 1px solid var(--border);
-      }
-
-      .cell-label {
-        display: block;
-      }
-
-      .button-row {
-        grid-template-columns: 1fr;
-      }
-
-      .drawer {
-        width: 100%;
-      }
-
-      .chart-wrap {
-        height: 330px;
-      }
-    }
-
-    @media (max-width: 410px) {
-      .brand-title { font-size: 0.96rem; }
-      .brand-sub { font-size: 0.68rem; }
-      .logo { width: 39px; height: 39px; }
-      .icon-btn { width: 40px; height: 40px; }
-      .balance { font-size: 2.45rem; }
-      .hero-actions { grid-template-columns: 1fr 1fr; }
-      .insight-grid { grid-template-columns: 1fr; }
-    }
-  </style>
-</head>
-
-<body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="logo">B</div>
-        <div>
-          <div class="brand-title">BlueCrypto</div>
-          <div class="brand-sub"><span class="pulse"></span><span id="syncText">Live prices every 2s</span></div>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <button class="icon-btn" onclick="goTrading()" aria-label="Trading">
-          <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h16M8 16V9m5 7V6m5 10v-4"/>
-          </svg>
-        </button>
-
-        <button class="icon-btn" onclick="refreshPrices(true)" aria-label="Refresh prices">
-          <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20 9A8 8 0 006.3 5.1L4 10m16 4l-2.3 4.9A8 8 0 014 15"/>
-          </svg>
-        </button>
-
-        <button class="icon-btn" onclick="openSettings()" aria-label="Settings">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
-
-        <div class="user-chip">
-          <div class="avatar"></div>
-          <span><%= typeof username !== 'undefined' ? username : 'user' %></span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main class="shell">
-    <section class="hero">
-      <div class="hero-grid">
-        <div>
-          <div class="eyebrow"><span class="pulse"></span> Live wallet terminal</div>
-          <div class="balance-label">Total portfolio value</div>
-          <div class="balance" id="totalBalance">$0.00</div>
-          <div style="margin-top:14px"><span class="pnl-chip neu" id="totalPnl">$0.00 (0.00%)</span></div>
-
-          <div class="hero-stats">
-            <div class="stat-card">
-              <div class="stat-label">Spot assets</div>
-              <div class="stat-value" id="spotCount">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Staked value</div>
-              <div class="stat-value" id="stakingBalance">$0.00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Staking PnL</div>
-              <div class="stat-value" id="stakingProfits">+$0.00</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-actions">
-          <button class="trade-btn" onclick="goTrading()"><strong>Trading</strong><span>Open trading terminal</span></button>
-          <button class="action-btn" onclick="openModal('swapModal')"><strong>Swap</strong><span>Any USDT pair</span></button>
-          <button class="action-btn" onclick="openModal('sendModal')"><strong>Send</strong><span>Transfer from spot</span></button>
-          <button class="action-btn" onclick="openModal('stakeModal')"><strong>Stake</strong><span>Highest APY options</span></button>
-        </div>
-      </div>
-    </section>
-
-    <section class="main-grid">
-      <div>
-        <section class="panel" id="assetsSection">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Assets</h2>
-              <p class="panel-sub">Clean overview. Tap an asset to view candles.</p>
-            </div>
-            <button class="small-btn primary" onclick="openSettings('assetTools')">Settings</button>
-          </div>
-          <div class="asset-list" id="portfolioList"></div>
-        </section>
-
-        <section class="panel" id="marketsSection">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Markets</h2>
-              <p class="panel-sub">Browse and search USDT-paired assets.</p>
-            </div>
-            <button class="small-btn" onclick="refreshPrices(true)">Refresh</button>
-          </div>
-
-          <div class="tabs">
-            <button class="tab-btn active" onclick="switchMarketTab('top', this)">Top</button>
-            <button class="tab-btn" onclick="switchMarketTab('alts', this)">Altcoins</button>
-            <button class="tab-btn" onclick="switchMarketTab('defi', this)">DeFi</button>
-            <button class="tab-btn" onclick="switchMarketTab('meme', this)">Meme</button>
-            <button class="tab-btn" onclick="switchMarketTab('watch', this)">Watch</button>
-          </div>
-
-          <div class="market-list" id="marketTabsList"></div>
-
-          <div class="global-search">
-            <div class="global-search-card form-row combo">
-              <label>Search all assets</label>
-              <input class="input" id="globalSearchInput" placeholder="Search BTC, ETH, DeFi, meme, AI, altcoins..." oninput="renderGlobalSearch(this.value)" />
-              <div class="global-results" id="globalSearchResults"></div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <aside>
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Performance</h2>
-              <p class="panel-sub">PnL and allocation summary.</p>
-            </div>
-          </div>
-
-          <div class="insight-grid">
-            <div class="insight">
-              <div class="insight-label">Daily PnL</div>
-              <div class="insight-value" id="dailyPnl">$0.00</div>
-            </div>
-            <div class="insight">
-              <div class="insight-label">Best ROI</div>
-              <div class="insight-value" id="bestAsset">--</div>
-            </div>
-            <div class="insight">
-              <div class="insight-label">Cost basis</div>
-              <div class="insight-value" id="totalCost">$0.00</div>
-            </div>
-            <div class="insight">
-              <div class="insight-label">Largest</div>
-              <div class="insight-value" id="largestHolding">--</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel" id="stakingSection">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Staking</h2>
-              <p class="panel-sub">Highest yield first, with optional auto-switch.</p>
-            </div>
-            <button class="small-btn" onclick="openSettings('stakingTools')">Options</button>
-          </div>
-          <div class="stake-list" id="stakingList"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-title">Real wallet</h2>
-              <p class="panel-sub">Encrypted client-side EVM wallet vault.</p>
-            </div>
-          </div>
-          <div class="manager-list" id="publicWalletList"></div>
-        </section>
-      </aside>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="active" onclick="scrollToSection('top', this)">Home</button>
-    <button onclick="scrollToSection('assetsSection', this)">Assets</button>
-    <button onclick="goTrading()">Trading</button>
-    <button onclick="openSettings()">Settings</button>
-  </nav>
-
-  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event, 'settingsOverlay')">
-    <aside class="drawer">
-      <div class="drawer-head">
-        <div>
-          <h2 class="drawer-title">Settings</h2>
-          <p class="drawer-sub">Assets are saved to your account and shared with wallet/trading pages.</p>
-        </div>
-        <button class="close" onclick="closeSettings()">×</button>
-      </div>
-
-      <section class="section" id="assetTools">
-        <h3>Asset manager</h3>
-        <div class="form-grid">
-          <div class="form-row combo">
-            <label>Search every supported USDT pair</label>
-            <input class="input" id="assetSearchInput" placeholder="Search BTC, ETH, PEPE, RENDER, AAVE..." autocomplete="off" oninput="filterCurrencyUniverse(this.value, 'assetSuggestions', selectAssetTicker)" />
-            <div class="suggestions" id="assetSuggestions"></div>
-          </div>
-
-          <div class="form-row">
-            <label>Currency</label>
-            <select class="select" id="currencyInput" onchange="selectAssetTicker(this.value)"></select>
-          </div>
-
-          <div class="form-row">
-            <label>Name</label>
-            <input class="input" id="nameInput" placeholder="Bitcoin" />
-          </div>
-
-          <div class="form-row">
-            <label>Balance</label>
-            <input class="input" type="number" id="amountInput" step="any" placeholder="0.00" />
-          </div>
-
-          <div class="form-row">
-            <label>Average buy price USD</label>
-            <input class="input" type="number" id="buyPriceInput" step="any" placeholder="0.00" />
-          </div>
-
-          <div class="button-row">
-            <button class="secondary-btn" onclick="clearAssetForm()">Clear</button>
-            <button class="primary-btn" onclick="saveAssetEntry()">Save asset</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h3>Visible assets</h3>
-        <div class="manager-list" id="assetManagerList"></div>
-      </section>
-
-      <section class="section" id="stakingTools">
-        <h3>Auto staking</h3>
-        <div class="form-grid">
-          <div class="form-row">
-            <label>Auto-switch to highest yield if current asset fails</label>
-            <select class="select" id="autoStakeToggle" onchange="saveStakingSettings()">
-              <option value="on">Enabled</option>
-              <option value="off">Disabled</option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <label>Risk mode</label>
-            <select class="select" id="stakingRiskMode" onchange="saveStakingSettings()">
-              <option value="balanced">Balanced</option>
-              <option value="highest">Highest APY</option>
-              <option value="stable">Stable networks</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <h3>Wallet security</h3>
-        <p class="drawer-sub">
-          Real EVM wallet keys are generated in your browser and encrypted before they are saved.
-          Never share your seed phrase or private key.
-        </p>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="unlockExistingWallet()">Unlock wallet</button>
-          <button class="secondary-btn" onclick="revealSecretPhrase()">Show seed phrase</button>
-        </div>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="revealPrivateKey()">Show private key</button>
-          <button class="primary-btn" onclick="createNewRealWalletForAccount()">Create wallet</button>
-        </div>
-      </section>
-
-      <section class="section">
-        <h3>Theme</h3>
-        <div class="button-row">
-          <button class="secondary-btn" onclick="setTheme('light')">Light mode</button>
-          <button class="secondary-btn" onclick="setTheme('dark')">Dark mode</button>
-        </div>
-      </section>
-
-      <section class="section">
-        <h3>Price feed</h3>
-        <p class="drawer-sub" id="feedStatus">Prices refresh every 2 seconds. Live feed is used when possible, local movement fills gaps smoothly.</p>
-        <div class="button-row">
-          <button class="secondary-btn" onclick="refreshPrices(true)">Refresh now</button>
-          <button class="danger-btn" onclick="resetDemoData()">Reset local data</button>
-        </div>
-      </section>
-    </aside>
-  </div>
-
-  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event, 'sendModal')">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <h2 class="modal-title">Send</h2>
-          <p class="modal-sub">This updates your app balance. For real on-chain sends, connect an RPC/broadcast flow.</p>
-        </div>
-        <button class="close" onclick="closeModal('sendModal')">×</button>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Asset</label>
-          <select class="select" id="sendAssetSelect"></select>
-        </div>
-
-        <div class="form-row">
-          <label>Destination</label>
-          <input class="input" placeholder="0x... or wallet address" />
-        </div>
-
-        <div class="form-row">
-          <label>Amount</label>
-          <input class="input" type="number" id="sendAmountInput" step="any" placeholder="0.00" />
-        </div>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="closeModal('sendModal')">Cancel</button>
-          <button class="primary-btn" onclick="executeSendAction()">Send</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="swapModal" onclick="overlayClose(event, 'swapModal')">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <h2 class="modal-title">Swap</h2>
-          <p class="modal-sub">Swap into any supported USDT-paired crypto. Includes 0.30% swap fee + estimated network fee.</p>
-        </div>
-        <button class="close" onclick="closeModal('swapModal')">×</button>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Pay with</label>
-          <select class="select" id="swapSrcSelect" onchange="calculateSwapFees()"></select>
-        </div>
-
-        <div class="form-row">
-          <label>Amount</label>
-          <input class="input" type="number" id="swapAmountInput" step="any" placeholder="0.00" oninput="calculateSwapFees()" />
-        </div>
-
-        <div class="form-row combo">
-          <label>Receive currency</label>
-          <input class="input" id="swapSearchInput" placeholder="Search any USDT pair..." oninput="filterCurrencyUniverse(this.value, 'swapSuggestions', selectSwapDest)" />
-          <div class="suggestions" id="swapSuggestions"></div>
-        </div>
-
-        <div class="form-row">
-          <label>Receive</label>
-          <select class="select" id="swapDestSelect" onchange="calculateSwapFees()"></select>
-        </div>
-
-        <div class="section">
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px;color:var(--muted);font-weight:850">
-            <span>Swap fee</span><span id="swapFeeSpan">$0.00</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px;color:var(--muted);font-weight:850">
-            <span>Network fee</span><span id="networkFeeSpan">$0.00</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;color:var(--text);font-weight:950">
-            <span>You get</span><span id="swapTargetReceiveSpan">0.00</span>
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="closeModal('swapModal')">Cancel</button>
-          <button class="primary-btn" onclick="executeSwapAction()">Confirm</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="stakeModal" onclick="overlayClose(event, 'stakeModal')">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <h2 class="modal-title">Staking options</h2>
-          <p class="modal-sub">Choose from highest to lowest estimated APY.</p>
-        </div>
-        <button class="close" onclick="closeModal('stakeModal')">×</button>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-row">
-          <label>Action</label>
-          <select class="select" id="stakeOperationType">
-            <option value="STAKE">Stake</option>
-            <option value="UNSTAKE">Unstake</option>
-          </select>
-        </div>
-
-        <div class="form-row combo">
-          <label>Search staking asset</label>
-          <input class="input" id="stakeSearchInput" placeholder="Search highest yield options..." oninput="filterStakingOptions(this.value, 'stakeSuggestions')" />
-          <div class="suggestions" id="stakeSuggestions"></div>
-        </div>
-
-        <div class="form-row">
-          <label>Selected asset</label>
-          <select class="select" id="stakeAssetTarget" onchange="updateStakePreview()"></select>
-        </div>
-
-        <div class="form-row">
-          <label>Amount</label>
-          <input class="input" type="number" id="stakeActionAmountInput" step="any" placeholder="0.00" oninput="updateStakePreview()" />
-        </div>
-
-        <div class="section">
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px;color:var(--muted);font-weight:850">
-            <span>Estimated APY</span><span id="stakeApyPreview">--</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;color:var(--text);font-weight:950">
-            <span>Daily yield est.</span><span id="stakeDailyPreview">$0.00</span>
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button class="secondary-btn" onclick="closeModal('stakeModal')">Cancel</button>
-          <button class="primary-btn" onclick="executeStakingModification()">Execute</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="chartModal" onclick="overlayClose(event, 'chartModal')">
-    <div class="modal-card chart">
-      <div class="chart-top">
-        <div>
-          <h2 class="modal-title" id="chartTitle">Asset chart</h2>
-          <p class="modal-sub" id="chartSub">Custom live candles</p>
-          <div class="chart-price" id="chartPrice">$0.00</div>
-        </div>
-        <button class="close" onclick="closeModal('chartModal')">×</button>
-      </div>
-
-      <div class="range-row" id="rangeRow">
-        <button class="active" onclick="setChartRange('5m', this)">5m</button>
-        <button onclick="setChartRange('15m', this)">15m</button>
-        <button onclick="setChartRange('30m', this)">30m</button>
-        <button onclick="setChartRange('1h', this)">1hr</button>
-        <button onclick="setChartRange('2h', this)">2hr</button>
-        <button onclick="setChartRange('1d', this)">1day</button>
-      </div>
-
-      <div class="chart-wrap">
-        <canvas id="priceCanvas"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
-
-  <script>
-    const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
-    const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
-    const CURRENT_ROLE = "<%= typeof role !== 'undefined' ? role : 'user' %>";
-
-    const CURRENCY_UNIVERSE = [
-      ['BTC','Bitcoin','top','bitcoin'],['ETH','Ethereum','top','ethereum'],['SOL','Solana','top','solana'],['BNB','BNB','top','binancecoin'],['XRP','XRP','top','ripple'],['DOGE','Dogecoin','top','dogecoin'],['TRX','TRON','top','tron'],['TON','Toncoin','top','the-open-network'],['ADA','Cardano','top','cardano'],['AVAX','Avalanche','top','avalanche-2'],
-      ['LINK','Chainlink','alts','chainlink'],['DOT','Polkadot','alts','polkadot'],['NEAR','NEAR Protocol','alts','near'],['ARB','Arbitrum','alts','arbitrum'],['OP','Optimism','alts','optimism'],['SUI','Sui','alts','sui'],['APT','Aptos','alts','aptos'],['ATOM','Cosmos','alts','cosmos'],['FIL','Filecoin','alts','filecoin'],['ETC','Ethereum Classic','alts','ethereum-classic'],['LTC','Litecoin','alts','litecoin'],['BCH','Bitcoin Cash','alts','bitcoin-cash'],['ICP','Internet Computer','alts','internet-computer'],['HBAR','Hedera','alts','hedera-hashgraph'],['SEI','Sei','alts','sei-network'],['INJ','Injective','alts','injective-protocol'],['RENDER','Render','alts','render-token'],['FET','Artificial Superintelligence Alliance','alts','fetch-ai'],['WLD','Worldcoin','alts','worldcoin-wld'],['TIA','Celestia','alts','celestia'],['JUP','Jupiter','alts','jupiter-exchange-solana'],['PYTH','Pyth Network','alts','pyth-network'],['GRT','The Graph','alts','the-graph'],['ALGO','Algorand','alts','algorand'],['VET','VeChain','alts','vechain'],['EGLD','MultiversX','alts','elrond-erd-2'],
-      ['UNI','Uniswap','defi','uniswap'],['AAVE','Aave','defi','aave'],['MKR','Maker','defi','maker'],['LDO','Lido DAO','defi','lido-dao'],['RUNE','THORChain','defi','thorchain'],['CRV','Curve DAO','defi','curve-dao-token'],['COMP','Compound','defi','compound-governance-token'],['SNX','Synthetix','defi','havven'],['DYDX','dYdX','defi','dydx-chain'],['GMX','GMX','defi','gmx'],['PENDLE','Pendle','defi','pendle'],['ENA','Ethena','defi','ethena'],
-      ['PEPE','Pepe','meme','pepe'],['SHIB','Shiba Inu','meme','shiba-inu'],['FLOKI','FLOKI','meme','floki'],['BONK','Bonk','meme','bonk'],['WIF','dogwifhat','meme','dogwifcoin'],['TURBO','Turbo','meme','turbo'],['BRETT','Brett','meme','based-brett'],['PNUT','Peanut the Squirrel','meme','peanut-the-squirrel'],['MEW','cat in a dogs world','meme','cat-in-a-dogs-world']
-    ];
-
-    const STAKING_APYS = {
-      INJ:18.4, ATOM:17.2, DOT:14.1, TIA:13.6, NEAR:11.8, AVAX:9.4, SUI:8.7,
-      SOL:7.2, SEI:6.9, ADA:5.9, ETH:5.5, BNB:4.8, APT:4.1, LINK:3.9,
-      TRX:3.6, TON:3.4, BTC:1.2, XRP:1.1, DOGE:0.8
-    };
-
-    const BASE_PRICES = {
-      BTC:67340, ETH:3420, SOL:164, BNB:585, XRP:.52, DOGE:.15, TRX:.12, TON:6.4,
-      ADA:.48, AVAX:34, LINK:16.2, DOT:6.85, NEAR:7.1, ARB:1.18, OP:2.62,
-      SUI:1.78, APT:9.5, ATOM:8.9, FIL:6.2, ETC:29, LTC:82, BCH:470, ICP:12.8,
-      HBAR:.1, SEI:.54, INJ:28, RENDER:9.4, FET:2.1, WLD:5.7, TIA:10.1, JUP:1.03,
-      PYTH:.42, GRT:.25, ALGO:.19, VET:.034, EGLD:36, UNI:9.7, AAVE:105, MKR:2700,
-      LDO:2.4, RUNE:5.6, CRV:.45, COMP:58, SNX:3.1, DYDX:2.2, GMX:37, PENDLE:5.1,
-      ENA:.84, PEPE:.000012, SHIB:.000025, FLOKI:.00021, BONK:.000031, WIF:2.9,
-      TURBO:.006, BRETT:.14, PNUT:.82, MEW:.004
-    };
-
-    const DEFAULT_PORTFOLIO = [
-      { currency:'BTC', name:'Bitcoin', amount:.45, avgBuyPrice:62000 },
-      { currency:'ETH', name:'Ethereum', amount:4.25, avgBuyPrice:2850.5 },
-      { currency:'SOL', name:'Solana', amount:145.5, avgBuyPrice:85.2 }
-    ];
-
-    const DEFAULT_VAULTS = [
-      { currency:'ETH', name:'Ethereum Vault', stakedAmount:2.5, apy:5.5, earnedAmount:0, startValueUsd:8550, dailyPnlUsd:0, livePnlUsd:0, failed:false },
-      { currency:'SOL', name:'Solana Vault', stakedAmount:50, apy:7.2, earnedAmount:0, startValueUsd:8240, dailyPnlUsd:0, livePnlUsd:0, failed:false }
-    ];
-
-    const universeBySymbol = Object.fromEntries(CURRENCY_UNIVERSE.map(x => [x[0], { symbol:x[0], name:x[1], group:x[2], gecko:x[3] }]));
-
-    let marketPrices = JSON.parse(localStorage.getItem('bc_markets_v5')) || JSON.parse(localStorage.getItem('bluecrypto_wallet_markets')) || buildDefaultMarkets();
-    let portfolio = JSON.parse(localStorage.getItem('bc_portfolio_v5')) || JSON.parse(localStorage.getItem('bluecrypto_wallet_assets')) || structuredClone(DEFAULT_PORTFOLIO);
-    let stakingVaults = JSON.parse(localStorage.getItem('bc_vaults_v5')) || JSON.parse(localStorage.getItem('bluecrypto_wallet_vaults')) || structuredClone(DEFAULT_VAULTS);
-    let settings = JSON.parse(localStorage.getItem('bc_settings_v5')) || { autoStake:'on', risk:'balanced' };
-    let publicWallets = JSON.parse(localStorage.getItem('bluecrypto_public_wallets')) || [];
-
-    if (SERVER_WALLET) {
-      portfolio = Array.isArray(SERVER_WALLET.assets) ? SERVER_WALLET.assets : portfolio;
-      stakingVaults = Array.isArray(SERVER_WALLET.staking?.vaults) ? SERVER_WALLET.staking.vaults : stakingVaults;
-      publicWallets = Array.isArray(SERVER_WALLET.publicWallets) ? SERVER_WALLET.publicWallets : publicWallets;
-      settings.autoStake = SERVER_WALLET.staking?.autoStake ? 'on' : settings.autoStake;
-      settings.risk = SERVER_WALLET.staking?.riskMode || settings.risk;
-    }
-
-    let lastTimestamp = parseInt(localStorage.getItem('bc_last_update_v5') || Date.now(), 10);
-    let activeMarketTab = 'top';
-    let activeChartSymbol = null;
-    let activeChartRange = '5m';
-    let chartHistory = JSON.parse(localStorage.getItem('bc_chart_history_v5')) || {};
-    let lastTotalValue = 0;
-    let balancePulseTimer;
-    let toastTimer;
-    let ACTIVE_DECRYPTED_WALLET = null;
-
-    function buildDefaultMarkets() {
-      const out = {};
-      CURRENCY_UNIVERSE.forEach(([s,n,g]) => {
-        out[s] = {
-          name: n,
-          price: BASE_PRICES[s] || 1,
-          prevPrice: BASE_PRICES[s] || 1,
-          change24h: (Math.random() - 0.45) * 8,
-          cap: 'USDT',
-          group: g
-        };
-      });
-      return out;
-    }
-
-    function save() {
-      localStorage.setItem('bluecrypto_wallet_assets', JSON.stringify(portfolio));
-      localStorage.setItem('bluecrypto_wallet_markets', JSON.stringify(marketPrices));
-      localStorage.setItem('bluecrypto_wallet_vaults', JSON.stringify(stakingVaults));
-      localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
-
-      localStorage.setItem('bc_markets_v5', JSON.stringify(marketPrices));
-      localStorage.setItem('bc_portfolio_v5', JSON.stringify(portfolio));
-      localStorage.setItem('bc_vaults_v5', JSON.stringify(stakingVaults));
-      localStorage.setItem('bc_settings_v5', JSON.stringify(settings));
-      localStorage.setItem('bc_last_update_v5', String(lastTimestamp));
-      localStorage.setItem('bc_chart_history_v5', JSON.stringify(chartHistory));
-
-      saveWalletStateToServer();
-    }
-
-    async function saveWalletStateToServer() {
-      try {
-        await fetch('/api/wallet/state', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assets: portfolio,
-            staking: {
-              autoStake: settings.autoStake === 'on',
-              riskMode: settings.risk,
-              vaults: stakingVaults
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
+const session = require('express-session');
+const nodemailer = require('nodemailer');
+
+const app = express();
+
+/* =========================
+   Config
+========================= */
+
+const PORT = process.env.PORT || 3000;
+
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || 'change-this-secret-in-render';
+
+const STAFF_USERNAME =
+  process.env.STAFF_USERNAME || 'admin';
+
+const STAFF_PASSWORD =
+  process.env.STAFF_PASSWORD || 'monterysasd';
+
+const STAFF_EMAIL =
+  process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluewallet.local';
+
+const DATA_DIR = path.join(__dirname, 'data');
+const DB_PATH = path.join(DATA_DIR, 'wallets.json');
+
+const otpStore = new Map();
+
+/* =========================
+   Asset Data
+========================= */
+
+const SUPPORTED_ASSETS = [
+  'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'TRX', 'TON', 'ADA', 'AVAX',
+  'LINK', 'DOT', 'NEAR', 'ARB', 'OP', 'SUI', 'APT', 'ATOM', 'FIL', 'ETC',
+  'LTC', 'BCH', 'ICP', 'HBAR', 'SEI', 'INJ', 'RENDER', 'FET', 'WLD', 'TIA',
+  'JUP', 'PYTH', 'GRT', 'ALGO', 'VET', 'EGLD',
+  'UNI', 'AAVE', 'MKR', 'LDO', 'RUNE', 'CRV', 'COMP', 'SNX', 'DYDX', 'GMX',
+  'PENDLE', 'ENA',
+  'PEPE', 'SHIB', 'FLOKI', 'BONK', 'WIF', 'TURBO', 'BRETT', 'PNUT', 'MEW',
+  'USDT'
+];
+
+const ASSET_NAMES = {
+  BTC: 'Bitcoin',
+  ETH: 'Ethereum',
+  SOL: 'Solana',
+  BNB: 'BNB',
+  XRP: 'XRP',
+  DOGE: 'Dogecoin',
+  TRX: 'TRON',
+  TON: 'Toncoin',
+  ADA: 'Cardano',
+  AVAX: 'Avalanche',
+  LINK: 'Chainlink',
+  DOT: 'Polkadot',
+  NEAR: 'NEAR Protocol',
+  ARB: 'Arbitrum',
+  OP: 'Optimism',
+  SUI: 'Sui',
+  APT: 'Aptos',
+  ATOM: 'Cosmos',
+  FIL: 'Filecoin',
+  ETC: 'Ethereum Classic',
+  LTC: 'Litecoin',
+  BCH: 'Bitcoin Cash',
+  ICP: 'Internet Computer',
+  HBAR: 'Hedera',
+  SEI: 'Sei',
+  INJ: 'Injective',
+  RENDER: 'Render',
+  FET: 'Artificial Superintelligence Alliance',
+  WLD: 'Worldcoin',
+  TIA: 'Celestia',
+  JUP: 'Jupiter',
+  PYTH: 'Pyth Network',
+  GRT: 'The Graph',
+  ALGO: 'Algorand',
+  VET: 'VeChain',
+  EGLD: 'MultiversX',
+  UNI: 'Uniswap',
+  AAVE: 'Aave',
+  MKR: 'Maker',
+  LDO: 'Lido DAO',
+  RUNE: 'THORChain',
+  CRV: 'Curve DAO',
+  COMP: 'Compound',
+  SNX: 'Synthetix',
+  DYDX: 'dYdX',
+  GMX: 'GMX',
+  PENDLE: 'Pendle',
+  ENA: 'Ethena',
+  PEPE: 'Pepe',
+  SHIB: 'Shiba Inu',
+  FLOKI: 'FLOKI',
+  BONK: 'Bonk',
+  WIF: 'dogwifhat',
+  TURBO: 'Turbo',
+  BRETT: 'Brett',
+  PNUT: 'Peanut the Squirrel',
+  MEW: 'cat in a dogs world',
+  USDT: 'Tether USD'
+};
+
+const GECKO_IDS = {
+  BTC: 'bitcoin',
+  ETH: 'ethereum',
+  SOL: 'solana',
+  BNB: 'binancecoin',
+  XRP: 'ripple',
+  DOGE: 'dogecoin',
+  TRX: 'tron',
+  TON: 'the-open-network',
+  ADA: 'cardano',
+  AVAX: 'avalanche-2',
+  LINK: 'chainlink',
+  DOT: 'polkadot',
+  NEAR: 'near',
+  ARB: 'arbitrum',
+  OP: 'optimism',
+  SUI: 'sui',
+  APT: 'aptos',
+  ATOM: 'cosmos',
+  FIL: 'filecoin',
+  ETC: 'ethereum-classic',
+  LTC: 'litecoin',
+  BCH: 'bitcoin-cash',
+  ICP: 'internet-computer',
+  HBAR: 'hedera-hashgraph',
+  SEI: 'sei-network',
+  INJ: 'injective-protocol',
+  RENDER: 'render-token',
+  FET: 'fetch-ai',
+  WLD: 'worldcoin-wld',
+  TIA: 'celestia',
+  JUP: 'jupiter-exchange-solana',
+  PYTH: 'pyth-network',
+  GRT: 'the-graph',
+  ALGO: 'algorand',
+  VET: 'vechain',
+  EGLD: 'elrond-erd-2',
+  UNI: 'uniswap',
+  AAVE: 'aave',
+  MKR: 'maker',
+  LDO: 'lido-dao',
+  RUNE: 'thorchain',
+  CRV: 'curve-dao-token',
+  COMP: 'compound-governance-token',
+  SNX: 'havven',
+  DYDX: 'dydx-chain',
+  GMX: 'gmx',
+  PENDLE: 'pendle',
+  ENA: 'ethena',
+  PEPE: 'pepe',
+  SHIB: 'shiba-inu',
+  FLOKI: 'floki',
+  BONK: 'bonk',
+  WIF: 'dogwifcoin',
+  TURBO: 'turbo',
+  BRETT: 'based-brett',
+  PNUT: 'peanut-the-squirrel',
+  MEW: 'cat-in-a-dogs-world',
+  USDT: 'tether'
+};
+
+const STAKING_APYS = {
+  INJ: 18.4,
+  ATOM: 17.2,
+  DOT: 14.1,
+  TIA: 13.6,
+  NEAR: 11.8,
+  AVAX: 9.4,
+  SUI: 8.7,
+  SOL: 7.2,
+  SEI: 6.9,
+  ADA: 5.9,
+  ETH: 5.5,
+  BNB: 4.8,
+  APT: 4.1,
+  LINK: 3.9,
+  TRX: 3.6,
+  TON: 3.4,
+  BTC: 1.2,
+  XRP: 1.1,
+  DOGE: 0.8,
+  USDT: 3.5
+};
+
+/* =========================
+   Express Setup
+========================= */
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: 'bluewallet.sid',
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
+}));
+
+/* =========================
+   Database Helpers
+========================= */
+
+function ensureDb() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (!fs.existsSync(DB_PATH)) {
+    fs.writeFileSync(DB_PATH, JSON.stringify({ users: {} }, null, 2));
+  }
+}
+
+function readDb() {
+  ensureDb();
+
+  try {
+    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  } catch (error) {
+    console.error('DB read error:', error);
+    return { users: {} };
+  }
+}
+
+function writeDb(db) {
+  ensureDb();
+  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+}
+
+function sha(input) {
+  return crypto
+    .createHash('sha256')
+    .update(String(input))
+    .digest('hex');
+}
+
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+/* =========================
+   Wallet Records
+========================= */
+
+function createWalletRecord(email, role = 'user') {
+  const normalizedEmail = normalizeEmail(email);
+  const isStaff = role === 'staff';
+
+  return {
+    id: `wallet_${sha(normalizedEmail).slice(0, 18)}`,
+    email: normalizedEmail,
+    role,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+
+    /*
+      IMPORTANT:
+      The raw seed phrase/private key should NEVER be stored here.
+      wallet.ejs encrypts it in the browser and only sends encryptedVault.
+    */
+    encryptedVault: null,
+
+    /*
+      Public wallet addresses are safe to store.
+      Example:
+      [{ type: 'evm', address: '0x...', networks: ['Ethereum', 'BNB Smart Chain'] }]
+    */
+    publicWallets: [],
+
+    /*
+      App portfolio balances.
+      These are app/account balances, not verified on-chain balances.
+    */
+    assets: isStaff
+      ? [
+          { currency: 'BTC', name: 'Bitcoin', amount: 2.75, avgBuyPrice: 42000 },
+          { currency: 'ETH', name: 'Ethereum', amount: 48.5, avgBuyPrice: 2200 },
+          { currency: 'SOL', name: 'Solana', amount: 2400, avgBuyPrice: 72 },
+          { currency: 'BNB', name: 'BNB', amount: 180, avgBuyPrice: 310 },
+          { currency: 'USDT', name: 'Tether USD', amount: 250000, avgBuyPrice: 1 }
+        ]
+      : [],
+
+    staking: {
+      autoStake: true,
+      riskMode: 'balanced',
+      vaults: isStaff
+        ? [
+            {
+              currency: 'ETH',
+              name: 'Ethereum Vault',
+              stakedAmount: 16,
+              apy: 5.5,
+              earnedAmount: 0,
+              livePnlUsd: 0,
+              dailyPnlUsd: 0,
+              failed: false
+            },
+            {
+              currency: 'SOL',
+              name: 'Solana Vault',
+              stakedAmount: 500,
+              apy: 7.2,
+              earnedAmount: 0,
+              livePnlUsd: 0,
+              dailyPnlUsd: 0,
+              failed: false
+            },
+            {
+              currency: 'USDT',
+              name: 'USDT Flexible Vault',
+              stakedAmount: 50000,
+              apy: 3.5,
+              earnedAmount: 0,
+              livePnlUsd: 0,
+              dailyPnlUsd: 0,
+              failed: false
             }
-          })
-        });
-      } catch (error) {
-        console.warn('Could not sync wallet state:', error);
-      }
+          ]
+        : []
     }
+  };
+}
 
-    function money(v) {
-      const n = Number(v) || 0;
-      const d = Math.abs(n) < 1 && n !== 0 ? 6 : 2;
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: d,
-        maximumFractionDigits: d
-      }).format(n);
+function getOrCreateUser(email, role = 'user') {
+  const normalizedEmail = normalizeEmail(email);
+  const db = readDb();
+
+  if (!db.users[normalizedEmail]) {
+    db.users[normalizedEmail] = createWalletRecord(normalizedEmail, role);
+    writeDb(db);
+  }
+
+  if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
+    const staffRecord = createWalletRecord(normalizedEmail, 'staff');
+
+    db.users[normalizedEmail] = {
+      ...db.users[normalizedEmail],
+      role: 'staff',
+      assets: staffRecord.assets,
+      staking: staffRecord.staking,
+      updatedAt: nowIso()
+    };
+
+    writeDb(db);
+  }
+
+  return db.users[normalizedEmail];
+}
+
+function updateUserWallet(email, patch) {
+  const normalizedEmail = normalizeEmail(email);
+  const db = readDb();
+
+  if (!db.users[normalizedEmail]) {
+    db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
+  }
+
+  db.users[normalizedEmail] = {
+    ...db.users[normalizedEmail],
+    ...patch,
+    updatedAt: nowIso()
+  };
+
+  writeDb(db);
+  return db.users[normalizedEmail];
+}
+
+function updateUserWalletNested(email, patch) {
+  const normalizedEmail = normalizeEmail(email);
+  const db = readDb();
+
+  if (!db.users[normalizedEmail]) {
+    db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
+  }
+
+  const current = db.users[normalizedEmail];
+
+  db.users[normalizedEmail] = {
+    ...current,
+    ...patch,
+    staking: {
+      ...(current.staking || {}),
+      ...(patch.staking || {})
+    },
+    updatedAt: nowIso()
+  };
+
+  writeDb(db);
+  return db.users[normalizedEmail];
+}
+
+/* =========================
+   OTP + Gmail
+========================= */
+
+function generateOtp() {
+  return String(crypto.randomInt(100000, 999999));
+}
+
+function createTransporter() {
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+
+  if (!gmailUser || !gmailPass) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: gmailUser,
+      pass: gmailPass
     }
+  });
+}
 
-    function amt(v) {
-      return Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 8 });
-    }
+async function sendOtpEmail(email, otp) {
+  const transporter = createTransporter();
 
-    function cls(v) {
-      return v > 0 ? 'pos' : v < 0 ? 'neg' : 'neu';
-    }
+  if (!transporter) {
+    console.log(`DEV OTP for ${email}: ${otp}`);
+    return false;
+  }
 
-    function icon(s) {
-      return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${s.toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${s.slice(0,3)}'" /></div>`;
-    }
-
-    function toast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('active');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('active'), 2300);
-    }
-
-    async function refreshPrices(manual = false) {
-      const ids = CURRENCY_UNIVERSE.map(x => x[3]).filter(Boolean).join(',');
-
-      try {
-        if (manual) document.getElementById('syncText').textContent = 'Refreshing live feed...';
-
-        const res = await fetch(`/api/prices?ids=${encodeURIComponent(ids)}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('feed failed');
-
-        const data = await res.json();
-
-        CURRENCY_UNIVERSE.forEach(([s,n,g,id]) => {
-          if (data[id]?.usd) {
-            const old = marketPrices[s]?.price || data[id].usd;
-            marketPrices[s] = {
-              name: n,
-              group: g,
-              price: data[id].usd,
-              prevPrice: old,
-              change24h: data[id].usd_24h_change || 0,
-              cap: 'USDT'
-            };
-            pushChartPoint(s, data[id].usd, true);
-          }
-        });
-
-        document.getElementById('syncText').textContent = `Live prices every 2s • ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}`;
-        const feedStatus = document.getElementById('feedStatus');
-        if (feedStatus) feedStatus.textContent = 'Live API connected through your Render server proxy.';
-
-        save();
-        renderAll(false);
-
-        if (manual) toast('Prices refreshed');
-      } catch (e) {
-        simulatePrices();
-        renderAll(false);
-        if (manual) toast('Using local movement fallback');
-      }
-    }
-
-    function simulatePrices() {
-      Object.keys(marketPrices).forEach(s => {
-        const p = marketPrices[s];
-        const old = p.price || 1;
-        const delta = (Math.random() - 0.5) * 0.0035;
-        p.prevPrice = old;
-        p.price = Math.max(0.00000001, old * (1 + delta));
-        p.change24h = (p.change24h || 0) + (Math.random() - 0.5) * 0.12;
-        pushChartPoint(s, p.price, false);
-      });
-
-      document.getElementById('syncText').textContent = `Price movement every 2s • ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}`;
-      save();
-    }
-
-    function candleMs() {
-      return {
-        '5m': 5 * 60 * 1000,
-        '15m': 15 * 60 * 1000,
-        '30m': 30 * 60 * 1000,
-        '1h': 60 * 60 * 1000,
-        '2h': 2 * 60 * 60 * 1000,
-        '1d': 24 * 60 * 60 * 1000
-      }[activeChartRange] || 5 * 60 * 1000;
-    }
-
-    function visibleCandles() {
-      return {
-        '5m': 60,
-        '15m': 64,
-        '30m': 72,
-        '1h': 96,
-        '2h': 96,
-        '1d': 90
-      }[activeChartRange] || 60;
-    }
-
-    function pushChartPoint(symbol, price, live) {
-      if (!chartHistory[symbol]) seedChart(symbol, price);
-
-      const arr = chartHistory[symbol];
-      const now = Date.now();
-      const interval = candleMs();
-
-      let last = arr[arr.length - 1];
-
-      if (!last || now - last.t >= interval) {
-        const open = last ? last.close : price;
-        last = {
-          t: now - (now % interval),
-          open,
-          high: Math.max(open, price),
-          low: Math.min(open, price),
-          close: price,
-          volume: Math.random() * 1000
-        };
-        arr.push(last);
-      } else {
-        last.close = price;
-        last.high = Math.max(last.high, price);
-        last.low = Math.min(last.low, price);
-        last.volume = (last.volume || 0) + Math.random() * 80;
-      }
-
-      if (!live) {
-        const wickSpread = price * (0.0008 + Math.random() * 0.0018);
-        last.high = Math.max(last.high, price + wickSpread);
-        last.low = Math.min(last.low, price - wickSpread);
-      }
-
-      if (arr.length > 900) arr.splice(0, arr.length - 900);
-    }
-
-    function seedChart(symbol, price) {
-      const base = price || marketPrices[symbol]?.price || 1;
-      const arr = [];
-      const now = Date.now();
-      const maxInterval = 24 * 60 * 60 * 1000;
-      let last = base;
-
-      for (let i = 260; i >= 0; i--) {
-        const open = last;
-        const close = Math.max(0.00000001, open * (1 + (Math.random() - 0.48) * 0.012));
-        const high = Math.max(open, close) * (1 + Math.random() * 0.004);
-        const low = Math.min(open, close) * (1 - Math.random() * 0.004);
-
-        arr.push({
-          t: now - i * maxInterval,
-          open,
-          high,
-          low,
-          close,
-          volume: Math.random() * 1000
-        });
-
-        last = close;
-      }
-
-      chartHistory[symbol] = arr;
-    }
-
-    function chartDataForRange(symbol) {
-      const raw = chartHistory[symbol] || [];
-      const count = visibleCandles();
-
-      if (raw.length < count) seedChart(symbol, marketPrices[symbol]?.price || 1);
-
-      const interval = candleMs();
-      const points = (chartHistory[symbol] || []).slice(-Math.max(300, count));
-      const buckets = [];
-
-      points.forEach(c => {
-        const t = c.t - (c.t % interval);
-        let b = buckets[buckets.length - 1];
-
-        if (!b || b.t !== t) {
-          buckets.push({
-            t,
-            open: c.open,
-            high: c.high,
-            low: c.low,
-            close: c.close,
-            volume: c.volume || 0
-          });
-        } else {
-          b.high = Math.max(b.high, c.high);
-          b.low = Math.min(b.low, c.low);
-          b.close = c.close;
-          b.volume += c.volume || 0;
-        }
-      });
-
-      return buckets.slice(-count);
-    }
-
-    function updateYield() {
-      const now = Date.now();
-      const years = Math.max(0, now - lastTimestamp) / (1000 * 60 * 60 * 24 * 365.25);
-      const days = Math.max(0, now - lastTimestamp) / (1000 * 60 * 60 * 24);
-
-      stakingVaults.forEach(v => {
-        const price = marketPrices[v.currency]?.price || 0;
-        const earned = (v.stakedAmount || 0) * (v.apy / 100) * years;
-
-        v.earnedAmount = (v.earnedAmount || 0) + earned;
-
-        const currentValue = (v.stakedAmount + v.earnedAmount) * price;
-
-        v.livePnlUsd = currentValue - (v.startValueUsd || v.stakedAmount * price);
-        v.dailyPnlUsd = (v.stakedAmount * price) * (v.apy / 100 / 365) * Math.max(days, 1 / 720);
-
-        if (settings.autoStake === 'on' && v.failed) autoSwitchVault(v);
-      });
-
-      lastTimestamp = now;
-      save();
-    }
-
-    function autoSwitchVault(vault) {
-      const best = stakingOptions()[0];
-
-      if (best && best.symbol !== vault.currency) {
-        vault.currency = best.symbol;
-        vault.name = `${best.name} Auto Vault`;
-        vault.apy = best.apy;
-        vault.failed = false;
-        toast(`Auto-switched staking to ${best.symbol}`);
-      }
-    }
-
-    function stakingOptions() {
-      return Object.keys(marketPrices)
-        .map(s => ({
-          symbol: s,
-          name: marketPrices[s].name,
-          apy: STAKING_APYS[s] ?? Math.max(0.4, 2 + Math.random() * 5.5)
-        }))
-        .sort((a,b) => b.apy - a.apy);
-    }
-
-    function renderAll(runYield = true) {
-      if (runYield) updateYield();
-      renderPortfolio();
-      renderMarkets();
-      renderStaking();
-      renderManagers();
-      renderSelects();
-      renderPublicWallets();
-      renderGlobalSearch(document.getElementById('globalSearchInput')?.value || '');
-      if (activeChartSymbol) drawChart();
-    }
-
-    function setBalanceText(total) {
-      const bal = document.getElementById('totalBalance');
-
-      bal.textContent = money(total);
-      bal.classList.remove('balance-up', 'balance-down');
-
-      clearTimeout(balancePulseTimer);
-
-      if (total > lastTotalValue) bal.classList.add('balance-up');
-      else if (total < lastTotalValue) bal.classList.add('balance-down');
-
-      balancePulseTimer = setTimeout(() => bal.classList.remove('balance-up', 'balance-down'), 420);
-      lastTotalValue = total;
-    }
-
-    function renderPortfolio() {
-      let total = 0;
-      let cost = 0;
-      let daily = 0;
-      let best = null;
-      let largest = null;
-
-      const html = portfolio.map(a => {
-        const p = marketPrices[a.currency] || { price:0, change24h:0, prevPrice:0, name:a.name };
-        const val = a.amount * p.price;
-        const c = a.amount * (a.avgBuyPrice || 0);
-        const pnl = val - c;
-        const roi = c ? pnl / c * 100 : 0;
-
-        total += val;
-        cost += c;
-        daily += val * ((p.change24h || 0) / 100);
-
-        if (!best || roi > best.roi) best = { s:a.currency, roi };
-        if (!largest || val > largest.val) largest = { s:a.currency, val };
-
-        const move = (p.price || 0) >= (p.prevPrice || p.price) ? 'up' : 'down';
-
-        return `
-          <div class="row-card asset-row" onclick="openChart('${a.currency}')">
-            <div class="asset-main">
-              ${icon(a.currency)}
-              <div>
-                <div class="name">${a.name}</div>
-                <div class="sym">${a.currency} · ${amt(a.amount)}</div>
-              </div>
-            </div>
-            <div>
-              <div class="cell-label">Value</div>
-              <div class="cell-value">${money(val)}</div>
-              <div class="cell-sub ${cls(pnl)}">${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
-            </div>
-            <div>
-              <div class="cell-label">Price</div>
-              <div class="cell-value ${move}">${money(p.price)}</div>
-              <div class="cell-sub ${cls(p.change24h)}">${p.change24h >= 0 ? '+' : ''}${Number(p.change24h || 0).toFixed(2)}%</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('portfolioList').innerHTML = html || `<div class="empty">No assets yet. Open Settings and add any USDT-paired currency.</div>`;
-
-      setBalanceText(total);
-
-      const pnl = total - cost;
-      const roi = cost ? pnl / cost * 100 : 0;
-      const pnlEl = document.getElementById('totalPnl');
-
-      pnlEl.className = `pnl-chip ${cls(pnl)}`;
-      pnlEl.textContent = `${pnl >= 0 ? '+' : ''}${money(Math.abs(pnl))} (${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%)`;
-
-      document.getElementById('spotCount').textContent = portfolio.length;
-      document.getElementById('dailyPnl').textContent = `${daily >= 0 ? '+' : ''}${money(Math.abs(daily))}`;
-      document.getElementById('dailyPnl').style.color = daily >= 0 ? 'var(--success)' : 'var(--danger)';
-      document.getElementById('bestAsset').textContent = best ? `${best.s} ${best.roi >= 0 ? '+' : ''}${best.roi.toFixed(1)}%` : '--';
-      document.getElementById('totalCost').textContent = money(cost);
-      document.getElementById('largestHolding').textContent = largest ? largest.s : '--';
-    }
-
-    function marketRowHtml(s) {
-      const p = marketPrices[s];
-      const move = p.price >= (p.prevPrice || p.price) ? 'up' : 'down';
-
-      return `
-        <div class="row-card market-row" onclick="openChart('${s}')">
-          <div class="asset-main">
-            ${icon(s)}
-            <div>
-              <div class="name">${p.name}</div>
-              <div class="sym">${s}/USDT · ${p.group}</div>
-            </div>
-          </div>
-          <div>
-            <div class="cell-label">Price</div>
-            <div class="cell-value ${move}">${money(p.price)}</div>
-            <div class="cell-sub">Live</div>
-          </div>
-          <div>
-            <div class="cell-label">24h</div>
-            <div class="cell-value">
-              <span class="pnl-chip ${cls(p.change24h)}">${p.change24h >= 0 ? '+' : ''}${Number(p.change24h || 0).toFixed(2)}%</span>
-            </div>
-          </div>
+  await transporter.sendMail({
+    from: `"Blue Wallet" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: 'Your Blue Wallet OTP Code',
+    text: `Your Blue Wallet login code is ${otp}. It expires in 10 minutes.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
+        <h2 style="margin: 0 0 12px;">Blue Wallet Login Code</h2>
+        <p style="color: #475569; margin: 0 0 18px;">Use this code to access your wallet and trading terminal.</p>
+        <div style="
+          font-size: 34px;
+          font-weight: 800;
+          letter-spacing: 7px;
+          padding: 18px;
+          border-radius: 14px;
+          background: #eef6ff;
+          color: #0284c7;
+          text-align: center;
+        ">
+          ${otp}
         </div>
-      `;
-    }
+        <p style="color: #64748b; font-size: 13px; margin-top: 18px;">
+          This code expires in 10 minutes. Do not share it with anyone.
+        </p>
+      </div>
+    `
+  });
 
-    function renderMarkets() {
-      const syms = Object.keys(marketPrices)
-        .filter(s => activeMarketTab === 'watch' ? portfolio.some(a => a.currency === s) : marketPrices[s].group === activeMarketTab)
-        .slice(0, 24);
+  return true;
+}
 
-      document.getElementById('marketTabsList').innerHTML = syms.map(s => marketRowHtml(s)).join('') || `<div class="empty">No markets in this tab.</div>`;
-    }
+function saveOtp(email, otp) {
+  const normalizedEmail = normalizeEmail(email);
 
-    function renderGlobalSearch(q) {
-      const box = document.getElementById('globalSearchResults');
-      if (!box) return;
+  otpStore.set(normalizedEmail, {
+    otpHash: sha(otp),
+    expiresAt: Date.now() + 1000 * 60 * 10,
+    attempts: 0
+  });
+}
 
-      const query = (q || '').trim().toLowerCase();
+function verifyOtp(email, otp) {
+  const normalizedEmail = normalizeEmail(email);
+  const record = otpStore.get(normalizedEmail);
 
-      const syms = Object.keys(marketPrices)
-        .filter(s => !query || s.toLowerCase().includes(query) || marketPrices[s].name.toLowerCase().includes(query) || marketPrices[s].group.toLowerCase().includes(query))
-        .slice(0, 18);
+  if (!record) {
+    return { ok: false, reason: 'No OTP found. Request a new code.' };
+  }
 
-      box.innerHTML = query ? syms.map(s => marketRowHtml(s)).join('') : '';
-    }
+  if (Date.now() > record.expiresAt) {
+    otpStore.delete(normalizedEmail);
+    return { ok: false, reason: 'OTP expired. Request a new code.' };
+  }
 
-    function renderStaking() {
-      let total = 0;
-      let yieldUsd = 0;
+  if (record.attempts >= 5) {
+    otpStore.delete(normalizedEmail);
+    return { ok: false, reason: 'Too many attempts. Request a new code.' };
+  }
 
-      document.getElementById('stakingList').innerHTML = stakingVaults
-        .slice()
-        .sort((a,b) => b.apy - a.apy)
-        .map(v => {
-          const p = marketPrices[v.currency]?.price || 0;
-          const value = v.stakedAmount * p;
-          const earnedUsd = (v.earnedAmount || 0) * p;
+  if (sha(otp) !== record.otpHash) {
+    record.attempts += 1;
+    otpStore.set(normalizedEmail, record);
+    return { ok: false, reason: 'Invalid OTP code.' };
+  }
 
-          total += value;
-          yieldUsd += earnedUsd;
+  otpStore.delete(normalizedEmail);
+  return { ok: true };
+}
 
-          return `
-            <div class="row-card stake-row">
-              <div class="asset-main">
-                ${icon(v.currency)}
-                <div>
-                  <div class="name">${v.name}</div>
-                  <div class="sym">${v.currency} · auto ${settings.autoStake === 'on' ? 'on' : 'off'}</div>
-                </div>
-              </div>
-              <div>
-                <div class="cell-label">APY</div>
-                <div class="cell-value"><span class="pnl-chip pos">${Number(v.apy).toFixed(2)}%</span></div>
-              </div>
-              <div>
-                <div class="cell-label">Live PnL</div>
-                <div class="cell-value ${cls(v.livePnlUsd || 0)}">${v.livePnlUsd >= 0 ? '+' : ''}${money(Math.abs(v.livePnlUsd || 0))}</div>
-              </div>
-              <div>
-                <div class="cell-label">Daily PnL</div>
-                <div class="cell-value pos">+${money(v.dailyPnlUsd || 0)}</div>
-                <div class="cell-sub">Yield + price</div>
-              </div>
-              <div>
-                <button class="mini-icon" onclick="simulateStakeFail('${v.currency}')">↻</button>
-              </div>
-            </div>
-          `;
-        }).join('') || `<div class="empty">No staking vaults. Open Stake to add one.</div>`;
+/* =========================
+   Auth Middleware
+========================= */
 
-      document.getElementById('stakingBalance').textContent = money(total);
-      document.getElementById('stakingProfits').textContent = `+${money(yieldUsd)}`;
-    }
+function requireAuth(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
 
-    function renderManagers() {
-      const list = document.getElementById('assetManagerList');
+  next();
+}
 
-      list.innerHTML = portfolio.map(a => `
-        <div class="manager-item">
-          <div>
-            <div class="manager-name">${a.name} · ${a.currency}</div>
-            <div class="manager-sub">${amt(a.amount)} ${a.currency} · ${money(a.amount * (marketPrices[a.currency]?.price || 0))}</div>
-          </div>
-          <div class="mini-actions">
-            <button class="mini-icon" onclick="editAsset('${a.currency}')">Edit</button>
-            <button class="mini-icon danger" onclick="removeAsset('${a.currency}')">×</button>
-          </div>
-        </div>
-      `).join('') || `<div class="empty">No visible assets yet.</div>`;
-    }
+function requireStaff(req, res, next) {
+  if (!req.session.user || req.session.user.role !== 'staff') {
+    return res.status(403).json({ error: 'Staff access required.' });
+  }
 
-    function renderPublicWallets() {
-      const list = document.getElementById('publicWalletList');
+  next();
+}
 
-      if (!publicWallets.length) {
-        list.innerHTML = `<div class="empty">No real wallet created yet. Open Settings → Wallet security → Create wallet.</div>`;
-        return;
-      }
+/* =========================
+   Page Routes
+========================= */
 
-      list.innerHTML = publicWallets.map(w => `
-        <div class="manager-item">
-          <div>
-            <div class="manager-name">${w.type?.toUpperCase() || 'EVM'} wallet</div>
-            <div class="manager-sub">${w.address}</div>
-          </div>
-          <div class="mini-actions">
-            <button class="mini-icon" onclick="copyText('${w.address}')">Copy</button>
-          </div>
-        </div>
-      `).join('');
-    }
+app.get('/', (req, res) => {
+  if (req.session.user) {
+    return res.redirect('/wallet');
+  }
 
-    function renderSelects() {
-      const options = CURRENCY_UNIVERSE.map(([s,n]) => `<option value="${s}">${s}/USDT · ${n}</option>`).join('');
+  res.render('index', {
+    error: null,
+    success: null,
+    otpEmail: null
+  });
+});
 
-      document.getElementById('currencyInput').innerHTML = options;
-      document.getElementById('swapDestSelect').innerHTML = options;
-      document.getElementById('stakeAssetTarget').innerHTML = stakingOptions().map(o => `<option value="${o.symbol}">${o.symbol} · ${o.name} · ${o.apy.toFixed(2)}% APY</option>`).join('');
+app.post('/send-otp', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
 
-      const owned = portfolio.map(a => `<option value="${a.currency}">${a.currency} · ${a.name} · Bal ${amt(a.amount)}</option>`).join('') || `<option>No assets</option>`;
-
-      document.getElementById('sendAssetSelect').innerHTML = owned;
-      document.getElementById('swapSrcSelect').innerHTML = owned;
-
-      document.getElementById('autoStakeToggle').value = settings.autoStake;
-      document.getElementById('stakingRiskMode').value = settings.risk;
-
-      updateStakePreview();
-      calculateSwapFees();
-    }
-
-    function openSettings(target) {
-      document.getElementById('settingsOverlay').classList.add('active');
-      renderSelects();
-      renderManagers();
-      renderPublicWallets();
-
-      if (target) {
-        setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior:'smooth', block:'start' }), 60);
-      }
-    }
-
-    function closeSettings() {
-      document.getElementById('settingsOverlay').classList.remove('active');
-    }
-
-    function openModal(id) {
-      renderSelects();
-      document.getElementById(id).classList.add('active');
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-
-    function overlayClose(e, id) {
-      if (e.target.id === id) document.getElementById(id).classList.remove('active');
-    }
-
-    function setTheme(t) {
-      document.documentElement.setAttribute('data-theme', t);
-      localStorage.setItem('bc_theme_v5', t);
-      toast(`${t === 'dark' ? 'Dark' : 'Light'} mode enabled`);
-    }
-
-    function saveStakingSettings() {
-      settings.autoStake = document.getElementById('autoStakeToggle').value;
-      settings.risk = document.getElementById('stakingRiskMode').value;
-      save();
-      toast('Staking settings saved');
-      renderStaking();
-    }
-
-    function goTrading() {
-      window.location.href = '/trading';
-    }
-
-    function filterCurrencyUniverse(q, boxId, cb) {
-      const box = document.getElementById(boxId);
-      const query = q.trim().toLowerCase();
-
-      box.innerHTML = '';
-
-      if (!query) {
-        box.classList.remove('active');
-        return;
-      }
-
-      CURRENCY_UNIVERSE
-        .filter(([s,n,g]) => s.toLowerCase().includes(query) || n.toLowerCase().includes(query) || g.toLowerCase().includes(query))
-        .slice(0, 40)
-        .forEach(([s,n,g]) => {
-          const item = document.createElement('div');
-          item.className = 'suggestion';
-          item.innerHTML = `<span><strong>${s}/USDT</strong> · ${n}</span><span>${g} · ${money(marketPrices[s]?.price || 0)}</span>`;
-          item.onclick = () => {
-            cb(s);
-            box.classList.remove('active');
-          };
-          box.appendChild(item);
-        });
-
-      box.classList.add('active');
-    }
-
-    function filterStakingOptions(q, boxId) {
-      const box = document.getElementById(boxId);
-      const query = q.trim().toLowerCase();
-
-      box.innerHTML = '';
-
-      const arr = stakingOptions()
-        .filter(o => !query || o.symbol.toLowerCase().includes(query) || o.name.toLowerCase().includes(query))
-        .slice(0, 30);
-
-      arr.forEach(o => {
-        const item = document.createElement('div');
-        item.className = 'suggestion';
-        item.innerHTML = `<span><strong>${o.symbol}</strong> · ${o.name}</span><span>${o.apy.toFixed(2)}% APY</span>`;
-        item.onclick = () => {
-          document.getElementById('stakeAssetTarget').value = o.symbol;
-          document.getElementById('stakeSearchInput').value = `${o.symbol} · ${o.name}`;
-          box.classList.remove('active');
-          updateStakePreview();
-        };
-        box.appendChild(item);
+    if (!email || !email.includes('@')) {
+      return res.render('index', {
+        error: 'Enter a valid email address.',
+        success: null,
+        otpEmail: null
       });
-
-      box.classList.add('active');
     }
 
-    function selectAssetTicker(s) {
-      const m = marketPrices[s] || { name: universeBySymbol[s]?.name || s, price: 0 };
-      const ex = portfolio.find(a => a.currency === s);
-
-      document.getElementById('currencyInput').value = s;
-      document.getElementById('assetSearchInput').value = `${s}/USDT · ${m.name}`;
-      document.getElementById('nameInput').value = ex?.name || m.name;
-      document.getElementById('amountInput').value = ex?.amount ?? '';
-      document.getElementById('buyPriceInput').value = ex?.avgBuyPrice ?? m.price ?? '';
-    }
-
-    function selectSwapDest(s) {
-      document.getElementById('swapDestSelect').value = s;
-      document.getElementById('swapSearchInput').value = `${s}/USDT · ${marketPrices[s]?.name || s}`;
-      calculateSwapFees();
-    }
-
-    function clearAssetForm() {
-      ['assetSearchInput','nameInput','amountInput','buyPriceInput'].forEach(id => document.getElementById(id).value = '');
-    }
-
-    function saveAssetEntry() {
-      const s = document.getElementById('currencyInput').value;
-      const name = document.getElementById('nameInput').value.trim() || marketPrices[s]?.name || s;
-      const amount = parseFloat(document.getElementById('amountInput').value);
-      const avg = parseFloat(document.getElementById('buyPriceInput').value) || marketPrices[s]?.price || 0;
-
-      if (!s || Number.isNaN(amount)) {
-        toast('Choose currency and balance');
-        return;
-      }
-
-      if (amount <= 0) {
-        portfolio = portfolio.filter(a => a.currency !== s);
-        toast(`${s} removed`);
-      } else {
-        const ex = portfolio.find(a => a.currency === s);
-
-        if (ex) {
-          ex.name = name;
-          ex.amount = amount;
-          ex.avgBuyPrice = avg;
-          toast(`${s} updated`);
-        } else {
-          portfolio.push({ currency:s, name, amount, avgBuyPrice:avg });
-          toast(`${s} added`);
-        }
-      }
-
-      save();
-      renderAll();
-    }
-
-    function editAsset(s) {
-      selectAssetTicker(s);
-      document.getElementById('assetTools').scrollIntoView({ behavior:'smooth', block:'start' });
-    }
-
-    function removeAsset(s) {
-      portfolio = portfolio.filter(a => a.currency !== s);
-      save();
-      renderAll();
-      toast(`${s} removed`);
-    }
-
-    function calculateSwapFees() {
-      const src = document.getElementById('swapSrcSelect')?.value;
-      const dst = document.getElementById('swapDestSelect')?.value;
-      const amount = parseFloat(document.getElementById('swapAmountInput')?.value) || 0;
-
-      if (!src || !dst) return;
-
-      const gross = amount * (marketPrices[src]?.price || 0);
-      const swapFee = gross * 0.003;
-      const networkFee = Math.max(0.15, gross * 0.0007);
-      const receive = (gross - swapFee - networkFee) / (marketPrices[dst]?.price || 1);
-
-      document.getElementById('swapFeeSpan').textContent = money(swapFee);
-      document.getElementById('networkFeeSpan').textContent = money(networkFee);
-      document.getElementById('swapTargetReceiveSpan').textContent = `${amt(Math.max(0, receive))} ${dst || ''}`;
-    }
-
-    function executeSwapAction() {
-      const src = document.getElementById('swapSrcSelect').value;
-      const dst = document.getElementById('swapDestSelect').value;
-      const amount = parseFloat(document.getElementById('swapAmountInput').value) || 0;
-      const a = portfolio.find(x => x.currency === src);
-
-      if (!a || !dst || src === dst || amount <= 0 || amount > a.amount) {
-        toast('Invalid swap');
-        return;
-      }
-
-      const gross = amount * (marketPrices[src]?.price || 0);
-      const net = gross - (gross * 0.003) - Math.max(0.15, gross * 0.0007);
-      const receive = net / (marketPrices[dst]?.price || 1);
-
-      a.amount -= amount;
-
-      if (a.amount <= 0) portfolio = portfolio.filter(x => x.currency !== src);
-
-      const b = portfolio.find(x => x.currency === dst);
-
-      if (b) b.amount += receive;
-      else portfolio.push({ currency:dst, name:marketPrices[dst].name, amount:receive, avgBuyPrice:marketPrices[dst].price });
-
-      save();
-      closeModal('swapModal');
-      renderAll();
-      toast(`Swapped to ${dst}`);
-    }
-
-    function executeSendAction() {
-      const s = document.getElementById('sendAssetSelect').value;
-      const amount = parseFloat(document.getElementById('sendAmountInput').value) || 0;
-      const a = portfolio.find(x => x.currency === s);
-
-      if (!a || amount <= 0 || amount > a.amount) {
-        toast('Invalid amount');
-        return;
-      }
-
-      a.amount -= amount;
-
-      if (a.amount <= 0) portfolio = portfolio.filter(x => x.currency !== s);
-
-      save();
-      closeModal('sendModal');
-      renderAll();
-      toast(`Sent ${amt(amount)} ${s}`);
-    }
-
-    function updateStakePreview() {
-      const s = document.getElementById('stakeAssetTarget')?.value;
-      if (!s) return;
-
-      const apy = STAKING_APYS[s] ?? stakingOptions().find(o => o.symbol === s)?.apy ?? 3;
-      const amount = parseFloat(document.getElementById('stakeActionAmountInput')?.value) || 1;
-      const daily = (amount * (marketPrices[s]?.price || 0)) * (apy / 100 / 365);
-
-      document.getElementById('stakeApyPreview').textContent = `${apy.toFixed(2)}%`;
-      document.getElementById('stakeDailyPreview').textContent = money(daily);
-    }
-
-    function executeStakingModification() {
-      const type = document.getElementById('stakeOperationType').value;
-      const s = document.getElementById('stakeAssetTarget').value;
-      const amount = parseFloat(document.getElementById('stakeActionAmountInput').value) || 0;
-
-      if (!s || amount <= 0) {
-        toast('Choose staking amount');
-        return;
-      }
-
-      if (type === 'STAKE') {
-        const a = portfolio.find(x => x.currency === s);
-
-        if (!a || a.amount < amount) {
-          toast('Insufficient spot balance');
-          return;
-        }
-
-        a.amount -= amount;
-
-        if (a.amount <= 0) portfolio = portfolio.filter(x => x.currency !== s);
-
-        const apy = STAKING_APYS[s] ?? stakingOptions().find(o => o.symbol === s)?.apy ?? 3;
-        const v = stakingVaults.find(x => x.currency === s);
-
-        if (v) v.stakedAmount += amount;
-        else {
-          stakingVaults.push({
-            currency:s,
-            name:`${marketPrices[s].name} Vault`,
-            stakedAmount:amount,
-            apy,
-            earnedAmount:0,
-            startValueUsd: amount * (marketPrices[s]?.price || 0),
-            dailyPnlUsd:0,
-            livePnlUsd:0,
-            failed:false
-          });
-        }
-
-        toast(`Staked ${s}`);
-      } else {
-        const v = stakingVaults.find(x => x.currency === s);
-
-        if (!v || v.stakedAmount < amount) {
-          toast('Insufficient staked balance');
-          return;
-        }
-
-        v.stakedAmount -= amount;
-
-        const a = portfolio.find(x => x.currency === s);
-
-        if (a) a.amount += amount;
-        else portfolio.push({ currency:s, name:marketPrices[s].name, amount, avgBuyPrice:marketPrices[s].price });
-
-        stakingVaults = stakingVaults.filter(x => x.stakedAmount > 0);
-        toast(`Unstaked ${s}`);
-      }
-
-      save();
-      closeModal('stakeModal');
-      renderAll();
-    }
-
-    function simulateStakeFail(s) {
-      const v = stakingVaults.find(x => x.currency === s);
-      if (v) {
-        v.failed = true;
-        autoSwitchVault(v);
-        save();
-        renderAll();
-      }
-    }
-
-    function switchMarketTab(tab, el) {
-      activeMarketTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      renderMarkets();
-    }
-
-    function scrollToSection(id, btn) {
-      document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if (id === 'top') window.scrollTo({ top:0, behavior:'smooth' });
-      else document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
-    }
-
-    function resetDemoData() {
-      marketPrices = buildDefaultMarkets();
-      portfolio = SERVER_WALLET?.assets || structuredClone(DEFAULT_PORTFOLIO);
-      stakingVaults = SERVER_WALLET?.staking?.vaults || structuredClone(DEFAULT_VAULTS);
-      chartHistory = {};
-      lastTimestamp = Date.now();
-      save();
-      renderAll();
-      toast('Local data reset');
-    }
-
-    function openChart(s) {
-      activeChartSymbol = s;
-      activeChartRange = '5m';
-      document.querySelectorAll('#rangeRow button').forEach((b,i) => b.classList.toggle('active', i === 0));
-      document.getElementById('chartModal').classList.add('active');
-      drawChart();
-    }
-
-    function setChartRange(r, el) {
-      activeChartRange = r;
-      document.querySelectorAll('#rangeRow button').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
-      drawChart();
-    }
-
-    function timeLabel(ts, range) {
-      const d = new Date(ts);
-      if (range === '1d') return d.toLocaleDateString([], { month:'short', day:'numeric' });
-      return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    }
-
-    function drawChart() {
-      const s = activeChartSymbol;
-      const p = marketPrices[s];
-
-      if (!s || !p) return;
-
-      const chartPrice = document.getElementById('chartPrice');
-      const oldText = chartPrice.dataset.price ? Number(chartPrice.dataset.price) : p.price;
-
-      chartPrice.classList.remove('up','down');
-      chartPrice.textContent = money(p.price);
-      chartPrice.dataset.price = p.price;
-
-      if (p.price > oldText) chartPrice.classList.add('up');
-      else if (p.price < oldText) chartPrice.classList.add('down');
-
-      document.getElementById('chartTitle').textContent = `${p.name} · ${s}/USDT`;
-      document.getElementById('chartSub').textContent = `${activeChartRange} candles · blue up / pink down`;
-
-      setTimeout(() => chartPrice.classList.remove('up','down'), 360);
-
-      const data = chartDataForRange(s);
-      const canvas = document.getElementById('priceCanvas');
-      const wrap = canvas.parentElement;
-      const dpr = window.devicePixelRatio || 1;
-
-      canvas.width = wrap.clientWidth * dpr;
-      canvas.height = wrap.clientHeight * dpr;
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      const w = wrap.clientWidth;
-      const h = wrap.clientHeight;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const css = getComputedStyle(document.documentElement);
-      const blue = css.getPropertyValue('--blue-candle').trim();
-      const pink = css.getPropertyValue('--pink-candle').trim();
-      const grid = css.getPropertyValue('--border').trim();
-      const text = css.getPropertyValue('--muted').trim();
-      const mainText = css.getPropertyValue('--text').trim();
-
-      const left = 58;
-      const right = 54;
-      const top = 22;
-      const bottom = 36;
-      const chartW = w - left - right;
-      const chartH = h - top - bottom;
-
-      const highs = data.map(x => x.high);
-      const lows = data.map(x => x.low);
-      const max = Math.max(...highs);
-      const min = Math.min(...lows);
-      const pad = (max - min) * 0.08 || max * 0.01 || 1;
-      const yMax = max + pad;
-      const yMin = min - pad;
-
-      const y = v => top + (yMax - v) / (yMax - yMin) * chartH;
-      const x = i => left + i * (chartW / Math.max(1, data.length - 1));
-
-      ctx.strokeStyle = grid;
-      ctx.lineWidth = 1;
-      ctx.fillStyle = text;
-      ctx.font = '700 11px Inter';
-      ctx.textBaseline = 'middle';
-
-      for (let i = 0; i < 6; i++) {
-        const yy = top + i * chartH / 5;
-        const price = yMax - i * (yMax - yMin) / 5;
-
-        ctx.beginPath();
-        ctx.moveTo(left, yy);
-        ctx.lineTo(w - right, yy);
-        ctx.stroke();
-
-        ctx.fillText(money(price), w - right + 8, yy);
-      }
-
-      ctx.textBaseline = 'top';
-
-      const timeSteps = 5;
-
-      for (let i = 0; i <= timeSteps; i++) {
-        const idx = Math.min(data.length - 1, Math.round(i * (data.length - 1) / timeSteps));
-        const xx = x(idx);
-
-        ctx.beginPath();
-        ctx.moveTo(xx, top);
-        ctx.lineTo(xx, h - bottom);
-        ctx.stroke();
-
-        ctx.fillText(timeLabel(data[idx].t, activeChartRange), Math.max(4, Math.min(w - 70, xx - 22)), h - bottom + 10);
-      }
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(left, top, chartW, chartH);
-      ctx.clip();
-
-      ctx.lineWidth = 1.5;
-
-      const slot = chartW / Math.max(8, data.length);
-      const bodyW = Math.max(4, Math.min(12, slot * 0.62));
-
-      data.forEach((c, i) => {
-        const xx = x(i);
-        const up = c.close >= c.open;
-        const col = up ? blue : pink;
-
-        ctx.strokeStyle = col;
-        ctx.fillStyle = col;
-
-        ctx.beginPath();
-        ctx.moveTo(xx, y(c.high));
-        ctx.lineTo(xx, y(c.low));
-        ctx.stroke();
-
-        const bodyY = Math.min(y(c.open), y(c.close));
-        const bodyH = Math.max(2, Math.abs(y(c.open) - y(c.close)));
-
-        ctx.fillRect(xx - bodyW / 2, bodyY, bodyW, bodyH);
+    const otp = generateOtp();
+    saveOtp(email, otp);
+
+    const sent = await sendOtpEmail(email, otp);
+
+    return res.render('index', {
+      error: null,
+      success: sent
+        ? 'OTP code sent to your email.'
+        : 'OTP generated. Gmail is not configured, so check the server console.',
+      otpEmail: email
+    });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+
+    return res.render('index', {
+      error: 'Unable to send OTP right now.',
+      success: null,
+      otpEmail: req.body.email || null
+    });
+  }
+});
+
+app.post('/verify-otp', (req, res) => {
+  const email = normalizeEmail(req.body.email);
+  const otp = String(req.body.otp || '').trim();
+
+  const result = verifyOtp(email, otp);
+
+  if (!result.ok) {
+    return res.render('index', {
+      error: result.reason,
+      success: null,
+      otpEmail: email
+    });
+  }
+
+  const user = getOrCreateUser(email, 'user');
+
+  req.session.user = {
+    email,
+    username: email.split('@')[0],
+    role: user.role,
+    walletId: user.id
+  };
+
+  return res.redirect('/wallet');
+});
+
+app.post('/staff-login', (req, res) => {
+  const username = String(req.body.username || '').trim();
+  const password = String(req.body.password || '');
+
+  if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) {
+    return res.render('index', {
+      error: 'Invalid staff username or password.',
+      success: null,
+      otpEmail: null
+    });
+  }
+
+  const user = getOrCreateUser(STAFF_EMAIL, 'staff');
+
+  req.session.user = {
+    email: STAFF_EMAIL,
+    username: 'admin',
+    role: 'staff',
+    walletId: user.id
+  };
+
+  return res.redirect('/wallet');
+});
+
+app.get('/wallet', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.render('wallet', {
+    username: req.session.user.username,
+    email: req.session.user.email,
+    role: req.session.user.role,
+    wallet: JSON.stringify(user)
+  });
+});
+
+app.get('/trading', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.render('trading', {
+    username: req.session.user.username,
+    email: req.session.user.email,
+    role: req.session.user.role,
+    wallet: JSON.stringify(user)
+  });
+});
+
+app.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+});
+
+/* =========================
+   Wallet API
+========================= */
+
+app.get('/api/wallet', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+  res.json(user);
+});
+
+app.post('/api/wallet/vault', requireAuth, (req, res) => {
+  const { encryptedVault, publicWallets } = req.body;
+
+  if (!encryptedVault || typeof encryptedVault !== 'object') {
+    return res.status(400).json({
+      error: 'Missing or invalid encryptedVault.'
+    });
+  }
+
+  if (!Array.isArray(publicWallets)) {
+    return res.status(400).json({
+      error: 'Missing or invalid publicWallets.'
+    });
+  }
+
+  /*
+    Server stores encrypted vault only.
+    Never send plaintext seed phrase/private key to this route.
+  */
+  const user = updateUserWallet(req.session.user.email, {
+    encryptedVault,
+    publicWallets
+  });
+
+  res.json({
+    ok: true,
+    wallet: user
+  });
+});
+
+app.post('/api/wallet/state', requireAuth, (req, res) => {
+  const patch = {};
+
+  if (Array.isArray(req.body.assets)) {
+    patch.assets = req.body.assets.map(asset => ({
+      currency: String(asset.currency || '').toUpperCase(),
+      name: String(asset.name || asset.currency || ''),
+      amount: Number(asset.amount || 0),
+      avgBuyPrice: Number(asset.avgBuyPrice || 0)
+    }));
+  }
+
+  if (req.body.staking && typeof req.body.staking === 'object') {
+    patch.staking = {
+      autoStake: Boolean(req.body.staking.autoStake),
+      riskMode: String(req.body.staking.riskMode || 'balanced'),
+      vaults: Array.isArray(req.body.staking.vaults)
+        ? req.body.staking.vaults.map(vault => ({
+            currency: String(vault.currency || '').toUpperCase(),
+            name: String(vault.name || vault.currency || ''),
+            stakedAmount: Number(vault.stakedAmount || 0),
+            apy: Number(vault.apy || 0),
+            earnedAmount: Number(vault.earnedAmount || 0),
+            livePnlUsd: Number(vault.livePnlUsd || 0),
+            dailyPnlUsd: Number(vault.dailyPnlUsd || 0),
+            failed: Boolean(vault.failed)
+          }))
+        : []
+    };
+  }
+
+  const user = updateUserWalletNested(req.session.user.email, patch);
+
+  res.json({
+    ok: true,
+    wallet: user
+  });
+});
+
+app.post('/api/wallet/public-wallets', requireAuth, (req, res) => {
+  const { publicWallets } = req.body;
+
+  if (!Array.isArray(publicWallets)) {
+    return res.status(400).json({
+      error: 'publicWallets must be an array.'
+    });
+  }
+
+  const user = updateUserWallet(req.session.user.email, {
+    publicWallets
+  });
+
+  res.json({
+    ok: true,
+    wallet: user
+  });
+});
+
+/* =========================
+   Assets + Staking API
+========================= */
+
+app.get('/api/assets', (req, res) => {
+  const assets = SUPPORTED_ASSETS.map(symbol => ({
+    symbol,
+    name: ASSET_NAMES[symbol] || symbol,
+    geckoId: GECKO_IDS[symbol] || null,
+    pair: `${symbol}/USDT`,
+    stakingApy: STAKING_APYS[symbol] || null
+  }));
+
+  res.json({ assets });
+});
+
+app.get('/api/staking-options', (req, res) => {
+  const options = SUPPORTED_ASSETS
+    .map(symbol => ({
+      symbol,
+      name: ASSET_NAMES[symbol] || symbol,
+      estimatedApy: STAKING_APYS[symbol] || Number((2 + Math.random() * 5).toFixed(2)),
+      risk: ['BTC', 'ETH', 'SOL', 'USDT', 'BNB'].includes(symbol)
+        ? 'lower'
+        : 'variable'
+    }))
+    .sort((a, b) => b.estimatedApy - a.estimatedApy);
+
+  res.json({ options });
+});
+
+/* =========================
+   Prices API
+========================= */
+
+app.get('/api/prices', async (req, res) => {
+  try {
+    const ids = String(req.query.ids || '').trim();
+
+    if (!ids) {
+      return res.status(400).json({
+        error: 'Missing ids query parameter.'
       });
-
-      const last = data[data.length - 1];
-      const lx = x(data.length - 1);
-      const ly = y(last.close);
-
-      ctx.strokeStyle = p.price >= p.prevPrice ? blue : pink;
-      ctx.setLineDash([5,5]);
-      ctx.beginPath();
-      ctx.moveTo(left, ly);
-      ctx.lineTo(w - right, ly);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      ctx.fillStyle = p.price >= p.prevPrice ? blue : pink;
-      const label = money(last.close);
-      ctx.font = '800 11px Inter';
-      const tw = ctx.measureText(label).width + 14;
-      const labelX = Math.min(w - right - tw, lx - 22);
-      const labelY = Math.max(top + 4, ly - 28);
-
-      ctx.fillRect(labelX, labelY, tw, 22);
-      ctx.fillStyle = 'white';
-      ctx.fillText(label, labelX + 7, labelY + 5);
-
-      ctx.restore();
-
-      ctx.fillStyle = mainText;
-      ctx.font = '900 11px Inter';
-      ctx.fillText('Price', w - right + 8, top - 2);
-      ctx.fillText('Time', left, h - 17);
     }
 
-    function copyText(text) {
-      navigator.clipboard?.writeText(text);
-      toast('Copied');
-    }
+    const url =
+      `https://api.coingecko.com/api/v3/simple/price` +
+      `?ids=${encodeURIComponent(ids)}` +
+      `&vs_currencies=usd` +
+      `&include_24hr_change=true`;
 
-    function bytesToBase64(bytes) {
-      return btoa(String.fromCharCode(...new Uint8Array(bytes)));
-    }
-
-    function base64ToBytes(base64) {
-      return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-    }
-
-    async function deriveAesKey(secret, saltBase64) {
-      const salt = base64ToBytes(saltBase64);
-
-      const keyMaterial = await crypto.subtle.importKey(
-        'raw',
-        new TextEncoder().encode(secret),
-        'PBKDF2',
-        false,
-        ['deriveKey']
-      );
-
-      return crypto.subtle.deriveKey(
-        {
-          name: 'PBKDF2',
-          salt,
-          iterations: 250000,
-          hash: 'SHA-256'
-        },
-        keyMaterial,
-        {
-          name: 'AES-GCM',
-          length: 256
-        },
-        false,
-        ['encrypt', 'decrypt']
-      );
-    }
-
-    async function encryptVault(vaultObject, secret) {
-      const salt = crypto.getRandomValues(new Uint8Array(16));
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const saltBase64 = bytesToBase64(salt);
-      const key = await deriveAesKey(secret, saltBase64);
-
-      const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
-        key,
-        new TextEncoder().encode(JSON.stringify(vaultObject))
-      );
-
-      return {
-        version: 1,
-        kdf: 'PBKDF2-SHA256',
-        cipher: 'AES-GCM',
-        iterations: 250000,
-        salt: saltBase64,
-        iv: bytesToBase64(iv),
-        data: bytesToBase64(encrypted)
-      };
-    }
-
-    async function decryptVault(encryptedVault, secret) {
-      const key = await deriveAesKey(secret, encryptedVault.salt);
-      const iv = base64ToBytes(encryptedVault.iv);
-      const encryptedData = base64ToBytes(encryptedVault.data);
-
-      const decrypted = await crypto.subtle.decrypt(
-        { name: 'AES-GCM', iv },
-        key,
-        encryptedData
-      );
-
-      return JSON.parse(new TextDecoder().decode(decrypted));
-    }
-
-    function generateRealEvmWallet() {
-      const wallet = ethers.Wallet.createRandom();
-
-      return {
-        type: 'evm',
-        standard: 'BIP39',
-        phrase: wallet.mnemonic.phrase,
-        privateKey: wallet.privateKey,
-        address: wallet.address,
-        networks: [
-          'Ethereum',
-          'BNB Smart Chain',
-          'Polygon',
-          'Avalanche C-Chain',
-          'Arbitrum',
-          'Optimism',
-          'Base'
-        ],
-        createdAt: new Date().toISOString()
-      };
-    }
-
-    async function saveEncryptedWalletToServer(encryptedVault, wallets) {
-      const response = await fetch('/api/wallet/vault', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          encryptedVault,
-          publicWallets: wallets
-        })
-      });
-
-      if (!response.ok) throw new Error('Unable to save encrypted wallet.');
-
-      return response.json();
-    }
-
-    async function createNewRealWalletForAccount() {
-      const passcode = prompt('Create a wallet encryption passcode. Use at least 8 characters. Do not forget it.');
-
-      if (!passcode || passcode.length < 8) {
-        toast('Passcode must be at least 8 characters');
-        return;
-      }
-
-      const confirmed = confirm(
-        'This will create a real EVM wallet. Save your seed phrase after creating it. If you lose the passcode and seed phrase, funds cannot be recovered. Continue?'
-      );
-
-      if (!confirmed) return;
-
-      const realWallet = generateRealEvmWallet();
-
-      const vaultObject = {
-        wallets: [realWallet],
-        createdAt: new Date().toISOString()
-      };
-
-      const secret = `${CURRENT_EMAIL}:${passcode}`;
-      const encryptedVault = await encryptVault(vaultObject, secret);
-
-      publicWallets = [
-        {
-          type: 'evm',
-          address: realWallet.address,
-          networks: realWallet.networks,
-          createdAt: realWallet.createdAt
-        }
-      ];
-
-      await saveEncryptedWalletToServer(encryptedVault, publicWallets);
-
-      ACTIVE_DECRYPTED_WALLET = vaultObject;
-
-      localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
-
-      renderPublicWallets();
-      toast('Real wallet created and encrypted');
-    }
-
-    async function unlockExistingWallet() {
-      if (!SERVER_WALLET || !SERVER_WALLET.encryptedVault) {
-        toast('No encrypted wallet exists yet');
-        return null;
-      }
-
-      const passcode = prompt('Enter your wallet encryption passcode.');
-      if (!passcode) return null;
-
-      try {
-        const secret = `${CURRENT_EMAIL}:${passcode}`;
-        ACTIVE_DECRYPTED_WALLET = await decryptVault(SERVER_WALLET.encryptedVault, secret);
-        toast('Wallet unlocked');
-        return ACTIVE_DECRYPTED_WALLET;
-      } catch (error) {
-        toast('Wrong passcode or corrupted wallet vault');
-        return null;
-      }
-    }
-
-    async function revealSecretPhrase() {
-      const unlocked = ACTIVE_DECRYPTED_WALLET || await unlockExistingWallet();
-      if (!unlocked) return;
-
-      const firstWallet = unlocked.wallets.find(w => w.type === 'evm');
-      if (!firstWallet) {
-        toast('No EVM wallet found');
-        return;
-      }
-
-      const confirmed = confirm('Your seed phrase controls real funds. Never share it. Show it now?');
-      if (!confirmed) return;
-
-      alert(`Seed phrase:\n\n${firstWallet.phrase}`);
-    }
-
-    async function revealPrivateKey() {
-      const unlocked = ACTIVE_DECRYPTED_WALLET || await unlockExistingWallet();
-      if (!unlocked) return;
-
-      const firstWallet = unlocked.wallets.find(w => w.type === 'evm');
-      if (!firstWallet) {
-        toast('No EVM wallet found');
-        return;
-      }
-
-      const confirmed = confirm('Your private key controls real funds. Never share it. Show it now?');
-      if (!confirmed) return;
-
-      alert(`Private key:\n\n${firstWallet.privateKey}`);
-    }
-
-    async function initializeRealWalletPrompt() {
-      if (!SERVER_WALLET) return;
-
-      localStorage.setItem('bluecrypto_wallet_assets', JSON.stringify(SERVER_WALLET.assets || []));
-      localStorage.setItem('bluecrypto_wallet_vaults', JSON.stringify(SERVER_WALLET.staking?.vaults || []));
-      localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(SERVER_WALLET.publicWallets || []));
-
-      if (!SERVER_WALLET.encryptedVault && CURRENT_ROLE !== 'staff') {
-        setTimeout(async () => {
-          const shouldCreate = confirm('No real wallet exists for this account yet. Generate a real EVM wallet now?');
-          if (shouldCreate) await createNewRealWalletForAccount();
-        }, 700);
-      }
-    }
-
-    window.addEventListener('resize', () => activeChartSymbol && drawChart());
-
-    window.addEventListener('click', e => {
-      if (!e.target.closest('.combo')) {
-        document.querySelectorAll('.suggestions').forEach(x => x.classList.remove('active'));
+    const response = await fetch(url, {
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'BlueCrypto-Wallet/1.0'
       }
     });
 
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        closeSettings();
-        document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
-      }
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Price provider failed.'
+      });
+    }
+
+    const data = await response.json();
+
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(data);
+  } catch (error) {
+    console.error('Price API error:', error);
+
+    res.status(500).json({
+      error: 'Unable to fetch prices.'
     });
+  }
+});
 
-    setTheme(localStorage.getItem('bc_theme_v5') || 'light');
+/* =========================
+   Staff API
+========================= */
 
-    save();
-    renderAll(false);
-    initializeRealWalletPrompt();
-    refreshPrices(false);
+app.get('/api/staff/users', requireStaff, (req, res) => {
+  const db = readDb();
 
-    setInterval(refreshPrices, 2000);
-    setInterval(() => {
-      simulatePrices();
-      renderAll(false);
-    }, 2000);
-  </script>
-</body>
-</html>
+  const users = Object.values(db.users).map(user => ({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    assetCount: Array.isArray(user.assets) ? user.assets.length : 0,
+    walletCount: Array.isArray(user.publicWallets) ? user.publicWallets.length : 0,
+    hasEncryptedVault: Boolean(user.encryptedVault)
+  }));
+
+  res.json({ users });
+});
+
+/* =========================
+   Health
+========================= */
+
+app.get('/health', (req, res) => {
+  res.json({
+    ok: true,
+    app: 'Blue Wallet',
+    time: nowIso()
+  });
+});
+
+/* =========================
+   404
+========================= */
+
+app.use((req, res) => {
+  res.status(404).send('Page not found');
+});
+
+/* =========================
+   Start
+========================= */
+
+app.listen(PORT, () => {
+  ensureDb();
+  console.log(`Blue Wallet running on port ${PORT}`);
+});
