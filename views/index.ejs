@@ -1,135 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue API - Login</title>
-    <style>
-        :root {
-            --bg-main: #0b0e14;
-            --bg-card: #151a27;
-            --primary-blue: #2563eb;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --danger: #ef4444;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Blue Wallet - Login</title>
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; align-items: center; height: 100vh; }
-        
-        .login-container {
-            background-color: var(--bg-card);
-            padding: 40px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-        .login-container h1 { font-size: 1.5rem; margin-bottom: 24px; color: var(--text-main); }
-        
-        .connect-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: transparent;
-            border: 1px solid var(--primary-blue);
-            color: var(--primary-blue);
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 24px;
-            transition: all 0.2s;
-        }
+  <style>
+    :root {
+      --bg: #f4f9ff;
+      --bg-2: #e8f3ff;
+      --card: #ffffff;
+      --card-2: #f7fbff;
+      --border: rgba(15, 23, 42, 0.08);
+      --border-strong: rgba(2, 132, 199, 0.28);
+      --text: #0f172a;
+      --muted: #64748b;
+      --muted-2: #94a3b8;
+      --primary: #0284c7;
+      --primary-2: #2563eb;
+      --danger: #e11d48;
+      --success: #0284c7;
+      --shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
+      --shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.08);
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
 
-        .connect-btn:hover { background-color: rgba(37, 99, 235, 0.1); }
-        
-        .unavailable-text {
-            color: var(--danger);
-            font-size: 0.85rem;
-            margin-top: -16px;
-            margin-bottom: 24px;
-            display: none;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        .divider {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 24px 0;
-            position: relative;
-        }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(2, 132, 199, 0.12), transparent 28%),
+        radial-gradient(circle at 90% 8%, rgba(225, 29, 72, 0.07), transparent 24%),
+        linear-gradient(135deg, var(--bg), var(--bg-2));
+      overflow-x: hidden;
+    }
 
-        .divider span {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--bg-card);
-            padding: 0 10px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+    button,
+    input {
+      font: inherit;
+    }
 
-        .form-group { margin-bottom: 16px; text-align: left; }
-        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background-color: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: white;
-            outline: none;
-        }
-        .form-group input:focus { border-color: var(--primary-blue); }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: calc(14px + var(--safe-top)) 18px 14px;
+    }
 
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .login-btn:hover { opacity: 0.9; }
+    .topbar-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .error-msg { color: var(--danger); font-size: 0.85rem; margin-bottom: 16px; }
-    </style>
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 950;
+      letter-spacing: -0.06em;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+    }
+
+    .brand-title {
+      font-weight: 950;
+      letter-spacing: -0.045em;
+      font-size: 1.04rem;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .staff-btn {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(14px);
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .staff-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+    }
+
+    .page {
+      min-height: 100vh;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: calc(86px + var(--safe-top)) 18px calc(28px + var(--safe-bottom));
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .hero {
+      padding: 20px 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--primary);
+      background: rgba(2, 132, 199, 0.08);
+      border: 1px solid var(--border-strong);
+      font-weight: 950;
+      font-size: 0.78rem;
+      margin-bottom: 18px;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 rgba(2, 132, 199, 0.45);
+      animation: pulse 1.7s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.42); }
+      80% { box-shadow: 0 0 0 9px rgba(2, 132, 199, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 7vw, 5.2rem);
+      line-height: 0.95;
+      letter-spacing: -0.08em;
+      font-weight: 950;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+      max-width: 540px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      font-weight: 650;
+    }
+
+    .features {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 620px;
+    }
+
+    .feature {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .feature strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 950;
+      margin-bottom: 5px;
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      justify-self: end;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+      padding: 22px;
+      backdrop-filter: blur(18px);
+    }
+
+    .card-head {
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 950;
+      letter-spacing: -0.055em;
+    }
+
+    .card-subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .connect-btn,
+    .primary-btn,
+    .secondary-btn {
+      width: 100%;
+      min-height: 50px;
+      border-radius: 16px;
+      font-weight: 950;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .connect-btn {
+      background: #0f172a;
+      color: white;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+      margin-bottom: 12px;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--primary-2), var(--primary));
+      color: white;
+      border: 0;
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.18);
+      margin-top: 8px;
+    }
+
+    .secondary-btn {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .connect-btn:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+    }
+
+    .notice {
+      display: none;
+      margin: 10px 0 14px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(225, 29, 72, 0.08);
+      color: var(--danger);
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .notice.active {
+      display: block;
+    }
+
+    .divider {
+      position: relative;
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    .divider span {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 13px;
+      text-align: left;
+    }
+
+    .form-group label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group input {
+      width: 100%;
+      min-height: 50px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      outline: none;
+      font-weight: 850;
+    }
+
+    .form-group input:focus {
+      border-color: var(--border-strong);
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.08);
+    }
+
+    .error-msg,
+    .success-msg {
+      padding: 11px 12px;
+      border-radius: 14px;
+      font-size: 0.83rem;
+      font-weight: 850;
+      line-height: 1.45;
+      margin-bottom: 13px;
+    }
+
+    .error-msg {
+      background: rgba(225, 29, 72, 0.08);
+      color: var(--danger);
+    }
+
+    .success-msg {
+      background: rgba(2, 132, 199, 0.08);
+      color: var(--success);
+    }
+
+    .small-text {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: grid;
+      place-items: center;
+    }
+
+    .modal-card {
+      width: min(420px, 100%);
+      background: white;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      padding: 20px;
+      animation: pop 0.2s ease both;
+    }
+
+    @keyframes pop {
+      from { transform: translateY(14px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 950;
+      letter-spacing: -0.05em;
+    }
+
+    .modal-subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 950;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 860px) {
+      .page {
+        grid-template-columns: 1fr;
+        align-items: start;
+        padding-top: calc(92px + var(--safe-top));
+      }
+
+      .login-card {
+        justify-self: stretch;
+        max-width: none;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-bottom: 0;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .brand-subtitle {
+        display: none;
+      }
+
+      .staff-btn {
+        padding: 0 11px;
+      }
+
+      .login-card {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      h1 {
+        font-size: 2.65rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">B</div>
+        <div>
+          <div class="brand-title">Blue Wallet</div>
+          <div class="brand-subtitle">Wallet · staking · trading</div>
+        </div>
+      </div>
 
-    <div class="login-container">
-        <h1>Blue API Portal</h1>
-        
-        <button class="connect-btn" onclick="showUnavailable()">Connect Web3 Wallet</button>
-        <div class="unavailable-text" id="unavailableText">Wallet connection is currently unavailable.</div>
-
-        <div class="divider"><span>OR</span></div>
-
-        <% if (error) { %>
-            <div class="error-msg"><%= error %></div>
-        <% } %>
-
-        <form action="/login" method="POST">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
+      <button class="staff-btn" type="button" onclick="openStaffModal()">Staff login</button>
     </div>
+  </header>
 
-    <script>
-        function showUnavailable() {
-            document.getElementById('unavailableText').style.display = 'block';
-        }
-    </script>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> Secure OTP access</div>
+      <h1>Your crypto wallet terminal.</h1>
+      <p>
+        Login with your email to access your saved wallet, assets, staking options, and trading workspace.
+        New accounts automatically receive a generated wallet profile.
+      </p>
+
+      <div class="features">
+        <div class="feature">
+          <strong>Saved wallet</strong>
+          <span>Returning users load their previous wallet profile and assets.</span>
+        </div>
+        <div class="feature">
+          <strong>Multi-asset</strong>
+          <span>Supports BTC, ETH, SOL, DeFi, meme coins, and USDT pairs.</span>
+        </div>
+        <div class="feature">
+          <strong>Trading-ready</strong>
+          <span>Wallet data is shared with wallet.ejs and trading.ejs.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="login-card">
+      <div class="card-head">
+        <div class="card-title">Login to wallet</div>
+        <div class="card-subtitle">
+          Enter your email. We will send a one-time code to continue.
+        </div>
+      </div>
+
+      <button class="connect-btn" type="button" onclick="showUnavailable()">Connect Web3 Wallet</button>
+      <div class="notice" id="unavailableText">
+        Web3 wallet connection is not enabled yet. Use email OTP login for now.
+      </div>
+
+      <div class="divider"><span>EMAIL OTP</span></div>
+
+      <% if (error) { %>
+        <div class="error-msg"><%= error %></div>
+      <% } %>
+
+      <% if (success) { %>
+        <div class="success-msg"><%= success %></div>
+      <% } %>
+
+      <% if (otpEmail) { %>
+        <form action="/verify-otp" method="POST">
+          <input type="hidden" name="email" value="<%= otpEmail %>" />
+
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" value="<%= otpEmail %>" disabled />
+          </div>
+
+          <div class="form-group">
+            <label>OTP Code</label>
+            <input
+              type="text"
+              name="otp"
+              placeholder="Enter 6-digit code"
+              inputmode="numeric"
+              maxlength="6"
+              required
+            />
+          </div>
+
+          <button type="submit" class="primary-btn">Verify & Open Wallet</button>
+        </form>
+
+        <form action="/send-otp" method="POST" style="margin-top: 10px;">
+          <input type="hidden" name="email" value="<%= otpEmail %>" />
+          <button type="submit" class="secondary-btn">Send New Code</button>
+        </form>
+      <% } else { %>
+        <form action="/send-otp" method="POST">
+          <div class="form-group">
+            <label>Email address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+
+          <button type="submit" class="primary-btn">Send OTP Code</button>
+        </form>
+      <% } %>
+
+      <div class="small-text">
+        Staff accounts use the Staff login button in the top-right.
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="staffModal" onclick="closeStaffModalOnOverlay(event)">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Staff login</div>
+          <div class="modal-subtitle">
+            Admin/staff accounts load the custom staff wallet balance.
+          </div>
+        </div>
+        <button class="close-btn" type="button" onclick="closeStaffModal()">×</button>
+      </div>
+
+      <form action="/staff-login" method="POST">
+        <div class="form-group">
+          <label>Staff username</label>
+          <input type="text" name="username" placeholder="admin" autocomplete="username" required />
+        </div>
+
+        <div class="form-group">
+          <label>Staff password</label>
+          <input type="password" name="password" placeholder="Password" autocomplete="current-password" required />
+        </div>
+
+        <button type="submit" class="primary-btn">Open Staff Wallet</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showUnavailable() {
+      document.getElementById('unavailableText').classList.add('active');
+    }
+
+    function openStaffModal() {
+      document.getElementById('staffModal').classList.add('active');
+    }
+
+    function closeStaffModal() {
+      document.getElementById('staffModal').classList.remove('active');
+    }
+
+    function closeStaffModalOnOverlay(event) {
+      if (event.target.id === 'staffModal') closeStaffModal();
+    }
+
+    window.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeStaffModal();
+    });
+  </script>
 </body>
 </html>
