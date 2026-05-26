@@ -18,7 +18,7 @@
       --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
       --blue: #0284c7; --blue2: #2563eb; --cyan: #38bdf8;
       --pink: #e11d48; --orange: #d97706; --green: #10b981;
-      --tensor: #8b5cf6; --tensor2: #d946ef; /* AI Tensor Colors */
+      --tensor: #8b5cf6; --tensor2: #d946ef; 
       --border: rgba(2,132,199,0.12); --border2: rgba(2,132,199,0.35);
       --shadow: 0 24px 64px rgba(37,99,235,0.12); --shadow2: 0 12px 32px rgba(2,132,199,0.08);
       --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
@@ -61,8 +61,6 @@
     .hero::before { content: ""; position: absolute; right: -80px; bottom: -100px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(2,132,199,0.2), transparent 60%); pointer-events: none; }
     
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 99px; color: var(--blue); background: rgba(2,132,199,0.1); border: 1px solid var(--border2); font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; }
-    .badge.tensor { color: var(--tensor); background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.3); }
-    
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); animation: pulse 2s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(2,132,199,0.5); } 70% { box-shadow: 0 0 0 8px rgba(2,132,199,0); } 100% { box-shadow: 0 0 0 0 rgba(2,132,199,0); } }
     
@@ -92,16 +90,18 @@
     .asset-scroll::-webkit-scrollbar { display: none; }
     .modal-asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-height: 240px; overflow-y: auto; padding-bottom: 6px; }
     
-    .asset-card, .staking-card { flex: 0 0 190px; scroll-snap-align: start; border-radius: 24px; padding: 16px; background: var(--glass2); border: 1px solid var(--border); color: var(--text); text-align: left; box-shadow: var(--shadow2); }
+    .asset-card { flex: 0 0 190px; scroll-snap-align: start; border-radius: 24px; padding: 16px; background: var(--glass2); border: 1px solid var(--border); color: var(--text); text-align: left; box-shadow: var(--shadow2); transition: 0.15s ease; }
+    .asset-card:active { transform: scale(0.97); }
     .asset-card.tensor { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.05); }
     .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(255,255,255,0.3)); }
+    [data-theme="dark"] .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(17,29,51,0.4)); }
     .asset-card.selected, .receive-option.selected { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(56,189,248,0.2); }
     .asset-card.tensor.selected { border-color: var(--tensor); box-shadow: 0 0 0 4px rgba(139,92,246,0.2); }
 
     .asset-top { display: flex; align-items: center; gap: 12px; }
     .coin { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); border: 1px solid var(--border); color: var(--blue); font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden; }
-    .coin.tensor-coin { color: var(--tensor); border-color: rgba(139,92,246,0.4); }
-    .coin.tensor-coin svg { width: 24px; height: 24px; fill: currentColor; }
+    .coin.tensor-coin { border: none; background: transparent; padding: 0; }
+    .coin.tensor-coin svg { width: 44px; height: 44px; }
     .coin img { width: 100%; height: 100%; object-fit: contain; }
 
     .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -128,8 +128,8 @@
 
     .icon-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
     .icon-option { height: 48px; border-radius: 14px; border: 1px solid var(--border); background: var(--solid); display: grid; place-items: center; color: var(--muted); transition: 0.2s; }
-    .icon-option.selected { border-color: var(--tensor); color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
-    .icon-option svg { width: 24px; height: 24px; fill: currentColor; }
+    .icon-option.selected { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
+    .icon-option svg { width: 32px; height: 32px; }
 
     .receive-hero { display: flex; flex-direction: column; align-items: center; background: var(--solid); border-radius: 28px; padding: 24px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow2); }
     .receive-address-box { width: 100%; display: flex; align-items: center; gap: 8px; background: var(--soft); padding: 8px 8px 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
@@ -167,7 +167,7 @@
       .quick-btn { min-height: 72px; padding: 10px 4px; border-radius: 20px; }
       .quick-btn strong { font-size: 0.8rem; }
       .panel { padding: 16px; border-radius: 24px; }
-      .asset-card, .staking-card { flex-basis: 170px; }
+      .asset-card { flex-basis: 170px; }
       .modal-card { width: 100%; border-radius: 32px 32px 0 0; margin: auto auto 0 auto; max-height: 92vh; }
       .drawer { width: 100%; }
       .huge-amount { font-size: 2.5rem; }
@@ -209,33 +209,6 @@
       </div>
     </section>
 
-    <section class="panel" id="adminTensorPanel" style="display:none; border-color:var(--pink); background:rgba(225,29,72,0.05);">
-      <div class="panel-head"><h2 class="title" style="color:var(--pink);">Admin: Tensor Factory</h2></div>
-      <div class="form">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="field"><label>Token Name</label><input class="input" id="adTenName" placeholder="e.g. Neural" /></div>
-          <div class="field"><label>Symbol</label><input class="input" id="adTenSym" placeholder="NRL" /></div>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="field"><label>Start Price (USDT)</label><input class="input" id="adTenPrice" type="number" step="any" placeholder="1.00" /></div>
-          <div class="field">
-            <label>Algorithm</label>
-            <select class="select" id="adTenVol">
-              <option value="bull">Bullish Bias</option>
-              <option value="bear">Bearish Bias</option>
-              <option value="stable">Stable / Neutral</option>
-              <option value="hyper">Hyper Volatile</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>Profile Icon</label>
-          <div class="icon-picker-grid" id="adTenIconPicker"></div>
-        </div>
-        <button class="primary-btn" style="background:var(--pink); box-shadow:none;" onclick="deployTensorToken()">Deploy to Tensor Network</button>
-      </div>
-    </section>
-
     <section class="panel tensor-panel" id="tensorAssetsSection">
       <div class="panel-head"><h2 class="title" style="color:var(--tensor);">Tensor Assets (AI)</h2><button class="small-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="openModal('tensorSendModal')">Send</button></div>
       <div class="asset-scroll" id="tensorCards"></div>
@@ -253,21 +226,40 @@
     <button id="navSettings" onclick="openSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </nav>
 
+  <div class="modal-overlay" id="tensorChartModal" onclick="overlayClose(event,'tensorChartModal')">
+    <div class="modal-card" style="width:min(640px, 100%); border-color:var(--tensor);">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="chartModalTitle" style="color:var(--tensor);">AI Token Dynamics</div>
+          <div class="modal-sub" id="chartModalStats">Cap: $0.00 | Dominance: 0.00%</div>
+        </div>
+        <button class="close" onclick="closeModal('tensorChartModal')">×</button>
+      </div>
+      <div style="position:relative; width:100%; height:260px; background:var(--soft); border-radius:18px; padding:10px; overflow:hidden;">
+         <canvas id="tensorCanvasInterface" style="width:100%; height:100%; display:block;"></canvas>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:14px; text-align:center;">
+         <div class="box" style="padding:10px;"><div class="tiny">Circulating Supply</div><strong id="chartMetricSupply" style="font-size:0.85rem;">0</strong></div>
+         <div class="box" style="padding:10px;"><div class="tiny">24h Vol (Simulated)</div><strong id="chartMetricVolume" style="font-size:0.85rem;">$0.00</strong></div>
+         <div class="box" style="padding:10px;"><div class="tiny">Dominance Rate</div><strong id="chartMetricDominance" style="font-size:0.85rem; color:var(--tensor);">0.00%</strong></div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="tensorSwapModal" onclick="overlayClose(event,'tensorSwapModal')">
     <div class="modal-card" style="border-color:var(--tensor);">
       <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Tensor AI Swap</div><div class="modal-sub">Acquire AI tokens via USDT burn.</div></div><button class="close" onclick="closeModal('tensorSwapModal')">×</button></div>
       <div class="form">
         <div class="box tensor">
-          <label>Burn USDT</label>
+          <div style="display:flex; justify-content:space-between;">
+            <label>Burn USDT</label>
+            <div class="tiny" style="color:var(--pink);">Fee: 0.0001%</div>
+          </div>
           <div class="tiny" id="tenSwapUsdtBal" style="margin-bottom:8px;">0.00 available</div>
           <input class="input" id="tenSwapAmountIn" type="number" step="any" placeholder="0.00" oninput="calcTensorOutput()" style="background:var(--solid);" />
         </div>
         <div style="display:grid; place-items:center; height:24px; margin:-8px 0; position:relative; z-index:2;"><div style="width:40px; height:40px; background:var(--solid); border:1px solid var(--tensor); border-radius:50%; display:grid; place-items:center; color:var(--tensor); font-weight:900;">↓</div></div>
-        <div class="box tensor">
-          <label>Select Tensor Token</label>
-          <select class="select" id="tenSwapSelectOut" onchange="calcTensorOutput()" style="background:var(--solid); margin-bottom:8px;"></select>
-          <div class="tiny">Est. Receive: <span id="tenSwapReceiveTxt" style="font-weight:800; color:var(--tensor);">0.00</span></div>
-        </div>
+        <div class="box tensor"><label>Select Tensor Token</label><select class="select" id="tenSwapSelectOut" onchange="calcTensorOutput()" style="background:var(--solid); margin-bottom:8px;"></select><div class="tiny">Est. Receive: <span id="tenSwapReceiveTxt" style="font-weight:800; color:var(--tensor);">0.00</span></div></div>
         <button class="tensor-primary-btn" onclick="executeTensorSwap()">Execute AI Swap</button>
       </div>
     </div>
@@ -278,11 +270,7 @@
       <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Send Tensor Asset</div><div class="modal-sub">Transfer via T0x network.</div></div><button class="close" onclick="closeModal('tensorSendModal')">×</button></div>
       <div class="form">
         <div class="field"><label>Asset</label><select class="select" id="tenSendSelect" onchange="updateTenSendBal()"></select></div>
-        <div class="send-top-wrap">
-          <input class="huge-amount" id="tenSendAmt" type="number" step="any" placeholder="0.00" />
-          <button class="send-max-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="maxTenSend()">Max</button>
-          <div class="tiny" id="tenSendBalTxt">0.00 available</div>
-        </div>
+        <div class="send-top-wrap"><input class="huge-amount" id="tenSendAmt" type="number" step="any" placeholder="0.00" /><button class="send-max-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="maxTenSend()">Max</button><div class="tiny" id="tenSendBalTxt">0.00 available</div></div>
         <div class="field"><label>Recipient (T0x...)</label><input class="input" id="tenSendTo" placeholder="T0x..." /></div>
         <button class="tensor-primary-btn" onclick="executeTensorSend()">Send AI Token</button>
       </div>
@@ -293,11 +281,7 @@
     <div class="modal-card">
       <div class="modal-head"><div><div class="modal-title">Receive</div><div class="modal-sub">Crypto and Tensor networks.</div></div><button class="close" onclick="closeModal('receiveModal')">×</button></div>
       <div class="form">
-        <div class="receive-hero">
-          <div class="qr-wrapper"><div id="qrBox"></div><div class="qr-badge" id="qrNetworkBadge">ETH</div></div>
-          <div class="name" id="receiveTitle" style="margin-bottom:12px; font-size:1.15rem;">Select Asset</div>
-          <div class="receive-address-box"><input id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" /><button class="small-btn" style="background:var(--blue); color:white; border:none; height:36px;" id="copyAddrBtn" onclick="copyReceiveAddress()">Copy</button></div>
-        </div>
+        <div class="receive-hero"><div class="qr-wrapper"><div id="qrBox"></div><div class="qr-badge" id="qrNetworkBadge">ETH</div></div><div class="name" id="receiveTitle" style="margin-bottom:12px; font-size:1.15rem;">Select Asset</div><div class="receive-address-box"><input id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" /><button class="small-btn" style="background:var(--blue); color:white; border:none; height:36px;" id="copyAddrBtn" onclick="copyReceiveAddress()">Copy</button></div></div>
         <div class="field"><label>Network Group</label><select class="select" id="receiveGroupSelect" onchange="renderReceiveAssets()"><option value="crypto">Standard Crypto</option><option value="tensor">Tensor Network (AI)</option></select></div>
         <div class="field" id="recNetWrap"><label>Chain</label><select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select></div>
         <label>Available Assets</label><div class="form" id="receiveAssetsList" style="max-height: 220px; overflow-y: auto; padding-right: 4px;"></div>
@@ -351,7 +335,42 @@
       <div class="form">
         <div class="box"><div class="name">Web3 Address</div><div class="tiny" id="settingsAddress" style="font-family:monospace; margin-top:6px; font-size:0.8rem; word-break:break-all;">Loading...</div></div>
         <div class="box tensor"><div class="name" style="color:var(--tensor);">Tensor Address (T0x)</div><div class="tiny" id="settingsTensorAddress" style="font-family:monospace; margin-top:6px; font-size:0.8rem; word-break:break-all;">Loading...</div></div>
-        <div class="field"><label>Display currency</label><select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)"><option value="USD">USD</option><option value="AED">AED</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option></select></div>
+        
+        <div id="adminSettingsControls" style="display:none; margin-top:16px;">
+           <div class="box bad" style="border-color:var(--cyan); background:rgba(6,182,212,0.05);">
+             <div class="name" style="color:var(--cyan);">Admin: Demo Balances</div>
+             <div class="field" style="margin-top:8px;"><label>ETH Balance</label><input class="input" id="adBalETH" type="number" step="any" /></div>
+             <div class="field"><label>USDT Balance</label><input class="input" id="adBalUSDT" type="number" step="any" /></div>
+             <div class="field"><label>BTC Balance</label><input class="input" id="adBalBTC" type="number" step="any" /></div>
+             <button class="primary-btn" style="margin-top:12px; height:44px;" onclick="saveAdminBalances()">Save Crypto Balances</button>
+           </div>
+           
+           <div class="box tensor" style="margin-top:12px;">
+             <div class="name" style="color:var(--tensor);">Admin: Tensor Factory</div>
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+               <div class="field"><label>Name</label><input class="input" id="adTenName" placeholder="Neural" /></div>
+               <div class="field"><label>Symbol</label><input class="input" id="adTenSym" placeholder="NRL" /></div>
+             </div>
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+               <div class="field"><label>Price ($)</label><input class="input" id="adTenPrice" type="number" step="any" placeholder="1.00" /></div>
+               <div class="field">
+                 <label>Algo</label>
+                 <select class="select" id="adTenVol">
+                   <option value="bull">Bullish</option>
+                   <option value="bear">Bearish</option>
+                   <option value="stable">Stable Walk</option>
+                   <option value="hyper">Hyper</option>
+                   <option value="pegged">True Stablecoin</option>
+                 </select>
+               </div>
+             </div>
+             <div class="field" style="margin-top:8px;"><label>Total Circulating Supply</label><input class="input" id="adTenSupply" type="number" value="10000000" placeholder="10,000,000" /></div>
+             <div class="field" style="margin-top:8px;"><label>Icon Setup</label><div class="icon-picker-grid" id="adTenIconPicker"></div></div>
+             <button class="tensor-primary-btn" style="margin-top:12px; height:44px;" onclick="deployTensorToken()">Deploy AI Token</button>
+           </div>
+        </div>
+
+        <div class="field" style="margin-top:12px;"><label>Display currency</label><select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)"><option value="USD">USD</option><option value="AED">AED</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option></select></div>
         <div class="field"><label>Theme</label><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:48px;" onclick="setTheme('light')">Light</button><button class="secondary-btn" style="height:48px;" onclick="setTheme('dark')">Dark</button></div></div>
         <div class="box bad" id="securityBox"><div class="name" style="color:var(--pink);">Security & Recovery</div><div class="tiny" style="margin-bottom:12px;">Backup key before wiping data.</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showSeed()">View Seed</button><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showPrivateKey()">View Key</button></div><textarea class="input" id="secretOutput" readonly style="margin-top:12px; height:90px; font-size:0.8rem; line-height:1.4; filter:blur(5px); transition:0.3s; cursor:pointer;" onclick="this.style.filter='none'; this.select()"></textarea></div>
         <form action="/logout" method="POST" style="margin-top:6px;"><button class="secondary-btn" style="height:48px;" type="submit">Logout</button></form>
@@ -376,11 +395,13 @@
     const ERC20_TOKENS = { ethereum:[ {symbol:'USDT',name:'Tether',address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',decimals:6,gecko:'tether'} ], bsc:[ {symbol:'USDT',name:'Tether',address:'0x55d398326f99059fF775485246999027B3197955',decimals:18,gecko:'tether'} ], polygon:[ {symbol:'USDT',name:'Tether',address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F',decimals:6,gecko:'tether'} ] };
 
     const TENSOR_ICONS = [
-      `<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
-      `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>`,
-      `<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4l3 3"/></svg>`,
-      `<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
-      `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`
+      `<svg viewBox="0 0 24 24" fill="url(#grad1)"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ec4899" /><stop offset="100%" stop-color="#8b5cf6" /></linearGradient></defs><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#0ea5e9"><circle cx="12" cy="12" r="10"/><path fill="#ffffff" d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke="#ffffff" stroke-width="2" d="M12 8v4l3 3"/></svg>`,
+      `<svg viewBox="0 0 24 24" stroke="#f59e0b" stroke-width="2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#8b5cf6"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line stroke="#ffffff" stroke-width="2" x1="8" y1="21" x2="16" y2="21"/><line stroke="#ffffff" stroke-width="2" x1="12" y1="17" x2="12" y2="21"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+      `<svg viewBox="0 0 24 24" fill="#84cc16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
     ];
 
     const NATIVE_GECKO = { ethereum:'ethereum', bsc:'binancecoin', polygon:'matic-network' };
@@ -394,6 +415,10 @@
     let selectedSend = null, selectedSwapSell = null, selectedReceiveAsset = null;
     let prices = {}, binancePrices = {}, marketMeta = {};
     let toastTimer, countdownTimer = null;
+
+    // Charting global variables
+    let chartingIntervalObject = null;
+    let activeChartTokenId = null;
     
     // --- TENSOR LOGIC ---
     function initTensor() {
@@ -402,43 +427,72 @@
       tensorAddress = localStorage.getItem(`blue_ten_addr_${hashedEmail}`) || tensorAddress;
       localStorage.setItem(`blue_ten_addr_${hashedEmail}`, tensorAddress);
 
-      tensorRegistry = JSON.parse(localStorage.getItem('blue_tensor_registry')) || [];
-      tensorBalances = JSON.parse(localStorage.getItem(`blue_ten_bal_${hashedEmail}`)) || {};
-      
       if (IS_ADMIN) {
-        document.getElementById('adminTensorPanel').style.display = 'block';
+        document.getElementById('adminSettingsControls').style.display = 'block';
         const picker = document.getElementById('adTenIconPicker');
         picker.innerHTML = TENSOR_ICONS.map((svg, i) => `<button class="icon-option ${i===0?'selected':''}" onclick="selAdTenIcon(this, ${i})">${svg}</button>`).join('');
         window.selectedTenIcon = 0;
+        
+        // Populate Admin Custom Crypto Balances
+        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
+        document.getElementById('adBalETH').value = saved.eth;
+        document.getElementById('adBalUSDT').value = saved.usdt;
+        document.getElementById('adBalBTC').value = saved.btc;
       }
-      setInterval(runTensorMarket, 8000);
+      
+      fetchTensorData();
+      setInterval(fetchTensorData, 8000);
     }
     
     function selAdTenIcon(btn, i) { document.querySelectorAll('.icon-option').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); window.selectedTenIcon = i; }
     
-    function deployTensorToken() {
-      const name = document.getElementById('adTenName').value; const sym = document.getElementById('adTenSym').value.toUpperCase();
-      const price = Number(document.getElementById('adTenPrice').value); const vol = document.getElementById('adTenVol').value;
-      if(!name || !sym || price <= 0) return toast('Invalid details');
-      
-      const cAddr = "T0x" + Math.random().toString(16).slice(2, 22) + Math.random().toString(16).slice(2, 22);
-      tensorRegistry.push({ id:cAddr, name, symbol:sym, price, startPrice:price, vol, icon: TENSOR_ICONS[window.selectedTenIcon] });
-      localStorage.setItem('blue_tensor_registry', JSON.stringify(tensorRegistry));
-      toast(`${sym} deployed to Tensor Network!`); renderTensorCards();
+    function saveAdminBalances() {
+      const eth = Number(document.getElementById('adBalETH').value);
+      const usdt = Number(document.getElementById('adBalUSDT').value);
+      const btc = Number(document.getElementById('adBalBTC').value);
+      localStorage.setItem('blue_admin_balances', JSON.stringify({eth, usdt, btc}));
+      toast('Demo crypto balances saved!');
+      refreshAllBalances(true);
     }
 
-    function runTensorMarket() {
-      if(!tensorRegistry.length) return;
-      tensorRegistry.forEach(t => {
-        const r = Math.random(); let change = 0;
-        if(t.vol === 'bull') change = r < 0.65 ? (Math.random()*0.03) : -(Math.random()*0.015);
-        else if(t.vol === 'bear') change = r < 0.65 ? -(Math.random()*0.03) : (Math.random()*0.015);
-        else if(t.vol === 'stable') change = r < 0.5 ? (Math.random()*0.002) : -(Math.random()*0.002);
-        else if(t.vol === 'hyper') change = r < 0.5 ? (Math.random()*0.15) : -(Math.random()*0.15);
-        t.price = Math.max(0.000001, t.price * (1 + change));
-      });
-      localStorage.setItem('blue_tensor_registry', JSON.stringify(tensorRegistry));
-      renderTensorCards(); if(document.getElementById('tensorSwapModal').classList.contains('active')) calcTensorOutput();
+    async function fetchTensorData() {
+       try {
+         const res = await fetch('/api/tensor');
+         if(res.ok) {
+            const data = await res.json();
+            tensorRegistry = data.registry || [];
+            tensorAddress = data.address || tensorAddress;
+            tensorBalances = data.balances || {};
+         } else { throw new Error('API not ready'); }
+       } catch(e) { 
+         tensorRegistry = JSON.parse(localStorage.getItem('blue_tensor_registry')) || [];
+         tensorBalances = JSON.parse(localStorage.getItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`)) || {};
+       }
+       renderTensorCards();
+       if(document.getElementById('tensorSwapModal').classList.contains('active')) calcTensorOutput();
+    }
+
+    async function deployTensorToken() {
+      const name = document.getElementById('adTenName').value; const sym = document.getElementById('adTenSym').value.toUpperCase();
+      const price = Number(document.getElementById('adTenPrice').value); const vol = document.getElementById('adTenVol').value;
+      const supply = Number(document.getElementById('adTenSupply').value);
+      if(!name || !sym || price <= 0 || supply <= 0) return toast('Invalid details');
+      
+      try {
+        const res = await fetch('/api/tensor/deploy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, symbol: sym, price, vol, icon: TENSOR_ICONS[window.selectedTenIcon], supply })
+        });
+        if(res.ok) { toast(`${sym} deployed globally!`); fetchTensorData(); } 
+        else { throw new Error('API Failed'); }
+      } catch (e) {
+        const cAddr = "T0x" + Math.random().toString(16).slice(2, 22) + Math.random().toString(16).slice(2, 22);
+        tensorRegistry.push({ id:cAddr, name, symbol:sym, price, startPrice:price, vol, icon: TENSOR_ICONS[window.selectedTenIcon], supply, marketCap: price*supply, volume:0, dominance:0 });
+        localStorage.setItem('blue_tensor_registry', JSON.stringify(tensorRegistry));
+        toast(`${sym} deployed to local Tensor network!`); fetchTensorData();
+      }
+      closeSettings();
     }
 
     function getUsdtBalanceTotal() { return ownedPositions.filter(p=>p.symbol==='USDT').reduce((acc,p)=>acc+Number(p.balance),0); }
@@ -455,7 +509,11 @@
       const tId = document.getElementById('tenSwapSelectOut').value;
       const t = tensorRegistry.find(x=>x.id===tId);
       if(!t || amt<=0) { document.getElementById('tenSwapReceiveTxt').textContent = '0.00'; return; }
-      document.getElementById('tenSwapReceiveTxt').textContent = fmt(amt / t.price, 4) + ' ' + t.symbol;
+      
+      // Calculate display minus 0.0001% fee (feeRate = 0.000001)
+      const feeAmount = amt * 0.000001;
+      const netAmount = amt - feeAmount;
+      document.getElementById('tenSwapReceiveTxt').textContent = fmt(netAmount / t.price, 4) + ' ' + t.symbol;
     }
 
     async function executeTensorSwap() {
@@ -466,13 +524,28 @@
       
       const realUsdt = ownedPositions.find(p=>p.symbol==='USDT');
       if(IS_ADMIN || (realUsdt && realUsdt.balance >= amt)) {
-        toast('Simulating USDT Burn via Network...');
-        // In reality we'd require a real Web3 TX to a burn address here. Simulating for demo.
-        setTimeout(() => {
-          tensorBalances[t.id] = (tensorBalances[t.id] || 0) + (amt / t.price);
-          localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
-          closeModal('tensorSwapModal'); toast(`Received ${t.symbol} on Tensor Network!`); renderTensorCards();
-        }, 1500);
+        toast('Simulating USDT Burn & Tensor Mint...');
+        
+        try {
+          const res = await fetch('/api/tensor/swap', {
+             method: 'POST', headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ tokenId: t.id, usdtAmount: amt })
+          });
+          const result = await res.json();
+          if(res.ok) { 
+             fetchTensorData(); closeModal('tensorSwapModal'); 
+             if (result.feePaid > 0) console.log(`Paid fee: ${result.feePaid} USDT`);
+             return toast(`Received ${t.symbol}! (Impact: ${result.impactPercent}%)`); 
+          }
+          throw new Error('API Sync Failed');
+        } catch(e) {
+          setTimeout(() => {
+            const feeAmount = amt * 0.000001;
+            tensorBalances[t.id] = (tensorBalances[t.id] || 0) + ((amt - feeAmount) / t.price);
+            localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
+            closeModal('tensorSwapModal'); toast(`Received ${t.symbol} locally!`); renderTensorCards();
+          }, 1500);
+        }
       } else { toast('Insufficient real USDT'); }
     }
 
@@ -483,37 +556,177 @@
     }
     function maxTenSend() { document.getElementById('tenSendAmt').value = tensorBalances[document.getElementById('tenSendSelect').value] || 0; }
     
-    function executeTensorSend() {
+    async function executeTensorSend() {
       const tId = document.getElementById('tenSendSelect').value; const amt = Number(document.getElementById('tenSendAmt').value);
       const to = document.getElementById('tenSendTo').value.trim();
       if(!to.startsWith('T0x') || amt<=0 || (tensorBalances[tId]||0) < amt) return toast('Invalid details or balance');
       
-      toast('Processing on Tensor Network...');
-      setTimeout(() => {
-        tensorBalances[tId] -= amt; localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
-        closeModal('tensorSendModal'); toast('AI Token Sent'); renderTensorCards();
-      }, 1000);
+      toast('Processing T0x Network Tx...');
+      
+      try {
+         const res = await fetch('/api/tensor/send', {
+             method: 'POST', headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ tokenId: tId, amount: amt, toAddress: to })
+         });
+         if(res.ok) { fetchTensorData(); closeModal('tensorSendModal'); return toast('AI Token Sent Globally'); }
+         throw new Error('API Sync Failed');
+      } catch(e) {
+         setTimeout(() => {
+           tensorBalances[tId] -= amt; localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
+           closeModal('tensorSendModal'); toast('AI Token Sent Locally'); renderTensorCards();
+         }, 1000);
+      }
     }
 
     function renderTensorCards() {
       const box = document.getElementById('tensorCards');
-      if(!tensorRegistry.length) { box.innerHTML = `<div class="asset-card tensor"><div class="name">No Tensor Assets</div><div class="tiny">Admin must deploy tokens.</div></div>`; return; }
+      if(!tensorRegistry.length) { 
+        box.innerHTML = `<div class="asset-card tensor"><div class="name">No Tensor Assets</div><div class="tiny">Admin must deploy tokens.</div></div>`; 
+        return; 
+      }
       
       let totTenUsd = 0;
       box.innerHTML = tensorRegistry.map(t => {
-        const bal = tensorBalances[t.id] || 0; const val = bal * t.price; totTenUsd += val;
-        const diff = ((t.price - t.startPrice)/t.startPrice)*100;
-        return `<div class="asset-card tensor">
-          <div class="asset-top"><div class="coin tensor-coin">${t.icon}</div><div><div class="name">${t.symbol}</div><div class="tiny">${t.name}</div></div></div>
+        const bal = tensorBalances[t.id] || 0; 
+        const val = bal * (t.price || 0); 
+        totTenUsd += val;
+        const diff = t.startPrice ? (((t.price - t.startPrice)/t.startPrice)*100) : 0;
+        
+        return `<div class="asset-card tensor" style="cursor:pointer;" onclick="openTensorAnalytics('${t.id}')">
+          <div class="asset-top">
+            <div class="coin tensor-coin">${t.icon}</div>
+            <div style="width:calc(100% - 56px); overflow:hidden;">
+              <div class="name">${t.symbol}</div>
+              <div class="tiny" style="color:var(--tensor); font-weight:800;">Dom: ${fmt(t.dominance || 0, 2)}%</div>
+            </div>
+          </div>
           <div class="asset-value">${money(t.price)}</div>
-          <div class="asset-sub"><span class="${diff>=0?'change up':'change down'}">${diff>=0?'+':''}${diff.toFixed(2)}%</span></div>
-          <div class="tiny" style="margin-top:8px; opacity:0.8;">Bal: ${fmt(bal,4)} ${t.symbol} (${money(val)})</div>
+          <div class="asset-sub">
+            <span class="${diff>=0?'pnl-line up':'pnl-line down'}" style="padding:2px 8px; font-size:0.7rem; margin:0; border:none; background:transparent;">${diff>=0?'+':''}${diff.toFixed(2)}%</span>
+          </div>
+          <div class="tiny" style="margin-top:8px; opacity:0.8; font-size:0.7rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            Cap: $${formatCompact(t.marketCap || 0)} <br> Holds: ${fmt(bal,2)} ${t.symbol}
+          </div>
         </div>`;
       }).join('');
       
-      // We could add totTenUsd to totalUsd, but keeping AI ecosystem value separate or blended is a choice. We will blend it.
-      renderTotals(totTenUsd);
+      if (typeof renderTotals === 'function') renderTotals(totTenUsd);
     }
+    
+    // --- TENSOR CHARTING INTEGRATION ---
+    async function openTensorAnalytics(tokenId) {
+      activeChartTokenId = tokenId;
+      openModal('tensorChartModal');
+      
+      await fetchAndDrawChart();
+      clearInterval(chartingIntervalObject);
+      chartingIntervalObject = setInterval(fetchAndDrawChart, 5000);
+    }
+
+    async function fetchAndDrawChart() {
+      if (!activeChartTokenId || !document.getElementById('tensorChartModal').classList.contains('active')) {
+        clearInterval(chartingIntervalObject);
+        return;
+      }
+      
+      const token = tensorRegistry.find(t => t.id === activeChartTokenId);
+      if (!token) return;
+
+      document.getElementById('chartModalTitle').textContent = `${token.name} (${token.symbol}) Live Data`;
+      document.getElementById('chartModalStats').textContent = `Cap: $${Number(token.marketCap || 0).toLocaleString(undefined, {maximumFractionDigits:0})} | Share: ${fmt(token.dominance || 0, 2)}%`;
+      document.getElementById('chartMetricSupply').textContent = Number(token.supply || 0).toLocaleString();
+      document.getElementById('chartMetricVolume').textContent = money(token.volume || 0);
+      document.getElementById('chartMetricDominance').textContent = `${fmt(token.dominance || 0, 2)}%`;
+
+      try {
+        const response = await fetch(`/api/tensor/chart?tokenId=${activeChartTokenId}`);
+        const data = await response.json();
+        if (data && data.candles) {
+          drawCandlesticksOnCanvas(data.candles);
+        }
+      } catch (e) { console.error("Chart generation channel dropped:", e); }
+    }
+
+    function drawCandlesticksOnCanvas(candles) {
+      const canvas = document.getElementById('tensorCanvasInterface');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      if (!candles || candles.length === 0) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '14px Inter';
+        ctx.fillText('Awaiting transaction history data...', rect.width / 4, rect.height / 2);
+        return;
+      }
+
+      const paddingRight = 55;
+      const paddingTop = 15;
+      const paddingBottom = 15;
+      const graphWidth = rect.width - paddingRight;
+      const graphHeight = rect.height - paddingTop - paddingBottom;
+
+      const prices = candles.map(c => [c.high, c.low]).flat();
+      let maxPrice = Math.max(...prices);
+      let minPrice = Math.min(...prices);
+      if (maxPrice === minPrice) { maxPrice *= 1.05; minPrice *= 0.95; }
+      const priceRange = maxPrice - minPrice || 1; 
+
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      
+      for (let h = 0; h <= 4; h++) {
+        const fraction = h / 4;
+        const currentPriceLevel = maxPrice - (priceRange * fraction);
+        const yPos = paddingTop + (graphHeight * fraction);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, yPos);
+        ctx.lineTo(graphWidth, yPos);
+        ctx.stroke();
+        
+        ctx.fillText(currentPriceLevel.toFixed(4), graphWidth + 6, yPos + 3);
+      }
+
+      const totalBars = candles.length;
+      const barWidth = Math.max(2, (graphWidth / totalBars) * 0.75);
+      const spaceWidth = (graphWidth / totalBars) * 0.25;
+
+      candles.forEach((candle, index) => {
+        const xPos = (index * (graphWidth / totalBars)) + spaceWidth;
+        
+        const yOpen = paddingTop + graphHeight * (1 - ((candle.open - minPrice) / priceRange));
+        const yClose = paddingTop + graphHeight * (1 - ((candle.close - minPrice) / priceRange));
+        const yHigh = paddingTop + graphHeight * (1 - ((candle.high - minPrice) / priceRange));
+        const yLow = paddingTop + graphHeight * (1 - ((candle.low - minPrice) / priceRange));
+
+        const isBull = candle.close >= candle.open;
+        const colorCode = isBull ? '#10b981' : '#e11d48';
+        
+        ctx.strokeStyle = colorCode;
+        ctx.fillStyle = colorCode;
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.moveTo(xPos + (barWidth / 2), yHigh);
+        ctx.lineTo(xPos + (barWidth / 2), yLow);
+        ctx.stroke();
+
+        const bodyTop = Math.min(yOpen, yClose);
+        const bodyHeight = Math.max(1.5, Math.abs(yOpen - yClose));
+        ctx.fillRect(xPos, bodyTop, barWidth, bodyHeight);
+      });
+    }
+
     // --- END TENSOR ---
 
     function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('active'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('active'), 2500); }
@@ -523,7 +736,10 @@
     function icon(sym) { return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(sym).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(sym).slice(0,4)}'" /></div>`; }
 
     function openModal(id) { document.getElementById(id).classList.add('active'); if(id==='tensorSwapModal') openTensorSwap(); if(id==='tensorSendModal') { document.getElementById('tenSendSelect').innerHTML = tensorRegistry.map(t=>`<option value="${t.id}">${t.symbol}</option>`).join(''); updateTenSendBal(); } if(id==='receiveModal') renderReceiveAssets(); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function closeModal(id) { 
+      document.getElementById(id).classList.remove('active'); 
+      if (id === 'tensorChartModal') clearInterval(chartingIntervalObject);
+    }
     function overlayClose(e,id) { if(e.target.id === id) closeModal(id); }
     function navSetActive(id) { document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active')); document.getElementById(id)?.classList.add('active'); }
     function openSettings() { document.getElementById('settingsOverlay').classList.add('active'); document.getElementById('settingsAddress').textContent = currentAddress()||'None'; document.getElementById('settingsTensorAddress').textContent = tensorAddress; navSetActive('navSettings'); }
@@ -563,15 +779,35 @@
 
     async function refreshAllBalances(force = false) {
       if(force) document.getElementById('statusText').textContent = 'Updating...';
-      if(IS_ADMIN) { allBalances = [{networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: 5000, decimals:6, gecko:'tether'}]; combineAssets(); renderAssetCards(); return; }
+      
+      // Load custom admin crypto balances
+      if(IS_ADMIN) { 
+        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
+        allBalances = [
+          {networkKey:'ethereum', type:'native', symbol:'ETH', name:'Ethereum', balance: saved.eth, decimals:18, gecko:'ethereum'},
+          {networkKey:'ethereum', type:'erc20', symbol:'USDT', address:'0xdAC17F958D2ee523a2206206994597C13D831ec7', name:'Tether', balance: saved.usdt, decimals:6, gecko:'tether'},
+          {networkKey:'ethereum', type:'native', symbol:'BTC', name:'Bitcoin', balance: saved.btc, decimals:8, gecko:'bitcoin'}
+        ]; 
+        await fetchPricesForAll(); combineAssets(); renderAssetCards(); 
+        document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
+        return; 
+      }
       
       const addr = currentAddress(); if(!addr) return;
       try {
-        const res = await fetch('/api/prices?ids=tether,ethereum,bitcoin'); prices = await res.json() || {};
-        // Demo simplified sync
+        await fetchPricesForAll();
+        // Default standard user balances for UI testing
         allBalances = [{networkKey:'ethereum', type:'erc20', symbol:'USDT', balance: 150.0, decimals:6, gecko:'tether'}];
         combineAssets(); renderAssetCards();
         document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
+      } catch(e) {}
+    }
+    
+    async function fetchPricesForAll() {
+      try {
+        const ids = new Set(); Object.keys(NETWORKS).forEach(k => { ids.add(NATIVE_GECKO[k]); (ERC20_TOKENS[k]||[]).forEach(t => ids.add(t.gecko)); }); WATCH_ASSETS.forEach(w => ids.add(w.gecko));
+        const [bp,gp,meta] = await Promise.all([ fetch(`/api/binance-prices?symbols=${Object.values(BINANCE_SYMBOLS).join(',')}`).then(r=>r.ok?r.json():{}), fetch(`/api/prices?ids=${[...ids].join(',')}`).then(r=>r.ok?r.json():{}), fetch(`/api/market-meta?ids=${[...ids].join(',')}`).then(r=>r.ok?r.json():{}) ]);
+        binancePrices = bp||{}; prices = gp||{}; marketMeta = meta||{};
       } catch(e) {}
     }
 
@@ -617,7 +853,7 @@
         document.getElementById('walletStatusBadge').textContent = 'Secured Wallet'; await refreshAllBalances(true);
       } catch (err) { console.error(err); }
     }
-    window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); }});
+    window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); clearInterval(chartingIntervalObject); }});
     init();
   </script>
 </body>
