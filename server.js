@@ -12,7 +12,6 @@ const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
 
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
-const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluecrypto.local';
 
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
@@ -50,7 +49,6 @@ const cache = new Map();
 
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {} }, null, 2));
   }
@@ -58,17 +56,13 @@ function ensureDb() {
 
 function readDb() {
   ensureDb();
-
   try {
     const raw = fs.readFileSync(DB_PATH, 'utf8');
     const db = JSON.parse(raw || '{}');
-
     if (!db.users || typeof db.users !== 'object') db.users = {};
     if (!db.otps || typeof db.otps !== 'object') db.otps = {};
-
     return db;
   } catch (error) {
-    console.error('DB read error:', error);
     return { users: {}, otps: {} };
   }
 }
@@ -92,7 +86,6 @@ function nowIso() {
 
 function createWalletRecord(email, role = 'user') {
   const normalizedEmail = normalizeEmail(email);
-
   return {
     id: `wallet_${sha(normalizedEmail).slice(0, 20)}`,
     email: normalizedEmail,
@@ -101,31 +94,7 @@ function createWalletRecord(email, role = 'user') {
     updatedAt: nowIso(),
     encryptedVault: null,
     publicWallets: [],
-    assets: [],
-    staking: {
-      autoStake: false,
-      riskMode: 'balanced',
-      vaults: []
-    }
-  };
-}
-
-function normalizeWalletRecord(record, email, role = 'user') {
-  const base = createWalletRecord(email, role);
-
-  return {
-    ...base,
-    ...record,
-    email: normalizeEmail(record?.email || email),
-    role: record?.role || role,
-    encryptedVault: record?.encryptedVault || null,
-    publicWallets: Array.isArray(record?.publicWallets) ? record.publicWallets : [],
-    assets: Array.isArray(record?.assets) ? record.assets : [],
-    staking: {
-      autoStake: Boolean(record?.staking?.autoStake),
-      riskMode: record?.staking?.riskMode || 'balanced',
-      vaults: Array.isArray(record?.staking?.vaults) ? record.staking.vaults : []
-    }
+    assets: []
   };
 }
 
@@ -139,18 +108,11 @@ function getOrCreateUser(email, role = 'user') {
     return db.users[normalizedEmail];
   }
 
-  db.users[normalizedEmail] = normalizeWalletRecord(
-    db.users[normalizedEmail],
-    normalizedEmail,
-    role
-  );
-
   if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
     db.users[normalizedEmail].role = 'staff';
+    db.users[normalizedEmail].updatedAt = nowIso();
+    writeDb(db);
   }
-
-  db.users[normalizedEmail].updatedAt = db.users[normalizedEmail].updatedAt || nowIso();
-  writeDb(db);
 
   return db.users[normalizedEmail];
 }
@@ -158,39 +120,10 @@ function getOrCreateUser(email, role = 'user') {
 function updateUserWallet(email, patch) {
   const normalizedEmail = normalizeEmail(email);
   const db = readDb();
-
   if (!db.users[normalizedEmail]) {
     db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
   }
-
-  db.users[normalizedEmail] = normalizeWalletRecord({
-    ...db.users[normalizedEmail],
-    ...patch,
-    updatedAt: nowIso()
-  }, normalizedEmail, db.users[normalizedEmail].role || 'user');
-
-  writeDb(db);
-  return db.users[normalizedEmail];
-}
-
-function deleteUserWalletVault(email) {
-  const normalizedEmail = normalizeEmail(email);
-  const db = readDb();
-
-  if (!db.users[normalizedEmail]) {
-    db.users[normalizedEmail] = createWalletRecord(normalizedEmail);
-  }
-
-  db.users[normalizedEmail].encryptedVault = null;
-  db.users[normalizedEmail].publicWallets = [];
-  db.users[normalizedEmail].assets = [];
-  db.users[normalizedEmail].staking = {
-    autoStake: false,
-    riskMode: 'balanced',
-    vaults: []
-  };
-  db.users[normalizedEmail].updatedAt = nowIso();
-
+  db.users[normalizedEmail] = { ...db.users[normalizedEmail], ...patch, updatedAt: nowIso() };
   writeDb(db);
   return db.users[normalizedEmail];
 }
@@ -201,9 +134,7 @@ function requireAuth(req, res, next) {
 }
 
 function requireAuthJson(req, res, next) {
-  if (!req.session.user) {
-    return res.status(401).json({ error: 'Not authenticated.' });
-  }
+  if (!req.session.user) return res.status(401).json({ error: 'Not authenticated.' });
   next();
 }
 
@@ -214,14 +145,11 @@ function generateOtp() {
 function saveOtp(email, otp) {
   const normalizedEmail = normalizeEmail(email);
   const db = readDb();
-
   db.otps[normalizedEmail] = {
     otpHash: sha(otp),
-    expiresAt: Date.now() + 1000 * 60 * 10, // 10 mins
-    attempts: 0,
-    createdAt: nowIso()
+    expiresAt: Date.now() + 1000 * 60 * 10,
+    attempts: 0
   };
-
   writeDb(db);
 }
 
@@ -231,142 +159,59 @@ function verifyOtp(email, otp) {
   const record = db.otps[normalizedEmail];
 
   if (!record) return { ok: false, reason: 'No OTP found. Request a new code.' };
-
   if (Date.now() > record.expiresAt) {
-    delete db.otps[normalizedEmail];
-    writeDb(db);
+    delete db.otps[normalizedEmail]; writeDb(db);
     return { ok: false, reason: 'OTP expired. Request a new code.' };
   }
-
   if (record.attempts >= 5) {
-    delete db.otps[normalizedEmail];
-    writeDb(db);
+    delete db.otps[normalizedEmail]; writeDb(db);
     return { ok: false, reason: 'Too many attempts. Request a new code.' };
   }
-
   if (sha(otp) !== record.otpHash) {
-    record.attempts += 1;
-    db.otps[normalizedEmail] = record;
-    writeDb(db);
+    record.attempts += 1; db.otps[normalizedEmail] = record; writeDb(db);
     return { ok: false, reason: 'Invalid OTP code.' };
   }
 
-  delete db.otps[normalizedEmail];
-  writeDb(db);
-
+  delete db.otps[normalizedEmail]; writeDb(db);
   return { ok: true };
 }
 
-function createTransporter() {
+async function sendOtpEmail(email, otp) {
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
-  if (!gmailUser || !gmailPass) return null;
-
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: gmailUser,
-      pass: gmailPass
-    }
-  });
-}
-
-async function sendOtpEmail(email, otp) {
-  const transporter = createTransporter();
-
-  if (!transporter) {
+  if (!gmailUser || !gmailPass) {
     console.log(`DEV OTP for ${email}: ${otp}`);
     return false;
   }
 
+  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass: gmailPass } });
+  
   await transporter.sendMail({
-    from: `"BlueCrypto" <${process.env.GMAIL_USER}>`,
-    replyTo: process.env.GMAIL_USER,
+    from: `"BlueCrypto" <${gmailUser}>`,
     to: email,
     subject: 'Your BlueCrypto login code',
-    text: `Your BlueCrypto login code is ${otp}. It expires in 10 minutes. If you do not see it, check Spam or Junk.`,
-    html: `
-      <div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;">
-        <div style="border:1px solid #dbeafe;border-radius:22px;padding:24px;background:#f8fcff;">
-          <h2 style="margin:0 0 10px;font-size:22px;">BlueCrypto Login Code</h2>
-          <p style="color:#475569;margin:0 0 18px;">Use this code to access your wallet.</p>
-          <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:16px;background:#eef6ff;color:#0284c7;text-align:center;">
-            ${otp}
-          </div>
-          <p style="color:#64748b;font-size:13px;margin-top:18px;">
-            This code expires in 10 minutes. If you do not see it, check Spam/Junk.
-          </p>
-        </div>
-      </div>
-    `
+    text: `Your login code is ${otp}. It expires in 10 minutes.`,
+    html: `<h3>Your BlueCrypto login code is <b>${otp}</b>.</h3><p>It expires in 10 minutes.</p>`
   });
-
   return true;
 }
 
 async function cachedJson(key, ttlMs, fetcher) {
   const hit = cache.get(key);
-
-  if (hit && Date.now() - hit.time < ttlMs) {
-    return hit.data;
-  }
-
+  if (hit && Date.now() - hit.time < ttlMs) return hit.data;
   const data = await fetcher();
-
-  cache.set(key, {
-    time: Date.now(),
-    data
-  });
-
+  cache.set(key, { time: Date.now(), data });
   return data;
 }
-
-function cleanCache(maxAgeMs = 1000 * 60 * 15) {
-  const now = Date.now();
-
-  for (const [key, value] of cache.entries()) {
-    if (!value || now - value.time > maxAgeMs) {
-      cache.delete(key);
-    }
-  }
-}
-
-setInterval(cleanCache, 1000 * 60 * 5);
 
 async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'BlueCrypto/1.0',
-        ...(options.headers || {})
-      }
-    });
-
-    const text = await response.text();
-
-    let body = null;
-    try {
-      body = text ? JSON.parse(text) : null;
-    } catch {
-      body = text;
-    }
-
-    if (!response.ok) {
-      const msg = typeof body === 'string'
-        ? body.slice(0, 200)
-        : JSON.stringify(body).slice(0, 200);
-
-      throw new Error(`HTTP ${response.status}: ${msg}`);
-    }
-
-    return body;
+    const response = await fetch(url, { ...options, signal: controller.signal, headers: { accept: 'application/json' } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
   } finally {
     clearTimeout(timer);
   }
@@ -375,45 +220,25 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
 /* Pages */
 
 app.get('/', (req, res) => {
-  res.render('index', {
-    error: null,
-    success: null,
-    otpEmail: null
-  });
+  res.render('index', { error: null, success: null, otpEmail: null });
 });
 
 app.post('/send-otp', async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
-
-    if (!email || !email.includes('@')) {
-      return res.render('index', {
-        error: 'Enter a valid email address.',
-        success: null,
-        otpEmail: null
-      });
-    }
+    if (!email || !email.includes('@')) return res.render('index', { error: 'Enter a valid email.', success: null, otpEmail: null });
 
     const otp = generateOtp();
     saveOtp(email, otp);
-
     const sent = await sendOtpEmail(email, otp);
 
     res.render('index', {
       error: null,
-      success: sent
-        ? 'OTP sent. Check your inbox. If it is not there, check spam.'
-        : 'OTP generated. Gmail is not configured, check Render logs.',
+      success: sent ? 'OTP sent. Check your inbox.' : 'OTP generated (Check console). Gmail missing.',
       otpEmail: email
     });
   } catch (error) {
-    console.error('Send OTP error:', error);
-
-    res.render('index', {
-      error: 'Unable to send OTP. Check Gmail app password and Render logs.',
-      success: null,
-      otpEmail: req.body.email || null
-    });
+    res.render('index', { error: 'Failed to send OTP.', success: null, otpEmail: req.body.email });
   }
 });
 
@@ -422,37 +247,11 @@ app.post('/verify-otp', (req, res) => {
   const otp = String(req.body.otp || '').trim();
 
   const result = verifyOtp(email, otp);
-
-  if (!result.ok) {
-    return res.render('index', {
-      error: result.reason,
-      success: null,
-      otpEmail: email
-    });
-  }
+  if (!result.ok) return res.render('index', { error: result.reason, success: null, otpEmail: email });
 
   const user = getOrCreateUser(email, 'user');
-
-  req.session.user = {
-    email,
-    username: email.split('@')[0],
-    role: user.role,
-    walletId: user.id
-  };
-
-  req.session.save(error => {
-    if (error) {
-      console.error('Session save error:', error);
-
-      return res.render('index', {
-        error: 'Session could not be saved. Try again.',
-        success: null,
-        otpEmail: email
-      });
-    }
-
-    res.redirect('/wallet');
-  });
+  req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id };
+  req.session.save(() => res.redirect('/wallet'));
 });
 
 app.post('/staff-login', (req, res) => {
@@ -460,425 +259,120 @@ app.post('/staff-login', (req, res) => {
   const password = String(req.body.password || '');
 
   if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) {
-    return res.render('index', {
-      error: 'Invalid staff login.',
-      success: null,
-      otpEmail: null
-    });
+    return res.render('index', { error: 'Invalid staff login.', success: null, otpEmail: null });
   }
 
-  const user = getOrCreateUser(STAFF_EMAIL, 'staff');
+  // FORCE FRESH WALLET: Give the admin a unique email modifier based on timestamp
+  const uniqueAdminEmail = `admin+${Date.now()}@bluecrypto.local`;
+  const user = getOrCreateUser(uniqueAdminEmail, 'staff');
 
-  req.session.user = {
-    email: STAFF_EMAIL,
-    username: 'admin',
-    role: 'staff',
-    walletId: user.id
-  };
-
-  req.session.save(error => {
-    if (error) {
-      console.error('Staff session save error:', error);
-
-      return res.render('index', {
-        error: 'Session could not be saved. Try again.',
-        success: null,
-        otpEmail: null
-      });
-    }
-
-    res.redirect('/wallet');
-  });
+  req.session.user = { email: uniqueAdminEmail, username: 'admin', role: 'staff', walletId: user.id };
+  req.session.save(() => res.redirect('/wallet'));
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-
-  res.render('wallet', {
-    username: req.session.user.username,
-    email: req.session.user.email,
-    role: req.session.user.role,
-    wallet: JSON.stringify(user)
-  });
+  res.render('wallet', { username: req.session.user.username, email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
 app.get('/trading', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-
-  res.render('trading', {
-    username: req.session.user.username,
-    email: req.session.user.email,
-    role: req.session.user.role,
-    wallet: JSON.stringify(user)
-  });
+  res.render('trading', { username: req.session.user.username, email: req.session.user.email, role: req.session.user.role, wallet: JSON.stringify(user) });
 });
 
-function destroySession(req, res) {
+app.get('/logout', (req, res) => {
   req.session.destroy(() => {
-    res.clearCookie('bluecrypto.sid', {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production'
-    });
+    res.clearCookie('bluecrypto.sid');
     res.redirect('/');
   });
-}
+});
+app.post('/logout', (req, res) => res.redirect('/logout'));
 
-app.get('/logout', destroySession);
-app.post('/logout', destroySession);
-
-/* Wallet API */
+/* APIs */
 
 app.get('/api/wallet', requireAuthJson, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  res.json(user);
+  res.json(getOrCreateUser(req.session.user.email, req.session.user.role));
 });
 
 app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
   const { encryptedVault, publicWallets } = req.body;
-
-  if (!encryptedVault || typeof encryptedVault !== 'object') {
-    return res.status(400).json({ error: 'Missing encryptedVault.' });
-  }
-
-  if (!Array.isArray(publicWallets)) {
-    return res.status(400).json({ error: 'Missing publicWallets.' });
-  }
-
-  const user = updateUserWallet(req.session.user.email, {
-    encryptedVault,
-    publicWallets
-  });
-
-  res.json({
-    ok: true,
-    wallet: user
-  });
+  const user = updateUserWallet(req.session.user.email, { encryptedVault, publicWallets });
+  res.json({ ok: true, wallet: user });
 });
 
 app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
-  const user = deleteUserWalletVault(req.session.user.email);
-
-  res.json({
-    ok: true,
-    wallet: user
-  });
+  const user = updateUserWallet(req.session.user.email, { encryptedVault: null, publicWallets: [] });
+  res.json({ ok: true, wallet: user });
 });
 
-app.post('/api/wallet/repair', requireAuthJson, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-
-  if (!user.encryptedVault || !user.publicWallets?.length) {
-    const repaired = deleteUserWalletVault(req.session.user.email);
-
-    return res.json({
-      ok: true,
-      repaired: true,
-      wallet: repaired
-    });
-  }
-
-  res.json({
-    ok: true,
-    repaired: false,
-    wallet: user
-  });
-});
-
-/* Prices */
-
+/* Prices API */
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
-    const ids = String(req.query.ids || '')
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean)
-      .slice(0, 120);
-
+    const ids = String(req.query.ids || '').split(',').filter(Boolean);
     if (!ids.length) return res.json({});
-
-    const sortedIds = [...new Set(ids)].sort();
-    const key = `coingecko-prices:${sortedIds.join(',')}`;
-
-    const data = await cachedJson(key, 15_000, async () => {
-      const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(sortedIds.join(','))}&vs_currencies=usd&include_24hr_change=true`;
-      return fetchJsonWithTimeout(url, {}, 8000);
-    });
-
+    const data = await cachedJson(`cg-prices:${ids.join(',')}`, 15000, () => fetchJsonWithTimeout(`${COINGECKO_BASE}/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`));
     res.json(data);
-  } catch (error) {
-    console.error('Price error:', error.message);
-    res.json({});
-  }
+  } catch { res.json({}); }
 });
 
 app.get('/api/market-meta', requireAuthJson, async (req, res) => {
   try {
-    const ids = String(req.query.ids || '')
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean)
-      .slice(0, 120);
-
+    const ids = String(req.query.ids || '').split(',').filter(Boolean);
     if (!ids.length) return res.json({});
-
-    const uniqueIds = [...new Set(ids)].sort();
-    const key = `market-meta:${uniqueIds.join(',')}`;
-
-    const data = await cachedJson(key, 30_000, async () => {
-      const url = `${COINGECKO_BASE}/coins/markets?vs_currency=usd&ids=${encodeURIComponent(uniqueIds.join(','))}&order=market_cap_desc&per_page=120&page=1&sparkline=false&price_change_percentage=24h`;
-      const rows = await fetchJsonWithTimeout(url, {}, 8000);
-
+    const data = await cachedJson(`cg-meta:${ids.join(',')}`, 30000, async () => {
+      const rows = await fetchJsonWithTimeout(`${COINGECKO_BASE}/coins/markets?vs_currency=usd&ids=${ids.join(',')}&order=market_cap_desc&per_page=100&page=1&sparkline=false`);
       const output = {};
-
-      for (const row of Array.isArray(rows) ? rows : []) {
-        output[row.id] = {
-          id: row.id,
-          symbol: String(row.symbol || '').toUpperCase(),
-          name: row.name,
-          marketCap: Number(row.market_cap || 0),
-          volume24h: Number(row.total_volume || 0),
-          change24h: Number(row.price_change_percentage_24h || 0)
-        };
-      }
-
+      for (const row of rows || []) output[row.id] = { id: row.id, symbol: String(row.symbol).toUpperCase(), marketCap: Number(row.market_cap || 0) };
       return output;
     });
-
     res.json(data);
-  } catch (error) {
-    console.error('Market meta error:', error.message);
-    res.json({});
-  }
+  } catch { res.json({}); }
 });
 
 app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
   try {
-    const symbols = String(req.query.symbols || '')
-      .split(',')
-      .map(x => x.trim().toUpperCase())
-      .filter(Boolean)
-      .slice(0, 120);
-
-    if (!symbols.length) return res.json({});
-
-    const uniqueSymbols = [...new Set(symbols)].sort();
-    const key = `binance-prices-batch:${uniqueSymbols.join(',')}`;
-
-    const data = await cachedJson(key, 4_000, async () => {
-      const wanted = new Set(uniqueSymbols);
+    const symbols = new Set(String(req.query.symbols || '').split(',').filter(Boolean));
+    if (!symbols.size) return res.json({});
+    const data = await cachedJson(`binance-prices`, 4000, async () => {
       const output = {};
-
-      for (const base of BINANCE_ENDPOINTS) {
-        try {
-          const rows = await fetchJsonWithTimeout(`${base}/api/v3/ticker/24hr`, {}, 8000);
-
-          for (const row of Array.isArray(rows) ? rows : []) {
-            if (!wanted.has(row.symbol)) continue;
-
-            output[row.symbol] = {
-              symbol: row.symbol,
-              lastPrice: Number(row.lastPrice || 0),
-              priceChangePercent: Number(row.priceChangePercent || 0),
-              priceChange: Number(row.priceChange || 0),
-              quoteVolume: Number(row.quoteVolume || 0),
-              highPrice: Number(row.highPrice || 0),
-              lowPrice: Number(row.lowPrice || 0)
-            };
-          }
-
-          if (Object.keys(output).length) return output;
-        } catch (error) {
-          console.error('Binance endpoint failed:', base, error.message);
-        }
-      }
-
+      const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/ticker/24hr`);
+      for (const row of rows || []) if (symbols.has(row.symbol)) output[row.symbol] = { lastPrice: Number(row.lastPrice), priceChangePercent: Number(row.priceChangePercent) };
       return output;
     });
-
     res.json(data);
-  } catch (error) {
-    console.error('Binance price error:', error.message);
-    res.json({});
-  }
+  } catch { res.json({}); }
 });
 
 app.get('/api/chart', requireAuthJson, async (req, res) => {
   try {
-    const id = String(req.query.id || '').trim();
-    const tf = String(req.query.tf || '5m').trim();
-    const symbol = String(req.query.symbol || '').trim().toUpperCase();
-
-    if (!id && !symbol) {
-      return res.status(400).json({ error: 'Missing id or symbol.' });
+    const { id, symbol, tf = '5m' } = req.query;
+    if (symbol) {
+      const binanceSymbol = `${symbol}USDT`;
+      const data = await cachedJson(`binance-chart:${binanceSymbol}:${tf}`, 4000, async () => {
+        const rows = await fetchJsonWithTimeout(`${BINANCE_ENDPOINTS[0]}/api/v3/klines?symbol=${binanceSymbol}&interval=${tf}&limit=80`);
+        return { candles: rows.map(k => ({ time: Number(k[0]), open: Number(k[1]), high: Number(k[2]), low: Number(k[3]), close: Number(k[4]) })) };
+      });
+      return res.json(data);
     }
-
-    const interval = tf === '15m' ? '15m' : tf === '1h' ? '1h' : '5m';
-    const binanceSymbol = symbol ? `${symbol}USDT` : '';
-
-    if (binanceSymbol) {
-      for (const base of BINANCE_ENDPOINTS) {
-        try {
-          const key = `binance-chart:${base}:${binanceSymbol}:${interval}`;
-
-          const data = await cachedJson(key, 4_000, async () => {
-            const url = `${base}/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=80`;
-            const rows = await fetchJsonWithTimeout(url, {}, 8000);
-
-            return {
-              source: 'binance',
-              symbol: binanceSymbol,
-              interval,
-              prices: rows.map(k => [Number(k[0]), Number(k[4])]),
-              candles: rows.map(k => ({
-                time: Number(k[0]),
-                open: Number(k[1]),
-                high: Number(k[2]),
-                low: Number(k[3]),
-                close: Number(k[4]),
-                volume: Number(k[5])
-              }))
-            };
-          });
-
-          return res.json(data);
-        } catch (error) {
-          console.error('Binance chart failed:', base, binanceSymbol, error.message);
-        }
-      }
-    }
-
-    if (!id) {
-      return res.status(404).json({ error: 'No Binance pair and no CoinGecko id.' });
-    }
-
-    const key = `coingecko-chart:${id}:${tf}`;
-
-    const data = await cachedJson(key, 20_000, async () => {
-      const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=1`;
-      const body = await fetchJsonWithTimeout(url, {}, 8000);
-
-      return {
-        source: 'coingecko',
-        id,
-        interval: tf,
-        prices: body.prices || []
-      };
+    const data = await cachedJson(`cg-chart:${id}`, 20000, async () => {
+      const body = await fetchJsonWithTimeout(`${COINGECKO_BASE}/coins/${id}/market_chart?vs_currency=usd&days=1`);
+      return { prices: body.prices || [] };
     });
-
     res.json(data);
-  } catch (error) {
-    console.error('Chart error:', error.message);
-    res.status(500).json({ error: 'Unable to load chart.' });
-  }
+  } catch { res.status(500).json({ error: 'Failed to load chart' }); }
 });
 
-/* SWAP API */
-
-// Handles simple deep links for swapping if needed externally
-app.get('/api/swap/link', requireAuthJson, (req, res) => {
-  const inputCurrency = String(req.query.inputCurrency || 'ETH').trim();
-  const outputCurrency = String(req.query.outputCurrency || '').trim();
-  const value = String(req.query.value || '').trim();
-
-  const params = new URLSearchParams();
-
-  params.set('inputCurrency', inputCurrency);
-
-  if (outputCurrency) params.set('outputCurrency', outputCurrency);
-  if (value) {
-    params.set('value', value);
-    params.set('field', 'input');
-  }
-
-  res.json({
-    ok: true,
-    provider: 'uniswap',
-    url: `https://app.uniswap.org/swap?${params.toString()}`
-  });
-});
-
-// Handles the actual API quote requested by the frontend
 app.post('/api/swap/quote', requireAuthJson, (req, res) => {
   try {
-    const { chainId, network, taker, sellToken, buyToken, sellAmount } = req.body;
-
-    if (!sellToken || !buyToken || !sellAmount) {
-      return res.status(400).json({ error: 'Missing required swap parameters.' });
-    }
-
-    // Creating a mock response formatted correctly for your frontend's parsing logic
-    // In a real production environment, you would proxy this request to the 0x API or 1inch
-    const slippageMockBuyAmount = (BigInt(sellAmount) * 98n / 100n).toString(); // Simulating 2% slippage 
-
+    const { sellAmount, sellToken } = req.body;
     res.json({
-      sellAmount,
-      buyAmount: slippageMockBuyAmount,
-      gas: '150000',
-      transaction: {
-        to: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', // standard 0x router dummy address
-        data: '0x',
-        value: sellToken === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? sellAmount : '0',
-        gas: '150000'
-      }
+      sellAmount, buyAmount: (BigInt(sellAmount) * 98n / 100n).toString(), gas: '150000',
+      transaction: { to: '0xdef1c0ded9bec7f1a1670819833240f027b25eff', data: '0x', value: sellToken === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? sellAmount : '0' }
     });
-  } catch (error) {
-    console.error('Swap quote error:', error);
-    res.status(500).json({ error: 'Unable to generate swap quote at this time.' });
-  }
-});
-
-/* Debug */
-
-app.get('/api/debug-prices', requireAuthJson, async (req, res) => {
-  const result = {
-    node: process.version,
-    hasFetch: typeof fetch !== 'undefined',
-    binance: null,
-    coingecko: null,
-    sessionUser: req.session.user || null,
-    time: nowIso()
-  };
-
-  try {
-    const body = await fetchJsonWithTimeout('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT', {}, 8000);
-    result.binance = { ok: true, sample: body };
-  } catch (e) {
-    result.binance = { ok: false, error: e.message };
-  }
-
-  try {
-    const body = await fetchJsonWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd', {}, 8000);
-    result.coingecko = { ok: true, sample: body };
-  } catch (e) {
-    result.coingecko = { ok: false, error: e.message };
-  }
-
-  res.json(result);
-});
-
-app.get('/debug-session', (req, res) => {
-  res.json({
-    user: req.session.user || null,
-    session: req.session
-  });
-});
-
-app.get('/health', (req, res) => {
-  res.json({
-    ok: true,
-    node: process.version,
-    hasFetch: typeof fetch !== 'undefined',
-    time: nowIso()
-  });
-});
-
-app.use((req, res) => {
-  res.status(404).send('Page not found');
+  } catch { res.status(500).json({ error: 'Quote failed' }); }
 });
 
 app.listen(PORT, () => {
   ensureDb();
   console.log(`BlueCrypto running on port ${PORT}`);
-  console.log(`Node version: ${process.version}`);
 });
