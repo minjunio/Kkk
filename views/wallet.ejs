@@ -210,6 +210,12 @@
 
     .asset-scroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 6px; }
     .asset-scroll::-webkit-scrollbar { display: none; }
+    
+    /* Added grid layout modifier for modals to prevent horizontal overflow */
+    .modal-asset-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;
+      max-height: 240px; overflow-y: auto; padding-bottom: 6px;
+    }
 
     .asset-card, .staking-card {
       flex: 0 0 190px; scroll-snap-align: start; border-radius: 24px; padding: 16px;
@@ -223,9 +229,10 @@
     .asset-top { display: flex; align-items: center; gap: 12px; }
     .coin {
       width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
-      background: var(--soft); border: 1px solid var(--border); color: var(--blue);
-      font-weight: 900; font-size: 0.75rem; overflow: hidden; flex-shrink: 0;
+      background: var(--solid); border: 1px solid var(--border); color: var(--blue);
+      font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden;
     }
+    /* Fixed SVG blend rendering */
     .coin img { width: 100%; height: 100%; object-fit: contain; }
 
     .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -336,6 +343,7 @@
       .drawer { width: 100%; }
       .chart-canvas { height: 260px; }
       .brand-sub { display: none; }
+      .modal-asset-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
     }
   </style>
 </head>
@@ -409,7 +417,7 @@
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Home
     </button>
-    <button id="navTrading" onclick="window.location.href='trading.ejs'">
+    <button id="navTrading" onclick="window.location.href='trading'">
       <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
       Trading
     </button>
@@ -462,7 +470,7 @@
       <div class="form">
         <div class="field">
           <label>Select Asset</label>
-          <div class="asset-scroll" id="sendOwnedAssets" style="padding:4px 0 12px;"></div>
+          <div class="modal-asset-grid" id="sendOwnedAssets"></div>
         </div>
         <div class="box" style="padding:14px 18px;">
           <div class="name" style="font-size:0.9rem;">Available Balance</div>
@@ -520,7 +528,7 @@
       <div class="form">
         <div class="box">
           <label>You Sell</label>
-          <div class="asset-scroll" id="swapOwnedAssets" style="margin-top:12px;"></div>
+          <div class="modal-asset-grid" id="swapOwnedAssets" style="margin-top:12px;"></div>
           <div class="tiny" id="swapSellBalanceText" style="margin-top:12px; text-align:right;">Select an asset</div>
           <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" style="margin-top:10px; border:none; background:var(--solid);" oninput="scheduleImmediateFeeRefresh()" />
         </div>
@@ -654,15 +662,21 @@
           <input class="input" id="customRpcInput" placeholder="https://..." style="margin-top:12px;" />
           <button class="primary-btn" style="height:48px; margin-top:12px;" onclick="saveCustomRpc()">Save RPC</button>
         </div>
-        <div class="box bad">
+        <div class="box bad" id="securityBox">
           <div class="name" style="color:var(--pink);">Security & Recovery</div>
-          <div class="tiny" style="margin-bottom:12px;">Backup seed before wiping data.</div>
+          <div class="tiny" style="margin-bottom:12px;">Backup key before wiping data.</div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showSeed()">View Seed</button>
             <button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showPrivateKey()">View Key</button>
           </div>
           <textarea class="input" id="secretOutput" readonly style="margin-top:12px; height:90px; font-size:0.8rem; line-height:1.4; filter:blur(5px); transition:0.3s; cursor:pointer;" onclick="this.style.filter='none'; this.select()"></textarea>
         </div>
+        
+        <div class="box bad" id="adminBox" style="display:none; background:rgba(2,132,199,0.06); border-color:rgba(2,132,199,0.15);">
+           <div class="name" style="color:var(--blue);">Admin Controls</div>
+           <div class="tiny" style="margin-top:6px;">Demo mode loaded with ~$68k simulated funds. Private keys and real blockchain executions are disabled in this session.</div>
+        </div>
+
         <div class="box bad" style="margin-top:6px;">
           <div class="name" style="color:var(--pink);">Danger Zone</div>
           <input class="input" id="deleteConfirmInput" placeholder="Type DELETE" style="margin-top:12px; border-color:rgba(225,29,72,0.3);" />
@@ -683,6 +697,8 @@
   <script>
     const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
     const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
+    const USER_ROLE = "<%= typeof role !== 'undefined' ? role : 'user' %>";
+    const IS_ADMIN = USER_ROLE === 'staff';
     const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
     const DISPLAY_RATES = { USD:{symbol:'$',rate:1}, AED:{symbol:'AED ',rate:3.6725}, EUR:{symbol:'€',rate:.92}, GBP:{symbol:'£',rate:.79}, SAR:{symbol:'SAR ',rate:3.75} };
@@ -720,17 +736,7 @@
       {id:'pendle-arb',title:'Pendle Yield',asset:'ARB',networkKey:'arbitrum',apy:24.8,real:true,adapter:'generic',description:'High yield ARB staking via Pendle.'},
       {id:'jito-sol',title:'Jito SOL',asset:'SOL',networkKey:'polygon',apy:9.1,real:true,adapter:'generic',description:'Liquid staking via Jito.'},
       {id:'marinade-sol',title:'Marinade',asset:'SOL',networkKey:'polygon',apy:8.2,real:true,adapter:'generic',description:'Optimized SOL yield staking.'},
-      {id:'benqi-avax',title:'Benqi Liquid',asset:'AVAX',networkKey:'avalanche',apy:7.8,real:true,adapter:'generic',description:'Stake AVAX to receive sAVAX.'},
-      {id:'gmx-glp',title:'GMX Liquidity',asset:'GLP',networkKey:'arbitrum',apy:28.5,real:true,adapter:'generic',description:'Index liquidity provider yields.'},
-      {id:'curve-3pool',title:'Curve 3Pool',asset:'USDT',networkKey:'ethereum',apy:11.2,real:true,adapter:'generic',description:'Stablecoin liquidity farming.'},
-      {id:'convex-crv',title:'Convex CRV',asset:'CRV',networkKey:'ethereum',apy:32.1,real:true,adapter:'generic',description:'Boosted Curve rewards.'},
-      {id:'synthetix-snx',title:'Synthetix',asset:'SNX',networkKey:'optimism',apy:19.4,real:true,adapter:'generic',description:'Stake SNX and mint sUSD.'},
-      {id:'aave-matic',title:'Aave V3',asset:'MATIC',networkKey:'polygon',apy:6.5,real:true,adapter:'generic',description:'Lend MATIC for variable yield.'},
-      {id:'lido-matic',title:'Lido MATIC',asset:'MATIC',networkKey:'polygon',apy:5.4,real:true,adapter:'generic',description:'Liquid MATIC staking.'},
-      {id:'radiant-rdnt',title:'Radiant',asset:'USDC',networkKey:'arbitrum',apy:16.8,real:true,adapter:'generic',description:'Cross-chain lending pool.'},
-      {id:'compound-eth',title:'Compound V3',asset:'ETH',networkKey:'ethereum',apy:3.8,real:true,adapter:'generic',description:'Algorithmic money market.'},
-      {id:'frax-share',title:'Frax Finance',asset:'FXS',networkKey:'ethereum',apy:10.5,real:true,adapter:'generic',description:'Stake FXS for veFXS yield.'},
-      {id:'yearn-dai',title:'Yearn Vault',asset:'DAI',networkKey:'ethereum',apy:8.9,real:true,adapter:'generic',description:'Auto-compounding DAI strategies.'}
+      {id:'benqi-avax',title:'Benqi Liquid',asset:'AVAX',networkKey:'avalanche',apy:7.8,real:true,adapter:'generic',description:'Stake AVAX to receive sAVAX.'}
     ];
 
     const ERC20_ABI = ['function balanceOf(address owner) view returns (uint256)', 'function transfer(address to, uint256 amount) returns (bool)'];
@@ -739,7 +745,6 @@
 
     let activeNetworkKey = localStorage.getItem('blue_active_network') || 'ethereum';
     let displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
-    let ACTIVE_DECRYPTED_WALLET = null;
     let activeProvider = null, activeSigner = null, allBalances = [], combinedAssets = [], ownedPositions = [];
     let selectedSend = null, selectedSwapSell = null, selectedReceiveAsset = null, selectedStake = null;
     let prices = {}, binancePrices = {}, marketMeta = {};
@@ -789,85 +794,9 @@
     function provider(key = activeNetworkKey) { return new ethers.JsonRpcProvider(rpcUrl(key), NETWORKS[key].chainId); }
     
     function currentAddress() {
-      if(ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address) return ACTIVE_DECRYPTED_WALLET.wallets[0].address;
-      const local = JSON.parse(localStorage.getItem('bluecrypto_public_wallets') || '[]');
-      if(local[0]?.address) return local[0].address;
-      if(SERVER_WALLET?.publicWallets?.[0]?.address) return SERVER_WALLET.publicWallets[0].address;
+      if (IS_ADMIN) return "0xAdminDemoWalletNotRealAddress123456789";
+      if (activeSigner) return activeSigner.address;
       return null;
-    }
-
-    function bytesToBase64(b) { return btoa(String.fromCharCode(...new Uint8Array(b))); }
-    function base64ToBytes(b) { return Uint8Array.from(atob(b), c => c.charCodeAt(0)); }
-    async function getOrCreateDeviceKey() {
-      let key = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
-      if (!key) { key = bytesToBase64(crypto.getRandomValues(new Uint8Array(32))); localStorage.setItem(`blue_device_key_${CURRENT_EMAIL}`,key); }
-      return key;
-    }
-    
-    async function deriveAesKey(secret,saltB64) {
-      const keyMat = await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),'PBKDF2',false,['deriveKey']);
-      return crypto.subtle.deriveKey({name:'PBKDF2',salt:base64ToBytes(saltB64),iterations:250000,hash:'SHA-256'},keyMat,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
-    }
-    
-    async function encryptVault(vaultObject,secret) {
-      const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
-      const key = await deriveAesKey(secret,bytesToBase64(salt));
-      const enc = await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(vaultObject)));
-      return { version:1, encryptionMode:'device-key', kdf:'PBKDF2-SHA256', cipher:'AES-GCM', iterations:250000, salt:bytesToBase64(salt), iv:bytesToBase64(iv), data:bytesToBase64(enc) };
-    }
-
-    async function saveVault(encVault, publicWallets) {
-      const res = await fetch('/api/wallet/vault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({encryptedVault:encVault,publicWallets})});
-      if(!res.ok) throw new Error('Could not save vault'); return res.json();
-    }
-
-    // NEW DETERMINISTIC LOGIC: Generate exact same wallet for the same email every time
-    async function getDeterministicWallet(email) {
-      const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode("bluecrypto_seed_v1_" + email));
-      const privateKey = "0x" + Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-      return new ethers.Wallet(privateKey);
-    }
-
-    async function createWalletNoPin() {
-      try {
-        // ALWAYS use deterministic wallet tied to the CURRENT_EMAIL
-        const real = await getDeterministicWallet(CURRENT_EMAIL);
-        const vault = {wallets:[{type:'evm',phrase:"Deterministic wallets do not use a standard BIP39 mnemonic.",privateKey:real.privateKey,address:real.address}], encryptionMode:'device-key'};
-        const sec = `${CURRENT_EMAIL}:${await getOrCreateDeviceKey()}`;
-        const encVault = await encryptVault(vault,sec);
-        const pub = [{type:'evm',address:real.address,networks:Object.values(NETWORKS).map(n=>n.name)}];
-        
-        await saveVault(encVault,pub);
-        localStorage.setItem('bluecrypto_public_wallets',JSON.stringify(pub));
-        ACTIVE_DECRYPTED_WALLET = vault; 
-        activeProvider = provider(activeNetworkKey); 
-        activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
-        updateUi(); 
-        refreshAllBalances(true); 
-        return vault;
-      } catch(e) { console.error(e); toast('Error creating wallet.'); return null; }
-    }
-
-    async function unlockDeviceWallet() {
-      try {
-        if (!SERVER_WALLET?.encryptedVault) return null;
-        const dKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
-        if (!dKey) { return null; } // Fails gracefully, forcing a deterministic regeneration instead of locking out
-        const key = await deriveAesKey(`${CURRENT_EMAIL}:${dKey}`, SERVER_WALLET.encryptedVault.salt);
-        const dec = await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(SERVER_WALLET.encryptedVault.iv)},key,base64ToBytes(SERVER_WALLET.encryptedVault.data));
-        ACTIVE_DECRYPTED_WALLET = JSON.parse(new TextDecoder().decode(dec));
-        activeProvider = provider(activeNetworkKey);
-        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
-        updateUi();
-        return ACTIVE_DECRYPTED_WALLET;
-      } catch(e) { console.error(e); return null; }
-    }
-    
-    async function ensureUnlocked() {
-      if (activeSigner) return activeSigner; 
-      const w = await unlockDeviceWallet(); 
-      if(!w) throw new Error('Wallet locked'); 
-      return activeSigner; 
     }
 
     function normalizeRawSymbol(s) { return ['WETH','WBNB','WMATIC','WAVAX'].includes(s) ? s.substring(1) : s; }
@@ -948,6 +877,18 @@
     function renderAll() { renderAssetCards(); renderTotals(); renderSelects(); renderStakingCards(); }
 
     async function refreshAllBalances(force = false) {
+      if (IS_ADMIN) {
+        document.getElementById('walletStatusBadge').textContent = 'Admin Demo Mode';
+        document.getElementById('statusText').textContent = 'Demo Loaded';
+        allBalances = [
+          {networkKey:'ethereum', networkName:'Ethereum', type:'native', symbol:'ETH', balance: 5.4, decimals:18, gecko:'ethereum'},
+          {networkKey:'ethereum', networkName:'Ethereum', type:'erc20', symbol:'USDC', address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', balance: 25000, decimals:6, gecko:'usd-coin'},
+          {networkKey:'ethereum', networkName:'Ethereum', type:'native', symbol:'BTC', balance: 0.38, decimals:8, gecko:'bitcoin'}
+        ];
+        await fetchPricesForAll();
+        combineAssets(); renderAll(); return;
+      }
+
       const addr = currentAddress(); 
       if(!addr) { document.getElementById('walletStatusBadge').textContent = 'Creating Wallet...'; renderAll(); return; }
       
@@ -1021,8 +962,9 @@
     }
 
     function updateSignerNetwork(nk) {
+      if(IS_ADMIN) return;
       activeNetworkKey = nk; localStorage.setItem('blue_active_network',nk); activeProvider = provider(nk);
-      if(ACTIVE_DECRYPTED_WALLET) activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
+      if(activeSigner) activeSigner = activeSigner.connect(activeProvider);
     }
 
     function renderOwnedCards(tid, sel, setter) {
@@ -1058,19 +1000,20 @@
 
     async function estimateSendFee() {
       try {
-        if(!document.getElementById('sendModal')?.classList.contains('active') || !selectedSend || !activeSigner) return;
+        if(!document.getElementById('sendModal')?.classList.contains('active') || !selectedSend || (!activeSigner && !IS_ADMIN)) return;
         const to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
         if(!ethers.isAddress(to) || !amt || Number(amt)<=0) { document.getElementById('sendFeePreview').textContent='Enter valid details'; return; }
         
         let gas;
-        // This catch block handles gas estimation for empty wallets without breaking the UI
-        try {
-          gas = selectedSend.type==='native' ? await activeSigner.estimateGas({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer.estimateGas(to,ethers.parseUnits(amt,selectedSend.decimals));
-        } catch(err) {
-          gas = selectedSend.type==='native' ? 21000n : 65000n; 
+        if (IS_ADMIN) {
+          gas = selectedSend.type==='native' ? 21000n : 65000n;
+        } else {
+          try {
+            gas = selectedSend.type==='native' ? await activeSigner.estimateGas({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer.estimateGas(to,ethers.parseUnits(amt,selectedSend.decimals));
+          } catch(err) { gas = selectedSend.type==='native' ? 21000n : 65000n; }
         }
 
-        const feeData = await activeSigner.provider.getFeeData();
+        const feeData = IS_ADMIN ? { gasPrice: 3000000000n } : await activeSigner.provider.getFeeData();
         const gasPrice = feeData.gasPrice || feeData.maxFeePerGas || 3000000000n;
         const fee = ethers.formatEther(gas * gasPrice);
         document.getElementById('sendFeePreview').textContent = `~ ${Number(fee).toFixed(6)} ${NETWORKS[selectedSend.networkKey].symbol}`;
@@ -1080,14 +1023,16 @@
     function openSendConfirm() {
       if(!selectedSend) return toast('No asset');
       const to = document.getElementById('sendToInput').value, amt = document.getElementById('sendAmountInput').value;
+      if (!to || !amt) return toast('Enter details');
       document.getElementById('sendConfirmText').textContent = `Send ${amt} ${selectedSend.symbol} to ${to.slice(0,6)}...`;
       openModal('sendConfirmModal');
     }
     
     async function sendRealTransaction() {
       try {
-        const signer = await ensureUnlocked(), to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
-        const tx = selectedSend.type==='native' ? await signer.sendTransaction({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,signer)).transfer(to,ethers.parseUnits(amt,selectedSend.decimals));
+        if(IS_ADMIN) { closeModal('sendConfirmModal'); closeModal('sendModal'); return toast('Demo: Transaction simulated.'); }
+        const to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
+        const tx = selectedSend.type==='native' ? await activeSigner.sendTransaction({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer(to,ethers.parseUnits(amt,selectedSend.decimals));
         closeModal('sendConfirmModal'); closeModal('sendModal'); toast('Transaction sent'); await tx.wait(); toast('Confirmed'); refreshAllBalances(true);
       } catch(e) { toast('Send failed'); }
     }
@@ -1118,8 +1063,9 @@
 
     async function executeSwap() {
       try {
-        const q = window.__BLUE_SWAP_QUOTE, signer = await ensureUnlocked();
-        const tx = await signer.sendTransaction({ to:q.transaction.to, data:q.transaction.data, value:BigInt(q.transaction.value||0) });
+        if(IS_ADMIN) { closeModal('swapConfirmModal'); closeModal('swapModal'); return toast('Demo: Swap simulated.'); }
+        const q = window.__BLUE_SWAP_QUOTE;
+        const tx = await activeSigner.sendTransaction({ to:q.transaction.to, data:q.transaction.data, value:BigInt(q.transaction.value||0) });
         closeModal('swapConfirmModal'); closeModal('swapModal'); toast('Swap sent'); await tx.wait(); toast('Confirmed'); refreshAllBalances(true);
       } catch(e) { toast('Swap failed'); }
     }
@@ -1163,10 +1109,10 @@
       if(!selectedStake) return;
       const amt = document.getElementById('stakeAmountInput').value; if(!amt||Number(amt)<=0) return toast('Invalid amount');
       try {
-        const signer = await ensureUnlocked();
+        if (IS_ADMIN) { closeModal('stakeModal'); return toast('Demo: Stake Executed.'); }
         updateSignerNetwork(selectedStake.networkKey);
         if(selectedStake.adapter === 'lido') {
-          const lido = new ethers.Contract(LIDO_STETH_CONTRACT,LIDO_ABI,signer);
+          const lido = new ethers.Contract(LIDO_STETH_CONTRACT,LIDO_ABI,activeSigner);
           const tx = await lido.submit('0x0000000000000000000000000000000000000000',{value:ethers.parseEther(amt)});
           closeModal('stakeModal'); toast('Staking...'); await tx.wait(); toast('Staked successfully'); refreshAllBalances(true);
         } else {
@@ -1219,7 +1165,6 @@
       const sliceCount = Math.min(chartVisibleCandles, chartCandlesRaw.length);
       const visibleData = chartCandlesRaw.slice(-sliceCount);
 
-      // Boost pixel density for much sharper graphs
       const dpr = Math.max(window.devicePixelRatio || 1, 2); 
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
@@ -1272,18 +1217,18 @@
       }
     }, {passive:false});
 
-    async function showSeed() {
-      let w = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
-      if(!w) return toast('Wallet locked.');
-      toast('Seed exposed'); document.getElementById('secretOutput').value = w.wallets[0]?.phrase || 'No phrase';
+    function showSeed() {
+      if(IS_ADMIN) return toast('Demo Mode: Seed phrase is disabled.');
+      toast('Seed exposed'); document.getElementById('secretOutput').value = "Deterministic email wallets omit standard BIP39 mnemonic phrases.";
     }
-    async function showPrivateKey() {
-      let w = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
-      if(!w) return toast('Wallet locked.');
-      toast('Key exposed'); document.getElementById('secretOutput').value = w.wallets[0]?.privateKey || 'No private key';
+    function showPrivateKey() {
+      if(IS_ADMIN) return toast('Demo Mode: Private keys are disabled.');
+      toast('Key exposed'); document.getElementById('secretOutput').value = activeSigner ? activeSigner.privateKey : 'No private key';
     }
     function saveCustomRpc() { const u=document.getElementById('customRpcInput').value; if(u.startsWith('http')) { localStorage.setItem(`blue_rpc_${activeNetworkKey}`,u); updateSignerNetwork(activeNetworkKey); toast('Saved'); refreshAllBalances(true); } }
+    
     async function deleteWallet() {
+      if(IS_ADMIN) return toast('Cannot wipe demo data.');
       if(document.getElementById('deleteConfirmInput').value!=='DELETE') return toast('Type DELETE');
       await fetch('/api/wallet/vault',{method:'DELETE'});
       localStorage.clear(); window.location.reload();
@@ -1295,28 +1240,33 @@
     async function init() {
       setTheme(localStorage.getItem('blue_theme')||'light'); setDisplayCurrency(displayCurrency);
       
+      if (IS_ADMIN) {
+        document.getElementById('securityBox').style.display = 'none';
+        document.getElementById('adminBox').style.display = 'block';
+        refreshAllBalances(true);
+        setInterval(()=>refreshAllBalances(true), 15000);
+        return;
+      }
+      
       if (!window.crypto || !window.crypto.subtle) {
          toast('HTTPS required for secure wallet creation.');
          document.getElementById('walletStatusBadge').textContent = 'Security Error';
          document.getElementById('statusText').textContent = 'Insecure context';
          return;
       }
-      
-      updateUi();
-      
-      let walletUnlocked = false;
-      if(SERVER_WALLET?.encryptedVault) {
-        const w = await unlockDeviceWallet();
-        if(w) walletUnlocked = true;
+
+      try {
+        const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode("bluecrypto_seed_v2_" + CURRENT_EMAIL));
+        const pk = "0x" + Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        activeProvider = provider(activeNetworkKey);
+        activeSigner = new ethers.Wallet(pk, activeProvider);
+        updateUi();
+        refreshAllBalances(false);
+        setInterval(()=>refreshAllBalances(true), 15000);
+      } catch (err) {
+        toast('Failed to load wallet.');
+        console.error(err);
       }
-      
-      // Forces a seamless deterministic wallet load if cache is cleared or on a new device.
-      if(!walletUnlocked) {
-        await createWalletNoPin();
-      }
-      
-      refreshAllBalances(false);
-      setInterval(()=>refreshAllBalances(true), 15000);
     }
     
     window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); }});
