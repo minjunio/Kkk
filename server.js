@@ -9,6 +9,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
+
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
 const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@bluewallet.local';
@@ -18,6 +19,7 @@ const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
 const ZEROX_API_KEY = process.env.ZEROX_API_KEY || '';
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
+const BINANCE_BASE = 'https://api.binance.com';
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -41,10 +43,12 @@ app.use(session({
   }
 }));
 
-const priceCache = new Map();
+const cache = new Map();
 
 function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
 
   if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify({ users: {}, otps: {} }, null, 2));
@@ -56,8 +60,10 @@ function readDb() {
 
   try {
     const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+
     if (!db.users) db.users = {};
     if (!db.otps) db.otps = {};
+
     return db;
   } catch {
     return { users: {}, otps: {} };
@@ -162,6 +168,14 @@ function requireAuth(req, res, next) {
   next();
 }
 
+function requireAuthJson(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Not authenticated.' });
+  }
+
+  next();
+}
+
 function generateOtp() {
   return String(crypto.randomInt(100000, 999999));
 }
@@ -185,7 +199,9 @@ function verifyOtp(email, otp) {
   const db = readDb();
   const record = db.otps[normalizedEmail];
 
-  if (!record) return { ok: false, reason: 'No OTP found. Request a new code.' };
+  if (!record) {
+    return { ok: false, reason: 'No OTP found. Request a new code.' };
+  }
 
   if (Date.now() > record.expiresAt) {
     delete db.otps[normalizedEmail];
@@ -239,15 +255,21 @@ async function sendOtpEmail(email, otp) {
     replyTo: process.env.GMAIL_USER,
     to: email,
     subject: 'Your Bluebook Wallet login code',
-    text: `Your Bluebook Wallet login code is ${otp}. It expires in 10 minutes.`,
+    text: `Your Bluebook Wallet login code is ${otp}. It expires in 10 minutes. If you do not see it, check Spam or Junk.`,
     html: `
-      <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;">
-        <h2 style="margin:0 0 12px;">Bluebook Wallet Login Code</h2>
-        <p style="color:#475569;">Use this code to access your wallet.</p>
-        <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:14px;background:#eef6ff;color:#0284c7;text-align:center;">
-          ${otp}
+      <div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:24px;background:#ffffff;color:#0f172a;">
+        <div style="border:1px solid #dbeafe;border-radius:22px;padding:24px;background:#f8fcff;">
+          <h2 style="margin:0 0 10px;font-size:22px;">Bluebook Wallet Login Code</h2>
+          <p style="color:#475569;margin:0 0 18px;">Use this code to access your wallet.</p>
+
+          <div style="font-size:34px;font-weight:800;letter-spacing:7px;padding:18px;border-radius:16px;background:#eef6ff;color:#0284c7;text-align:center;">
+            ${otp}
+          </div>
+
+          <p style="color:#64748b;font-size:13px;margin-top:18px;">
+            This code expires in 10 minutes. If you do not see it, check Spam/Junk.
+          </p>
         </div>
-        <p style="color:#64748b;font-size:13px;">This code expires in 10 minutes. Check Spam/Junk if you do not see it.</p>
       </div>
     `
   });
@@ -256,16 +278,33 @@ async function sendOtpEmail(email, otp) {
 }
 
 async function cachedJson(key, ttlMs, fetcher) {
-  const hit = priceCache.get(key);
+  const hit = cache.get(key);
 
   if (hit && Date.now() - hit.time < ttlMs) {
     return hit.data;
   }
 
   const data = await fetcher();
-  priceCache.set(key, { time: Date.now(), data });
+
+  cache.set(key, {
+    time: Date.now(),
+    data
+  });
+
   return data;
 }
+
+function cleanCache(maxAgeMs = 1000 * 60 * 15) {
+  const now = Date.now();
+
+  for (const [key, value] of cache.entries()) {
+    if (!value || now - value.time > maxAgeMs) {
+      cache.delete(key);
+    }
+  }
+}
+
+setInterval(cleanCache, 1000 * 60 * 5);
 
 /* Pages */
 
@@ -298,7 +337,9 @@ app.post('/send-otp', async (req, res) => {
 
     res.render('index', {
       error: null,
-      success: sent ? 'OTP sent successfully. Check your inbox or spam folder.' : 'OTP generated. Gmail is not configured, check Render logs.',
+      success: sent
+        ? 'OTP sent. Check your inbox. If it is not there, check spam.'
+        : 'OTP generated. Gmail is not configured, check Render logs.',
       otpEmail: email
     });
   } catch (error) {
@@ -371,7 +412,19 @@ app.post('/staff-login', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save(() => res.redirect('/wallet'));
+  req.session.save(error => {
+    if (error) {
+      console.error('Staff session save error:', error);
+
+      return res.render('index', {
+        error: 'Session could not be saved. Try again.',
+        success: null,
+        otpEmail: null
+      });
+    }
+
+    res.redirect('/wallet');
+  });
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
@@ -402,12 +455,12 @@ app.post('/logout', (req, res) => {
 
 /* Wallet API */
 
-app.get('/api/wallet', requireAuth, (req, res) => {
+app.get('/api/wallet', requireAuthJson, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
   res.json(user);
 });
 
-app.post('/api/wallet/vault', requireAuth, (req, res) => {
+app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
   const { encryptedVault, publicWallets } = req.body;
 
   if (!encryptedVault || typeof encryptedVault !== 'object') {
@@ -423,17 +476,24 @@ app.post('/api/wallet/vault', requireAuth, (req, res) => {
     publicWallets
   });
 
-  res.json({ ok: true, wallet: user });
+  res.json({
+    ok: true,
+    wallet: user
+  });
 });
 
-app.delete('/api/wallet/vault', requireAuth, (req, res) => {
+app.delete('/api/wallet/vault', requireAuthJson, (req, res) => {
   const user = deleteUserWalletVault(req.session.user.email);
-  res.json({ ok: true, wallet: user });
+
+  res.json({
+    ok: true,
+    wallet: user
+  });
 });
 
 /* Prices */
 
-app.get('/api/prices', requireAuth, async (req, res) => {
+app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
     const ids = String(req.query.ids || '')
       .split(',')
@@ -443,17 +503,22 @@ app.get('/api/prices', requireAuth, async (req, res) => {
 
     if (!ids.length) return res.json({});
 
-    const key = `prices:${ids.sort().join(',')}`;
+    const sortedIds = [...new Set(ids)].sort();
+    const key = `coingecko-prices:${sortedIds.join(',')}`;
 
     const data = await cachedJson(key, 20_000, async () => {
-      const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(ids.join(','))}&vs_currencies=usd&include_24hr_change=true`;
+      const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(sortedIds.join(','))}&vs_currencies=usd&include_24hr_change=true`;
+
       const response = await fetch(url, {
         headers: {
           accept: 'application/json'
         }
       });
 
-      if (!response.ok) throw new Error(`CoinGecko failed: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`CoinGecko failed: ${response.status}`);
+      }
+
       return response.json();
     });
 
@@ -464,26 +529,141 @@ app.get('/api/prices', requireAuth, async (req, res) => {
   }
 });
 
-app.get('/api/chart', requireAuth, async (req, res) => {
+app.get('/api/binance-prices', requireAuthJson, async (req, res) => {
+  try {
+    const symbols = String(req.query.symbols || '')
+      .split(',')
+      .map(x => x.trim().toUpperCase())
+      .filter(Boolean)
+      .slice(0, 120);
+
+    if (!symbols.length) return res.json({});
+
+    const uniqueSymbols = [...new Set(symbols)].sort();
+    const key = `binance-prices:${uniqueSymbols.join(',')}`;
+
+    const data = await cachedJson(key, 5_000, async () => {
+      const output = {};
+
+      await Promise.all(uniqueSymbols.map(async symbol => {
+        try {
+          const url = `${BINANCE_BASE}/api/v3/ticker/24hr?symbol=${encodeURIComponent(symbol)}`;
+
+          const response = await fetch(url, {
+            headers: {
+              accept: 'application/json'
+            }
+          });
+
+          if (!response.ok) return;
+
+          const body = await response.json();
+
+          output[symbol] = {
+            symbol,
+            lastPrice: Number(body.lastPrice || 0),
+            priceChangePercent: Number(body.priceChangePercent || 0),
+            priceChange: Number(body.priceChange || 0),
+            quoteVolume: Number(body.quoteVolume || 0),
+            highPrice: Number(body.highPrice || 0),
+            lowPrice: Number(body.lowPrice || 0)
+          };
+        } catch {
+          // unsupported pair or temporary Binance issue
+        }
+      }));
+
+      return output;
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.error('Binance price error:', error);
+    res.status(500).json({ error: 'Unable to load Binance prices.' });
+  }
+});
+
+app.get('/api/chart', requireAuthJson, async (req, res) => {
   try {
     const id = String(req.query.id || '').trim();
     const tf = String(req.query.tf || '5m').trim();
+    const symbol = String(req.query.symbol || '').trim().toUpperCase();
 
-    if (!id) return res.status(400).json({ error: 'Missing id.' });
+    if (!id && !symbol) {
+      return res.status(400).json({ error: 'Missing id or symbol.' });
+    }
 
-    const days = tf === '1h' ? '1' : '1';
-    const key = `chart:${id}:${tf}`;
+    const interval = tf === '15m' ? '15m' : tf === '1h' ? '1h' : '5m';
+    const binanceSymbol = symbol ? `${symbol}USDT` : '';
+
+    if (binanceSymbol) {
+      try {
+        const key = `binance-chart:${binanceSymbol}:${interval}`;
+
+        const data = await cachedJson(key, 5_000, async () => {
+          const url = `${BINANCE_BASE}/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=80`;
+
+          const response = await fetch(url, {
+            headers: {
+              accept: 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`Binance chart failed: ${response.status}`);
+          }
+
+          const rows = await response.json();
+
+          return {
+            source: 'binance',
+            symbol: binanceSymbol,
+            interval,
+            prices: rows.map(k => [Number(k[0]), Number(k[4])]),
+            candles: rows.map(k => ({
+              time: Number(k[0]),
+              open: Number(k[1]),
+              high: Number(k[2]),
+              low: Number(k[3]),
+              close: Number(k[4]),
+              volume: Number(k[5])
+            }))
+          };
+        });
+
+        return res.json(data);
+      } catch {
+        // fallback to CoinGecko below
+      }
+    }
+
+    if (!id) {
+      return res.status(404).json({ error: 'No Binance pair and no CoinGecko id.' });
+    }
+
+    const key = `coingecko-chart:${id}:${tf}`;
 
     const data = await cachedJson(key, 20_000, async () => {
-      const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`;
+      const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=1`;
+
       const response = await fetch(url, {
         headers: {
           accept: 'application/json'
         }
       });
 
-      if (!response.ok) throw new Error(`Chart failed: ${response.status}`);
-      return response.json();
+      if (!response.ok) {
+        throw new Error(`CoinGecko chart failed: ${response.status}`);
+      }
+
+      const body = await response.json();
+
+      return {
+        source: 'coingecko',
+        id,
+        interval: tf,
+        prices: body.prices || []
+      };
     });
 
     res.json(data);
@@ -495,7 +675,7 @@ app.get('/api/chart', requireAuth, async (req, res) => {
 
 /* Swap API */
 
-app.post('/api/swap/quote', requireAuth, async (req, res) => {
+app.post('/api/swap/quote', requireAuthJson, async (req, res) => {
   try {
     if (!ZEROX_API_KEY) {
       return res.status(501).json({
