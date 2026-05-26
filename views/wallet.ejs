@@ -15,9 +15,9 @@
       --bg1:#e8f7ff;
       --bg2:#f8fbff;
       --bg3:#d5efff;
-      --glass:rgba(255,255,255,.74);
-      --glass2:rgba(255,255,255,.58);
-      --solid:#ffffff;
+      --glass:rgba(255,255,255,.76);
+      --glass2:rgba(255,255,255,.56);
+      --solid:#fff;
       --soft:#f4f9ff;
       --text:#0f172a;
       --muted:#64748b;
@@ -28,7 +28,7 @@
       --green:#16a34a;
       --orange:#d97706;
       --border:rgba(15,23,42,.08);
-      --border2:rgba(2,132,199,.28);
+      --border2:rgba(2,132,199,.26);
       --shadow:0 24px 80px rgba(37,99,235,.14);
       --shadow2:0 12px 34px rgba(15,23,42,.08);
       --safe-top:env(safe-area-inset-top);
@@ -40,15 +40,15 @@
       --bg1:#06111f;
       --bg2:#050816;
       --bg3:#0b2940;
-      --glass:rgba(13,22,40,.8);
-      --glass2:rgba(17,29,51,.6);
+      --glass:rgba(13,22,40,.80);
+      --glass2:rgba(17,29,51,.62);
       --solid:#0d1628;
       --soft:#111d33;
       --text:#f8fafc;
       --muted:#94a3b8;
       --blue:#38bdf8;
       --border:rgba(125,211,252,.13);
-      --border2:rgba(56,189,248,.3);
+      --border2:rgba(56,189,248,.30);
       --shadow:0 24px 80px rgba(0,0,0,.36);
       --shadow2:0 12px 34px rgba(0,0,0,.22);
     }
@@ -61,7 +61,7 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    html,body {
+    html, body {
       width:100%;
       max-width:100%;
       overflow-x:hidden;
@@ -76,34 +76,26 @@
         radial-gradient(circle at 50% 105%,rgba(14,165,233,.18),transparent 30%),
         linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
       background-attachment:fixed;
-      padding-bottom:calc(88px + var(--safe-bottom));
+      padding-bottom:calc(90px + var(--safe-bottom));
     }
 
-    button,input,select,textarea {
-      font:inherit;
-    }
-
-    button {
-      border:0;
-      cursor:pointer;
-    }
+    button,input,select,textarea { font:inherit; }
+    button { border:0; cursor:pointer; }
 
     .topbar {
       position:sticky;
       top:0;
       z-index:50;
       padding:calc(10px + var(--safe-top)) 12px 10px;
-      background:rgba(248,251,255,.6);
+      background:rgba(248,251,255,.60);
       border-bottom:1px solid var(--border);
       backdrop-filter:blur(20px);
     }
 
-    [data-theme="dark"] .topbar {
-      background:rgba(5,8,22,.7);
-    }
+    [data-theme="dark"] .topbar { background:rgba(5,8,22,.70); }
 
     .topbar-inner {
-      width:min(940px,100%);
+      width:min(960px,100%);
       margin:0 auto;
       display:flex;
       align-items:center;
@@ -167,7 +159,7 @@
     }
 
     .shell {
-      width:min(940px,100%);
+      width:min(960px,100%);
       margin:0 auto;
       padding:12px;
     }
@@ -271,9 +263,7 @@
       padding-bottom:2px;
     }
 
-    .chips::-webkit-scrollbar {
-      display:none;
-    }
+    .chips::-webkit-scrollbar { display:none; }
 
     .chip {
       flex:0 0 auto;
@@ -324,9 +314,7 @@
       font-weight:850;
     }
 
-    .quick-btn.primary span {
-      color:rgba(255,255,255,.82);
-    }
+    .quick-btn.primary span { color:rgba(255,255,255,.82); }
 
     .panel {
       margin-top:12px;
@@ -366,16 +354,15 @@
       display:flex;
       gap:10px;
       overflow-x:auto;
-      scroll-snap-type:x mandatory;
+      scroll-snap-type:x proximity;
       scrollbar-width:none;
       padding:2px 2px 4px;
     }
 
-    .asset-scroll::-webkit-scrollbar {
-      display:none;
-    }
+    .asset-scroll::-webkit-scrollbar { display:none; }
 
-    .asset-card {
+    .asset-card,
+    .staking-card {
       flex:0 0 168px;
       scroll-snap-align:start;
       border-radius:22px;
@@ -384,17 +371,18 @@
       border:1px solid var(--border);
       backdrop-filter:blur(14px);
       min-width:0;
-      text-align:left;
       color:var(--text);
-    }
-
-    .asset-card.selected {
-      border-color:var(--border2);
-      box-shadow:0 0 0 4px rgba(2,132,199,.08);
+      text-align:left;
     }
 
     .asset-card.watch {
       background:linear-gradient(180deg,var(--glass2),rgba(255,255,255,.28));
+    }
+
+    .asset-card.selected,
+    .staking-card.selected {
+      border-color:var(--border2);
+      box-shadow:0 0 0 4px rgba(2,132,199,.08);
     }
 
     .asset-top {
@@ -470,6 +458,15 @@
       color:var(--muted);
       font-size:.68rem;
       font-weight:850;
+    }
+
+    .apy {
+      margin-top:10px;
+      font-size:1.65rem;
+      line-height:1;
+      font-weight:950;
+      letter-spacing:-.06em;
+      color:var(--blue);
     }
 
     .small-btn,.primary-btn,.secondary-btn,.danger-btn {
@@ -550,9 +547,7 @@
       margin-top:10px;
     }
 
-    .button-row.one {
-      grid-template-columns:1fr;
-    }
+    .button-row.one { grid-template-columns:1fr; }
 
     .box {
       margin-top:10px;
@@ -661,9 +656,7 @@
       margin:10px 0;
     }
 
-    .timeframe-row::-webkit-scrollbar {
-      display:none;
-    }
+    .timeframe-row::-webkit-scrollbar { display:none; }
 
     .timeframe-btn {
       flex:0 0 auto;
@@ -689,29 +682,6 @@
       display:block;
     }
 
-    .staking-card {
-      flex:0 0 188px;
-      scroll-snap-align:start;
-      border-radius:22px;
-      padding:13px;
-      background:var(--glass2);
-      border:1px solid var(--border);
-      backdrop-filter:blur(14px);
-    }
-
-    .staking-card.real {
-      border-color:rgba(22,163,74,.2);
-    }
-
-    .apy {
-      margin-top:10px;
-      font-size:1.65rem;
-      line-height:1;
-      font-weight:950;
-      letter-spacing:-.06em;
-      color:var(--blue);
-    }
-
     .modal-overlay,.drawer-overlay {
       position:fixed;
       inset:0;
@@ -722,9 +692,7 @@
       padding:10px;
     }
 
-    .modal-overlay.active,.drawer-overlay.active {
-      display:block;
-    }
+    .modal-overlay.active,.drawer-overlay.active { display:block; }
 
     .modal-card {
       width:min(520px,100%);
@@ -852,9 +820,7 @@
       backdrop-filter:blur(16px);
     }
 
-    [data-theme="dark"] .bottom-nav {
-      background:rgba(13,22,40,.9);
-    }
+    [data-theme="dark"] .bottom-nav { background:rgba(13,22,40,.9); }
 
     .bottom-nav button {
       min-height:47px;
@@ -871,66 +837,21 @@
     }
 
     @media (max-width:580px) {
-      body {
-        padding-bottom:calc(82px + var(--safe-bottom));
-      }
-
-      .shell {
-        padding:9px;
-      }
-
-      .hero {
-        padding:14px;
-        border-radius:27px;
-      }
-
-      .quick {
-        grid-template-columns:repeat(3,1fr);
-      }
-
-      .quick-btn {
-        min-height:62px;
-        padding:8px 6px;
-        border-radius:19px;
-      }
-
-      .quick-btn strong {
-        font-size:.8rem;
-      }
-
-      .quick-btn span {
-        font-size:.62rem;
-      }
-
-      .panel {
-        padding:12px;
-        border-radius:22px;
-      }
-
-      .asset-card {
-        flex-basis:150px;
-      }
-
-      .receive-option {
-        grid-template-columns:1fr;
-      }
-
-      .button-row {
-        grid-template-columns:1fr;
-      }
-
-      .brand-sub {
-        display:none;
-      }
-
-      .drawer {
-        width:100%;
-      }
-
-      .modal-card {
-        width:100%;
-        margin-top:calc(8px + var(--safe-top));
-      }
+      body { padding-bottom:calc(82px + var(--safe-bottom)); }
+      .shell { padding:9px; }
+      .hero { padding:14px; border-radius:27px; }
+      .quick { grid-template-columns:repeat(3,1fr); }
+      .quick-btn { min-height:62px; padding:8px 6px; border-radius:19px; }
+      .quick-btn strong { font-size:.8rem; }
+      .quick-btn span { font-size:.62rem; }
+      .panel { padding:12px; border-radius:22px; }
+      .asset-card,.staking-card { flex-basis:150px; }
+      .receive-option { grid-template-columns:1fr; }
+      .button-row { grid-template-columns:1fr; }
+      .brand-sub { display:none; }
+      .drawer { width:100%; }
+      .modal-card { width:100%; margin-top:calc(8px + var(--safe-top)); }
+      .chart-canvas { height:250px; }
     }
   </style>
 </head>
@@ -979,7 +900,7 @@
 
           <button class="quick-btn" onclick="openModal('swapModal')">
             <strong>Swap</strong>
-            <span>Owned assets</span>
+            <span>Live quote</span>
           </button>
         </div>
       </div>
@@ -988,8 +909,8 @@
     <section class="panel" id="assetsSection">
       <div class="panel-head">
         <div>
-          <h2 class="title">My assets</h2>
-          <p class="sub">Owned assets are combined. Watch assets still show live charts at 0 balance.</p>
+          <h2 class="title">Assets</h2>
+          <p class="sub">Horizontal cards. Balances are combined across all supported EVM networks.</p>
         </div>
         <button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button>
       </div>
@@ -1001,7 +922,7 @@
       <div class="panel-head">
         <div>
           <h2 class="title">Staking</h2>
-          <p class="sub">Highest APY first. ETH Lido staking is real; other protocols need adapters.</p>
+          <p class="sub">Highest APY first. Real staking only where a protocol adapter is included.</p>
         </div>
       </div>
 
@@ -1021,7 +942,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Receive</div>
-          <div class="modal-sub">Choose a network first. Then copy the address for that token/network.</div>
+          <div class="modal-sub">Select the network first, then copy the address for that asset.</div>
         </div>
         <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
@@ -1042,14 +963,14 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Send</div>
-          <div class="modal-sub">Only funded assets appear. The network auto-matches your selection.</div>
+          <div class="modal-sub">Only assets you own are shown. Network auto-matches the selected asset.</div>
         </div>
         <button class="close" onclick="closeModal('sendModal')">×</button>
       </div>
 
       <div class="form">
         <div class="field">
-          <label>Your asset</label>
+          <label>Your assets</label>
           <div class="asset-scroll" id="sendOwnedAssets"></div>
         </div>
 
@@ -1090,7 +1011,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Confirm send</div>
-          <div class="modal-sub">Blockchain transactions cannot be reversed.</div>
+          <div class="modal-sub">This is a real blockchain transaction and cannot be reversed.</div>
         </div>
         <button class="close" onclick="closeModal('sendConfirmModal')">×</button>
       </div>
@@ -1112,7 +1033,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Swap</div>
-          <div class="modal-sub">Choose an owned asset, then choose what you want to receive.</div>
+          <div class="modal-sub">Choose an asset you own, then choose what to receive on the same network.</div>
         </div>
         <button class="close" onclick="closeModal('swapModal')">×</button>
       </div>
@@ -1124,7 +1045,7 @@
         </div>
 
         <div class="box">
-          <div class="name">Your sell balance</div>
+          <div class="name">Sell balance</div>
           <div class="tiny" id="swapSellBalanceText">Select an asset.</div>
         </div>
 
@@ -1141,7 +1062,7 @@
         <div class="box">
           <div class="fee-box">
             <div>
-              <div class="name">Estimated swap fee</div>
+              <div class="name">Estimated swap quote</div>
               <div class="tiny" id="swapQuoteText">Enter amount to estimate route.</div>
             </div>
             <div class="countdown-ring" id="swapCountdown" style="--progress:1"><span>5</span></div>
@@ -1212,7 +1133,7 @@
       <div class="drawer-head">
         <div>
           <div class="drawer-title">Settings</div>
-          <div class="drawer-sub">Wallet info, recovery, theme, RPC, and deletion.</div>
+          <div class="drawer-sub">Wallet info, seed phrase, private key, RPC, theme, and deletion.</div>
         </div>
         <button class="close" onclick="closeSettings()">×</button>
       </div>
@@ -1258,7 +1179,7 @@
 
       <div class="box bad">
         <div class="name">Delete wallet</div>
-        <div class="tiny">Deletes the encrypted wallet vault from this email account. This does not delete blockchain funds.</div>
+        <div class="tiny">Deletes the encrypted vault from this account. This does not delete blockchain funds.</div>
         <div class="field" style="margin-top:10px;">
           <label>Type DELETE to confirm</label>
           <input class="input" id="deleteConfirmInput" placeholder="DELETE" />
@@ -1317,4 +1238,1447 @@
         {symbol:'WMATIC',name:'Wrapped MATIC',address:'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',decimals:18,gecko:'wmatic'}
       ],
       base:[
-        {symbol:'USDC',name:'USD Coin',address:'0x833589fCD6eDb6E08f4c7C32D4f71b
+        {symbol:'USDC',name:'USD Coin',address:'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'DAI',name:'Dai',address:'0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',decimals:18,gecko:'dai'}
+      ],
+      arbitrum:[
+        {symbol:'USDT',name:'Tether USD',address:'0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xaf88d065e77c8cC2239327C5EDb3A432268e5831',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',decimals:18,gecko:'weth'},
+        {symbol:'ARB',name:'Arbitrum',address:'0x912CE59144191C1204E64559FE8253a0e49E6548',decimals:18,gecko:'arbitrum'}
+      ],
+      optimism:[
+        {symbol:'USDT',name:'Tether USD',address:'0x94b008aD8eD3f9fE1ef8bE45b16bB2fF12a2bA8a',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'OP',name:'Optimism',address:'0x4200000000000000000000000000000000000042',decimals:18,gecko:'optimism'}
+      ],
+      avalanche:[
+        {symbol:'USDT',name:'Tether USD',address:'0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',decimals:6,gecko:'usd-coin'},
+        {symbol:'WAVAX',name:'Wrapped AVAX',address:'0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',decimals:18,gecko:'wrapped-avax'}
+      ]
+    };
+
+    const NATIVE_GECKO = {
+      ethereum:'ethereum',
+      bsc:'binancecoin',
+      polygon:'matic-network',
+      base:'ethereum',
+      arbitrum:'ethereum',
+      optimism:'ethereum',
+      avalanche:'avalanche-2'
+    };
+
+    const WATCH_ASSETS = [
+      {symbol:'BTC',name:'Bitcoin',gecko:'bitcoin'},
+      {symbol:'ETH',name:'Ethereum',gecko:'ethereum'},
+      {symbol:'USDT',name:'Tether USD',gecko:'tether'},
+      {symbol:'USDC',name:'USD Coin',gecko:'usd-coin'},
+      {symbol:'BNB',name:'BNB',gecko:'binancecoin'},
+      {symbol:'SOL',name:'Solana',gecko:'solana'},
+      {symbol:'XRP',name:'XRP',gecko:'ripple'},
+      {symbol:'LINK',name:'Chainlink',gecko:'chainlink'},
+      {symbol:'UNI',name:'Uniswap',gecko:'uniswap'},
+      {symbol:'AVAX',name:'Avalanche',gecko:'avalanche-2'},
+      {symbol:'MATIC',name:'Polygon',gecko:'matic-network'},
+      {symbol:'ARB',name:'Arbitrum',gecko:'arbitrum'},
+      {symbol:'OP',name:'Optimism',gecko:'optimism'}
+    ];
+
+    const STAKING_OPTIONS = [
+      {id:'lido-eth',title:'Lido ETH',asset:'ETH',networkKey:'ethereum',apy:3.4,real:true,adapter:'lido',description:'Stake ETH through Lido stETH.'},
+      {id:'venus-usdt',title:'Venus USDT',asset:'USDT',networkKey:'bsc',apy:5.8,real:false,adapter:'venus',description:'Adapter needed before real execution.'},
+      {id:'aave-usdt-polygon',title:'Aave USDT',asset:'USDT',networkKey:'polygon',apy:5.1,real:false,adapter:'aave',description:'Adapter needed before real execution.'},
+      {id:'aave-usdc',title:'Aave USDC',asset:'USDC',networkKey:'ethereum',apy:4.2,real:false,adapter:'aave',description:'Adapter needed before real execution.'}
+    ];
+
+    const ERC20_ABI = [
+      'function balanceOf(address owner) view returns (uint256)',
+      'function transfer(address to, uint256 amount) returns (bool)',
+      'function approve(address spender, uint256 amount) returns (bool)',
+      'function allowance(address owner, address spender) view returns (uint256)'
+    ];
+
+    const LIDO_STETH_CONTRACT = '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84';
+    const LIDO_ABI = ['function submit(address _referral) payable returns (uint256)'];
+
+    let activeNetworkKey = localStorage.getItem('blue_active_network') || 'ethereum';
+    let ACTIVE_DECRYPTED_WALLET = null;
+    let activeProvider = null;
+    let activeSigner = null;
+    let allBalances = [];
+    let combinedAssets = [];
+    let ownedPositions = [];
+    let selectedSend = null;
+    let selectedSwapSell = null;
+    let prices = {};
+    let toastTimer;
+    let countdownTimer = null;
+    let sendFeeRefreshAt = 0;
+    let swapFeeRefreshAt = 0;
+    let currentChartAsset = null;
+    let currentChartTf = '5m';
+    let chartTimer = null;
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('active');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('active'), 2600);
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format(Number(value || 0));
+    }
+
+    function fmt(value, decimals = 6) {
+      return Number(value || 0).toLocaleString(undefined, { maximumFractionDigits:decimals });
+    }
+
+    function short(addr) {
+      if (!addr) return 'No wallet';
+      return `${addr.slice(0,6)}...${addr.slice(-4)}`;
+    }
+
+    function icon(symbol) {
+      return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(symbol).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0,4)}'" /></div>`;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      renderSelects();
+
+      if (id === 'assetChartModal') setTimeout(refreshChart, 50);
+
+      if (id === 'sendModal' || id === 'swapModal') {
+        scheduleImmediateFeeRefresh();
+        startCountdownLoop();
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+
+      if (id === 'assetChartModal') {
+        clearInterval(chartTimer);
+        chartTimer = null;
+      }
+    }
+
+    function overlayClose(e, id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    function navSetActive(id) {
+      document.querySelectorAll('.bottom-nav button').forEach(btn => btn.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function navGo(where) {
+      if (where === 'home') {
+        document.getElementById('homeSection').scrollIntoView({ behavior:'smooth' });
+        navSetActive('navHome');
+      }
+
+      if (where === 'assets') {
+        document.getElementById('assetsSection').scrollIntoView({ behavior:'smooth' });
+        navSetActive('navAssets');
+      }
+
+      if (where === 'stake') {
+        document.getElementById('stakingSection').scrollIntoView({ behavior:'smooth' });
+        navSetActive('navStake');
+      }
+    }
+
+    function setupBottomNavObserver() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          if (entry.target.id === 'homeSection') navSetActive('navHome');
+          if (entry.target.id === 'assetsSection') navSetActive('navAssets');
+          if (entry.target.id === 'stakingSection') navSetActive('navStake');
+        });
+      }, { threshold:0.45 });
+
+      ['homeSection','assetsSection','stakingSection'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+    }
+
+    function openSettings() {
+      document.getElementById('settingsOverlay').classList.add('active');
+      navSetActive('navSettings');
+      renderSettings();
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsOverlay').classList.remove('active');
+      navSetActive('navHome');
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('blue_theme', theme);
+      toast(`${theme} mode enabled`);
+    }
+
+    function rpcUrl(key = activeNetworkKey) {
+      return localStorage.getItem(`blue_rpc_${key}`) || NETWORKS[key].rpc;
+    }
+
+    function provider(key = activeNetworkKey) {
+      return new ethers.JsonRpcProvider(rpcUrl(key), NETWORKS[key].chainId);
+    }
+
+    function getPublicWallet() {
+      const local = JSON.parse(localStorage.getItem('bluecrypto_public_wallets') || '[]');
+      return local[0] || SERVER_WALLET?.publicWallets?.[0] || null;
+    }
+
+    function currentAddress() {
+      return getPublicWallet()?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address || null;
+    }
+
+    function bytesToBase64(bytes) {
+      return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+    }
+
+    function base64ToBytes(base64) {
+      return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    }
+
+    async function getOrCreateDeviceKey() {
+      let key = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
+
+      if (!key) {
+        const bytes = crypto.getRandomValues(new Uint8Array(32));
+        key = bytesToBase64(bytes);
+        localStorage.setItem(`blue_device_key_${CURRENT_EMAIL}`, key);
+      }
+
+      return key;
+    }
+
+    async function deriveAesKey(secret, saltBase64) {
+      const salt = base64ToBytes(saltBase64);
+      const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveKey']);
+
+      return crypto.subtle.deriveKey(
+        { name:'PBKDF2', salt, iterations:250000, hash:'SHA-256' },
+        keyMaterial,
+        { name:'AES-GCM', length:256 },
+        false,
+        ['encrypt','decrypt']
+      );
+    }
+
+    async function encryptVault(vaultObject, secret) {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const saltBase64 = bytesToBase64(salt);
+      const key = await deriveAesKey(secret, saltBase64);
+      const encrypted = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(vaultObject)));
+
+      return {
+        version:1,
+        encryptionMode:'device-key',
+        kdf:'PBKDF2-SHA256',
+        cipher:'AES-GCM',
+        iterations:250000,
+        salt:saltBase64,
+        iv:bytesToBase64(iv),
+        data:bytesToBase64(encrypted)
+      };
+    }
+
+    async function decryptVault(encryptedVault, secret) {
+      const key = await deriveAesKey(secret, encryptedVault.salt);
+      const iv = base64ToBytes(encryptedVault.iv);
+      const encryptedData = base64ToBytes(encryptedVault.data);
+      const decrypted = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, encryptedData);
+      return JSON.parse(new TextDecoder().decode(decrypted));
+    }
+
+    function generateWallet() {
+      const wallet = ethers.Wallet.createRandom();
+
+      return {
+        type:'evm',
+        phrase:wallet.mnemonic.phrase,
+        privateKey:wallet.privateKey,
+        address:wallet.address,
+        createdAt:new Date().toISOString()
+      };
+    }
+
+    async function saveVault(encryptedVault, publicWallets) {
+      const res = await fetch('/api/wallet/vault', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body:JSON.stringify({ encryptedVault, publicWallets })
+      });
+
+      if (!res.ok) throw new Error('Could not save wallet vault');
+      return res.json();
+    }
+
+    async function createWalletNoPin() {
+      try {
+        if (SERVER_WALLET?.encryptedVault || getPublicWallet()) return await unlockDeviceWallet();
+
+        const real = generateWallet();
+        const vault = { wallets:[real], createdAt:new Date().toISOString(), encryptionMode:'device-key' };
+        const deviceKey = await getOrCreateDeviceKey();
+        const secret = `${CURRENT_EMAIL}:${deviceKey}`;
+        const encryptedVault = await encryptVault(vault, secret);
+
+        const publicWallets = [{
+          type:'evm',
+          address:real.address,
+          networks:Object.values(NETWORKS).map(n => n.name),
+          createdAt:real.createdAt
+        }];
+
+        await saveVault(encryptedVault, publicWallets);
+        localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(publicWallets));
+
+        ACTIVE_DECRYPTED_WALLET = vault;
+        activeProvider = provider(activeNetworkKey);
+        activeSigner = new ethers.Wallet(real.privateKey, activeProvider);
+
+        updateUi();
+        refreshAllBalances(true);
+        return vault;
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Wallet creation failed');
+        return null;
+      }
+    }
+
+    async function unlockDeviceWallet() {
+      try {
+        if (!SERVER_WALLET?.encryptedVault) return await createWalletNoPin();
+
+        const deviceKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
+        if (!deviceKey) {
+          toast('This browser cannot decrypt the saved wallet. Save seed recovery is needed.');
+          return null;
+        }
+
+        const secret = `${CURRENT_EMAIL}:${deviceKey}`;
+        ACTIVE_DECRYPTED_WALLET = await decryptVault(SERVER_WALLET.encryptedVault, secret);
+
+        activeProvider = provider(activeNetworkKey);
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
+
+        updateUi();
+        return ACTIVE_DECRYPTED_WALLET;
+      } catch (err) {
+        console.error(err);
+        toast('Could not load wallet');
+        return null;
+      }
+    }
+
+    async function ensureUnlocked() {
+      if (activeSigner) return activeSigner;
+      const wallet = await unlockDeviceWallet();
+      if (!wallet) throw new Error('Wallet not available');
+      return activeSigner;
+    }
+
+    async function fetchPricesForAll() {
+      const ids = new Set();
+
+      for (const key of Object.keys(NETWORKS)) {
+        ids.add(NATIVE_GECKO[key]);
+        for (const token of ERC20_TOKENS[key] || []) {
+          if (token.gecko) ids.add(token.gecko);
+        }
+      }
+
+      for (const watch of WATCH_ASSETS) ids.add(watch.gecko);
+
+      try {
+        const res = await fetch(`/api/prices?ids=${encodeURIComponent([...ids].join(','))}`, { cache:'no-store' });
+        if (!res.ok) throw new Error('Price error');
+        prices = await res.json();
+      } catch {
+        prices = {};
+      }
+    }
+
+    function priceFor(asset) {
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd || 0;
+      return prices[asset.gecko]?.usd || 0;
+    }
+
+    function changeFor(asset) {
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd_24h_change || 0;
+      return prices[asset.gecko]?.usd_24h_change || 0;
+    }
+
+    function normalizeSymbol(asset) {
+      if (asset.symbol === 'WETH') return 'ETH';
+      if (asset.symbol === 'WBNB') return 'BNB';
+      if (asset.symbol === 'WMATIC') return 'MATIC';
+      if (asset.symbol === 'WAVAX') return 'AVAX';
+      return asset.symbol;
+    }
+
+    function combineAssets() {
+      const map = new Map();
+
+      for (const watch of WATCH_ASSETS) {
+        map.set(watch.symbol, {
+          symbol:watch.symbol,
+          name:watch.name,
+          gecko:watch.gecko,
+          amount:0,
+          usd:0,
+          weightedPrev:0,
+          positions:[],
+          isWatch:true
+        });
+      }
+
+      for (const asset of allBalances) {
+        const symbol = normalizeSymbol(asset);
+        const usd = Number(asset.balance || 0) * priceFor(asset);
+        const amount = Number(asset.balance || 0);
+
+        if (!map.has(symbol)) {
+          map.set(symbol, {
+            symbol,
+            name:asset.name || symbol,
+            gecko:asset.gecko,
+            amount:0,
+            usd:0,
+            weightedPrev:0,
+            positions:[],
+            isWatch:false
+          });
+        }
+
+        const item = map.get(symbol);
+        item.amount += amount;
+        item.usd += usd;
+
+        const change = changeFor(asset);
+        const previous = change > -99.9 ? usd / (1 + change / 100) : usd;
+        item.weightedPrev += previous;
+
+        if (amount > 0) {
+          item.isWatch = false;
+          item.positions.push({ ...asset, normalizedSymbol:symbol, usd });
+        }
+      }
+
+      combinedAssets = [...map.values()].sort((a,b) => {
+        if (b.usd !== a.usd) return b.usd - a.usd;
+        return a.symbol.localeCompare(b.symbol);
+      });
+
+      ownedPositions = allBalances
+        .filter(x => Number(x.balance || 0) > 0)
+        .sort((a,b) => {
+          const bv = Number(b.balance || 0) * priceFor(b);
+          const av = Number(a.balance || 0) * priceFor(a);
+          return bv - av;
+        });
+    }
+
+    function renderTotals() {
+      let total = 0;
+      let prev = 0;
+
+      for (const asset of combinedAssets) {
+        total += asset.usd;
+        prev += asset.weightedPrev || asset.usd;
+      }
+
+      const pnl = total - prev;
+      const roi = prev > 0 ? (pnl / prev) * 100 : 0;
+
+      document.getElementById('totalUsd').textContent = money(total);
+
+      const pnlLine = document.getElementById('pnlLine');
+      pnlLine.textContent = `24h PnL ${pnl >= 0 ? '+' : ''}${money(pnl)} · ROI ${pnl >= 0 ? '+' : ''}${roi.toFixed(2)}%`;
+      pnlLine.className = `pnl-line ${pnl > 0 ? 'up' : pnl < 0 ? 'down' : ''}`;
+
+      document.getElementById('tokenCountText').textContent = `${combinedAssets.length} assets`;
+    }
+
+    function renderAssetCards() {
+      const el = document.getElementById('assetCards');
+
+      if (!combinedAssets.length) {
+        el.innerHTML = `
+          <div class="asset-card">
+            <div class="name">Loading assets</div>
+            <div class="tiny">Prices and balances are loading.</div>
+          </div>
+        `;
+        return;
+      }
+
+      el.innerHTML = combinedAssets.map(asset => {
+        const live = prices[asset.gecko]?.usd || 0;
+        const change = prices[asset.gecko]?.usd_24h_change || 0;
+
+        return `
+          <button class="asset-card ${asset.usd <= 0 ? 'watch' : ''}" onclick="openAssetChart('${asset.symbol}')">
+            <div class="asset-top">
+              ${icon(asset.symbol)}
+              <div style="min-width:0;text-align:left;">
+                <div class="name">${asset.symbol}</div>
+                <div class="tiny">${asset.positions.length ? `${asset.positions.length} network${asset.positions.length === 1 ? '' : 's'}` : 'Watch asset'}</div>
+              </div>
+            </div>
+
+            <div class="asset-value">${asset.usd > 0 ? money(asset.usd) : money(live)}</div>
+            <div class="asset-sub">${fmt(asset.amount, asset.amount < 1 ? 8 : 6)} ${asset.symbol} · ${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}%</div>
+
+            <div class="network-list">
+              ${
+                asset.positions.length
+                  ? asset.positions.slice(0,3).map(p => `
+                    <div class="mini-net">
+                      <span>${p.networkName}</span>
+                      <span>${fmt(p.balance, p.balance < 1 ? 6 : 4)}</span>
+                    </div>
+                  `).join('')
+                  : `<div class="mini-net"><span>Live price</span><span>${money(live)}</span></div>`
+              }
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    async function refreshAllBalances(force = false) {
+      try {
+        const addr = currentAddress();
+
+        if (!addr) {
+          renderAssetCards();
+          renderTotals();
+          return;
+        }
+
+        if (!force) {
+          const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            allBalances = parsed.balances || [];
+            prices = parsed.prices || {};
+            combineAssets();
+            renderTotals();
+            renderAssetCards();
+            renderSelects();
+            renderStakingCards();
+          }
+        }
+
+        document.getElementById('statusText').textContent = 'Updating assets...';
+
+        await fetchPricesForAll();
+
+        const networkTasks = Object.entries(NETWORKS).map(async ([networkKey, net]) => {
+          const out = [];
+          const p = provider(networkKey);
+
+          try {
+            const nativeBalance = Number(ethers.formatEther(await p.getBalance(addr)));
+
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:nativeBalance,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null
+            });
+          } catch {
+            out.push({
+              networkKey,
+              networkName:net.name,
+              type:'native',
+              symbol:net.symbol,
+              name:`${net.name} Native`,
+              balance:0,
+              decimals:18,
+              gecko:NATIVE_GECKO[networkKey],
+              address:null,
+              error:true
+            });
+          }
+
+          const tokenTasks = (ERC20_TOKENS[networkKey] || []).map(async token => {
+            try {
+              const contract = new ethers.Contract(token.address, ERC20_ABI, p);
+              const raw = await contract.balanceOf(addr);
+
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:Number(ethers.formatUnits(raw, token.decimals))
+              };
+            } catch {
+              return {
+                ...token,
+                networkKey,
+                networkName:net.name,
+                type:'erc20',
+                balance:0,
+                error:true
+              };
+            }
+          });
+
+          out.push(...await Promise.all(tokenTasks));
+          return out;
+        });
+
+        const results = await Promise.allSettled(networkTasks);
+        allBalances = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+        localStorage.setItem(`blue_balance_cache_${CURRENT_EMAIL}`, JSON.stringify({
+          updatedAt:Date.now(),
+          balances:allBalances,
+          prices
+        }));
+
+        combineAssets();
+        renderTotals();
+        renderAssetCards();
+        renderSelects();
+        renderStakingCards();
+
+        document.getElementById('statusText').textContent = 'Assets updated';
+      } catch (err) {
+        console.error(err);
+        toast('Could not update assets');
+      }
+    }
+
+    function receiveOptionsFor(networkKey) {
+      const net = NETWORKS[networkKey];
+
+      return [
+        { type:'native', symbol:net.symbol, name:`${net.symbol} Native`, address:NATIVE_TOKEN, decimals:18 },
+        ...(ERC20_TOKENS[networkKey] || [])
+      ];
+    }
+
+    function renderReceiveSelects() {
+      const select = document.getElementById('receiveNetworkSelect');
+      if (!select) return;
+
+      select.innerHTML = Object.entries(NETWORKS).map(([key, net]) => `
+        <option value="${key}">${net.name}</option>
+      `).join('');
+
+      select.value = activeNetworkKey;
+      renderReceiveAssets();
+    }
+
+    function renderReceiveAssets() {
+      const box = document.getElementById('receiveAssetsList');
+      if (!box) return;
+
+      const networkKey = document.getElementById('receiveNetworkSelect')?.value || activeNetworkKey;
+      const net = NETWORKS[networkKey];
+      const addr = currentAddress();
+
+      box.innerHTML = receiveOptionsFor(networkKey).map(asset => `
+        <button class="receive-option" onclick="copySpecificReceive('${networkKey}','${asset.symbol}')">
+          <div>
+            <div class="name">${asset.symbol}</div>
+            <div class="tiny">${asset.name} on ${net.name} · ${addr ? short(addr) : 'No address'}</div>
+          </div>
+          <span class="small-btn">Copy</span>
+        </button>
+      `).join('');
+    }
+
+    function copySpecificReceive(networkKey, symbol) {
+      const addr = currentAddress();
+      if (!addr) return toast('No address available');
+
+      navigator.clipboard?.writeText(addr);
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network', networkKey);
+      updateSignerNetwork(networkKey);
+      toast(`${symbol} ${NETWORKS[networkKey].name} address copied`);
+    }
+
+    function updateSignerNetwork(networkKey) {
+      activeNetworkKey = networkKey;
+      localStorage.setItem('blue_active_network', networkKey);
+      activeProvider = provider(networkKey);
+
+      if (ACTIVE_DECRYPTED_WALLET) {
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
+      }
+    }
+
+    function renderOwnedCards(targetId, selected, setterName) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+
+      if (!ownedPositions.length) {
+        box.innerHTML = `
+          <div class="asset-card">
+            <div class="name">No assets</div>
+            <div class="tiny">Receive crypto first.</div>
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = ownedPositions.map((p, index) => {
+        const id = `${p.networkKey}:${p.address || 'native'}:${p.symbol}`;
+        const selectedId = selected ? `${selected.networkKey}:${selected.address || 'native'}:${selected.symbol}` : '';
+
+        return `
+          <button class="asset-card ${id === selectedId ? 'selected' : ''}" onclick="${setterName}(${index})">
+            <div class="asset-top">
+              ${icon(p.symbol)}
+              <div style="min-width:0;text-align:left;">
+                <div class="name">${p.symbol}</div>
+                <div class="tiny">${p.networkName}</div>
+              </div>
+            </div>
+            <div class="asset-value">${money(Number(p.balance || 0) * priceFor(p))}</div>
+            <div class="asset-sub">${fmt(p.balance, p.balance < 1 ? 8 : 6)} ${p.symbol}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setSelectedSend(index) {
+      selectedSend = ownedPositions[index] || null;
+      if (selectedSend) updateSignerNetwork(selectedSend.networkKey);
+      renderSelects();
+      renderSendBalance();
+      scheduleImmediateFeeRefresh();
+    }
+
+    function setSelectedSwapSell(index) {
+      selectedSwapSell = ownedPositions[index] || null;
+      if (selectedSwapSell) updateSignerNetwork(selectedSwapSell.networkKey);
+      renderSelects();
+      renderSwapBalance();
+      scheduleImmediateFeeRefresh();
+    }
+
+    function renderSendBalance() {
+      const el = document.getElementById('sendBalanceText');
+      if (!el) return;
+
+      if (!selectedSend) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
+        return;
+      }
+
+      el.textContent = `${fmt(selectedSend.balance, selectedSend.balance < 1 ? 8 : 6)} ${selectedSend.symbol} on ${selectedSend.networkName} · ${money(Number(selectedSend.balance || 0) * priceFor(selectedSend))}`;
+    }
+
+    function renderSwapBalance() {
+      const el = document.getElementById('swapSellBalanceText');
+      if (!el) return;
+
+      if (!selectedSwapSell) {
+        el.textContent = ownedPositions.length ? 'Select an asset.' : 'No assets available.';
+        return;
+      }
+
+      el.textContent = `${fmt(selectedSwapSell.balance, selectedSwapSell.balance < 1 ? 8 : 6)} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName} · ${money(Number(selectedSwapSell.balance || 0) * priceFor(selectedSwapSell))}`;
+    }
+
+    function renderSwapBuyOptions() {
+      const select = document.getElementById('swapBuySelect');
+      if (!select) return;
+
+      const net = NETWORKS[activeNetworkKey];
+
+      select.innerHTML = [
+        `<option value="${NATIVE_TOKEN}">${net.symbol} · Native</option>`,
+        ...(ERC20_TOKENS[activeNetworkKey] || []).map(t => `<option value="${t.address}">${t.symbol} · ${t.name}</option>`)
+      ].join('');
+    }
+
+    function renderSelects() {
+      if (!selectedSend && ownedPositions.length) selectedSend = ownedPositions[0];
+      if (!selectedSwapSell && ownedPositions.length) selectedSwapSell = ownedPositions[0];
+
+      renderReceiveSelects();
+      renderOwnedCards('sendOwnedAssets', selectedSend, 'setSelectedSend');
+      renderOwnedCards('swapOwnedAssets', selectedSwapSell, 'setSelectedSwapSell');
+
+      if (selectedSend && document.getElementById('sendModal')?.classList.contains('active')) {
+        updateSignerNetwork(selectedSend.networkKey);
+      }
+
+      if (selectedSwapSell && document.getElementById('swapModal')?.classList.contains('active')) {
+        updateSignerNetwork(selectedSwapSell.networkKey);
+      }
+
+      renderSwapBuyOptions();
+      renderSendBalance();
+      renderSwapBalance();
+    }
+
+    function selectedToSwapToken(position) {
+      if (!position) return null;
+      if (position.type === 'native') return NATIVE_TOKEN;
+      return position.address;
+    }
+
+    async function estimateSendFee() {
+      try {
+        if (!document.getElementById('sendModal')?.classList.contains('active')) return;
+
+        if (!selectedSend) {
+          document.getElementById('sendFeePreview').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSend.networkKey);
+
+        if (!activeSigner) {
+          document.getElementById('sendFeePreview').textContent = 'Wallet is still loading.';
+          return;
+        }
+
+        const to = document.getElementById('sendToInput').value.trim();
+        const amount = document.getElementById('sendAmountInput').value.trim();
+
+        if (!ethers.isAddress(to) || !amount || Number(amount) <= 0) {
+          document.getElementById('sendFeePreview').textContent = 'Enter valid address and amount.';
+          return;
+        }
+
+        let gas;
+
+        if (selectedSend.type === 'native') {
+          gas = await activeSigner.estimateGas({ to, value:ethers.parseEther(amount) });
+        } else {
+          const contract = new ethers.Contract(selectedSend.address, ERC20_ABI, activeSigner);
+          gas = await contract.transfer.estimateGas(to, ethers.parseUnits(amount, selectedSend.decimals));
+        }
+
+        const feeData = await activeSigner.provider.getFeeData();
+        const gasPrice = feeData.gasPrice || 0n;
+        const totalFee = gas * gasPrice;
+
+        document.getElementById('sendFeePreview').textContent =
+          `Network: ${selectedSend.networkName} · Gas ${gas.toString()} · fee ≈ ${ethers.formatEther(totalFee)} ${NETWORKS[selectedSend.networkKey].symbol}`;
+      } catch (err) {
+        document.getElementById('sendFeePreview').textContent = err.shortMessage || err.message || 'Fee estimate failed';
+      }
+    }
+
+    function openSendConfirm() {
+      if (!selectedSend) return toast('No asset selected');
+
+      const to = document.getElementById('sendToInput').value.trim();
+      const amount = document.getElementById('sendAmountInput').value.trim();
+
+      document.getElementById('sendConfirmText').textContent =
+        `Send ${amount || '0'} ${selectedSend.symbol} on ${selectedSend.networkName} to ${to || 'no address'}.`;
+
+      openModal('sendConfirmModal');
+    }
+
+    async function sendRealTransaction() {
+      try {
+        if (!selectedSend) throw new Error('No asset selected');
+
+        updateSignerNetwork(selectedSend.networkKey);
+
+        const signer = await ensureUnlocked();
+        const to = document.getElementById('sendToInput').value.trim();
+        const amount = document.getElementById('sendAmountInput').value.trim();
+
+        if (!ethers.isAddress(to)) throw new Error('Invalid address');
+        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
+
+        let tx;
+
+        if (selectedSend.type === 'native') {
+          tx = await signer.sendTransaction({ to, value:ethers.parseEther(amount) });
+        } else {
+          const contract = new ethers.Contract(selectedSend.address, ERC20_ABI, signer);
+          tx = await contract.transfer(to, ethers.parseUnits(amount, selectedSend.decimals));
+        }
+
+        closeModal('sendConfirmModal');
+        closeModal('sendModal');
+        toast('Transaction sent');
+
+        await tx.wait();
+
+        toast('Transaction confirmed');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Send failed');
+      }
+    }
+
+    async function estimateSwapFee() {
+      try {
+        if (!document.getElementById('swapModal')?.classList.contains('active')) return;
+
+        if (!selectedSwapSell) {
+          document.getElementById('swapQuoteText').textContent = 'No owned asset selected.';
+          return;
+        }
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
+
+        const amount = document.getElementById('swapAmount').value.trim();
+
+        if (!amount || Number(amount) <= 0) {
+          document.getElementById('swapQuoteText').textContent = 'Enter amount to estimate route.';
+          return;
+        }
+
+        document.getElementById('swapQuoteText').textContent =
+          `Route: ${amount} ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Getting quote...`;
+
+        await getSwapQuote(false);
+      } catch {}
+    }
+
+    async function getSwapQuote(showToast = true) {
+      try {
+        if (!selectedSwapSell) throw new Error('No sell asset selected');
+
+        updateSignerNetwork(selectedSwapSell.networkKey);
+
+        const signer = await ensureUnlocked();
+        const sellToken = selectedToSwapToken(selectedSwapSell);
+        const buyToken = document.getElementById('swapBuySelect').value;
+        const amount = document.getElementById('swapAmount').value.trim();
+
+        if (!amount || Number(amount) <= 0) throw new Error('Invalid amount');
+
+        const sellAmount = ethers.parseUnits(amount, selectedSwapSell.decimals).toString();
+
+        const res = await fetch('/api/swap/quote', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body:JSON.stringify({
+            chainId:NETWORKS[selectedSwapSell.networkKey].chainId,
+            network:selectedSwapSell.networkKey,
+            taker:await signer.getAddress(),
+            sellToken,
+            buyToken,
+            sellAmount
+          })
+        });
+
+        const quote = await res.json();
+
+        if (!res.ok) {
+          throw new Error(quote.error || 'Swap quote failed.');
+        }
+
+        window.__BLUE_SWAP_QUOTE = quote;
+
+        const gas = quote.gas || quote.transaction?.gas || 'N/A';
+        const value = quote.value || quote.transaction?.value || '0';
+
+        document.getElementById('swapQuoteText').textContent =
+          `Quote ready on ${selectedSwapSell.networkName}. Gas: ${gas} · value: ${value} · refreshes every 5s.`;
+
+        if (showToast) toast('Quote loaded');
+      } catch (err) {
+        window.__BLUE_SWAP_QUOTE = null;
+        document.getElementById('swapQuoteText').textContent = err.message || 'Quote failed';
+        if (showToast) toast(err.message || 'Quote failed');
+      }
+    }
+
+    function openSwapConfirm() {
+      const quote = window.__BLUE_SWAP_QUOTE;
+
+      if (!quote) return toast('Get a quote first');
+      if (!selectedSwapSell) return toast('No asset selected');
+
+      const gas = quote.gas || quote.transaction?.gas || 'N/A';
+
+      document.getElementById('swapConfirmText').textContent =
+        `Swap ${selectedSwapSell.symbol} on ${selectedSwapSell.networkName}. Gas: ${gas}.`;
+
+      openModal('swapConfirmModal');
+    }
+
+    async function executeSwap() {
+      try {
+        const quote = window.__BLUE_SWAP_QUOTE;
+        if (!quote) throw new Error('Get quote first');
+
+        const signer = await ensureUnlocked();
+        const txData = quote.transaction || quote;
+
+        const tx = await signer.sendTransaction({
+          to:txData.to,
+          data:txData.data,
+          value:txData.value ? BigInt(txData.value) : 0n,
+          gasLimit:txData.gas ? BigInt(txData.gas) : undefined
+        });
+
+        closeModal('swapConfirmModal');
+        closeModal('swapModal');
+        toast('Swap sent');
+
+        await tx.wait();
+
+        toast('Swap confirmed');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Swap failed');
+      }
+    }
+
+    function scheduleImmediateFeeRefresh() {
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+      renderCountdowns();
+    }
+
+    function renderCountdowns() {
+      const now = Date.now();
+
+      const sendRemaining = Math.max(0, Math.ceil((sendFeeRefreshAt - now) / 1000));
+      const swapRemaining = Math.max(0, Math.ceil((swapFeeRefreshAt - now) / 1000));
+
+      const sendRing = document.getElementById('sendCountdown');
+      if (sendRing) {
+        sendRing.style.setProperty('--progress', sendRemaining / 5);
+        sendRing.querySelector('span').textContent = String(sendRemaining || 0);
+      }
+
+      const swapRing = document.getElementById('swapCountdown');
+      if (swapRing) {
+        swapRing.style.setProperty('--progress', swapRemaining / 5);
+        swapRing.querySelector('span').textContent = String(swapRemaining || 0);
+      }
+    }
+
+    function startCountdownLoop() {
+      if (countdownTimer) return;
+
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+
+      countdownTimer = setInterval(async () => {
+        const now = Date.now();
+
+        if (document.getElementById('sendModal')?.classList.contains('active') && now >= sendFeeRefreshAt) {
+          sendFeeRefreshAt = now + 5000;
+          await estimateSendFee();
+        }
+
+        if (document.getElementById('swapModal')?.classList.contains('active') && now >= swapFeeRefreshAt) {
+          swapFeeRefreshAt = now + 5000;
+          await estimateSwapFee();
+        }
+
+        renderCountdowns();
+      }, 250);
+    }
+
+    function openAssetChart(symbol) {
+      currentChartAsset = combinedAssets.find(x => x.symbol === symbol)
+        || WATCH_ASSETS.find(x => x.symbol === symbol);
+
+      if (!currentChartAsset) return;
+
+      openModal('assetChartModal');
+
+      clearInterval(chartTimer);
+      chartTimer = setInterval(refreshChart, 5000);
+    }
+
+    function setChartTf(tf) {
+      currentChartTf = tf;
+
+      document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+      const el = document.getElementById(`tf${tf}`);
+      if (el) el.classList.add('active');
+
+      refreshChart();
+    }
+
+    function aggregateToCandles(pricesArray, tf) {
+      if (!Array.isArray(pricesArray) || pricesArray.length < 5) return [];
+
+      const minutes = tf === '5m' ? 5 : tf === '15m' ? 15 : 60;
+      const bucketMs = minutes * 60 * 1000;
+      const buckets = new Map();
+
+      for (const [time, price] of pricesArray) {
+        const key = Math.floor(time / bucketMs) * bucketMs;
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(Number(price));
+      }
+
+      return [...buckets.entries()].slice(-44).map(([time, values]) => {
+        const open = values[0];
+        const close = values[values.length - 1];
+        const high = Math.max(...values);
+        const low = Math.min(...values);
+
+        return { time, open, high, low, close };
+      });
+    }
+
+    function drawCandles(canvas, candles, latestPrice) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const padL = 46;
+      const padR = 12;
+      const padT = 16;
+      const padB = 28;
+
+      ctx.clearRect(0, 0, w, h);
+
+      if (!candles.length) return;
+
+      const max = Math.max(...candles.map(c => c.high));
+      const min = Math.min(...candles.map(c => c.low));
+      const range = Math.max(max - min, max * 0.002);
+
+      const y = price => padT + ((max - price) / range) * (h - padT - padB);
+      const xStep = (w - padL - padR) / candles.length;
+      const bodyW = Math.max(4, xStep * 0.55);
+
+      ctx.strokeStyle = 'rgba(100,116,139,.18)';
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < 4; i++) {
+        const yy = padT + i * ((h - padT - padB) / 3);
+        ctx.beginPath();
+        ctx.moveTo(padL, yy);
+        ctx.lineTo(w - padR, yy);
+        ctx.stroke();
+
+        const price = max - i * (range / 3);
+        ctx.fillStyle = 'rgba(100,116,139,.9)';
+        ctx.font = '10px Inter';
+        ctx.fillText(price >= 1 ? price.toFixed(2) : price.toFixed(5), 4, yy + 3);
+      }
+
+      candles.forEach((c, i) => {
+        const cx = padL + i * xStep + xStep / 2;
+        const up = c.close >= c.open;
+        const color = up ? '#0284c7' : '#e11d48';
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, y(c.high));
+        ctx.lineTo(cx, y(c.low));
+        ctx.stroke();
+
+        const top = y(Math.max(c.open, c.close));
+        const bottom = y(Math.min(c.open, c.close));
+        const bodyH = Math.max(2, bottom - top);
+
+        ctx.fillRect(cx - bodyW / 2, top, bodyW, bodyH);
+      });
+
+      const latestY = y(latestPrice);
+
+      ctx.strokeStyle = 'rgba(2,132,199,.45)';
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(padL, latestY);
+      ctx.lineTo(w - padR, latestY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#0284c7';
+      ctx.font = 'bold 11px Inter';
+      const label = latestPrice >= 1 ? latestPrice.toFixed(2) : latestPrice.toFixed(6);
+      const labelW = ctx.measureText(label).width + 12;
+
+      ctx.fillRect(w - padR - labelW, latestY - 10, labelW, 20);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(label, w - padR - labelW + 6, latestY + 4);
+
+      ctx.fillStyle = 'rgba(100,116,139,.9)';
+      ctx.font = '10px Inter';
+      ctx.fillText(currentChartTf, padL, h - 8);
+      ctx.fillText('Now', w - padR - 24, h - 8);
+    }
+
+    async function refreshChart() {
+      if (!currentChartAsset) return;
+
+      const id = currentChartAsset.gecko;
+      const live = prices[id]?.usd || 0;
+      const change = prices[id]?.usd_24h_change || 0;
+
+      document.getElementById('chartAssetTitle').textContent = `${currentChartAsset.symbol} Chart`;
+      document.getElementById('chartAssetSub').textContent = currentChartAsset.name || currentChartAsset.symbol;
+      document.getElementById('chartLivePrice').textContent = money(live);
+      document.getElementById('chartChangeText').textContent =
+        `${change >= 0 ? '+' : ''}${Number(change || 0).toFixed(2)}% 24h · ${currentChartTf}`;
+
+      try {
+        const res = await fetch(`/api/chart?id=${encodeURIComponent(id)}&tf=${encodeURIComponent(currentChartTf)}`, { cache:'no-store' });
+        const data = await res.json();
+        const candles = aggregateToCandles(data.prices || [], currentChartTf);
+        drawCandles(document.getElementById('assetChartCanvas'), candles, live || candles[candles.length - 1]?.close || 1);
+      } catch {
+        const synthetic = makeSyntheticCandles(live || 1);
+        drawCandles(document.getElementById('assetChartCanvas'), synthetic, live || 1);
+      }
+    }
+
+    function makeSyntheticCandles(basePrice) {
+      const candles = [];
+      let price = basePrice;
+
+      for (let i = 0; i < 42; i++) {
+        const open = price;
+        const close = Math.max(0.000001, open + (Math.random() - 0.48) * basePrice * 0.004);
+        const high = Math.max(open, close) + Math.random() * basePrice * 0.003;
+        const low = Math.min(open, close) - Math.random() * basePrice * 0.003;
+        price = close;
+        candles.push({ open, close, high, low:Math.max(0.000001, low) });
+      }
+
+      return candles;
+    }
+
+    function renderStakingCards() {
+      const box = document.getElementById('stakingCards');
+      if (!box) return;
+
+      const sorted = [...STAKING_OPTIONS].sort((a,b) => b.apy - a.apy);
+
+      box.innerHTML = sorted.map(option => {
+        const owned = ownedPositions.find(p =>
+          normalizeSymbol(p) === option.asset &&
+          p.networkKey === option.networkKey
+        );
+
+        return `
+          <div class="staking-card">
+            <div class="asset-top">
+              ${icon(option.asset)}
+              <div style="min-width:0;">
+                <div class="name">${option.title}</div>
+                <div class="tiny">${NETWORKS[option.networkKey].name}</div>
+              </div>
+            </div>
+
+            <div class="apy">${option.apy.toFixed(2)}%</div>
+            <div class="asset-sub">APY · ${option.real ? 'Real staking' : 'Adapter needed'}</div>
+
+            <div class="tiny" style="margin-top:8px;">${option.description}</div>
+            <div class="tiny" style="margin-top:6px;">
+              Balance: ${owned ? `${fmt(owned.balance,6)} ${owned.symbol}` : `0 ${option.asset}`}
+            </div>
+
+            <button class="${option.real ? 'primary-btn' : 'secondary-btn'}" style="width:100%;margin-top:10px;" onclick="openStake('${option.id}')">
+              ${option.real ? 'Stake' : 'Unavailable'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function openStake(id) {
+      const option = STAKING_OPTIONS.find(x => x.id === id);
+      if (!option) return;
+
+      if (!option.real) {
+        toast('This staking pool needs a protocol adapter first.');
+        return;
+      }
+
+      if (option.adapter === 'lido') {
+        const amount = prompt('Enter ETH amount to stake with Lido');
+
+        if (!amount || Number(amount) <= 0) {
+          toast('Invalid amount');
+          return;
+        }
+
+        await stakeEthLido(amount);
+      }
+    }
+
+    async function stakeEthLido(amount) {
+      try {
+        updateSignerNetwork('ethereum');
+
+        const signer = await ensureUnlocked();
+        const lido = new ethers.Contract(LIDO_STETH_CONTRACT, LIDO_ABI, signer);
+
+        const tx = await lido.submit('0x0000000000000000000000000000000000000000', {
+          value:ethers.parseEther(String(amount))
+        });
+
+        toast('Staking transaction sent');
+
+        await tx.wait();
+
+        toast('ETH staked through Lido');
+        refreshAllBalances(true);
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Staking failed');
+      }
+    }
+
+    async function showSeed() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].phrase;
+      output.classList.add('visible');
+      toast('Seed phrase shown');
+    }
+
+    async function showPrivateKey() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].privateKey;
+      output.classList.add('visible');
+      toast('Private key shown');
+    }
+
+    async function deleteWallet() {
+      const value = document.getElementById('deleteConfirmInput').value.trim();
+
+      if (value !== 'DELETE') return toast('Type DELETE to confirm');
+
+      try {
+        const res = await fetch('/api/wallet/vault', { method:'DELETE' });
+        const body = await res.json().catch(() => ({}));
+
+        if (!res.ok || !body.ok) throw new Error(body.error || 'Delete failed');
+
+        localStorage.removeItem('bluecrypto_public_wallets');
+        localStorage.removeItem(`blue_device_key_${CURRENT_EMAIL}`);
+        localStorage.removeItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+
+        ACTIVE_DECRYPTED_WALLET = null;
+        activeSigner = null;
+        allBalances = [];
+        combinedAssets = [];
+        ownedPositions = [];
+
+        toast('Wallet deleted');
+        setTimeout(() => window.location.reload(), 800);
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Delete failed');
+      }
+    }
+
+    function saveCustomRpc() {
+      const url = document.getElementById('customRpcInput').value.trim();
+
+      if (!url.startsWith('http')) return toast('Enter a valid RPC URL');
+
+      localStorage.setItem(`blue_rpc_${activeNetworkKey}`, url);
+      updateSignerNetwork(activeNetworkKey);
+
+      toast('RPC saved');
+      refreshAllBalances(true);
+    }
+
+    function renderSettings() {
+      const addr = currentAddress();
+      document.getElementById('settingsAddress').textContent = addr || 'No wallet loaded';
+    }
+
+    function updateUi() {
+      const addr = currentAddress();
+      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
+      document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
+      renderSettings();
+    }
+
+    async function initialize() {
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('blue_theme') || 'light');
+
+      if (SERVER_WALLET?.publicWallets) {
+        localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(SERVER_WALLET.publicWallets));
+      }
+
+      activeProvider = provider(activeNetworkKey);
+      updateUi();
+
+      if (SERVER_WALLET?.encryptedVault) {
+        await unlockDeviceWallet();
+      } else {
+        await createWalletNoPin();
+      }
+
+      const cached = localStorage.getItem(`blue_balance_cache_${CURRENT_EMAIL}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        allBalances = parsed.balances || [];
+        prices = parsed.prices || {};
+        combineAssets();
+        renderTotals();
+        renderAssetCards();
+        renderSelects();
+        renderStakingCards();
+      }
+
+      refreshAllBalances(false);
+      startCountdownLoop();
+      setupBottomNavObserver();
+      renderStakingCards();
+    }
+
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeSettings();
+        document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
+      }
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
