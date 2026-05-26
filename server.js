@@ -16,14 +16,7 @@ const STAFF_EMAIL = process.env.STAFF_EMAIL || process.env.GMAIL_USER || 'admin@
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
-const otpStore = new Map();
-
-/*
-  VERY IMPORTANT FOR RENDER:
-  Without this, secure cookies may not save correctly behind Render proxy.
-*/
 app.set('trust proxy', 1);
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -49,7 +42,10 @@ function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
   if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ users: {} }, null, 2));
+    fs.writeFileSync(DB_PATH, JSON.stringify({
+      users: {},
+      otps: {}
+    }, null, 2));
   }
 }
 
@@ -57,10 +53,12 @@ function readDb() {
   ensureDb();
 
   try {
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-  } catch (error) {
-    console.error('DB read error:', error);
-    return { users: {} };
+    const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+    if (!db.users) db.users = {};
+    if (!db.otps) db.otps = {};
+    return db;
+  } catch {
+    return { users: {}, otps: {} };
   }
 }
 
@@ -91,12 +89,8 @@ function createWalletRecord(email, role = 'user') {
     role,
     createdAt: nowIso(),
     updatedAt: nowIso(),
-
-    // Real wallet vault is created/encrypted in wallet.ejs, then saved here.
     encryptedVault: null,
     publicWallets: [],
-
-    // For the real wallet version, normal users start empty.
     assets: isStaff
       ? [
           { currency: 'BTC', name: 'Bitcoin', amount: 2.75, avgBuyPrice: 42000 },
@@ -105,24 +99,10 @@ function createWalletRecord(email, role = 'user') {
           { currency: 'USDT', name: 'Tether USD', amount: 250000, avgBuyPrice: 1 }
         ]
       : [],
-
     staking: {
-      autoStake: true,
+      autoStake: false,
       riskMode: 'balanced',
-      vaults: isStaff
-        ? [
-            {
-              currency: 'ETH',
-              name: 'Ethereum Vault',
-              stakedAmount: 16,
-              apy: 5.5,
-              earnedAmount: 0,
-              livePnlUsd: 0,
-              dailyPnlUsd: 0,
-              failed: false
-            }
-          ]
-        : []
+      vaults: []
     }
   };
 }
@@ -134,19 +114,17 @@ function getOrCreateUser(email, role = 'user') {
   if (!db.users[normalizedEmail]) {
     db.users[normalizedEmail] = createWalletRecord(normalizedEmail, role);
     writeDb(db);
-    console.log(`Created new wallet record for ${normalizedEmail}`);
-  } else {
-    console.log(`Loaded existing wallet record for ${normalizedEmail}`);
+    console.log(`Created wallet record for ${normalizedEmail}`);
   }
 
   if (role === 'staff' && db.users[normalizedEmail].role !== 'staff') {
-    const staffRecord = createWalletRecord(normalizedEmail, 'staff');
+    const staff = createWalletRecord(normalizedEmail, 'staff');
 
     db.users[normalizedEmail] = {
       ...db.users[normalizedEmail],
       role: 'staff',
-      assets: staffRecord.assets,
-      staking: staffRecord.staking,
+      assets: staff.assets,
+      staking: staff.staking,
       updatedAt: nowIso()
     };
 
@@ -174,47 +152,74 @@ function updateUserWallet(email, patch) {
   return db.users[normalizedEmail];
 }
 
+function deleteUserWalletVault(email) {
+  const normalizedEmail = normalizeEmail(email);
+  const db = readDb();
+
+  if (!db.users[normalizedEmail]) return null;
+
+  db.users[normalizedEmail].encryptedVault = null;
+  db.users[normalizedEmail].publicWallets = [];
+  db.users[normalizedEmail].assets = [];
+  db.users[normalizedEmail].staking = {
+    autoStake: false,
+    riskMode: 'balanced',
+    vaults: []
+  };
+  db.users[normalizedEmail].updatedAt = nowIso();
+
+  writeDb(db);
+  return db.users[normalizedEmail];
+}
+
 function generateOtp() {
   return String(crypto.randomInt(100000, 999999));
 }
 
 function saveOtp(email, otp) {
   const normalizedEmail = normalizeEmail(email);
+  const db = readDb();
 
-  otpStore.set(normalizedEmail, {
+  db.otps[normalizedEmail] = {
     otpHash: sha(otp),
     expiresAt: Date.now() + 1000 * 60 * 10,
-    attempts: 0
-  });
+    attempts: 0,
+    createdAt: nowIso()
+  };
 
-  console.log(`OTP saved for ${normalizedEmail}`);
+  writeDb(db);
 }
 
 function verifyOtp(email, otp) {
   const normalizedEmail = normalizeEmail(email);
-  const record = otpStore.get(normalizedEmail);
+  const db = readDb();
+  const record = db.otps[normalizedEmail];
 
   if (!record) {
     return { ok: false, reason: 'No OTP found. Please request a new code.' };
   }
 
   if (Date.now() > record.expiresAt) {
-    otpStore.delete(normalizedEmail);
+    delete db.otps[normalizedEmail];
+    writeDb(db);
     return { ok: false, reason: 'OTP expired. Please request a new code.' };
   }
 
   if (record.attempts >= 5) {
-    otpStore.delete(normalizedEmail);
+    delete db.otps[normalizedEmail];
+    writeDb(db);
     return { ok: false, reason: 'Too many attempts. Please request a new code.' };
   }
 
   if (sha(otp) !== record.otpHash) {
     record.attempts += 1;
-    otpStore.set(normalizedEmail, record);
+    db.otps[normalizedEmail] = record;
+    writeDb(db);
     return { ok: false, reason: 'Invalid OTP code.' };
   }
 
-  otpStore.delete(normalizedEmail);
+  delete db.otps[normalizedEmail];
+  writeDb(db);
   return { ok: true };
 }
 
@@ -237,7 +242,6 @@ async function sendOtpEmail(email, otp) {
   const transporter = createTransporter();
 
   if (!transporter) {
-    console.log('Gmail not configured.');
     console.log(`DEV OTP for ${email}: ${otp}`);
     return false;
   }
@@ -265,7 +269,7 @@ async function sendOtpEmail(email, otp) {
           ${otp}
         </div>
         <p style="color: #64748b; font-size: 13px;">
-          This code expires in 10 minutes. If you did not request it, ignore this email.
+          This code expires in 10 minutes. If you do not see it, check Spam/Junk.
         </p>
       </div>
     `
@@ -275,22 +279,14 @@ async function sendOtpEmail(email, otp) {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session.user) {
-    console.log('Blocked /wallet because no session user exists.');
-    return res.redirect('/');
-  }
-
+  if (!req.session.user) return res.redirect('/');
   next();
 }
 
-/* =========================
-   Pages
-========================= */
+/* Pages */
 
 app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/wallet');
-  }
+  if (req.session.user) return res.redirect('/wallet');
 
   res.render('index', {
     error: null,
@@ -316,18 +312,18 @@ app.post('/send-otp', async (req, res) => {
 
     const sent = await sendOtpEmail(email, otp);
 
-    return res.render('index', {
+    res.render('index', {
       error: null,
       success: sent
         ? 'OTP sent successfully.'
-        : 'OTP generated. Gmail is not configured, so check the Render logs.',
+        : 'OTP generated. Gmail is not configured, so check Render logs.',
       otpEmail: email
     });
   } catch (error) {
     console.error('Send OTP error:', error);
 
-    return res.render('index', {
-      error: 'Unable to send OTP right now.',
+    res.render('index', {
+      error: 'Unable to send OTP. Check Gmail app password and Render logs.',
       success: null,
       otpEmail: req.body.email || null
     });
@@ -338,13 +334,9 @@ app.post('/verify-otp', (req, res) => {
   const email = normalizeEmail(req.body.email);
   const otp = String(req.body.otp || '').trim();
 
-  console.log(`Verifying OTP for ${email}`);
-
   const result = verifyOtp(email, otp);
 
   if (!result.ok) {
-    console.log(`OTP failed for ${email}: ${result.reason}`);
-
     return res.render('index', {
       error: result.reason,
       success: null,
@@ -361,20 +353,17 @@ app.post('/verify-otp', (req, res) => {
     walletId: user.id
   };
 
-  console.log('Session user set:', req.session.user);
-
   req.session.save((error) => {
     if (error) {
       console.error('Session save error:', error);
 
       return res.render('index', {
-        error: 'Login session could not be saved. Please try again.',
+        error: 'Session could not be saved. Try again.',
         success: null,
         otpEmail: email
       });
     }
 
-    console.log(`Redirecting ${email} to /wallet`);
     return res.redirect('/wallet');
   });
 });
@@ -400,25 +389,11 @@ app.post('/staff-login', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save((error) => {
-    if (error) {
-      console.error('Staff session save error:', error);
-
-      return res.render('index', {
-        error: 'Login session could not be saved. Please try again.',
-        success: null,
-        otpEmail: null
-      });
-    }
-
-    return res.redirect('/wallet');
-  });
+  req.session.save(() => res.redirect('/wallet'));
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-
-  console.log(`Rendering wallet.ejs for ${user.email}`);
 
   res.render('wallet', {
     username: req.session.user.username,
@@ -443,9 +418,7 @@ app.post('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-/* =========================
-   Wallet API
-========================= */
+/* Wallet APIs */
 
 app.get('/api/wallet', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
@@ -456,11 +429,11 @@ app.post('/api/wallet/vault', requireAuth, (req, res) => {
   const { encryptedVault, publicWallets } = req.body;
 
   if (!encryptedVault || typeof encryptedVault !== 'object') {
-    return res.status(400).json({ error: 'Missing or invalid encryptedVault.' });
+    return res.status(400).json({ error: 'Missing encryptedVault.' });
   }
 
   if (!Array.isArray(publicWallets)) {
-    return res.status(400).json({ error: 'Missing or invalid publicWallets.' });
+    return res.status(400).json({ error: 'Missing publicWallets.' });
   }
 
   const user = updateUserWallet(req.session.user.email, {
@@ -468,19 +441,11 @@ app.post('/api/wallet/vault', requireAuth, (req, res) => {
     publicWallets
   });
 
-  res.json({
-    ok: true,
-    wallet: user
-  });
+  res.json({ ok: true, wallet: user });
 });
 
-app.post('/api/wallet/state', requireAuth, (req, res) => {
-  const patch = {};
-
-  if (Array.isArray(req.body.assets)) patch.assets = req.body.assets;
-  if (req.body.staking && typeof req.body.staking === 'object') patch.staking = req.body.staking;
-
-  const user = updateUserWallet(req.session.user.email, patch);
+app.delete('/api/wallet/vault', requireAuth, (req, res) => {
+  const user = deleteUserWalletVault(req.session.user.email);
 
   res.json({
     ok: true,
@@ -488,48 +453,16 @@ app.post('/api/wallet/state', requireAuth, (req, res) => {
   });
 });
 
-/* =========================
-   Price API
-========================= */
+app.post('/api/wallet/delete', requireAuth, (req, res) => {
+  const user = deleteUserWalletVault(req.session.user.email);
 
-app.get('/api/prices', async (req, res) => {
-  try {
-    const ids = String(req.query.ids || '').trim();
-
-    if (!ids) {
-      return res.status(400).json({ error: 'Missing ids query parameter.' });
-    }
-
-    const url =
-      `https://api.coingecko.com/api/v3/simple/price` +
-      `?ids=${encodeURIComponent(ids)}` +
-      `&vs_currencies=usd` +
-      `&include_24hr_change=true`;
-
-    const response = await fetch(url, {
-      headers: {
-        accept: 'application/json',
-        'user-agent': 'BlueCrypto-Wallet/1.0'
-      }
-    });
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Price provider failed.' });
-    }
-
-    const data = await response.json();
-
-    res.setHeader('Cache-Control', 'no-store');
-    res.json(data);
-  } catch (error) {
-    console.error('Price API error:', error);
-    res.status(500).json({ error: 'Unable to fetch prices.' });
-  }
+  res.json({
+    ok: true,
+    wallet: user
+  });
 });
 
-/* =========================
-   Debug
-========================= */
+/* Debug */
 
 app.get('/debug-session', (req, res) => {
   res.json({
@@ -541,14 +474,9 @@ app.get('/debug-session', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({
     ok: true,
-    app: 'Blue Wallet',
     time: nowIso()
   });
 });
-
-/* =========================
-   404
-========================= */
 
 app.use((req, res) => {
   res.status(404).send('Page not found');
