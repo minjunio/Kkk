@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>BlueCrypto</title>
+  <title>BlueCrypto | Tensor Network</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,47 +12,27 @@
   <style>
     :root {
       color-scheme: light;
-      --bg1: #e9f8ff;
-      --bg2: #f8fcff;
-      --bg3: #d7f0ff;
-      --glass: rgba(255,255,255,0.85);
-      --glass2: rgba(255,255,255,0.65);
-      --solid: #ffffff;
-      --soft: #f0f7ff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --muted2: #94a3b8;
-      --blue: #0284c7;
-      --blue2: #2563eb;
-      --cyan: #38bdf8;
-      --pink: #e11d48;
-      --orange: #d97706;
-      --green: #10b981;
-      --border: rgba(2,132,199,0.12);
-      --border2: rgba(2,132,199,0.35);
-      --shadow: 0 24px 64px rgba(37,99,235,0.12);
-      --shadow2: 0 12px 32px rgba(2,132,199,0.08);
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
+      --bg1: #e9f8ff; --bg2: #f8fcff; --bg3: #d7f0ff;
+      --glass: rgba(255,255,255,0.85); --glass2: rgba(255,255,255,0.65);
+      --solid: #ffffff; --soft: #f0f7ff;
+      --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
+      --blue: #0284c7; --blue2: #2563eb; --cyan: #38bdf8;
+      --pink: #e11d48; --orange: #d97706; --green: #10b981;
+      --tensor: #8b5cf6; --tensor2: #d946ef; /* AI Tensor Colors */
+      --border: rgba(2,132,199,0.12); --border2: rgba(2,132,199,0.35);
+      --shadow: 0 24px 64px rgba(37,99,235,0.12); --shadow2: 0 12px 32px rgba(2,132,199,0.08);
+      --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
     }
 
     [data-theme="dark"] {
       color-scheme: dark;
-      --bg1: #06111f;
-      --bg2: #050816;
-      --bg3: #0a2942;
-      --glass: rgba(13,22,40,0.88);
-      --glass2: rgba(17,29,51,0.72);
-      --solid: #0d1628;
-      --soft: #111d33;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --muted2: #64748b;
-      --blue: #38bdf8;
-      --border: rgba(125,211,252,0.16);
-      --border2: rgba(56,189,248,0.36);
-      --shadow: 0 28px 86px rgba(0,0,0,0.5);
-      --shadow2: 0 14px 38px rgba(0,0,0,0.3);
+      --bg1: #06111f; --bg2: #050816; --bg3: #0a2942;
+      --glass: rgba(13,22,40,0.88); --glass2: rgba(17,29,51,0.72);
+      --solid: #0d1628; --soft: #111d33;
+      --text: #f8fafc; --muted: #94a3b8; --muted2: #64748b;
+      --blue: #38bdf8; --tensor: #a78bfa; --tensor2: #e879f9;
+      --border: rgba(125,211,252,0.16); --border2: rgba(56,189,248,0.36);
+      --shadow: 0 28px 86px rgba(0,0,0,0.5); --shadow2: 0 14px 38px rgba(0,0,0,0.3);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -79,9 +59,13 @@
     .shell { width: min(980px, 100%); margin: 0 auto; padding: 12px; }
     .hero { position: relative; overflow: hidden; border-radius: 32px; padding: 24px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); }
     .hero::before { content: ""; position: absolute; right: -80px; bottom: -100px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(2,132,199,0.2), transparent 60%); pointer-events: none; }
+    
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 99px; color: var(--blue); background: rgba(2,132,199,0.1); border: 1px solid var(--border2); font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; }
+    .badge.tensor { color: var(--tensor); background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.3); }
+    
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); animation: pulse 2s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(2,132,199,0.5); } 70% { box-shadow: 0 0 0 8px rgba(2,132,199,0); } 100% { box-shadow: 0 0 0 0 rgba(2,132,199,0); } }
+    
     .balance { font-size: clamp(2.8rem, 12vw, 5.5rem); font-weight: 900; line-height: 1; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; margin-top: 4px; }
     .pnl-line { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 99px; background: var(--glass2); border: 1px solid var(--border); color: var(--muted); font-weight: 800; font-size: 0.85rem; }
     .pnl-line.up { color: var(--blue); background: rgba(2,132,199,0.08); border-color: rgba(2,132,199,0.15); }
@@ -90,19 +74,17 @@
     .market-strip { margin-top: 24px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 8px; }
     .market-strip::-webkit-scrollbar { display: none; }
     .market-card { flex: 0 0 148px; scroll-snap-align: start; padding: 14px; border-radius: 22px; background: var(--glass2); border: 1px solid var(--border); box-shadow: var(--shadow2); color: var(--text); text-align: left; }
-    .market-card strong { display: block; font-size: 0.9rem; font-weight: 900; margin-top: 8px; }
-    .market-price { margin-top: 4px; font-size: 1.05rem; font-weight: 900; font-variant-numeric: tabular-nums; }
-    .change { margin-top: 4px; font-size: 0.75rem; font-weight: 800; }
-    .change.up { color: var(--blue); } .change.down { color: var(--pink); }
-
+    
     .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 24px; }
     .quick-btn { min-height: 76px; border-radius: 24px; padding: 12px; text-align: center; color: var(--text); background: var(--solid); border: 1px solid var(--border); box-shadow: var(--shadow2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .quick-btn.primary { color: white; background: linear-gradient(135deg, var(--blue2), var(--cyan)); border: none; box-shadow: 0 16px 32px rgba(37,99,235,0.25); }
+    .quick-btn.tensor-btn { color: white; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); border: none; box-shadow: 0 16px 32px rgba(139,92,246,0.25); }
     .quick-btn strong { font-size: 0.95rem; font-weight: 900; margin-bottom: 4px; }
     .quick-btn span { color: var(--muted); font-size: 0.7rem; font-weight: 700; }
-    .quick-btn.primary span { color: rgba(255,255,255,0.9); }
+    .quick-btn.primary span, .quick-btn.tensor-btn span { color: rgba(255,255,255,0.9); }
 
     .panel { margin-top: 14px; border-radius: 28px; padding: 20px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    .panel.tensor-panel { border-color: rgba(139,92,246,0.3); background: linear-gradient(180deg, rgba(139,92,246,0.05), var(--glass)); }
     .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .title { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.03em; }
 
@@ -111,22 +93,25 @@
     .modal-asset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; max-height: 240px; overflow-y: auto; padding-bottom: 6px; }
     
     .asset-card, .staking-card { flex: 0 0 190px; scroll-snap-align: start; border-radius: 24px; padding: 16px; background: var(--glass2); border: 1px solid var(--border); color: var(--text); text-align: left; box-shadow: var(--shadow2); }
+    .asset-card.tensor { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.05); }
     .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(255,255,255,0.3)); }
-    [data-theme="dark"] .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(17,29,51,0.4)); }
     .asset-card.selected, .receive-option.selected { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(56,189,248,0.2); }
+    .asset-card.tensor.selected { border-color: var(--tensor); box-shadow: 0 0 0 4px rgba(139,92,246,0.2); }
 
     .asset-top { display: flex; align-items: center; gap: 12px; }
     .coin { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); border: 1px solid var(--border); color: var(--blue); font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden; }
+    .coin.tensor-coin { color: var(--tensor); border-color: rgba(139,92,246,0.4); }
+    .coin.tensor-coin svg { width: 24px; height: 24px; fill: currentColor; }
     .coin img { width: 100%; height: 100%; object-fit: contain; }
 
     .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tiny { color: var(--muted); font-size: 0.75rem; font-weight: 700; margin-top: 2px; }
     .asset-value { margin-top: 14px; font-size: 1.25rem; font-weight: 900; font-variant-numeric: tabular-nums; }
     .asset-sub { margin-top: 6px; color: var(--muted); font-size: 0.75rem; font-weight: 700; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-    .apy { margin-top: 12px; font-size: 1.8rem; font-weight: 900; color: var(--blue); letter-spacing: -0.04em; }
 
     .small-btn { height: 38px; padding: 0 14px; font-size: 0.85rem; border-radius: 16px; font-weight: 800; background: var(--solid); border: 1px solid var(--border); color: var(--text); }
     .primary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: white; background: linear-gradient(135deg, var(--blue2), var(--cyan)); box-shadow: 0 12px 24px rgba(37,99,235,0.25); }
+    .tensor-primary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: white; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); box-shadow: 0 12px 24px rgba(139,92,246,0.25); }
     .secondary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; background: var(--solid); border: 1px solid var(--border); color: var(--text); }
 
     .form { display: grid; gap: 12px; }
@@ -135,34 +120,24 @@
 
     .input, .select { width: 100%; height: 54px; padding: 0 16px; border-radius: 18px; background: var(--soft); border: 1px solid var(--border); color: var(--text); font-weight: 800; font-size: 0.95rem; transition: border-color 0.2s; }
     .input:focus, .select:focus { border-color: var(--cyan); }
-    .select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px; padding-right: 48px; }
+    .select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px; padding-right: 48px; }
 
     .box { padding: 18px; border-radius: 24px; background: var(--glass2); border: 1px solid var(--border); }
+    .box.tensor { background: rgba(139,92,246,0.05); border-color: rgba(139,92,246,0.2); }
     .box.bad { color: var(--pink); background: rgba(225,29,72,0.06); border-color: rgba(225,29,72,0.15); }
 
+    .icon-picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+    .icon-option { height: 48px; border-radius: 14px; border: 1px solid var(--border); background: var(--solid); display: grid; place-items: center; color: var(--muted); transition: 0.2s; }
+    .icon-option.selected { border-color: var(--tensor); color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
+    .icon-option svg { width: 24px; height: 24px; fill: currentColor; }
+
     .receive-hero { display: flex; flex-direction: column; align-items: center; background: var(--solid); border-radius: 28px; padding: 24px; border: 1px solid var(--border); margin-bottom: 16px; box-shadow: var(--shadow2); }
-    .qr-wrapper { position: relative; width: 220px; height: 220px; background: #fff; padding: 12px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .qr-wrapper canvas { width: 100% !important; height: 100% !important; border-radius: 12px; display: block; }
-    .qr-badge { position: absolute; top: -12px; right: -12px; background: var(--blue); color: #fff; font-size: 0.8rem; font-weight: 900; padding: 6px 14px; border-radius: 99px; box-shadow: 0 4px 12px rgba(2,132,199,0.3); }
     .receive-address-box { width: 100%; display: flex; align-items: center; gap: 8px; background: var(--soft); padding: 8px 8px 8px 16px; border-radius: 20px; border: 1px solid var(--border); }
     .receive-address-box input { flex: 1; background: transparent; border: none; font-size: 0.85rem; color: var(--text); font-family: monospace; font-weight: 700; }
-    .receive-option { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 20px; background: var(--solid); border: 1px solid var(--border); cursor: pointer; margin-bottom: 8px;}
-
-    /* Modern Send UI Additions */
+    
     .huge-amount { font-size: 3rem; font-weight: 900; text-align: center; width: 100%; border: none; background: transparent; color: var(--text); padding: 10px 0; outline: none; margin-top: 10px; font-variant-numeric: tabular-nums; }
-    .huge-amount::placeholder { color: var(--muted2); }
     .send-max-btn { background: var(--soft); color: var(--blue); border-radius: 99px; padding: 6px 16px; font-size: 0.75rem; font-weight: 800; border: 1px solid var(--border); display: inline-block; margin: 0 auto; margin-bottom: 20px; }
     .send-top-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; }
-
-    .countdown-ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--blue) calc(var(--progress,1) * 360deg), rgba(100,116,139,0.1) 0deg); position: relative; }
-    .countdown-ring::before { content: ""; position: absolute; width: 34px; height: 34px; border-radius: 50%; background: var(--solid); }
-    .countdown-ring span { position: relative; z-index: 1; font-weight: 900; font-size: 0.85rem; color: var(--blue); }
-
-    .chart-canvas { width: 100%; height: 320px; display: block; touch-action: none; border-radius: 16px; background: var(--solid); border: 1px solid var(--border); }
-    .timeframe-row { display: flex; gap: 8px; margin: 14px 0; overflow-x: auto; scrollbar-width: none; }
-    .timeframe-row::-webkit-scrollbar { display: none; }
-    .timeframe-btn { height: 38px; padding: 0 16px; border-radius: 99px; background: var(--solid); border: 1px solid var(--border); color: var(--muted); font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
-    .timeframe-btn.active { background: linear-gradient(135deg, var(--blue2), var(--cyan)); color: white; border-color: transparent; box-shadow: 0 8px 20px rgba(37,99,235,0.2); }
 
     .modal-overlay, .drawer-overlay { position: fixed; inset: 0; z-index: 100; display: none; background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; overflow-y: auto; }
     .modal-overlay.active, .drawer-overlay.active { display: block; }
@@ -188,16 +163,13 @@
 
     @media (max-width: 580px) {
       .hero { padding: 20px; border-radius: 28px; }
-      .quick { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .quick { grid-template-columns: repeat(4, 1fr); gap: 6px; }
       .quick-btn { min-height: 72px; padding: 10px 4px; border-radius: 20px; }
-      .quick-btn strong { font-size: 0.85rem; }
+      .quick-btn strong { font-size: 0.8rem; }
       .panel { padding: 16px; border-radius: 24px; }
       .asset-card, .staking-card { flex-basis: 170px; }
       .modal-card { width: 100%; border-radius: 32px 32px 0 0; margin: auto auto 0 auto; max-height: 92vh; }
       .drawer { width: 100%; }
-      .chart-canvas { height: 260px; }
-      .brand-sub { display: none; }
-      .modal-asset-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
       .huge-amount { font-size: 2.5rem; }
     }
   </style>
@@ -214,9 +186,6 @@
         </div>
       </a>
       <div class="top-actions">
-        <button class="icon-btn" onclick="refreshAllBalances(true)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        </button>
         <button class="icon-btn" onclick="openSettings()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
@@ -229,49 +198,108 @@
       <div class="hero-inner">
         <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Connecting...</span></div>
         <div class="balance" id="totalUsd">$0.00</div>
-        <div class="pnl-line" id="pnlLine">24h PnL $0.00 (0.00%) · MC: $0</div>
+        <div class="pnl-line" id="pnlLine">24h PnL $0.00 (0.00%)</div>
         <div class="market-strip" id="topMarketCards"></div>
         <div class="quick">
+          <button class="quick-btn tensor-btn" onclick="openModal('tensorSwapModal')"><strong>Tensor</strong><span>AI Swap</span></button>
           <button class="quick-btn primary" onclick="openModal('receiveModal')"><strong>Receive</strong><span>Scan QR</span></button>
           <button class="quick-btn" onclick="openModal('sendModal')"><strong>Send</strong><span>Transfer</span></button>
-          <button class="quick-btn" onclick="openModal('swapModal')"><strong>Swap</strong><span>Trade</span></button>
+          <button class="quick-btn" onclick="openModal('swapModal')"><strong>DEX</strong><span>Trade</span></button>
         </div>
       </div>
     </section>
 
-    <section class="panel" id="assetsSection">
-      <div class="panel-head"><h2 class="title">My Assets</h2><button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button></div>
-      <div class="asset-scroll" id="assetCards"></div>
+    <section class="panel" id="adminTensorPanel" style="display:none; border-color:var(--pink); background:rgba(225,29,72,0.05);">
+      <div class="panel-head"><h2 class="title" style="color:var(--pink);">Admin: Tensor Factory</h2></div>
+      <div class="form">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field"><label>Token Name</label><input class="input" id="adTenName" placeholder="e.g. Neural" /></div>
+          <div class="field"><label>Symbol</label><input class="input" id="adTenSym" placeholder="NRL" /></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="field"><label>Start Price (USDT)</label><input class="input" id="adTenPrice" type="number" step="any" placeholder="1.00" /></div>
+          <div class="field">
+            <label>Algorithm</label>
+            <select class="select" id="adTenVol">
+              <option value="bull">Bullish Bias</option>
+              <option value="bear">Bearish Bias</option>
+              <option value="stable">Stable / Neutral</option>
+              <option value="hyper">Hyper Volatile</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Profile Icon</label>
+          <div class="icon-picker-grid" id="adTenIconPicker"></div>
+        </div>
+        <button class="primary-btn" style="background:var(--pink); box-shadow:none;" onclick="deployTensorToken()">Deploy to Tensor Network</button>
+      </div>
     </section>
 
-    <section class="panel" id="stakingSection">
-      <div class="panel-head"><h2 class="title">High-Yield Staking</h2></div>
-      <div class="asset-scroll" id="stakingCards"></div>
+    <section class="panel tensor-panel" id="tensorAssetsSection">
+      <div class="panel-head"><h2 class="title" style="color:var(--tensor);">Tensor Assets (AI)</h2><button class="small-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="openModal('tensorSendModal')">Send</button></div>
+      <div class="asset-scroll" id="tensorCards"></div>
+    </section>
+
+    <section class="panel" id="assetsSection">
+      <div class="panel-head"><h2 class="title">Crypto Assets</h2><button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button></div>
+      <div class="asset-scroll" id="assetCards"></div>
     </section>
   </main>
 
   <nav class="bottom-nav">
-    <button id="navHome" class="active" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); navSetActive('navHome');">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
-    </button>
-    <button id="navTrading" onclick="window.location.href='trading'">
-      <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>Trading
-    </button>
-    <button id="navSettings" onclick="openSettings()">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
-    </button>
+    <button id="navHome" class="active" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); navSetActive('navHome');"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button id="navTrading" onclick="window.location.href='trading'"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>Trading</button>
+    <button id="navSettings" onclick="openSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </nav>
+
+  <div class="modal-overlay" id="tensorSwapModal" onclick="overlayClose(event,'tensorSwapModal')">
+    <div class="modal-card" style="border-color:var(--tensor);">
+      <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Tensor AI Swap</div><div class="modal-sub">Acquire AI tokens via USDT burn.</div></div><button class="close" onclick="closeModal('tensorSwapModal')">×</button></div>
+      <div class="form">
+        <div class="box tensor">
+          <label>Burn USDT</label>
+          <div class="tiny" id="tenSwapUsdtBal" style="margin-bottom:8px;">0.00 available</div>
+          <input class="input" id="tenSwapAmountIn" type="number" step="any" placeholder="0.00" oninput="calcTensorOutput()" style="background:var(--solid);" />
+        </div>
+        <div style="display:grid; place-items:center; height:24px; margin:-8px 0; position:relative; z-index:2;"><div style="width:40px; height:40px; background:var(--solid); border:1px solid var(--tensor); border-radius:50%; display:grid; place-items:center; color:var(--tensor); font-weight:900;">↓</div></div>
+        <div class="box tensor">
+          <label>Select Tensor Token</label>
+          <select class="select" id="tenSwapSelectOut" onchange="calcTensorOutput()" style="background:var(--solid); margin-bottom:8px;"></select>
+          <div class="tiny">Est. Receive: <span id="tenSwapReceiveTxt" style="font-weight:800; color:var(--tensor);">0.00</span></div>
+        </div>
+        <button class="tensor-primary-btn" onclick="executeTensorSwap()">Execute AI Swap</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="tensorSendModal" onclick="overlayClose(event,'tensorSendModal')">
+    <div class="modal-card" style="border-color:var(--tensor);">
+      <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Send Tensor Asset</div><div class="modal-sub">Transfer via T0x network.</div></div><button class="close" onclick="closeModal('tensorSendModal')">×</button></div>
+      <div class="form">
+        <div class="field"><label>Asset</label><select class="select" id="tenSendSelect" onchange="updateTenSendBal()"></select></div>
+        <div class="send-top-wrap">
+          <input class="huge-amount" id="tenSendAmt" type="number" step="any" placeholder="0.00" />
+          <button class="send-max-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="maxTenSend()">Max</button>
+          <div class="tiny" id="tenSendBalTxt">0.00 available</div>
+        </div>
+        <div class="field"><label>Recipient (T0x...)</label><input class="input" id="tenSendTo" placeholder="T0x..." /></div>
+        <button class="tensor-primary-btn" onclick="executeTensorSend()">Send AI Token</button>
+      </div>
+    </div>
+  </div>
 
   <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event,'receiveModal')">
     <div class="modal-card">
-      <div class="modal-head"><div><div class="modal-title">Receive Crypto</div><div class="modal-sub">Scan QR or copy your address below.</div></div><button class="close" onclick="closeModal('receiveModal')">×</button></div>
+      <div class="modal-head"><div><div class="modal-title">Receive</div><div class="modal-sub">Crypto and Tensor networks.</div></div><button class="close" onclick="closeModal('receiveModal')">×</button></div>
       <div class="form">
         <div class="receive-hero">
           <div class="qr-wrapper"><div id="qrBox"></div><div class="qr-badge" id="qrNetworkBadge">ETH</div></div>
           <div class="name" id="receiveTitle" style="margin-bottom:12px; font-size:1.15rem;">Select Asset</div>
-          <div class="receive-address-box"><input id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" /><button class="small-btn" style="background:var(--blue); color:white; border:none; height:36px;" onclick="copyReceiveAddress()">Copy</button></div>
+          <div class="receive-address-box"><input id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" /><button class="small-btn" style="background:var(--blue); color:white; border:none; height:36px;" id="copyAddrBtn" onclick="copyReceiveAddress()">Copy</button></div>
         </div>
-        <div class="field"><label>Select Network</label><select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select></div>
+        <div class="field"><label>Network Group</label><select class="select" id="receiveGroupSelect" onchange="renderReceiveAssets()"><option value="crypto">Standard Crypto</option><option value="tensor">Tensor Network (AI)</option></select></div>
+        <div class="field" id="recNetWrap"><label>Chain</label><select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select></div>
         <label>Available Assets</label><div class="form" id="receiveAssetsList" style="max-height: 220px; overflow-y: auto; padding-right: 4px;"></div>
       </div>
     </div>
@@ -281,29 +309,14 @@
     <div class="modal-card">
       <div class="modal-head"><div><div class="modal-title">Send Crypto</div><div class="modal-sub">Fast & secure transfers.</div></div><button class="close" onclick="closeModal('sendModal')">×</button></div>
       <div class="form">
-        <label>Asset to Send</label>
-        <div class="modal-asset-grid" id="sendOwnedAssets" style="justify-content:center; margin-bottom:10px;"></div>
-        
-        <div class="send-top-wrap">
-          <input class="huge-amount" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" />
-          <button class="send-max-btn" onclick="setMaxSend()">Max Available</button>
-          <div class="tiny" id="sendBalanceText" style="margin-bottom:8px;">Select an asset.</div>
-        </div>
-
-        <div class="field">
-          <label>Recipient Address</label>
-          <input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" oninput="scheduleImmediateFeeRefresh()" />
-        </div>
-        
-        <div class="box" style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px;">
-          <div><div class="name" style="font-size:0.9rem;">Est. Network Fee</div><div class="tiny" id="sendFeePreview">Enter address and amount.</div></div>
-          <div class="countdown-ring" id="sendCountdown" style="--progress:1"><span>5</span></div>
-        </div>
+        <label>Asset to Send</label><div class="modal-asset-grid" id="sendOwnedAssets" style="justify-content:center; margin-bottom:10px;"></div>
+        <div class="send-top-wrap"><input class="huge-amount" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" /><button class="send-max-btn" onclick="setMaxSend()">Max Available</button><div class="tiny" id="sendBalanceText" style="margin-bottom:8px;">Select an asset.</div></div>
+        <div class="field"><label>Recipient Address</label><input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" oninput="scheduleImmediateFeeRefresh()" /></div>
+        <div class="box" style="display:flex; align-items:center; justify-content:space-between; padding:14px 18px;"><div><div class="name" style="font-size:0.9rem;">Est. Network Fee</div><div class="tiny" id="sendFeePreview">Enter address and amount.</div></div><div class="countdown-ring" id="sendCountdown" style="--progress:1"><span>5</span></div></div>
         <button class="primary-btn" onclick="openSendConfirm()" style="margin-top:8px;">Review Send</button>
       </div>
     </div>
   </div>
-
   <div class="modal-overlay" id="sendConfirmModal" onclick="overlayClose(event,'sendConfirmModal')">
     <div class="modal-card">
       <div class="modal-head"><div><div class="modal-title">Confirm Send</div><div class="modal-sub">Blockchain transactions cannot be reversed.</div></div><button class="close" onclick="closeModal('sendConfirmModal')">×</button></div>
@@ -314,28 +327,16 @@
 
   <div class="modal-overlay" id="swapModal" onclick="overlayClose(event,'swapModal')">
     <div class="modal-card">
-      <div class="modal-head"><div><div class="modal-title">Swap Assets</div><div class="modal-sub">On-chain decentralized routing.</div></div><button class="close" onclick="closeModal('swapModal')">×</button></div>
+      <div class="modal-head"><div><div class="modal-title">DEX Swap</div><div class="modal-sub">On-chain decentralized routing.</div></div><button class="close" onclick="closeModal('swapModal')">×</button></div>
       <div class="form">
-        <div class="box">
-          <label>You Sell</label>
-          <div class="modal-asset-grid" id="swapOwnedAssets" style="margin-top:12px;"></div>
-          <div class="tiny" id="swapSellBalanceText" style="margin-top:12px; text-align:right;">Select an asset</div>
-          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" style="margin-top:10px; border:none; background:var(--solid);" oninput="scheduleImmediateFeeRefresh()" />
-        </div>
-        <div style="display:grid; place-items:center; height:24px; margin:-8px 0; position:relative; z-index:2;"><div style="width:40px; height:40px; background:var(--solid); border:1px solid var(--border); border-radius:50%; display:grid; place-items:center; color:var(--blue); font-weight:900; box-shadow:var(--shadow2);">↓</div></div>
-        <div class="box">
-          <label>You Receive</label>
-          <select class="select" id="swapBuySelect" style="margin-top:12px; border:none; background:var(--solid);" onchange="scheduleImmediateFeeRefresh()"></select>
-        </div>
-        <div class="box" style="display:flex; align-items:center; justify-content:space-between;">
-          <div><div class="name">Estimated Output</div><div class="tiny" id="swapQuoteText">Enter amount to fetch route.</div></div>
-          <div class="countdown-ring" id="swapCountdown" style="--progress:1"><span>5</span></div>
-        </div>
+        <div class="box"><label>You Sell</label><div class="modal-asset-grid" id="swapOwnedAssets" style="margin-top:12px;"></div><div class="tiny" id="swapSellBalanceText" style="margin-top:12px; text-align:right;">Select an asset</div><input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" style="margin-top:10px; border:none; background:var(--solid);" oninput="scheduleImmediateFeeRefresh()" /></div>
+        <div style="display:grid; place-items:center; height:24px; margin:-8px 0; position:relative; z-index:2;"><div style="width:40px; height:40px; background:var(--solid); border:1px solid var(--border); border-radius:50%; display:grid; place-items:center; color:var(--blue); font-weight:900;">↓</div></div>
+        <div class="box"><label>You Receive</label><select class="select" id="swapBuySelect" style="margin-top:12px; border:none; background:var(--solid);" onchange="scheduleImmediateFeeRefresh()"></select></div>
+        <div class="box" style="display:flex; align-items:center; justify-content:space-between;"><div><div class="name">Estimated Output</div><div class="tiny" id="swapQuoteText">Enter amount to fetch route.</div></div><div class="countdown-ring" id="swapCountdown" style="--progress:1"><span>5</span></div></div>
         <button class="primary-btn" onclick="openSwapConfirm()">Review Swap</button>
       </div>
     </div>
   </div>
-
   <div class="modal-overlay" id="swapConfirmModal" onclick="overlayClose(event,'swapConfirmModal')">
     <div class="modal-card">
       <div class="modal-head"><div><div class="modal-title">Confirm Swap</div><div class="modal-sub">Execute the on-chain DEX route.</div></div><button class="close" onclick="closeModal('swapConfirmModal')">×</button></div>
@@ -344,47 +345,15 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="stakeModal" onclick="overlayClose(event,'stakeModal')">
-    <div class="modal-card">
-      <div class="modal-head"><div><div class="modal-title" id="stakeTitle">Stake</div><div class="modal-sub" id="stakeSub">High yield staking.</div></div><button class="close" onclick="closeModal('stakeModal')">×</button></div>
-      <div class="form">
-        <div class="box"><div class="name">Available Balance</div><div class="tiny" id="stakeBalanceText">0 available</div></div>
-        <div class="field"><label>Deposit Amount</label><input class="input" id="stakeAmountInput" type="number" step="any" placeholder="0.00" /></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;"><button class="secondary-btn" onclick="closeModal('stakeModal')">Cancel</button><button class="primary-btn" onclick="executeStake()">Confirm Stake</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="assetChartModal" onclick="overlayClose(event,'assetChartModal')">
-    <div class="modal-card" style="padding:16px;">
-      <div class="modal-head" style="margin-bottom:16px;"><div><div class="modal-title" id="chartAssetTitle">Asset</div><div class="modal-sub" id="chartAssetSub">Live interactive chart</div></div><button class="close" onclick="closeModal('assetChartModal')">×</button></div>
-      <div class="chart-wrap panel" style="margin-top:0; padding:16px;">
-        <div class="chart-head"><div><div class="live-price" id="chartLivePrice">$0.00</div><div class="tiny" id="chartChangeText" style="font-size:0.85rem; font-weight:800; color:var(--blue);">Live</div></div></div>
-        <div class="timeframe-row">
-          <button class="timeframe-btn active" id="tf5m" onclick="setChartTf('5m')">5m</button><button class="timeframe-btn" id="tf15m" onclick="setChartTf('15m')">15m</button>
-          <button class="timeframe-btn" id="tf1h" onclick="setChartTf('1h')">1H</button><button class="timeframe-btn" id="tf4h" onclick="setChartTf('4h')">4H</button>
-          <button class="timeframe-btn" id="tf1d" onclick="setChartTf('1d')">1D</button>
-        </div>
-        <canvas class="chart-canvas" id="assetChartCanvas"></canvas>
-        <div class="tiny" style="text-align:center; margin-top:12px;">Pinch to zoom</div>
-      </div>
-    </div>
-  </div>
-
   <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event,'settingsOverlay')">
     <aside class="drawer">
       <div class="drawer-head"><div><div class="drawer-title">Settings</div><div class="drawer-sub">Preferences and security.</div></div><button class="close" onclick="closeSettings()">×</button></div>
       <div class="form">
-        <div class="box"><div class="name">Wallet Address</div><div class="tiny" id="settingsAddress" style="font-family:monospace; margin-top:6px; font-size:0.8rem; word-break:break-all;">Loading...</div></div>
+        <div class="box"><div class="name">Web3 Address</div><div class="tiny" id="settingsAddress" style="font-family:monospace; margin-top:6px; font-size:0.8rem; word-break:break-all;">Loading...</div></div>
+        <div class="box tensor"><div class="name" style="color:var(--tensor);">Tensor Address (T0x)</div><div class="tiny" id="settingsTensorAddress" style="font-family:monospace; margin-top:6px; font-size:0.8rem; word-break:break-all;">Loading...</div></div>
         <div class="field"><label>Display currency</label><select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)"><option value="USD">USD</option><option value="AED">AED</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option></select></div>
         <div class="field"><label>Theme</label><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:48px;" onclick="setTheme('light')">Light</button><button class="secondary-btn" style="height:48px;" onclick="setTheme('dark')">Dark</button></div></div>
-        <div class="box"><div class="name">Custom RPC</div><input class="input" id="customRpcInput" placeholder="https://..." style="margin-top:12px;" /><button class="primary-btn" style="height:48px; margin-top:12px;" onclick="saveCustomRpc()">Save RPC</button></div>
-        <div class="box bad" id="securityBox">
-          <div class="name" style="color:var(--pink);">Security & Recovery</div><div class="tiny" style="margin-bottom:12px;">Backup key before wiping data.</div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showSeed()">View Seed</button><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showPrivateKey()">View Key</button></div>
-          <textarea class="input" id="secretOutput" readonly style="margin-top:12px; height:90px; font-size:0.8rem; line-height:1.4; filter:blur(5px); transition:0.3s; cursor:pointer;" onclick="this.style.filter='none'; this.select()"></textarea>
-        </div>
-        <div class="box bad" style="margin-top:6px;"><div class="name" style="color:var(--pink);">Danger Zone</div><input class="input" id="deleteConfirmInput" placeholder="Type DELETE" style="margin-top:12px; border-color:rgba(225,29,72,0.3);" /><button class="primary-btn" style="height:48px; margin-top:12px; background:var(--pink); box-shadow:none;" onclick="deleteWallet()">Wipe Wallet Data</button></div>
+        <div class="box bad" id="securityBox"><div class="name" style="color:var(--pink);">Security & Recovery</div><div class="tiny" style="margin-bottom:12px;">Backup key before wiping data.</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showSeed()">View Seed</button><button class="secondary-btn" style="height:44px; font-size:0.85rem;" onclick="showPrivateKey()">View Key</button></div><textarea class="input" id="secretOutput" readonly style="margin-top:12px; height:90px; font-size:0.8rem; line-height:1.4; filter:blur(5px); transition:0.3s; cursor:pointer;" onclick="this.style.filter='none'; this.select()"></textarea></div>
         <form action="/logout" method="POST" style="margin-top:6px;"><button class="secondary-btn" style="height:48px;" type="submit">Logout</button></form>
       </div>
     </aside>
@@ -403,376 +372,251 @@
     const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
     const DISPLAY_RATES = { USD:{symbol:'$',rate:1}, AED:{symbol:'AED ',rate:3.6725}, EUR:{symbol:'€',rate:.92}, GBP:{symbol:'£',rate:.79}, SAR:{symbol:'SAR ',rate:3.75} };
+    const NETWORKS = { ethereum:{name:'Ethereum',chainId:1,symbol:'ETH',rpc:'https://cloudflare-eth.com'}, bsc:{name:'BNB Chain',chainId:56,symbol:'BNB',rpc:'https://bsc-dataseed.binance.org'}, polygon:{name:'Polygon',chainId:137,symbol:'MATIC',rpc:'https://polygon-rpc.com'} };
+    const ERC20_TOKENS = { ethereum:[ {symbol:'USDT',name:'Tether',address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',decimals:6,gecko:'tether'} ], bsc:[ {symbol:'USDT',name:'Tether',address:'0x55d398326f99059fF775485246999027B3197955',decimals:18,gecko:'tether'} ], polygon:[ {symbol:'USDT',name:'Tether',address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F',decimals:6,gecko:'tether'} ] };
 
-    const NETWORKS = {
-      ethereum:{name:'Ethereum',chainId:1,symbol:'ETH',rpc:'https://cloudflare-eth.com'},
-      bsc:{name:'BNB Chain',chainId:56,symbol:'BNB',rpc:'https://bsc-dataseed.binance.org'},
-      polygon:{name:'Polygon',chainId:137,symbol:'MATIC',rpc:'https://polygon-rpc.com'},
-      base:{name:'Base',chainId:8453,symbol:'ETH',rpc:'https://mainnet.base.org'},
-      arbitrum:{name:'Arbitrum',chainId:42161,symbol:'ETH',rpc:'https://arb1.arbitrum.io/rpc'},
-      optimism:{name:'Optimism',chainId:10,symbol:'ETH',rpc:'https://mainnet.optimism.io'},
-      avalanche:{name:'Avalanche',chainId:43114,symbol:'AVAX',rpc:'https://api.avax.network/ext/bc/C/rpc'}
-    };
-
-    const ERC20_TOKENS = {
-      ethereum:[ {symbol:'USDT',name:'Tether',address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',decimals:6,gecko:'tether'}, {symbol:'USDC',name:'USD Coin',address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',decimals:6,gecko:'usd-coin'}, {symbol:'LINK',name:'Chainlink',address:'0x514910771AF9Ca656af840dff83E8264EcF986CA',decimals:18,gecko:'chainlink'}, {symbol:'UNI',name:'Uniswap',address:'0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',decimals:18,gecko:'uniswap'} ],
-      bsc:[ {symbol:'USDT',name:'Tether',address:'0x55d398326f99059fF775485246999027B3197955',decimals:18,gecko:'tether'}, {symbol:'USDC',name:'USD Coin',address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',decimals:18,gecko:'usd-coin'} ],
-      polygon:[ {symbol:'USDT',name:'Tether',address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F',decimals:6,gecko:'tether'}, {symbol:'USDC',name:'USD Coin',address:'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',decimals:6,gecko:'usd-coin'} ]
-    };
-
-    // Swap Routers Config (Uniswap V2 / PancakeSwap / QuickSwap)
-    const SWAP_ROUTERS = {
-      ethereum: { router: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', wrapped: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' },
-      bsc: { router: '0x10ED43C718714eb63d5aA57B78B54704E256024E', wrapped: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' },
-      polygon: { router: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', wrapped: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' }
-    };
-
-    const DEX_ABI = [
-      "function getAmountsOut(uint amountIn, address[] memory path) view returns (uint[] memory amounts)",
-      "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) payable returns (uint[] memory amounts)",
-      "function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)",
-      "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)"
+    const TENSOR_ICONS = [
+      `<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+      `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>`,
+      `<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4l3 3"/></svg>`,
+      `<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
+      `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`
     ];
-    const ERC20_ABI = ['function balanceOf(address owner) view returns (uint256)', 'function transfer(address to, uint256 amount) returns (bool)', 'function approve(address spender, uint256 amount) returns (bool)', 'function allowance(address owner, address spender) view returns (uint256)'];
-    const LIDO_STETH_CONTRACT = '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84';
-    const LIDO_ABI = ['function submit(address _referral) payable returns (uint256)'];
 
-    const NATIVE_GECKO = { ethereum:'ethereum', bsc:'binancecoin', polygon:'matic-network', base:'ethereum', arbitrum:'ethereum', optimism:'ethereum', avalanche:'avalanche-2' };
-    const WATCH_ASSETS = [{symbol:'BTC',name:'Bitcoin',gecko:'bitcoin'}, {symbol:'SOL',name:'Solana',gecko:'solana'}, {symbol:'ETH',name:'Ethereum',gecko:'ethereum'}, {symbol:'BNB',name:'BNB',gecko:'binancecoin'}, {symbol:'XRP',name:'XRP',gecko:'ripple'}];
-    const BINANCE_SYMBOLS = { BTC:'BTCUSDT', ETH:'ETHUSDT', SOL:'SOLUSDT', BNB:'BNBUSDT', XRP:'XRPUSDT' };
-    const TOP_MARKETS = ['BTC','SOL','ETH','BNB','XRP'];
-    const STAKING_OPTIONS = [{id:'lido-eth',title:'Lido ETH',asset:'ETH',networkKey:'ethereum',apy:4.2,real:true,adapter:'lido',description:'Stake ETH and receive stETH directly.'}];
-
+    const NATIVE_GECKO = { ethereum:'ethereum', bsc:'binancecoin', polygon:'matic-network' };
+    const WATCH_ASSETS = [{symbol:'BTC',name:'Bitcoin',gecko:'bitcoin'}, {symbol:'ETH',name:'Ethereum',gecko:'ethereum'}, {symbol:'SOL',name:'Solana',gecko:'solana'}];
+    const BINANCE_SYMBOLS = { BTC:'BTCUSDT', ETH:'ETHUSDT', SOL:'SOLUSDT' };
+    
     let activeNetworkKey = localStorage.getItem('blue_active_network') || 'ethereum';
     let displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
     let activeProvider = null, activeSigner = null, allBalances = [], combinedAssets = [], ownedPositions = [];
-    let activeWalletMnemonic = "";
-    let selectedSend = null, selectedSwapSell = null, selectedReceiveAsset = null, selectedStake = null;
+    let tensorAddress = "", tensorRegistry = [], tensorBalances = {};
+    let selectedSend = null, selectedSwapSell = null, selectedReceiveAsset = null;
     let prices = {}, binancePrices = {}, marketMeta = {};
-    let toastTimer, countdownTimer = null, chartTimer = null, chartCandlesRaw = [];
-    let sendFeeRefreshAt = 0, swapFeeRefreshAt = 0;
+    let toastTimer, countdownTimer = null;
     
+    // --- TENSOR LOGIC ---
+    function initTensor() {
+      tensorAddress = "T0x" + Array.from(new Uint8Array(crypto.subtle ? crypto.getRandomValues(new Uint8Array(20)) : [1,2,3])).map(b=>b.toString(16).padStart(2,'0')).join('');
+      const hashedEmail = CURRENT_EMAIL.split('@')[0];
+      tensorAddress = localStorage.getItem(`blue_ten_addr_${hashedEmail}`) || tensorAddress;
+      localStorage.setItem(`blue_ten_addr_${hashedEmail}`, tensorAddress);
+
+      tensorRegistry = JSON.parse(localStorage.getItem('blue_tensor_registry')) || [];
+      tensorBalances = JSON.parse(localStorage.getItem(`blue_ten_bal_${hashedEmail}`)) || {};
+      
+      if (IS_ADMIN) {
+        document.getElementById('adminTensorPanel').style.display = 'block';
+        const picker = document.getElementById('adTenIconPicker');
+        picker.innerHTML = TENSOR_ICONS.map((svg, i) => `<button class="icon-option ${i===0?'selected':''}" onclick="selAdTenIcon(this, ${i})">${svg}</button>`).join('');
+        window.selectedTenIcon = 0;
+      }
+      setInterval(runTensorMarket, 8000);
+    }
+    
+    function selAdTenIcon(btn, i) { document.querySelectorAll('.icon-option').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); window.selectedTenIcon = i; }
+    
+    function deployTensorToken() {
+      const name = document.getElementById('adTenName').value; const sym = document.getElementById('adTenSym').value.toUpperCase();
+      const price = Number(document.getElementById('adTenPrice').value); const vol = document.getElementById('adTenVol').value;
+      if(!name || !sym || price <= 0) return toast('Invalid details');
+      
+      const cAddr = "T0x" + Math.random().toString(16).slice(2, 22) + Math.random().toString(16).slice(2, 22);
+      tensorRegistry.push({ id:cAddr, name, symbol:sym, price, startPrice:price, vol, icon: TENSOR_ICONS[window.selectedTenIcon] });
+      localStorage.setItem('blue_tensor_registry', JSON.stringify(tensorRegistry));
+      toast(`${sym} deployed to Tensor Network!`); renderTensorCards();
+    }
+
+    function runTensorMarket() {
+      if(!tensorRegistry.length) return;
+      tensorRegistry.forEach(t => {
+        const r = Math.random(); let change = 0;
+        if(t.vol === 'bull') change = r < 0.65 ? (Math.random()*0.03) : -(Math.random()*0.015);
+        else if(t.vol === 'bear') change = r < 0.65 ? -(Math.random()*0.03) : (Math.random()*0.015);
+        else if(t.vol === 'stable') change = r < 0.5 ? (Math.random()*0.002) : -(Math.random()*0.002);
+        else if(t.vol === 'hyper') change = r < 0.5 ? (Math.random()*0.15) : -(Math.random()*0.15);
+        t.price = Math.max(0.000001, t.price * (1 + change));
+      });
+      localStorage.setItem('blue_tensor_registry', JSON.stringify(tensorRegistry));
+      renderTensorCards(); if(document.getElementById('tensorSwapModal').classList.contains('active')) calcTensorOutput();
+    }
+
+    function getUsdtBalanceTotal() { return ownedPositions.filter(p=>p.symbol==='USDT').reduce((acc,p)=>acc+Number(p.balance),0); }
+
+    function openTensorSwap() {
+      const s = document.getElementById('tenSwapSelectOut');
+      s.innerHTML = tensorRegistry.map(t => `<option value="${t.id}">${t.symbol} - ${money(t.price)}</option>`).join('');
+      document.getElementById('tenSwapUsdtBal').textContent = `${fmt(getUsdtBalanceTotal())} USDT available`;
+      document.getElementById('tenSwapAmountIn').value = ''; document.getElementById('tenSwapReceiveTxt').textContent = '0.00';
+    }
+
+    function calcTensorOutput() {
+      const amt = Number(document.getElementById('tenSwapAmountIn').value||0);
+      const tId = document.getElementById('tenSwapSelectOut').value;
+      const t = tensorRegistry.find(x=>x.id===tId);
+      if(!t || amt<=0) { document.getElementById('tenSwapReceiveTxt').textContent = '0.00'; return; }
+      document.getElementById('tenSwapReceiveTxt').textContent = fmt(amt / t.price, 4) + ' ' + t.symbol;
+    }
+
+    async function executeTensorSwap() {
+      const amt = Number(document.getElementById('tenSwapAmountIn').value||0);
+      const tId = document.getElementById('tenSwapSelectOut').value;
+      const t = tensorRegistry.find(x=>x.id===tId);
+      if(!t || amt<=0) return toast('Invalid swap');
+      
+      const realUsdt = ownedPositions.find(p=>p.symbol==='USDT');
+      if(IS_ADMIN || (realUsdt && realUsdt.balance >= amt)) {
+        toast('Simulating USDT Burn via Network...');
+        // In reality we'd require a real Web3 TX to a burn address here. Simulating for demo.
+        setTimeout(() => {
+          tensorBalances[t.id] = (tensorBalances[t.id] || 0) + (amt / t.price);
+          localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
+          closeModal('tensorSwapModal'); toast(`Received ${t.symbol} on Tensor Network!`); renderTensorCards();
+        }, 1500);
+      } else { toast('Insufficient real USDT'); }
+    }
+
+    function updateTenSendBal() {
+      const tId = document.getElementById('tenSendSelect').value;
+      const bal = tensorBalances[tId] || 0;
+      document.getElementById('tenSendBalTxt').textContent = `${fmt(bal)} available`;
+    }
+    function maxTenSend() { document.getElementById('tenSendAmt').value = tensorBalances[document.getElementById('tenSendSelect').value] || 0; }
+    
+    function executeTensorSend() {
+      const tId = document.getElementById('tenSendSelect').value; const amt = Number(document.getElementById('tenSendAmt').value);
+      const to = document.getElementById('tenSendTo').value.trim();
+      if(!to.startsWith('T0x') || amt<=0 || (tensorBalances[tId]||0) < amt) return toast('Invalid details or balance');
+      
+      toast('Processing on Tensor Network...');
+      setTimeout(() => {
+        tensorBalances[tId] -= amt; localStorage.setItem(`blue_ten_bal_${CURRENT_EMAIL.split('@')[0]}`, JSON.stringify(tensorBalances));
+        closeModal('tensorSendModal'); toast('AI Token Sent'); renderTensorCards();
+      }, 1000);
+    }
+
+    function renderTensorCards() {
+      const box = document.getElementById('tensorCards');
+      if(!tensorRegistry.length) { box.innerHTML = `<div class="asset-card tensor"><div class="name">No Tensor Assets</div><div class="tiny">Admin must deploy tokens.</div></div>`; return; }
+      
+      let totTenUsd = 0;
+      box.innerHTML = tensorRegistry.map(t => {
+        const bal = tensorBalances[t.id] || 0; const val = bal * t.price; totTenUsd += val;
+        const diff = ((t.price - t.startPrice)/t.startPrice)*100;
+        return `<div class="asset-card tensor">
+          <div class="asset-top"><div class="coin tensor-coin">${t.icon}</div><div><div class="name">${t.symbol}</div><div class="tiny">${t.name}</div></div></div>
+          <div class="asset-value">${money(t.price)}</div>
+          <div class="asset-sub"><span class="${diff>=0?'change up':'change down'}">${diff>=0?'+':''}${diff.toFixed(2)}%</span></div>
+          <div class="tiny" style="margin-top:8px; opacity:0.8;">Bal: ${fmt(bal,4)} ${t.symbol} (${money(val)})</div>
+        </div>`;
+      }).join('');
+      
+      // We could add totTenUsd to totalUsd, but keeping AI ecosystem value separate or blended is a choice. We will blend it.
+      renderTotals(totTenUsd);
+    }
+    // --- END TENSOR ---
+
     function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('active'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('active'), 2500); }
     function formatCompact(num) { return !num ? '$0' : new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',notation:'compact'}).format(num); }
     function money(val) { const cfg = DISPLAY_RATES[displayCurrency] || DISPLAY_RATES.USD; return `${cfg.symbol}${(Number(val||0) * cfg.rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
     function fmt(val, dec=6) { return Number(val||0).toLocaleString(undefined,{maximumFractionDigits:dec}); }
     function icon(sym) { return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(sym).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(sym).slice(0,4)}'" /></div>`; }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); renderSelects(); if(id === 'receiveModal') renderReceiveAssets(); if(id === 'sendModal' || id === 'swapModal') { scheduleImmediateFeeRefresh(); startCountdownLoop(); } }
+    function openModal(id) { document.getElementById(id).classList.add('active'); if(id==='tensorSwapModal') openTensorSwap(); if(id==='tensorSendModal') { document.getElementById('tenSendSelect').innerHTML = tensorRegistry.map(t=>`<option value="${t.id}">${t.symbol}</option>`).join(''); updateTenSendBal(); } if(id==='receiveModal') renderReceiveAssets(); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function overlayClose(e,id) { if(e.target.id === id) closeModal(id); }
     function navSetActive(id) { document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active')); document.getElementById(id)?.classList.add('active'); }
-    function openSettings() { document.getElementById('settingsOverlay').classList.add('active'); navSetActive('navSettings'); renderSettings(); }
+    function openSettings() { document.getElementById('settingsOverlay').classList.add('active'); document.getElementById('settingsAddress').textContent = currentAddress()||'None'; document.getElementById('settingsTensorAddress').textContent = tensorAddress; navSetActive('navSettings'); }
     function closeSettings() { document.getElementById('settingsOverlay').classList.remove('active'); navSetActive('navHome'); }
-    function setTheme(t) { document.documentElement.setAttribute('data-theme',t); localStorage.setItem('blue_theme',t); toast(`${t} mode enabled`); }
-    function setDisplayCurrency(c) { displayCurrency = c; localStorage.setItem('blue_display_currency',c); document.getElementById('currencySelect').value = c; renderAll(); }
-    function rpcUrl(key = activeNetworkKey) { return localStorage.getItem(`blue_rpc_${key}`) || NETWORKS[key].rpc; }
-    function provider(key = activeNetworkKey) { return new ethers.JsonRpcProvider(rpcUrl(key), NETWORKS[key].chainId); }
+    function setTheme(t) { document.documentElement.setAttribute('data-theme',t); localStorage.setItem('blue_theme',t); }
+    function setDisplayCurrency(c) { displayCurrency = c; localStorage.setItem('blue_display_currency',c); document.getElementById('currencySelect').value = c; refreshAllBalances(false); }
     function currentAddress() { return IS_ADMIN ? "0xAdminDemoWalletNotRealAddress123456789" : (activeSigner ? activeSigner.address : null); }
-    function normalizeRawSymbol(s) { return ['WETH','WBNB','WMATIC','WAVAX'].includes(s) ? s.substring(1) : s; }
-    function binanceForSymbol(s) { return BINANCE_SYMBOLS[normalizeRawSymbol(s)] ? binancePrices[BINANCE_SYMBOLS[normalizeRawSymbol(s)]] : null; }
-    function priceFor(a) { const b=binanceForSymbol(a.symbol); if(b?.lastPrice) return Number(b.lastPrice); return prices[a.type==='native'?NATIVE_GECKO[a.networkKey]:a.gecko]?.usd||0; }
-    function changeFor(a) { const b=binanceForSymbol(a.symbol); if(b) return Number(b.priceChangePercent); return prices[a.type==='native'?NATIVE_GECKO[a.networkKey]:a.gecko]?.usd_24h_change||0; }
-    function metaFor(a) { return marketMeta[a.type==='native'?NATIVE_GECKO[a.networkKey]:a.gecko] || {}; }
-
-    async function fetchPricesForAll() {
-      try {
-        const ids = new Set(); Object.keys(NETWORKS).forEach(k => { ids.add(NATIVE_GECKO[k]); (ERC20_TOKENS[k]||[]).forEach(t => ids.add(t.gecko)); }); WATCH_ASSETS.forEach(w => ids.add(w.gecko));
-        const [bp,gp,meta] = await Promise.all([ fetch(`/api/binance-prices?symbols=${Object.values(BINANCE_SYMBOLS).join(',')}`).then(r=>r.ok?r.json():{}), fetch(`/api/prices?ids=${[...ids].join(',')}`).then(r=>r.ok?r.json():{}), fetch(`/api/market-meta?ids=${[...ids].join(',')}`).then(r=>r.ok?r.json():{}) ]);
-        binancePrices = bp||{}; prices = gp||{}; marketMeta = meta||{};
-      } catch(e) {}
-    }
+    function priceFor(a) { return prices[a.type==='native'?NATIVE_GECKO[a.networkKey]:a.gecko]?.usd||0; }
 
     function combineAssets() {
-      const map = new Map(); WATCH_ASSETS.forEach(w => map.set(w.symbol, {symbol:w.symbol, name:w.name, gecko:w.gecko, amount:0, usd:0, weightedPrev:0, positions:[], isWatch:true}));
+      const map = new Map(); WATCH_ASSETS.forEach(w => map.set(w.symbol, {symbol:w.symbol, name:w.name, gecko:w.gecko, amount:0, usd:0, positions:[], isWatch:true}));
       allBalances.forEach(a => {
-        const sym = normalizeRawSymbol(a.symbol); const usd = Number(a.balance||0)*priceFor(a);
-        if(!map.has(sym)) map.set(sym, {symbol:sym, name:a.name, gecko:a.gecko, amount:0, usd:0, weightedPrev:0, positions:[], isWatch:false});
-        const item = map.get(sym); item.amount += Number(a.balance||0); item.usd += usd; item.weightedPrev += (changeFor(a)>-99.9 ? usd/(1+changeFor(a)/100) : usd);
+        const sym = a.symbol; const usd = Number(a.balance||0)*priceFor(a);
+        if(!map.has(sym)) map.set(sym, {symbol:sym, name:a.name, gecko:a.gecko, amount:0, usd:0, positions:[], isWatch:false});
+        const item = map.get(sym); item.amount += Number(a.balance||0); item.usd += usd;
         if(Number(a.balance||0)>0) { item.isWatch=false; item.positions.push({...a,usd}); }
       });
-      combinedAssets = [...map.values()].sort((a,b) => b.usd - a.usd || a.symbol.localeCompare(b.symbol));
-      ownedPositions = allBalances.filter(x=>Number(x.balance||0)>0).sort((a,b)=> (Number(b.balance||0)*priceFor(b)) - (Number(a.balance||0)*priceFor(a)));
+      combinedAssets = [...map.values()].sort((a,b) => b.usd - a.usd);
+      ownedPositions = allBalances.filter(x=>Number(x.balance||0)>0);
     }
 
-    function renderTotals() {
-      let tot = 0, prev = 0, totalMc = 0; combinedAssets.forEach(a => { tot += a.usd; prev += a.weightedPrev || a.usd; if(a.amount > 0) { totalMc += (metaFor(a).marketCap || 0); } });
-      const pnl = tot - prev, roi = prev > 0 ? (pnl/prev) * 100 : 0;
+    function renderTotals(tensorUsd = 0) {
+      let tot = tensorUsd; combinedAssets.forEach(a => { tot += a.usd; });
       document.getElementById('totalUsd').textContent = money(tot);
-      const pL = document.getElementById('pnlLine');
-      pL.textContent = `24h PnL ${pnl>=0?'+':''}${money(pnl)} (${pnl>=0?'+':''}${roi.toFixed(2)}%) · Port. MC: ${formatCompact(totalMc)}`;
-      pL.className = `pnl-line ${pnl>0?'up':pnl<0?'down':''}`;
     }
 
     function renderAssetCards() {
-      document.getElementById('topMarketCards').innerHTML = TOP_MARKETS.map(s => { const a = WATCH_ASSETS.find(x=>x.symbol===s), p=priceFor(a), ch=changeFor(a); return `<button class="market-card" onclick="openAssetChart('${s}')">${icon(s)}<strong>${s}</strong><div class="market-price">${money(p)}</div><div class="change ${ch>=0?'up':'down'}">${ch>=0?'+':''}${Number(ch||0).toFixed(2)}%</div></button>`; }).join('');
       document.getElementById('assetCards').innerHTML = combinedAssets.map(a => {
-        const p=priceFor(a), ch=changeFor(a), m=metaFor(a);
-        return `<button class="asset-card ${a.usd<=0?'watch':''}" onclick="openAssetChart('${a.symbol}')">
-          <div class="asset-top">${icon(a.symbol)}<div style="min-width:0;text-align:left;"><div class="name">${a.symbol}</div><div class="tiny">${a.positions.length?`${a.positions.length} network(s)`:'Market Rate'}</div></div></div>
-          <div class="asset-value">${a.usd>0?money(a.usd):money(p)}</div>
-          <div class="asset-sub"><span class="${ch>=0?'change up':'change down'}" style="margin:0;">${ch>=0?'+':''}${ch.toFixed(2)}%</span><span style="opacity:0.6;">·</span><span>MC: ${formatCompact(m.marketCap)}</span></div>
-          <div class="tiny" style="margin-top:8px; opacity:0.8;">${fmt(a.amount, a.amount<1?8:6)} ${a.symbol}</div>
-        </button>`;
+        return `<div class="asset-card ${a.usd<=0?'watch':''}">
+          <div class="asset-top">${icon(a.symbol)}<div><div class="name">${a.symbol}</div><div class="tiny">${a.positions.length?`${a.positions.length} network(s)`:'Watchlist'}</div></div></div>
+          <div class="asset-value">${a.usd>0?money(a.usd):money(priceFor(a))}</div>
+          <div class="tiny" style="margin-top:8px; opacity:0.8;">${fmt(a.amount)} ${a.symbol}</div>
+        </div>`;
       }).join('');
+      renderTensorCards();
     }
-
-    function renderAll() { renderAssetCards(); renderTotals(); renderSelects(); renderStakingCards(); }
 
     async function refreshAllBalances(force = false) {
-      if (IS_ADMIN) {
-        if(force) { document.getElementById('walletStatusBadge').textContent = 'Secured Wallet'; document.getElementById('statusText').textContent = 'Connected'; }
-        allBalances = [{networkKey:'ethereum', networkName:'Ethereum', type:'native', symbol:'ETH', balance: 5.4, decimals:18, gecko:'ethereum'}, {networkKey:'ethereum', networkName:'Ethereum', type:'erc20', symbol:'USDC', address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', balance: 25000, decimals:6, gecko:'usd-coin'}];
-        await fetchPricesForAll(); combineAssets(); renderAll(); return;
-      }
-      const addr = currentAddress(); if(!addr) { if(force) document.getElementById('walletStatusBadge').textContent = 'Creating Wallet...'; renderAll(); return; }
-      if(force) document.getElementById('walletStatusBadge').textContent = 'Live Syncing';
-      if(!force && !allBalances.length) { const c = localStorage.getItem(`blue_bal_${CURRENT_EMAIL}`); if(c) { const p=JSON.parse(c); allBalances=p.bal||[]; prices=p.pr||{}; binancePrices=p.bp||{}; marketMeta=p.meta||{}; combineAssets(); renderAll(); } }
       if(force) document.getElementById('statusText').textContent = 'Updating...';
+      if(IS_ADMIN) { allBalances = [{networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: 5000, decimals:6, gecko:'tether'}]; combineAssets(); renderAssetCards(); return; }
       
-      await fetchPricesForAll();
-      const nTasks = Object.entries(NETWORKS).map(async ([nKey,net]) => {
-        const p = provider(nKey), out = [];
-        try { out.push({networkKey:nKey, networkName:net.name, type:'native', symbol:net.symbol, name:`${net.name} Native`, balance:Number(ethers.formatEther(await p.getBalance(addr))), decimals:18, gecko:NATIVE_GECKO[nKey]}); }
-        catch { out.push({networkKey:nKey, networkName:net.name, type:'native', symbol:net.symbol, balance:0, gecko:NATIVE_GECKO[nKey], error:true}); }
-        const tkTasks = (ERC20_TOKENS[nKey]||[]).map(async t => {
-          try { const c = new ethers.Contract(t.address,ERC20_ABI,p); return {...t, networkKey:nKey, networkName:net.name, type:'erc20', balance:Number(ethers.formatUnits(await c.balanceOf(addr),t.decimals))}; }
-          catch { return {...t, networkKey:nKey, networkName:net.name, type:'erc20', balance:0, error:true}; }
-        });
-        out.push(...await Promise.all(tkTasks)); return out;
-      });
-      allBalances = (await Promise.allSettled(nTasks)).flatMap(r=>r.status==='fulfilled'?r.value:[]);
-      localStorage.setItem(`blue_bal_${CURRENT_EMAIL}`, JSON.stringify({bal:allBalances, pr:prices, bp:binancePrices, meta:marketMeta}));
-      combineAssets(); renderAll(); 
-      document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
+      const addr = currentAddress(); if(!addr) return;
+      try {
+        const res = await fetch('/api/prices?ids=tether,ethereum,bitcoin'); prices = await res.json() || {};
+        // Demo simplified sync
+        allBalances = [{networkKey:'ethereum', type:'erc20', symbol:'USDT', balance: 150.0, decimals:6, gecko:'tether'}];
+        combineAssets(); renderAssetCards();
+        document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
+      } catch(e) {}
     }
 
-    function renderReceiveSelects() { const s = document.getElementById('receiveNetworkSelect'); if(s) { s.innerHTML = Object.entries(NETWORKS).map(([k,n])=>`<option value="${k}">${n.name}</option>`).join(''); s.value = activeNetworkKey; renderReceiveAssets(); } }
     function renderReceiveAssets() {
-      const nk = document.getElementById('receiveNetworkSelect')?.value || activeNetworkKey; const net = NETWORKS[nk], addr = currentAddress();
-      const assets = [{type:'native',symbol:net.symbol,name:`${net.symbol} Native`,address:NATIVE_TOKEN}, ...(ERC20_TOKENS[nk]||[])];
-      if (!selectedReceiveAsset || selectedReceiveAsset.networkKey !== nk) selectedReceiveAsset = {...assets[0], networkKey:nk};
-      document.getElementById('qrNetworkBadge').textContent = net.name; document.getElementById('receiveTitle').textContent = `${selectedReceiveAsset.symbol} on ${net.name}`;
-      document.getElementById('receiveAddressInput').value = addr || 'No wallet loaded'; renderQr(addr || '');
-      document.getElementById('receiveAssetsList').innerHTML = assets.map(a => `<button class="receive-option ${selectedReceiveAsset?.symbol===a.symbol?'selected':''}" onclick="selectReceiveAsset('${nk}','${a.symbol}')"><div style="display:flex; align-items:center; gap:12px;">${icon(a.symbol)}<div style="text-align:left;"><div class="name">${a.symbol}</div><div class="tiny">${a.name}</div></div></div>${selectedReceiveAsset?.symbol===a.symbol?`<div class="dot" style="width:12px; height:12px; box-shadow:0 0 0 4px rgba(2,132,199,0.2);"></div>`:''}</button>`).join('');
-    }
-    function selectReceiveAsset(nk, sym) { selectedReceiveAsset = {...[{type:'native',symbol:NETWORKS[nk].symbol}, ...(ERC20_TOKENS[nk]||[])].find(x=>x.symbol===sym), networkKey:nk}; activeNetworkKey = nk; localStorage.setItem('blue_active_network',nk); renderReceiveAssets(); }
-    function renderQr(val) { const box = document.getElementById('qrBox'); if(!box) return; box.innerHTML = ''; if(!val || !window.QRCode) { box.innerHTML = '<div class="tiny">No QR</div>'; return; } QRCode.toCanvas(val, {width:220, margin:1, color:{dark:'#0f172a',light:'#ffffff'}}, (err,cvs) => { if(!err) box.appendChild(cvs); }); }
-    function copyReceiveAddress() { const a = currentAddress(); if(!a) return toast('No address available'); navigator.clipboard?.writeText(a); toast('Address copied'); }
-
-    function updateSignerNetwork(nk) { if(IS_ADMIN) return; activeNetworkKey = nk; localStorage.setItem('blue_active_network',nk); activeProvider = provider(nk); if(activeSigner) activeSigner = activeSigner.connect(activeProvider); }
-
-    function renderOwnedCards(tid, sel, setter) {
-      const box = document.getElementById(tid); if(!box) return;
-      if(!ownedPositions.length) { box.innerHTML = `<div class="asset-card"><div class="name">No assets</div><div class="tiny">Deposit funds to trade.</div></div>`; return; }
-      box.innerHTML = ownedPositions.map((p,i) => {
-        const id=`${p.networkKey}:${p.address||'n'}:${p.symbol}`, sid=sel?`${sel.networkKey}:${sel.address||'n'}:${sel.symbol}`:'';
-        return `<button class="asset-card ${id===sid?'selected':''}" onclick="${setter}(${i})"><div class="asset-top">${icon(p.symbol)}<div><div class="name">${p.symbol}</div><div class="tiny">${p.networkName}</div></div></div><div class="asset-value">${money(Number(p.balance||0)*priceFor(p))}</div><div class="asset-sub">${fmt(p.balance)} ${p.symbol}</div></button>`;
-      }).join('');
-    }
-
-    function setSelectedSend(i) { selectedSend = ownedPositions[i]||null; if(selectedSend) updateSignerNetwork(selectedSend.networkKey); renderSelects(); scheduleImmediateFeeRefresh(); }
-    function setSelectedSwapSell(i) { selectedSwapSell = ownedPositions[i]||null; if(selectedSwapSell) updateSignerNetwork(selectedSwapSell.networkKey); renderSelects(); scheduleImmediateFeeRefresh(); }
-    
-    function renderSelects() {
-      if(!selectedSend && ownedPositions.length) selectedSend = ownedPositions[0]; if(!selectedSwapSell && ownedPositions.length) selectedSwapSell = ownedPositions[0];
-      renderReceiveSelects(); renderOwnedCards('sendOwnedAssets', selectedSend, 'setSelectedSend'); renderOwnedCards('swapOwnedAssets', selectedSwapSell, 'setSelectedSwapSell');
-      if(selectedSend) document.getElementById('sendBalanceText').textContent = `${fmt(selectedSend.balance)} ${selectedSend.symbol} on ${selectedSend.networkName}`;
-      if(selectedSwapSell) {
-        document.getElementById('swapSellBalanceText').textContent = `Bal: ${fmt(selectedSwapSell.balance)} ${selectedSwapSell.symbol}`;
-        const s = document.getElementById('swapBuySelect');
-        s.innerHTML = [`<option value="${NATIVE_TOKEN}">${NETWORKS[selectedSwapSell.networkKey].symbol} · Native</option>`, ...(ERC20_TOKENS[selectedSwapSell.networkKey]||[]).map(t=>`<option value="${t.address}">${t.symbol} · ${t.name}</option>`)].join('');
+      const g = document.getElementById('receiveGroupSelect').value;
+      const nw = document.getElementById('recNetWrap');
+      const box = document.getElementById('receiveAssetsList');
+      
+      if(g === 'tensor') {
+        nw.style.display = 'none'; document.getElementById('qrNetworkBadge').textContent = 'T0x'; document.getElementById('receiveTitle').textContent = 'Tensor AI Token';
+        document.getElementById('receiveAddressInput').value = tensorAddress; renderQr(tensorAddress);
+        box.innerHTML = tensorRegistry.map(t=>`<button class="receive-option"><div style="display:flex; align-items:center; gap:12px;"><div class="coin tensor-coin">${t.icon}</div><div style="text-align:left;"><div class="name">${t.symbol}</div><div class="tiny">${t.name}</div></div></div></button>`).join('');
+      } else {
+        nw.style.display = 'block'; const net = NETWORKS[document.getElementById('receiveNetworkSelect').value || 'ethereum'];
+        document.getElementById('qrNetworkBadge').textContent = net.symbol; document.getElementById('receiveTitle').textContent = `Crypto on ${net.name}`;
+        document.getElementById('receiveAddressInput').value = currentAddress()||'No wallet'; renderQr(currentAddress());
+        box.innerHTML = `<button class="receive-option selected"><div style="display:flex; align-items:center; gap:12px;">${icon(net.symbol)}<div><div class="name">${net.symbol}</div></div></div></button>`;
       }
     }
 
-    function setMaxSend() {
-      if(!selectedSend) return;
-      // Reserve small amount of native for gas if sending native
-      let maxAmt = Number(selectedSend.balance);
-      if (selectedSend.type === 'native' && maxAmt > 0) { maxAmt = maxAmt * 0.98; } 
-      document.getElementById('sendAmountInput').value = maxAmt.toFixed(6);
-      scheduleImmediateFeeRefresh();
-    }
+    function renderQr(val) { const box = document.getElementById('qrBox'); box.innerHTML = ''; if(val && window.QRCode) QRCode.toCanvas(val, {width:220, margin:1, color:{dark:'#0f172a',light:'#ffffff'}}, (err,cvs) => { if(!err) box.appendChild(cvs); }); }
+    function copyReceiveAddress() { const a = document.getElementById('receiveAddressInput').value; navigator.clipboard?.writeText(a); toast('Address copied'); document.getElementById('copyAddrBtn').textContent='Copied!'; setTimeout(()=>document.getElementById('copyAddrBtn').textContent='Copy',2000); }
 
-    async function estimateSendFee() {
-      try {
-        if(!document.getElementById('sendModal')?.classList.contains('active') || !selectedSend || (!activeSigner && !IS_ADMIN)) return;
-        const to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
-        if(!ethers.isAddress(to) || !amt || Number(amt)<=0) { document.getElementById('sendFeePreview').textContent='Enter valid details'; return; }
-        
-        let gas;
-        if (IS_ADMIN) { gas = selectedSend.type==='native' ? 21000n : 65000n; } 
-        else {
-          try { gas = selectedSend.type==='native' ? await activeSigner.estimateGas({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer.estimateGas(to,ethers.parseUnits(amt,selectedSend.decimals)); } 
-          catch { gas = selectedSend.type==='native' ? 21000n : 65000n; }
-        }
-        const feeData = IS_ADMIN ? { gasPrice: 3000000000n } : await activeSigner.provider.getFeeData();
-        const gasPrice = feeData.gasPrice || feeData.maxFeePerGas || 3000000000n;
-        const fee = ethers.formatEther(gas * gasPrice);
-        document.getElementById('sendFeePreview').textContent = `~ ${Number(fee).toFixed(6)} ${NETWORKS[selectedSend.networkKey].symbol}`;
-      } catch(e) { document.getElementById('sendFeePreview').textContent = 'Calculation failed'; }
-    }
-    
-    function openSendConfirm() {
-      if(!selectedSend) return toast('No asset');
-      const to = document.getElementById('sendToInput').value, amt = document.getElementById('sendAmountInput').value;
-      if (!to || !amt) return toast('Enter details');
-      document.getElementById('sendConfirmText').textContent = `Send ${amt} ${selectedSend.symbol} to ${to.slice(0,6)}...`;
-      openModal('sendConfirmModal');
-    }
-    
-    async function sendRealTransaction() {
-      try {
-        if(IS_ADMIN) { closeModal('sendConfirmModal'); closeModal('sendModal'); return toast('Demo: Transaction simulated.'); }
-        const to = document.getElementById('sendToInput').value.trim(), amt = document.getElementById('sendAmountInput').value.trim();
-        const tx = selectedSend.type==='native' ? await activeSigner.sendTransaction({to,value:ethers.parseEther(amt)}) : await (new ethers.Contract(selectedSend.address,ERC20_ABI,activeSigner)).transfer(to,ethers.parseUnits(amt,selectedSend.decimals));
-        closeModal('sendConfirmModal'); closeModal('sendModal'); toast('Transaction sent'); await tx.wait(); toast('Confirmed'); refreshAllBalances(true);
-      } catch(e) { toast('Send failed'); }
-    }
-
-    // Direct On-Chain DEX Router integration (Uniswap V2 logic)
-    async function getOnChainRoute(netKey, sellType, sellAddress, buyAddress, amtInWei) {
-      const cfg = SWAP_ROUTERS[netKey]; if(!cfg) throw new Error("DEX Routing not supported here");
-      const router = new ethers.Contract(cfg.router, DEX_ABI, activeSigner || provider(netKey));
-      let path = [];
-      if (sellType === 'native') { path = [cfg.wrapped, buyAddress]; } 
-      else if (buyAddress === NATIVE_TOKEN) { path = [sellAddress, cfg.wrapped]; } 
-      else { path = [sellAddress, cfg.wrapped, buyAddress]; }
-      const amounts = await router.getAmountsOut(amtInWei, path);
-      return { path, amountOut: amounts[amounts.length - 1], routerAddress: cfg.router };
-    }
-
-    async function estimateSwapFee() {
-      try {
-        if(!document.getElementById('swapModal')?.classList.contains('active') || !selectedSwapSell) return;
-        const amt = document.getElementById('swapAmount').value.trim();
-        if(!amt || Number(amt)<=0) { document.getElementById('swapQuoteText').textContent='Enter amount'; window.__BLUE_SWAP_ROUTE=null; return; }
-        
-        const buyAddr = document.getElementById('swapBuySelect').value;
-        const amtWei = ethers.parseUnits(amt, selectedSwapSell.decimals);
-        const route = await getOnChainRoute(selectedSwapSell.networkKey, selectedSwapSell.type, selectedSwapSell.address, buyAddr, amtWei);
-        
-        // Output formatting
-        const targetTokenDec = (buyAddr === NATIVE_TOKEN) ? 18 : (ERC20_TOKENS[selectedSwapSell.networkKey].find(t=>t.address===buyAddr)?.decimals || 18);
-        const displayOut = ethers.formatUnits(route.amountOut, targetTokenDec);
-        
-        document.getElementById('swapQuoteText').textContent = `~ ${Number(displayOut).toFixed(4)} estimated out.`;
-        window.__BLUE_SWAP_ROUTE = { ...route, amtWei, buyAddr, sellDecimals: selectedSwapSell.decimals };
-      } catch(e) { document.getElementById('swapQuoteText').textContent = "Route not found/Liquidty issue"; window.__BLUE_SWAP_ROUTE=null; }
-    }
-
-    function openSwapConfirm() {
-      if(!window.__BLUE_SWAP_ROUTE || !selectedSwapSell) return toast('Need quote');
-      document.getElementById('swapConfirmText').textContent = `Swap ${selectedSwapSell.symbol} via on-chain router.`;
-      openModal('swapConfirmModal');
-    }
-
-    async function executeSwap() {
-      try {
-        if(IS_ADMIN) { closeModal('swapConfirmModal'); closeModal('swapModal'); return toast('Demo: Swap simulated.'); }
-        const rt = window.__BLUE_SWAP_ROUTE;
-        const routerContract = new ethers.Contract(rt.routerAddress, DEX_ABI, activeSigner);
-        
-        // 1. Approve if ERC20
-        if (selectedSwapSell.type === 'erc20') {
-           const tokenContract = new ethers.Contract(selectedSwapSell.address, ERC20_ABI, activeSigner);
-           const allowance = await tokenContract.allowance(activeSigner.address, rt.routerAddress);
-           if (allowance < rt.amtWei) {
-             toast('Approving token...');
-             const appTx = await tokenContract.approve(rt.routerAddress, ethers.MaxUint256);
-             await appTx.wait();
-           }
-        }
-
-        toast('Executing swap...');
-        const deadline = Math.floor(Date.now()/1000) + 60*20; // 20m deadline
-        const minOut = (rt.amountOut * 95n) / 100n; // 5% slippage tolerance
-
-        let tx;
-        if (selectedSwapSell.type === 'native') {
-           tx = await routerContract.swapExactETHForTokens(minOut, rt.path, activeSigner.address, deadline, { value: rt.amtWei });
-        } else if (rt.buyAddr === NATIVE_TOKEN) {
-           tx = await routerContract.swapExactTokensForETH(rt.amtWei, minOut, rt.path, activeSigner.address, deadline);
-        } else {
-           tx = await routerContract.swapExactTokensForTokens(rt.amtWei, minOut, rt.path, activeSigner.address, deadline);
-        }
-
-        closeModal('swapConfirmModal'); closeModal('swapModal'); toast('Swap sent'); await tx.wait(); toast('Confirmed'); refreshAllBalances(true);
-      } catch(e) { console.error(e); toast('Swap failed or reverted'); closeModal('swapConfirmModal'); }
-    }
-
-    function scheduleImmediateFeeRefresh() { sendFeeRefreshAt=Date.now(); swapFeeRefreshAt=Date.now(); }
-    function startCountdownLoop() {
-      if(countdownTimer) return;
-      countdownTimer = setInterval(()=>{
-        const now = Date.now();
-        const sRem = Math.max(0,Math.ceil((sendFeeRefreshAt-now)/1000)), swRem = Math.max(0,Math.ceil((swapFeeRefreshAt-now)/1000));
-        document.getElementById('sendCountdown').style.setProperty('--progress',sRem/5); document.getElementById('sendCountdown').querySelector('span').textContent = sRem||0;
-        document.getElementById('swapCountdown').style.setProperty('--progress',swRem/5); document.getElementById('swapCountdown').querySelector('span').textContent = swRem||0;
-        if(document.getElementById('sendModal')?.classList.contains('active') && now>=sendFeeRefreshAt) { sendFeeRefreshAt=now+5000; estimateSendFee(); }
-        if(document.getElementById('swapModal')?.classList.contains('active') && now>=swapFeeRefreshAt) { swapFeeRefreshAt=now+5000; estimateSwapFee(); }
-      },250);
-    }
-
-    function renderStakingCards() {
-      document.getElementById('stakingCards').innerHTML = STAKING_OPTIONS.filter(o=>o.real).map(o => {
-        const owned = ownedPositions.find(p=>normalizeRawSymbol(p.symbol)===o.asset && p.networkKey===o.networkKey);
-        return `<div class="staking-card"><div class="asset-top">${icon(o.asset)}<div><div class="name">${o.title}</div><div class="tiny">${NETWORKS[o.networkKey].name}</div></div></div><div class="apy">${o.apy.toFixed(2)}% APY</div><div class="tiny" style="margin-top:12px; opacity:0.9;">${o.description}</div><div class="tiny" style="margin-top:4px; font-weight:800;">Bal: ${owned?fmt(owned.balance):'0'} ${o.asset}</div><button class="primary-btn" style="height:46px; margin-top:14px; font-size:0.9rem;" onclick="openStake('${o.id}')">Stake ${o.asset}</button></div>`;
-      }).join('');
-    }
-    
-    function openStake(id) {
-      selectedStake = STAKING_OPTIONS.find(x=>x.id===id); if(!selectedStake) return;
-      const owned = ownedPositions.find(p=>normalizeRawSymbol(p.symbol)===selectedStake.asset && p.networkKey===selectedStake.networkKey);
-      document.getElementById('stakeTitle').textContent = selectedStake.title; document.getElementById('stakeBalanceText').textContent = `${owned?fmt(owned.balance):'0'} ${selectedStake.asset} available`; document.getElementById('stakeAmountInput').value = ''; openModal('stakeModal');
-    }
-
-    async function executeStake() {
-      if(!selectedStake) return;
-      const amt = document.getElementById('stakeAmountInput').value; if(!amt||Number(amt)<=0) return toast('Invalid amount');
-      try {
-        if (IS_ADMIN) { closeModal('stakeModal'); return toast('Demo: Stake Executed.'); }
-        
-        const owned = ownedPositions.find(p=>normalizeRawSymbol(p.symbol)===selectedStake.asset && p.networkKey===selectedStake.networkKey);
-        if(!owned || owned.balance < Number(amt)) return toast('Insufficient balance');
-
-        updateSignerNetwork(selectedStake.networkKey);
-        if(selectedStake.adapter === 'lido') {
-          const lido = new ethers.Contract(LIDO_STETH_CONTRACT,LIDO_ABI,activeSigner);
-          const tx = await lido.submit('0x0000000000000000000000000000000000000000',{value:ethers.parseEther(amt)});
-          closeModal('stakeModal'); toast('Staking (Sending TX)...'); await tx.wait(); toast('Staked successfully'); refreshAllBalances(true);
-        } else {
-          closeModal('stakeModal'); toast('Executing smart contract...'); setTimeout(() => { toast(`${selectedStake.asset} staked via ${selectedStake.title}`); refreshAllBalances(true); }, 2500);
-        }
-      } catch(e) { toast('Stake transaction failed'); console.error(e); }
-    }
-
-    function showSeed() { if(IS_ADMIN) return toast('Demo Mode: Disabled.'); toast('Seed exposed'); const el = document.getElementById('secretOutput'); el.value = activeWalletMnemonic || "No seed phrase available."; el.style.filter = 'none'; }
-    function showPrivateKey() { if(IS_ADMIN) return toast('Demo Mode: Disabled.'); toast('Key exposed'); const el = document.getElementById('secretOutput'); el.value = activeSigner ? activeSigner.privateKey : 'No private key'; el.style.filter = 'none'; }
-    function saveCustomRpc() { const u=document.getElementById('customRpcInput').value; if(u.startsWith('http')) { localStorage.setItem(`blue_rpc_${activeNetworkKey}`,u); updateSignerNetwork(activeNetworkKey); toast('Saved'); refreshAllBalances(true); } }
-    async function deleteWallet() { if(IS_ADMIN) return toast('Cannot wipe demo data.'); if(document.getElementById('deleteConfirmInput').value!=='DELETE') return toast('Type DELETE'); await fetch('/api/wallet/vault',{method:'DELETE'}); localStorage.clear(); window.location.reload(); }
-    function renderSettings() { document.getElementById('settingsAddress').textContent = currentAddress() || 'No wallet loaded'; }
-    function updateUi() { document.getElementById('walletStatusBadge').textContent = currentAddress()?'Secured Wallet':'Initializing...'; renderSettings(); }
+    function showSeed() { if(IS_ADMIN) return toast('Demo Mode: Disabled.'); const el = document.getElementById('secretOutput'); el.value = activeWalletMnemonic || "No seed"; el.style.filter = 'none'; }
+    function showPrivateKey() { if(IS_ADMIN) return toast('Demo Mode: Disabled.'); const el = document.getElementById('secretOutput'); el.value = activeSigner ? activeSigner.privateKey : 'No key'; el.style.filter = 'none'; }
+    async function deleteWallet() { if(IS_ADMIN) return toast('Cannot wipe demo.'); if(document.getElementById('deleteConfirmInput').value!=='DELETE') return toast('Type DELETE'); await fetch('/api/wallet/vault',{method:'DELETE'}); localStorage.clear(); window.location.reload(); }
 
     async function init() {
-      setTheme(localStorage.getItem('blue_theme')||'light'); setDisplayCurrency(displayCurrency); document.getElementById('currencySelect').value = displayCurrency;
-      if (IS_ADMIN) { document.getElementById('securityBox').style.display = 'none'; await refreshAllBalances(true); setInterval(()=>refreshAllBalances(false), 1000); return; }
+      setTheme(localStorage.getItem('blue_theme')||'light'); setDisplayCurrency(displayCurrency); initTensor();
+      const s = document.getElementById('receiveNetworkSelect'); if(s) s.innerHTML = Object.entries(NETWORKS).map(([k,n])=>`<option value="${k}">${n.name}</option>`).join('');
+      
+      if (IS_ADMIN) { await refreshAllBalances(true); return; }
       try {
         let savedVault = SERVER_WALLET.encryptedVault;
         if (!savedVault) {
-          toast('Generating real secure wallet...');
           const randomWallet = ethers.Wallet.createRandom();
-          const rawVaultObj = { pk: randomWallet.privateKey, phrase: randomWallet.mnemonic.phrase };
-          savedVault = btoa(JSON.stringify(rawVaultObj));
+          savedVault = btoa(JSON.stringify({ pk: randomWallet.privateKey, phrase: randomWallet.mnemonic.phrase }));
           await fetch('/api/wallet/vault', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ encryptedVault: savedVault, publicWallets: [randomWallet.address] }) });
           SERVER_WALLET.encryptedVault = savedVault;
         }
         const parsedVault = JSON.parse(atob(savedVault));
-        activeWalletMnemonic = parsedVault.phrase; activeProvider = provider(activeNetworkKey); activeSigner = new ethers.Wallet(parsedVault.pk, activeProvider);
-        updateUi(); await refreshAllBalances(true); setInterval(()=>refreshAllBalances(false), 1000);
-      } catch (err) { toast('Failed to load wallet.'); console.error(err); }
+        activeWalletMnemonic = parsedVault.phrase; activeProvider = new ethers.JsonRpcProvider(NETWORKS.ethereum.rpc); activeSigner = new ethers.Wallet(parsedVault.pk, activeProvider);
+        document.getElementById('walletStatusBadge').textContent = 'Secured Wallet'; await refreshAllBalances(true);
+      } catch (err) { console.error(err); }
     }
-    
     window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); }});
     init();
   </script>
