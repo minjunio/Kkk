@@ -2080,4 +2080,207 @@
     }
 
     function openSwapConfirm() {
-      const quote = window.__BLUE_SWAP
+      const quote = window.__BLUE_SWAP_QUOTE;
+
+      if (!quote) {
+        toast('Get a quote first');
+        return;
+      }
+
+      document.getElementById('swapConfirmText').textContent =
+        `Execute swap on ${NETWORKS[activeNetworkKey].name}. Gas: ${quote.gas || 'N/A'}.`;
+
+      openModal('swapConfirmModal');
+    }
+
+    async function executeSwap() {
+      try {
+        const quote = window.__BLUE_SWAP_QUOTE;
+        if (!quote) throw new Error('Get quote first');
+
+        const signer = await ensureUnlocked();
+
+        const tx = await signer.sendTransaction({
+          to: quote.to,
+          data: quote.data,
+          value: quote.value ? BigInt(quote.value) : 0n,
+          gasLimit: quote.gas ? BigInt(quote.gas) : undefined
+        });
+
+        closeModal('swapConfirmModal');
+        closeModal('swapModal');
+        toast('Swap sent');
+
+        await tx.wait();
+
+        toast('Swap confirmed');
+        refreshAllBalances();
+      } catch (err) {
+        console.error(err);
+        toast(err.shortMessage || err.message || 'Swap failed');
+      }
+    }
+
+    function scheduleImmediateFeeRefresh() {
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+      renderCountdowns();
+    }
+
+    function renderCountdowns() {
+      const now = Date.now();
+
+      const sendRemaining = Math.max(0, Math.ceil((sendFeeRefreshAt - now) / 1000));
+      const swapRemaining = Math.max(0, Math.ceil((swapFeeRefreshAt - now) / 1000));
+
+      const sendRing = document.getElementById('sendCountdown');
+      if (sendRing) {
+        const pct = sendRemaining / 5;
+        sendRing.style.setProperty('--progress', pct);
+        sendRing.querySelector('span').textContent = String(sendRemaining || 0);
+      }
+
+      const swapRing = document.getElementById('swapCountdown');
+      if (swapRing) {
+        const pct = swapRemaining / 5;
+        swapRing.style.setProperty('--progress', pct);
+        swapRing.querySelector('span').textContent = String(swapRemaining || 0);
+      }
+    }
+
+    function startCountdownLoop() {
+      if (countdownTimer) return;
+
+      sendFeeRefreshAt = Date.now();
+      swapFeeRefreshAt = Date.now();
+
+      countdownTimer = setInterval(async () => {
+        const now = Date.now();
+
+        if (document.getElementById('sendModal')?.classList.contains('active') && now >= sendFeeRefreshAt) {
+          sendFeeRefreshAt = now + 5000;
+          await estimateSendFee();
+        }
+
+        if (document.getElementById('swapModal')?.classList.contains('active') && now >= swapFeeRefreshAt) {
+          swapFeeRefreshAt = now + 5000;
+          await estimateSwapFee();
+        }
+
+        renderCountdowns();
+      }, 250);
+    }
+
+    async function showSeed() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].phrase;
+      output.classList.add('visible');
+      toast('Seed phrase shown');
+    }
+
+    async function showPrivateKey() {
+      const wallet = ACTIVE_DECRYPTED_WALLET || await unlockDeviceWallet();
+      if (!wallet) return;
+
+      const output = document.getElementById('secretOutput');
+      output.value = wallet.wallets[0].privateKey;
+      output.classList.add('visible');
+      toast('Private key shown');
+    }
+
+    async function deleteWallet() {
+      const value = document.getElementById('deleteConfirmInput').value.trim();
+
+      if (value !== 'DELETE') {
+        toast('Type DELETE to confirm');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/wallet/vault', { method: 'DELETE' });
+        if (!res.ok) throw new Error('Delete failed');
+
+        localStorage.removeItem('bluecrypto_public_wallets');
+        localStorage.removeItem(`blue_device_key_${CURRENT_EMAIL}`);
+
+        ACTIVE_DECRYPTED_WALLET = null;
+        activeSigner = null;
+        allBalances = [];
+
+        toast('Wallet deleted');
+        setTimeout(() => window.location.reload(), 800);
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Delete failed');
+      }
+    }
+
+    function saveCustomRpc() {
+      const url = document.getElementById('customRpcInput').value.trim();
+
+      if (!url.startsWith('http')) {
+        toast('Enter a valid RPC URL');
+        return;
+      }
+
+      localStorage.setItem(`blue_rpc_${activeNetworkKey}`, url);
+      activeProvider = provider(activeNetworkKey);
+
+      if (ACTIVE_DECRYPTED_WALLET) {
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey, activeProvider);
+      }
+
+      toast('RPC saved');
+      refreshAllBalances();
+    }
+
+    function renderSettings() {
+      const addr = currentAddress();
+      document.getElementById('settingsAddress').textContent = addr || 'No wallet loaded';
+    }
+
+    function updateUi() {
+      const addr = currentAddress();
+
+      document.getElementById('walletStatusBadge').textContent = addr ? 'Real wallet active' : 'Creating wallet';
+      document.getElementById('activeNetworkText').textContent = 'All networks';
+      document.getElementById('securityText').textContent = activeSigner ? 'Loaded' : 'Encrypted';
+
+      renderSelects();
+      renderSettings();
+    }
+
+    async function initialize() {
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('blue_theme') || 'light');
+
+      if (SERVER_WALLET?.publicWallets) {
+        localStorage.setItem('bluecrypto_public_wallets', JSON.stringify(SERVER_WALLET.publicWallets));
+      }
+
+      activeProvider = provider(activeNetworkKey);
+
+      updateUi();
+
+      if (SERVER_WALLET?.encryptedVault) {
+        await unlockDeviceWallet();
+      } else {
+        await createWalletNoPin();
+      }
+
+      startCountdownLoop();
+    }
+
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeSettings();
+        document.querySelectorAll('.modal-overlay.active').forEach(x => x.classList.remove('active'));
+      }
+    });
+
+    initialize();
+  </script>
+</body>
+</html>
