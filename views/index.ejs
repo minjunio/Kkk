@@ -1,557 +1,1959 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Blue Wallet Login</title>
+  <title>Bluebook Wallet</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #f4f9ff;
-      --card: #ffffff;
-      --card2: #f8fbff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: rgba(15, 23, 42, 0.08);
-      --blue: #0284c7;
-      --blue2: #2563eb;
-      --green: #16a34a;
-      --red: #e11d48;
-      --shadow: 0 24px 70px rgba(15, 23, 42, 0.1);
+      color-scheme: light;
+      --bg1:#e9f8ff;
+      --bg2:#f8fcff;
+      --bg3:#d7f0ff;
+      --glass:rgba(255,255,255,.84);
+      --glass2:rgba(255,255,255,.66);
+      --solid:#fff;
+      --soft:#f3f9ff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --muted2:#94a3b8;
+      --blue:#0284c7;
+      --blue2:#2563eb;
+      --cyan:#38bdf8;
+      --pink:#e11d48;
+      --green:#16a34a;
+      --orange:#d97706;
+      --border:rgba(15,23,42,.08);
+      --border2:rgba(2,132,199,.30);
+      --shadow:0 26px 82px rgba(37,99,235,.15);
+      --shadow2:0 14px 38px rgba(15,23,42,.08);
+      --safe-top:env(safe-area-inset-top);
+      --safe-bottom:env(safe-area-inset-bottom);
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg1:#06111f;
+      --bg2:#050816;
+      --bg3:#0a2942;
+      --glass:rgba(13,22,40,.86);
+      --glass2:rgba(17,29,51,.70);
+      --solid:#0d1628;
+      --soft:#111d33;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --muted2:#64748b;
+      --blue:#38bdf8;
+      --border:rgba(125,211,252,.14);
+      --border2:rgba(56,189,248,.34);
+      --shadow:0 28px 86px rgba(0,0,0,.42);
+      --shadow2:0 14px 38px rgba(0,0,0,.25);
     }
 
     * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    html, body {
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
     }
 
     body {
-      min-height: 100vh;
-      color: var(--text);
+      min-height:100vh;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(2, 132, 199, 0.12), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(22, 163, 74, 0.08), transparent 25%),
-        linear-gradient(135deg, #f4f9ff, #e8f3ff);
-      padding: 18px;
+        radial-gradient(circle at 8% 5%,rgba(56,189,248,.32),transparent 30%),
+        radial-gradient(circle at 92% 12%,rgba(37,99,235,.18),transparent 24%),
+        radial-gradient(circle at 50% 105%,rgba(14,165,233,.18),transparent 30%),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
+      background-attachment:fixed;
+      padding-bottom:calc(92px + var(--safe-bottom));
+    }
+
+    button,input,select,textarea {
+      font:inherit;
+    }
+
+    button {
+      border:0;
+      cursor:pointer;
     }
 
     .topbar {
-      width: min(980px, 100%);
-      margin: 0 auto 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      position:sticky;
+      top:0;
+      z-index:50;
+      padding:calc(10px + var(--safe-top)) 12px 10px;
+      background:rgba(248,251,255,.68);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(22px);
+      -webkit-backdrop-filter:blur(22px);
+    }
+
+    [data-theme="dark"] .topbar {
+      background:rgba(5,8,22,.76);
+    }
+
+    .topbar-inner {
+      width:min(980px,100%);
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
     }
 
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
     .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      color: white;
-      font-weight: 950;
-      background: linear-gradient(135deg, var(--blue2), #38bdf8);
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.2);
+      width:44px;
+      height:44px;
+      border-radius:17px;
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:950;
+      background:linear-gradient(135deg,var(--blue2),var(--cyan));
+      box-shadow:0 14px 34px rgba(37,99,235,.24);
+      flex:0 0 auto;
     }
 
-    .brand h1 {
-      font-size: 1rem;
-      font-weight: 950;
-      letter-spacing: -0.04em;
+    .brand-title {
+      font-weight:950;
+      letter-spacing:-.05em;
+      font-size:1.04rem;
+      white-space:nowrap;
     }
 
-    .brand p {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 700;
+    .brand-sub {
+      margin-top:2px;
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+      white-space:nowrap;
     }
 
-    .staff-btn {
-      height: 42px;
-      padding: 0 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--text);
-      font-weight: 850;
-      cursor: pointer;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    .top-actions {
+      display:flex;
+      align-items:center;
+      gap:6px;
     }
 
-    .wrap {
-      width: min(980px, 100%);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 430px 1fr;
-      gap: 18px;
-      align-items: start;
+    .icon-btn {
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      color:var(--text);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      font-weight:950;
     }
 
-    .card {
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      padding: 22px;
-      backdrop-filter: blur(16px);
+    .shell {
+      width:min(980px,100%);
+      margin:0 auto;
+      padding:12px;
     }
 
-    .login-card {
-      order: 1;
+    .hero {
+      position:relative;
+      overflow:hidden;
+      border-radius:34px;
+      padding:18px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(24px);
+      -webkit-backdrop-filter:blur(24px);
+      contain:layout paint;
     }
 
-    .info-card {
-      order: 2;
+    .hero::before {
+      content:"";
+      position:absolute;
+      right:-90px;
+      bottom:-130px;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(2,132,199,.25),transparent 70%);
+      pointer-events:none;
+    }
+
+    .hero-inner {
+      position:relative;
+      z-index:1;
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      background: rgba(2, 132, 199, 0.08);
-      border: 1px solid rgba(2, 132, 199, 0.22);
-      color: var(--blue);
-      font-size: 0.76rem;
-      font-weight: 950;
-      margin-bottom: 14px;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 11px;
+      border-radius:999px;
+      color:var(--blue);
+      background:rgba(2,132,199,.08);
+      border:1px solid var(--border2);
+      font-size:.74rem;
+      font-weight:950;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--blue);
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--blue);
+      animation:pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow:0 0 0 0 rgba(2,132,199,.42); }
+      80% { box-shadow:0 0 0 9px rgba(2,132,199,0); }
+      100% { box-shadow:0 0 0 0 rgba(2,132,199,0); }
+    }
+
+    .balance {
+      margin-top:14px;
+      font-size:clamp(2.55rem,12vw,5.15rem);
+      font-weight:950;
+      line-height:.93;
+      letter-spacing:-.08em;
+      font-variant-numeric:tabular-nums;
+      will-change:contents;
+    }
+
+    .pnl-line {
+      margin-top:9px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 11px;
+      border-radius:999px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-weight:900;
+      font-size:.76rem;
+    }
+
+    .pnl-line.up {
+      color:var(--green);
+      background:rgba(22,163,74,.09);
+      border-color:rgba(22,163,74,.16);
+    }
+
+    .pnl-line.down {
+      color:var(--pink);
+      background:rgba(225,29,72,.08);
+      border-color:rgba(225,29,72,.14);
+    }
+
+    .market-strip {
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      overflow-x:auto;
+      scroll-snap-type:x proximity;
+      scrollbar-width:none;
+      padding:2px 2px 6px;
+      contain:layout paint;
+    }
+
+    .market-strip::-webkit-scrollbar {
+      display:none;
+    }
+
+    .market-card {
+      flex:0 0 150px;
+      scroll-snap-align:start;
+      padding:12px;
+      border-radius:23px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      color:var(--text);
+      text-align:left;
+      min-width:0;
+      contain:layout paint;
+    }
+
+    .market-card strong {
+      display:block;
+      font-size:.88rem;
+      font-weight:950;
+      margin-top:8px;
+    }
+
+    .market-price {
+      margin-top:6px;
+      font-size:1rem;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .change {
+      margin-top:4px;
+      font-size:.72rem;
+      font-weight:950;
+      color:var(--muted);
+    }
+
+    .change.up {
+      color:var(--green);
+    }
+
+    .change.down {
+      color:var(--pink);
+    }
+
+    .chips {
+      display:flex;
+      gap:7px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      margin-top:13px;
+      padding-bottom:2px;
+    }
+
+    .chips::-webkit-scrollbar {
+      display:none;
+    }
+
+    .chip {
+      flex:0 0 auto;
+      padding:8px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      background:var(--glass2);
+      border:1px solid var(--border);
+      font-size:.72rem;
+      font-weight:900;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+
+    .quick {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:15px;
+    }
+
+    .quick-btn {
+      min-height:74px;
+      border-radius:23px;
+      padding:10px;
+      text-align:center;
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
+    }
+
+    .quick-btn.primary {
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      border-color:transparent;
+    }
+
+    .quick-btn strong {
+      display:block;
+      font-size:.88rem;
+      font-weight:950;
+      margin-bottom:4px;
+    }
+
+    .quick-btn span {
+      color:var(--muted);
+      font-size:.66rem;
+      font-weight:850;
+    }
+
+    .quick-btn.primary span {
+      color:rgba(255,255,255,.84);
+    }
+
+    .panel {
+      margin-top:12px;
+      border-radius:27px;
+      padding:15px;
+      background:var(--glass);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow2);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      overflow:hidden;
+      max-width:100%;
+      contain:layout paint;
+    }
+
+    .panel-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:12px;
     }
 
     .title {
-      font-size: 1.45rem;
-      font-weight: 950;
-      letter-spacing: -0.06em;
-      margin-bottom: 7px;
+      font-size:1.06rem;
+      font-weight:950;
+      letter-spacing:-.045em;
     }
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 650;
-      line-height: 1.55;
-      margin-bottom: 18px;
+    .asset-scroll {
+      display:flex;
+      gap:11px;
+      overflow-x:auto;
+      scroll-snap-type:x proximity;
+      scrollbar-width:none;
+      padding:2px 2px 5px;
+      contain:layout paint;
     }
 
-    .form-group {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 13px;
+    .asset-scroll::-webkit-scrollbar {
+      display:none;
+    }
+
+    .asset-card,
+    .staking-card {
+      flex:0 0 178px;
+      scroll-snap-align:start;
+      border-radius:24px;
+      padding:14px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      min-width:0;
+      color:var(--text);
+      text-align:left;
+      box-shadow:0 8px 24px rgba(15,23,42,.05);
+      contain:layout paint;
+    }
+
+    [data-theme="dark"] .asset-card,
+    [data-theme="dark"] .staking-card,
+    [data-theme="dark"] .market-card {
+      box-shadow:0 10px 28px rgba(0,0,0,.18);
+    }
+
+    .asset-card.watch {
+      background:linear-gradient(180deg,var(--glass2),rgba(255,255,255,.26));
+    }
+
+    [data-theme="dark"] .asset-card.watch {
+      background:linear-gradient(180deg,var(--glass2),rgba(17,29,51,.35));
+    }
+
+    .asset-card.selected,
+    .staking-card.selected {
+      border-color:var(--border2);
+      box-shadow:0 0 0 4px rgba(2,132,199,.08);
+    }
+
+    .asset-top {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .coin {
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:var(--soft);
+      border:1px solid var(--border);
+      color:var(--blue);
+      font-size:.7rem;
+      font-weight:950;
+      overflow:hidden;
+      flex:0 0 auto;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+    }
+
+    .coin img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      image-rendering:auto;
+      transform:translateZ(0);
+    }
+
+    .name {
+      font-weight:950;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      min-width:0;
+    }
+
+    .tiny {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.72rem;
+      line-height:1.45;
+      font-weight:800;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .asset-value {
+      margin-top:12px;
+      font-size:1.12rem;
+      font-weight:950;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .asset-sub {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+    }
+
+    .network-list {
+      display:grid;
+      gap:6px;
+      margin-top:8px;
+    }
+
+    .mini-net {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      color:var(--muted);
+      font-size:.68rem;
+      font-weight:850;
+    }
+
+    .apy {
+      margin-top:11px;
+      font-size:1.7rem;
+      line-height:1;
+      font-weight:950;
+      letter-spacing:-.06em;
+      color:var(--blue);
+    }
+
+    .small-btn,.primary-btn,.secondary-btn,.danger-btn {
+      min-height:44px;
+      border-radius:16px;
+      font-weight:950;
+    }
+
+    .small-btn {
+      padding:0 12px;
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
+      font-size:.75rem;
+      white-space:nowrap;
+    }
+
+    .primary-btn {
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      box-shadow:0 14px 30px rgba(37,99,235,.20);
+    }
+
+    .secondary-btn {
+      color:var(--text);
+      background:var(--solid);
+      border:1px solid var(--border);
+    }
+
+    .danger-btn {
+      color:white;
+      background:linear-gradient(135deg,#be123c,#fb7185);
+    }
+
+    .form {
+      display:grid;
+      gap:10px;
+    }
+
+    .field {
+      display:grid;
+      gap:7px;
     }
 
     label {
-      color: var(--muted);
-      font-size: 0.74rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      color:var(--muted);
+      font-size:.7rem;
+      font-weight:950;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
-    input {
-      width: 100%;
-      min-height: 50px;
-      padding: 13px 14px;
-      border-radius: 16px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      outline: none;
-      font-weight: 800;
-      font-size: 0.95rem;
+    .input,.select,.textarea {
+      width:100%;
+      min-height:48px;
+      padding:12px;
+      border-radius:16px;
+      color:var(--text);
+      background:var(--soft);
+      border:1px solid var(--border);
+      outline:none;
+      font-weight:850;
+      max-width:100%;
     }
 
-    input:focus {
-      border-color: rgba(2, 132, 199, 0.35);
-      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.08);
+    .textarea {
+      min-height:112px;
+      resize:vertical;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:.8rem;
+      line-height:1.5;
     }
 
-    .btn {
-      width: 100%;
-      min-height: 50px;
-      border: 0;
-      border-radius: 16px;
-      font-weight: 950;
-      cursor: pointer;
+    .button-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:10px;
     }
 
-    .primary {
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
-      color: white;
-      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.18);
+    .button-row.one {
+      grid-template-columns:1fr;
     }
 
-    .secondary {
-      background: var(--card2);
-      color: var(--text);
-      border: 1px solid var(--border);
+    .box {
+      margin-top:10px;
+      padding:12px;
+      border-radius:19px;
+      background:var(--glass2);
+      border:1px solid var(--border);
+      max-width:100%;
+      min-width:0;
     }
 
-    .btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
+    .box.warn {
+      color:var(--orange);
+      background:rgba(217,119,6,.1);
+      border-color:rgba(217,119,6,.18);
     }
 
-    .msg {
-      padding: 12px;
-      border-radius: 15px;
-      font-size: 0.84rem;
-      font-weight: 800;
-      line-height: 1.45;
-      margin-bottom: 13px;
+    .box.bad {
+      color:var(--pink);
+      background:rgba(225,29,72,.08);
+      border-color:rgba(225,29,72,.14);
     }
 
-    .error {
-      background: rgba(225, 29, 72, 0.08);
-      color: var(--red);
+    .receive-card {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      padding:14px;
+      border-radius:24px;
+      background:var(--soft);
+      border:1px solid var(--border);
+      min-width:0;
+      overflow:hidden;
     }
 
-    .success {
-      background: rgba(22, 163, 74, 0.09);
-      color: var(--green);
-      display: flex;
-      gap: 9px;
-      align-items: flex-start;
+    .receive-main {
+      display:grid;
+      gap:12px;
+      min-width:0;
     }
 
-    .check {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--green);
-      color: white;
-      display: inline-grid;
-      place-items: center;
-      flex: 0 0 auto;
-      font-size: 0.82rem;
-      font-weight: 950;
+    .receive-address-wrap {
+      min-width:0;
+      width:100%;
     }
 
-    .hint {
-      background: rgba(2, 132, 199, 0.08);
-      color: var(--blue);
+    #receiveAddressText,
+    #receiveAddressInput,
+    #receiveContractText {
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .resend {
-      margin-top: 10px;
+    .qr-box {
+      width:min(220px,100%);
+      aspect-ratio:1;
+      margin:0 auto;
+      border-radius:24px;
+      display:grid;
+      place-items:center;
+      background:#ffffff;
+      border:1px solid rgba(15,23,42,.08);
+      padding:14px;
+      overflow:hidden;
+      box-shadow:0 14px 36px rgba(15,23,42,.10);
     }
 
-    .security-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
+    .qr-box canvas,
+    .qr-box img {
+      width:100% !important;
+      height:auto !important;
+      max-width:100%;
+      max-height:100%;
+      display:block;
     }
 
-    .security-item {
-      padding: 13px;
-      border-radius: 18px;
-      background: var(--card2);
-      border: 1px solid var(--border);
+    .receive-grid {
+      display:grid;
+      gap:8px;
     }
 
-    .security-item strong {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 950;
-      margin-bottom: 4px;
+    .receive-option {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:8px;
+      align-items:center;
+      padding:12px;
+      border-radius:18px;
+      background:var(--solid);
+      border:1px solid var(--border);
+      text-align:left;
+      max-width:100%;
+      color:var(--text);
+      min-width:0;
     }
 
-    .security-item span {
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 650;
-      line-height: 1.5;
+    .receive-option > div {
+      min-width:0;
     }
 
-    .small {
-      margin-top: 12px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.76rem;
-      font-weight: 700;
-      line-height: 1.5;
+    .receive-option .name,
+    .receive-option .tiny {
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: none;
-      place-items: center;
-      background: rgba(15, 23, 42, 0.42);
-      backdrop-filter: blur(8px);
-      padding: 18px;
+    .receive-option.selected {
+      border-color:var(--border2);
+      box-shadow:0 0 0 4px rgba(2,132,199,.08);
     }
 
-    .modal.active {
-      display: grid;
+    .fee-box {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 42px;
+      align-items:center;
+      gap:10px;
+    }
+
+    .countdown-ring {
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:conic-gradient(var(--blue) calc(var(--progress,1) * 360deg),rgba(100,116,139,.16) 0deg);
+      position:relative;
+      flex:0 0 auto;
+    }
+
+    .countdown-ring::before {
+      content:"";
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      background:var(--solid);
+      position:absolute;
+    }
+
+    .countdown-ring span {
+      position:relative;
+      font-size:.72rem;
+      font-weight:950;
+      color:var(--blue);
+      z-index:1;
+    }
+
+    .chart-wrap {
+      width:100%;
+      border-radius:24px;
+      background:var(--soft);
+      border:1px solid var(--border);
+      overflow:hidden;
+      padding:10px;
+      contain:layout paint;
+    }
+
+    .chart-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .live-price {
+      font-size:1.6rem;
+      font-weight:950;
+      letter-spacing:-.05em;
+    }
+
+    .timeframe-row {
+      display:flex;
+      gap:7px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      margin:10px 0;
+    }
+
+    .timeframe-row::-webkit-scrollbar {
+      display:none;
+    }
+
+    .timeframe-btn {
+      flex:0 0 auto;
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      background:var(--solid);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-size:.74rem;
+      font-weight:950;
+    }
+
+    .timeframe-btn.active {
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      border-color:transparent;
+    }
+
+    .chart-canvas {
+      width:100%;
+      height:280px;
+      display:block;
+    }
+
+    .modal-overlay,.drawer-overlay {
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      background:rgba(15,23,42,.42);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      padding:10px;
+    }
+
+    .modal-overlay.active,.drawer-overlay.active {
+      display:block;
     }
 
     .modal-card {
-      width: min(420px, 100%);
-      background: white;
-      border-radius: 24px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 20px;
+      width:min(540px,100%);
+      max-height:calc(100vh - 20px - var(--safe-top) - var(--safe-bottom));
+      overflow-y:auto;
+      margin:calc(10px + var(--safe-top)) auto 0;
+      padding:14px;
+      border-radius:28px;
+      background:var(--solid);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      animation:pop .18s ease both;
+      max-width:100%;
     }
 
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 14px;
+    .drawer {
+      position:absolute;
+      top:0;
+      right:0;
+      width:min(480px,100%);
+      height:100%;
+      overflow-y:auto;
+      padding:calc(16px + var(--safe-top)) 14px calc(18px + var(--safe-bottom));
+      background:var(--solid);
+      border-left:1px solid var(--border);
+      box-shadow:-24px 0 80px rgba(0,0,0,.22);
+      animation:slide .18s ease both;
+      max-width:100%;
+    }
+
+    @keyframes pop {
+      from { transform:translateY(14px) scale(.985); opacity:0; }
+      to { transform:translateY(0) scale(1); opacity:1; }
+    }
+
+    @keyframes slide {
+      from { transform:translateX(28px); opacity:0; }
+      to { transform:translateX(0); opacity:1; }
+    }
+
+    .modal-head,.drawer-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:12px;
+    }
+
+    .modal-title,.drawer-title {
+      font-size:1.24rem;
+      font-weight:950;
+      letter-spacing:-.055em;
+    }
+
+    .modal-sub,.drawer-sub {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:.8rem;
+      font-weight:760;
+      line-height:1.45;
     }
 
     .close {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--card2);
-      font-size: 1.2rem;
-      font-weight: 950;
-      cursor: pointer;
+      width:42px;
+      height:42px;
+      border-radius:16px;
+      color:var(--text);
+      background:var(--soft);
+      border:1px solid var(--border);
+      font-size:1.2rem;
+      font-weight:950;
+      flex:0 0 auto;
     }
 
-    @media (max-width: 840px) {
-      .wrap {
-        grid-template-columns: 1fr;
+    .secret-card {
+      filter:blur(5px);
+      user-select:none;
+      transition:filter .2s ease;
+    }
+
+    .secret-card.visible {
+      filter:none;
+      user-select:text;
+    }
+
+    .toast {
+      position:fixed;
+      left:50%;
+      bottom:calc(92px + var(--safe-bottom));
+      transform:translateX(-50%) translateY(12px);
+      z-index:150;
+      max-width:min(430px,calc(100% - 28px));
+      padding:12px 14px;
+      border-radius:16px;
+      background:rgba(2,6,23,.92);
+      color:white;
+      box-shadow:var(--shadow2);
+      opacity:0;
+      pointer-events:none;
+      transition:all .2s ease;
+      font-weight:850;
+      font-size:.84rem;
+    }
+
+    .toast.active {
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    .bottom-nav {
+      position:fixed;
+      left:50%;
+      bottom:calc(10px + var(--safe-bottom));
+      transform:translateX(-50%);
+      z-index:70;
+      width:min(430px,calc(100% - 24px));
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:6px;
+      padding:7px;
+      border-radius:23px;
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+
+    [data-theme="dark"] .bottom-nav {
+      background:rgba(13,22,40,.92);
+    }
+
+    .bottom-nav button {
+      min-height:48px;
+      border-radius:17px;
+      color:var(--muted);
+      background:transparent;
+      font-size:.7rem;
+      font-weight:950;
+    }
+
+    .bottom-nav button.active {
+      color:white;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+    }
+
+    @media (min-width:620px) {
+      .receive-card {
+        grid-template-columns:230px minmax(0,1fr);
+        align-items:center;
       }
 
-      .login-card {
-        order: 1;
-      }
-
-      .info-card {
-        order: 2;
+      .receive-card .primary-btn {
+        grid-column:1 / -1;
       }
     }
 
-    @media (max-width: 430px) {
-      body {
-        padding: 13px;
-      }
-
-      .brand p {
-        display: none;
-      }
-
-      .card {
-        padding: 18px;
-        border-radius: 24px;
-      }
-
-      .staff-btn {
-        padding: 0 11px;
-      }
+    @media (max-width:580px) {
+      body { padding-bottom:calc(84px + var(--safe-bottom)); }
+      .shell { padding:9px; }
+      .hero { padding:14px; border-radius:29px; }
+      .quick { grid-template-columns:repeat(3,1fr); }
+      .quick-btn { min-height:64px; padding:8px 6px; border-radius:20px; }
+      .quick-btn strong { font-size:.8rem; }
+      .quick-btn span { font-size:.62rem; }
+      .panel { padding:12px; border-radius:23px; }
+      .asset-card,.staking-card { flex-basis:160px; }
+      .market-card { flex-basis:138px; }
+      .receive-option { grid-template-columns:1fr; }
+      .button-row { grid-template-columns:1fr; }
+      .brand-sub { display:none; }
+      .drawer { width:100%; }
+      .modal-card { width:100%; margin-top:calc(8px + var(--safe-top)); }
+      .chart-canvas { height:255px; }
     }
   </style>
 </head>
 
 <body>
   <header class="topbar">
-    <div class="brand">
-      <div class="logo">B</div>
-      <div>
-        <h1>Blue Wallet</h1>
-        <p>Secure email wallet login</p>
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">B</div>
+        <div>
+          <div class="brand-title">Bluebook Wallet</div>
+          <div class="brand-sub" id="statusText">Loading wallet</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn" onclick="refreshAllBalances(true)">⟳</button>
+        <button class="icon-btn" onclick="openSettings()">⚙</button>
       </div>
     </div>
-
-    <button class="staff-btn" type="button" onclick="openStaffModal()">Staff</button>
   </header>
 
-  <main class="wrap">
-    <section class="card login-card">
-      <div class="badge"><span class="dot"></span>Email verification</div>
-      <div class="title">Open your wallet</div>
-      <div class="subtitle">
-        Enter your email. Existing users load their saved wallet. New users get a new encrypted wallet setup after login.
-      </div>
+  <main class="shell">
+    <section class="hero" id="homeSection">
+      <div class="hero-inner">
+        <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Wallet loading</span></div>
 
-      <% if (error) { %>
-        <div class="msg error"><%= error %></div>
-      <% } %>
+        <div class="balance" id="totalUsd">$0.00</div>
+        <div class="pnl-line" id="pnlLine">24h PnL $0.00 · ROI 0.00%</div>
 
-      <% if (success) { %>
-        <div class="msg success">
-          <span class="check">✓</span>
-          <div>
-            <strong><%= success %></strong><br />
-            Check your inbox. Also check Spam/Junk and mark it as “Not spam” if needed.
-          </div>
+        <div class="market-strip" id="topMarketCards"></div>
+
+        <div class="chips">
+          <span class="chip">All networks</span>
+          <span class="chip" id="tokenCountText">0 assets</span>
+          <span class="chip" id="currencyChip">USD</span>
+          <span class="chip" id="securityText">Auto encrypted</span>
         </div>
-      <% } %>
 
-      <% if (otpEmail) { %>
-        <form action="/verify-otp" method="POST">
-          <input type="hidden" name="email" value="<%= otpEmail %>" />
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" value="<%= otpEmail %>" disabled />
-          </div>
-
-          <div class="form-group">
-            <label>OTP code</label>
-            <input
-              type="text"
-              name="otp"
-              placeholder="Enter 6-digit code"
-              inputmode="numeric"
-              maxlength="6"
-              autocomplete="one-time-code"
-              required
-            />
-          </div>
-
-          <button class="btn primary" type="submit">Verify & go to wallet</button>
-        </form>
-
-        <form action="/send-otp" method="POST" class="resend">
-          <input type="hidden" name="email" value="<%= otpEmail %>" />
-          <button class="btn secondary" type="submit" id="resendBtn" disabled>
-            Resend OTP in <span id="countdown">10</span>s
+        <div class="quick">
+          <button class="quick-btn primary" onclick="openModal('receiveModal')">
+            <strong>Receive</strong>
+            <span>QR + address</span>
           </button>
-        </form>
 
-        <div class="msg hint" style="margin-top: 12px;">
-          After verification, you will be redirected to <strong>/wallet</strong>. If this email already has a wallet, it loads the same wallet.
+          <button class="quick-btn" onclick="openModal('sendModal')">
+            <strong>Send</strong>
+            <span>Owned assets</span>
+          </button>
+
+          <button class="quick-btn" onclick="openModal('swapModal')">
+            <strong>Swap</strong>
+            <span>Live quote</span>
+          </button>
         </div>
-      <% } else { %>
-        <form action="/send-otp" method="POST">
-          <div class="form-group">
-            <label>Email address</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-          </div>
-
-          <button class="btn primary" type="submit">Send OTP</button>
-        </form>
-      <% } %>
-
-      <div class="small">
-        Your OTP expires after 10 minutes.
       </div>
     </section>
 
-    <section class="card info-card">
-      <div class="badge"><span class="dot"></span>Security</div>
-      <div class="title">How secure is it?</div>
-      <div class="subtitle">
-        Blue Wallet is designed as a non-custodial web wallet. Your wallet key is created in your browser and encrypted before storage.
+    <section class="panel" id="assetsSection">
+      <div class="panel-head">
+        <h2 class="title">Assets</h2>
+        <button class="small-btn" onclick="refreshAllBalances(true)">Refresh</button>
       </div>
 
-      <div class="security-list">
-        <div class="security-item">
-          <strong>Client-side wallet generation</strong>
-          <span>The real wallet is generated in the browser. The server should never receive the raw seed phrase or private key.</span>
-        </div>
+      <div class="asset-scroll" id="assetCards"></div>
+    </section>
 
-        <div class="security-item">
-          <strong>Encrypted wallet vault</strong>
-          <span>Your seed/private key is encrypted with your wallet passcode before being saved to your account record.</span>
-        </div>
-
-        <div class="security-item">
-          <strong>Same email, same wallet</strong>
-          <span>When you login with the same verified email, the server loads your designated wallet record.</span>
-        </div>
-
-        <div class="security-item">
-          <strong>Important warning</strong>
-          <span>If you lose your wallet passcode and seed phrase, your wallet cannot be recovered.</span>
-        </div>
+    <section class="panel" id="stakingSection">
+      <div class="panel-head">
+        <h2 class="title">Staking</h2>
       </div>
+
+      <div class="asset-scroll" id="stakingCards"></div>
     </section>
   </main>
 
-  <div class="modal" id="staffModal" onclick="closeStaffModalOnOverlay(event)">
+  <nav class="bottom-nav">
+    <button id="navHome" class="active" onclick="navGo('home')">Home</button>
+    <button id="navAssets" onclick="navGo('assets')">Assets</button>
+    <button id="navStake" onclick="navGo('stake')">Stake</button>
+    <button id="navSettings" onclick="openSettings()">Settings</button>
+  </nav>
+
+  <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event,'receiveModal')">
     <div class="modal-card">
       <div class="modal-head">
         <div>
-          <div class="title" style="font-size:1.2rem;margin-bottom:4px;">Staff login</div>
-          <div class="subtitle" style="margin-bottom:0;">Staff account loads the admin wallet.</div>
+          <div class="modal-title">Receive</div>
+          <div class="modal-sub">Select the network and asset. EVM tokens such as USDT use your same wallet address on that selected network.</div>
         </div>
-        <button class="close" type="button" onclick="closeStaffModal()">×</button>
+        <button class="close" onclick="closeModal('receiveModal')">×</button>
       </div>
 
-      <form action="/staff-login" method="POST">
-        <div class="form-group">
-          <label>Username</label>
-          <input type="text" name="username" placeholder="admin" autocomplete="username" required />
+      <div class="form">
+        <div class="field">
+          <label>Network</label>
+          <select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select>
         </div>
 
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" name="password" placeholder="Password" autocomplete="current-password" required />
+        <div class="receive-card">
+          <div class="qr-box" id="qrBox"></div>
+
+          <div class="receive-main">
+            <div>
+              <div class="name" id="receiveTitle">Receive</div>
+              <div class="tiny" id="receiveAddressText">No wallet address loaded.</div>
+              <div class="tiny" id="receiveContractText"></div>
+            </div>
+
+            <div class="field receive-address-wrap">
+              <label>Copy / paste address</label>
+              <input class="input" id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" />
+            </div>
+          </div>
+
+          <button class="primary-btn" onclick="copyReceiveAddress()">Copy address</button>
         </div>
 
-        <button class="btn primary" type="submit">Open staff wallet</button>
-      </form>
+        <div class="receive-grid" id="receiveAssetsList"></div>
+      </div>
     </div>
   </div>
 
+  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event,'sendModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Send</div>
+          <div class="modal-sub">Network auto-matches your selected asset.</div>
+        </div>
+        <button class="close" onclick="closeModal('sendModal')">×</button>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label>Your assets</label>
+          <div class="asset-scroll" id="sendOwnedAssets"></div>
+        </div>
+
+        <div class="box">
+          <div class="name">Selected balance</div>
+          <div class="tiny" id="sendBalanceText">Select an asset.</div>
+        </div>
+
+        <div class="field">
+          <label>Recipient</label>
+          <input class="input" id="sendToInput" placeholder="0x..." autocomplete="off" oninput="scheduleImmediateFeeRefresh()" />
+        </div>
+
+        <div class="field">
+          <label>Amount</label>
+          <input class="input" id="sendAmountInput" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" />
+        </div>
+
+        <div class="box">
+          <div class="fee-box">
+            <div>
+              <div class="name">Estimated network fee</div>
+              <div class="tiny" id="sendFeePreview">Enter address and amount.</div>
+            </div>
+            <div class="countdown-ring" id="sendCountdown" style="--progress:1"><span>5</span></div>
+          </div>
+        </div>
+
+        <div class="button-row one">
+          <button class="primary-btn" onclick="openSendConfirm()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="sendConfirmModal" onclick="overlayClose(event,'sendConfirmModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Confirm send</div>
+          <div class="modal-sub">This is a real blockchain transaction and cannot be reversed.</div>
+        </div>
+        <button class="close" onclick="closeModal('sendConfirmModal')">×</button>
+      </div>
+
+      <div class="box bad">
+        <div class="name">Final review</div>
+        <div class="tiny" id="sendConfirmText"></div>
+      </div>
+
+      <div class="button-row">
+        <button class="secondary-btn" onclick="closeModal('sendConfirmModal')">Cancel</button>
+        <button class="primary-btn" onclick="sendRealTransaction()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="swapModal" onclick="overlayClose(event,'swapModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Swap</div>
+          <div class="modal-sub">Choose an owned asset, then choose what to receive on the same network.</div>
+        </div>
+        <button class="close" onclick="closeModal('swapModal')">×</button>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label>Sell asset</label>
+          <div class="asset-scroll" id="swapOwnedAssets"></div>
+        </div>
+
+        <div class="box">
+          <div class="name">Sell balance</div>
+          <div class="tiny" id="swapSellBalanceText">Select an asset.</div>
+        </div>
+
+        <div class="field">
+          <label>Buy asset</label>
+          <select class="select" id="swapBuySelect" onchange="scheduleImmediateFeeRefresh()"></select>
+        </div>
+
+        <div class="field">
+          <label>Sell amount</label>
+          <input class="input" id="swapAmount" type="number" step="any" placeholder="0.00" oninput="scheduleImmediateFeeRefresh()" />
+        </div>
+
+        <div class="box">
+          <div class="fee-box">
+            <div>
+              <div class="name">Estimated swap quote</div>
+              <div class="tiny" id="swapQuoteText">Enter amount to estimate route.</div>
+            </div>
+            <div class="countdown-ring" id="swapCountdown" style="--progress:1"><span>5</span></div>
+          </div>
+        </div>
+
+        <div class="button-row one">
+          <button class="primary-btn" onclick="openSwapConfirm()">Swap</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="swapConfirmModal" onclick="overlayClose(event,'swapConfirmModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Confirm swap</div>
+          <div class="modal-sub">This executes the loaded swap quote.</div>
+        </div>
+        <button class="close" onclick="closeModal('swapConfirmModal')">×</button>
+      </div>
+
+      <div class="box bad">
+        <div class="name">Final review</div>
+        <div class="tiny" id="swapConfirmText"></div>
+      </div>
+
+      <div class="button-row">
+        <button class="secondary-btn" onclick="closeModal('swapConfirmModal')">Cancel</button>
+        <button class="primary-btn" onclick="executeSwap()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="stakeModal" onclick="overlayClose(event,'stakeModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="stakeTitle">Stake</div>
+          <div class="modal-sub" id="stakeSub">Available staking option</div>
+        </div>
+        <button class="close" onclick="closeModal('stakeModal')">×</button>
+      </div>
+
+      <div class="form">
+        <div class="box">
+          <div class="name">Available balance</div>
+          <div class="tiny" id="stakeBalanceText">0 ETH</div>
+        </div>
+
+        <div class="field">
+          <label>Amount</label>
+          <input class="input" id="stakeAmountInput" type="number" step="any" placeholder="0.00" />
+        </div>
+
+        <div class="button-row">
+          <button class="secondary-btn" onclick="closeModal('stakeModal')">Cancel</button>
+          <button class="primary-btn" onclick="executeStake()">Stake</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="assetChartModal" onclick="overlayClose(event,'assetChartModal')">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="chartAssetTitle">Asset</div>
+          <div class="modal-sub" id="chartAssetSub">Live price and candles</div>
+        </div>
+        <button class="close" onclick="closeModal('assetChartModal')">×</button>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-head">
+          <div>
+            <div class="live-price" id="chartLivePrice">$0.00</div>
+            <div class="tiny" id="chartChangeText">Live</div>
+          </div>
+          <button class="small-btn" onclick="refreshChart()">Refresh</button>
+        </div>
+
+        <div class="timeframe-row">
+          <button class="timeframe-btn active" id="tf5m" onclick="setChartTf('5m')">5m</button>
+          <button class="timeframe-btn" id="tf15m" onclick="setChartTf('15m')">15m</button>
+          <button class="timeframe-btn" id="tf1h" onclick="setChartTf('1h')">1h</button>
+        </div>
+
+        <canvas class="chart-canvas" id="assetChartCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event,'settingsOverlay')">
+    <aside class="drawer">
+      <div class="drawer-head">
+        <div>
+          <div class="drawer-title">Settings</div>
+          <div class="drawer-sub">Wallet info, recovery, currency, theme, and deletion.</div>
+        </div>
+        <button class="close" onclick="closeSettings()">×</button>
+      </div>
+
+      <div class="box">
+        <div class="name">Wallet address</div>
+        <div class="tiny" id="settingsAddress">No wallet loaded.</div>
+      </div>
+
+      <div class="box">
+        <div class="name">Display currency</div>
+        <div class="field" style="margin-top:10px;">
+          <select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)">
+            <option value="USD">USD</option>
+            <option value="AED">AED</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+            <option value="SAR">SAR</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="box warn">
+        <div class="name">Recovery</div>
+        <div class="tiny">Save your seed phrase. If you delete browser data and lose your seed phrase, you may lose access.</div>
+
+        <div class="button-row">
+          <button class="secondary-btn" onclick="showSeed()">Show seed</button>
+          <button class="secondary-btn" onclick="showPrivateKey()">Show key</button>
+        </div>
+
+        <div class="field" style="margin-top:10px;">
+          <label>Secret output</label>
+          <textarea class="textarea secret-card" id="secretOutput" readonly placeholder="Seed phrase or private key appears here."></textarea>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="name">Custom RPC</div>
+        <div class="tiny">Applies to the selected network while sending or swapping.</div>
+        <div class="field" style="margin-top:10px;">
+          <input class="input" id="customRpcInput" placeholder="https://..." />
+        </div>
+        <div class="button-row one">
+          <button class="primary-btn" onclick="saveCustomRpc()">Save RPC</button>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="name">Theme</div>
+        <div class="button-row">
+          <button class="secondary-btn" onclick="setTheme('light')">Light</button>
+          <button class="secondary-btn" onclick="setTheme('dark')">Dark</button>
+        </div>
+      </div>
+
+      <div class="box bad">
+        <div class="name">Delete wallet</div>
+        <div class="tiny">Deletes the encrypted vault from this account. This does not delete blockchain funds.</div>
+        <div class="field" style="margin-top:10px;">
+          <label>Type DELETE to confirm</label>
+          <input class="input" id="deleteConfirmInput" placeholder="DELETE" />
+        </div>
+        <div class="button-row one">
+          <button class="danger-btn" onclick="deleteWallet()">Delete wallet</button>
+        </div>
+      </div>
+
+      <div class="box">
+        <form action="/logout" method="POST">
+          <button class="secondary-btn" type="submit" style="width:100%;">Logout</button>
+        </form>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
   <script>
-    function openStaffModal() {
-      document.getElementById('staffModal').classList.add('active');
+    const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
+    const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
+    const NATIVE_TOKEN = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+
+    const DISPLAY_RATES = {
+      USD:{symbol:'$',rate:1},
+      AED:{symbol:'AED ',rate:3.6725},
+      EUR:{symbol:'€',rate:.92},
+      GBP:{symbol:'£',rate:.79},
+      SAR:{symbol:'SAR ',rate:3.75}
+    };
+
+    const NETWORKS = {
+      ethereum:{name:'Ethereum',chainId:1,symbol:'ETH',rpc:'https://cloudflare-eth.com',explorer:'https://etherscan.io/tx/'},
+      bsc:{name:'BNB Chain',chainId:56,symbol:'BNB',rpc:'https://bsc-dataseed.binance.org',explorer:'https://bscscan.com/tx/'},
+      polygon:{name:'Polygon',chainId:137,symbol:'MATIC',rpc:'https://polygon-rpc.com',explorer:'https://polygonscan.com/tx/'},
+      base:{name:'Base',chainId:8453,symbol:'ETH',rpc:'https://mainnet.base.org',explorer:'https://basescan.org/tx/'},
+      arbitrum:{name:'Arbitrum',chainId:42161,symbol:'ETH',rpc:'https://arb1.arbitrum.io/rpc',explorer:'https://arbiscan.io/tx/'},
+      optimism:{name:'Optimism',chainId:10,symbol:'ETH',rpc:'https://mainnet.optimism.io',explorer:'https://optimistic.etherscan.io/tx/'},
+      avalanche:{name:'Avalanche',chainId:43114,symbol:'AVAX',rpc:'https://api.avax.network/ext/bc/C/rpc',explorer:'https://snowtrace.io/tx/'}
+    };
+
+    const ERC20_TOKENS = {
+      ethereum:[
+        {symbol:'USDT',name:'Tether USD',address:'0xdAC17F958D2ee523a2206206994597C13D831ec7',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',decimals:6,gecko:'usd-coin'},
+        {symbol:'DAI',name:'Dai',address:'0x6B175474E89094C44Da98b954EedeAC495271d0F',decimals:18,gecko:'dai'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',decimals:18,gecko:'weth'},
+        {symbol:'LINK',name:'Chainlink',address:'0x514910771AF9Ca656af840dff83E8264EcF986CA',decimals:18,gecko:'chainlink'},
+        {symbol:'UNI',name:'Uniswap',address:'0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',decimals:18,gecko:'uniswap'},
+        {symbol:'AAVE',name:'Aave',address:'0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',decimals:18,gecko:'aave'},
+        {symbol:'MKR',name:'Maker',address:'0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',decimals:18,gecko:'maker'}
+      ],
+      bsc:[
+        {symbol:'USDT',name:'Tether USD',address:'0x55d398326f99059fF775485246999027B3197955',decimals:18,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',decimals:18,gecko:'usd-coin'},
+        {symbol:'WBNB',name:'Wrapped BNB',address:'0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',decimals:18,gecko:'wbnb'},
+        {symbol:'CAKE',name:'PancakeSwap',address:'0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',decimals:18,gecko:'pancakeswap-token'}
+      ],
+      polygon:[
+        {symbol:'USDT',name:'Tether USD',address:'0xc2132D05D31c914a87C6611C10748AEb04B58e8F',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',decimals:6,gecko:'usd-coin'},
+        {symbol:'DAI',name:'Dai',address:'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',decimals:18,gecko:'dai'},
+        {symbol:'WMATIC',name:'Wrapped MATIC',address:'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',decimals:18,gecko:'wmatic'}
+      ],
+      base:[
+        {symbol:'USDC',name:'USD Coin',address:'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'DAI',name:'Dai',address:'0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',decimals:18,gecko:'dai'}
+      ],
+      arbitrum:[
+        {symbol:'USDT',name:'Tether USD',address:'0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xaf88d065e77c8cC2239327C5EDb3A432268e5831',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',decimals:18,gecko:'weth'},
+        {symbol:'ARB',name:'Arbitrum',address:'0x912CE59144191C1204E64559FE8253a0e49E6548',decimals:18,gecko:'arbitrum'}
+      ],
+      optimism:[
+        {symbol:'USDT',name:'Tether USD',address:'0x94b008aD8eD3f9fE1ef8bE45b16bB2fF12a2bA8a',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0x0b2C639c533813f4Aa9D7837CAF62653d097Ff85',decimals:6,gecko:'usd-coin'},
+        {symbol:'WETH',name:'Wrapped ETH',address:'0x4200000000000000000000000000000000000006',decimals:18,gecko:'weth'},
+        {symbol:'OP',name:'Optimism',address:'0x4200000000000000000000000000000000000042',decimals:18,gecko:'optimism'}
+      ],
+      avalanche:[
+        {symbol:'USDT',name:'Tether USD',address:'0x9702230A8Ea53601f5cD2dc00fDBC13d4dF4A8c7',decimals:6,gecko:'tether'},
+        {symbol:'USDC',name:'USD Coin',address:'0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',decimals:6,gecko:'usd-coin'},
+        {symbol:'WAVAX',name:'Wrapped AVAX',address:'0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',decimals:18,gecko:'wrapped-avax'}
+      ]
+    };
+
+    const NATIVE_GECKO = {
+      ethereum:'ethereum',
+      bsc:'binancecoin',
+      polygon:'matic-network',
+      base:'ethereum',
+      arbitrum:'ethereum',
+      optimism:'ethereum',
+      avalanche:'avalanche-2'
+    };
+
+    const WATCH_ASSETS = [
+      {symbol:'BTC',name:'Bitcoin',gecko:'bitcoin'},
+      {symbol:'SOL',name:'Solana',gecko:'solana'},
+      {symbol:'ETH',name:'Ethereum',gecko:'ethereum'},
+      {symbol:'BNB',name:'BNB',gecko:'binancecoin'},
+      {symbol:'XRP',name:'XRP',gecko:'ripple'},
+      {symbol:'USDT',name:'Tether USD',gecko:'tether'},
+      {symbol:'USDC',name:'USD Coin',gecko:'usd-coin'},
+      {symbol:'AVAX',name:'Avalanche',gecko:'avalanche-2'},
+      {symbol:'MATIC',name:'Polygon',gecko:'matic-network'},
+      {symbol:'LINK',name:'Chainlink',gecko:'chainlink'},
+      {symbol:'UNI',name:'Uniswap',gecko:'uniswap'},
+      {symbol:'ARB',name:'Arbitrum',gecko:'arbitrum'},
+      {symbol:'OP',name:'Optimism',gecko:'optimism'},
+      {symbol:'AAVE',name:'Aave',gecko:'aave'},
+      {symbol:'MKR',name:'Maker',gecko:'maker'},
+      {symbol:'CAKE',name:'PancakeSwap',gecko:'pancakeswap-token'}
+    ];
+
+    const BINANCE_SYMBOLS = {
+      BTC:'BTCUSDT',
+      ETH:'ETHUSDT',
+      SOL:'SOLUSDT',
+      BNB:'BNBUSDT',
+      XRP:'XRPUSDT',
+      AVAX:'AVAXUSDT',
+      MATIC:'MATICUSDT',
+      LINK:'LINKUSDT',
+      UNI:'UNIUSDT',
+      ARB:'ARBUSDT',
+      OP:'OPUSDT',
+      AAVE:'AAVEUSDT',
+      MKR:'MKRUSDT',
+      CAKE:'CAKEUSDT'
+    };
+
+    const TOP_MARKETS = ['BTC','SOL','ETH','BNB','XRP'];
+
+    const STAKING_OPTIONS = [
+      {id:'lido-eth',title:'Lido ETH',asset:'ETH',networkKey:'ethereum',apy:3.4,real:true,adapter:'lido',description:'Stake ETH and receive stETH.'}
+    ];
+
+    const ERC20_ABI = [
+      'function balanceOf(address owner) view returns (uint256)',
+      'function transfer(address to, uint256 amount) returns (bool)',
+      'function approve(address spender, uint256 amount) returns (bool)',
+      'function allowance(address owner, address spender) view returns (uint256)'
+    ];
+
+    const LIDO_STETH_CONTRACT = '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84';
+    const LIDO_ABI = ['function submit(address _referral) payable returns (uint256)'];
+
+    let activeNetworkKey = localStorage.getItem('blue_active_network') || 'ethereum';
+    let displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
+    let ACTIVE_DECRYPTED_WALLET = null;
+    let activeProvider = null;
+    let activeSigner = null;
+    let allBalances = [];
+    let combinedAssets = [];
+    let ownedPositions = [];
+    let selectedSend = null;
+    let selectedSwapSell = null;
+    let selectedStake = null;
+    let selectedReceiveAsset = null;
+    let prices = {};
+    let binancePrices = {};
+    let marketMeta = {};
+    let toastTimer;
+    let countdownTimer = null;
+    let priceTimer = null;
+    let sendFeeRefreshAt = 0;
+    let swapFeeRefreshAt = 0;
+    let currentChartAsset = null;
+    let currentChartTf = '5m';
+    let chartTimer = null;
+    let lastAssetSignature = '';
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('active');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('active'), 2200);
     }
 
-    function closeStaffModal() {
-      document.getElementById('staffModal').classList.remove('active');
+    function money(value) {
+      const cfg = DISPLAY_RATES[displayCurrency] || DISPLAY_RATES.USD;
+      const converted = Number(value || 0) * cfg.rate;
+      return `${cfg.symbol}${converted.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
     }
 
-    function closeStaffModalOnOverlay(event) {
-      if (event.target.id === 'staffModal') closeStaffModal();
+    function compactMoney(value) {
+      const cfg = DISPLAY_RATES[displayCurrency] || DISPLAY_RATES.USD;
+      const converted = Number(value || 0) * cfg.rate;
+
+      if (converted >= 1_000_000_000_000) return `${cfg.symbol}${(converted / 1_000_000_000_000).toFixed(2)}T`;
+      if (converted >= 1_000_000_000) return `${cfg.symbol}${(converted / 1_000_000_000).toFixed(2)}B`;
+      if (converted >= 1_000_000) return `${cfg.symbol}${(converted / 1_000_000).toFixed(2)}M`;
+      if (converted >= 1_000) return `${cfg.symbol}${(converted / 1_000).toFixed(2)}K`;
+
+      return money(value);
     }
 
-    window.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') closeStaffModal();
-    });
+    function fmt(value, decimals = 6) {
+      return Number(value || 0).toLocaleString(undefined,{maximumFractionDigits:decimals});
+    }
 
-    const resendBtn = document.getElementById('resendBtn');
-    const countdownEl = document.getElementById('countdown');
+    function short(addr) {
+      if (!addr) return 'No wallet';
+      return `${addr.slice(0,6)}...${addr.slice(-4)}`;
+    }
 
-    if (resendBtn && countdownEl) {
-      let seconds = 10;
+    function icon(symbol) {
+      const clean = String(symbol || '').toLowerCase();
+      return `<div class="coin"><img loading="lazy" decoding="async" src="https://assets.coincap.io/assets/icons/${clean}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(symbol).slice(0,4)}'" /></div>`;
+    }
 
-      const timer = setInterval(function () {
-        seconds -= 1;
-        countdownEl.textContent = seconds;
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el && el.textContent !== String(value)) el.textContent = value;
+    }
 
-        if (seconds <= 0) {
-          clearInterval(timer);
-          resendBtn.disabled = false;
-          resendBtn.textContent = 'Resend OTP';
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      renderSelects();
+
+      if (id === 'receiveModal') renderReceiveAssets();
+      if (id === 'assetChartModal') setTimeout(refreshChart, 20);
+
+      if (id === 'sendModal' || id === 'swapModal') {
+        scheduleImmediateFeeRefresh();
+        startCountdownLoop();
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+
+      if (id === 'assetChartModal') {
+        clearInterval(chartTimer);
+        chartTimer = null;
+      }
+    }
+
+    function overlayClose(e,id) {
+      if (e.target.id === id) closeModal(id);
+    }
+
+    function navSetActive(id) {
+      document.querySelectorAll('.bottom-nav button').forEach(btn => btn.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el) el.classList.add('active');
+    }
+
+    function navGo(where) {
+      if (where === 'home') {
+        document.getElementById('homeSection').scrollIntoView({behavior:'smooth'});
+        navSetActive('navHome');
+      }
+
+      if (where === 'assets') {
+        document.getElementById('assetsSection').scrollIntoView({behavior:'smooth'});
+        navSetActive('navAssets');
+      }
+
+      if (where === 'stake') {
+        document.getElementById('stakingSection').scrollIntoView({behavior:'smooth'});
+        navSetActive('navStake');
+      }
+    }
+
+    function setupBottomNavObserver() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          if (entry.target.id === 'homeSection') navSetActive('navHome');
+          if (entry.target.id === 'assetsSection') navSetActive('navAssets');
+          if (entry.target.id === 'stakingSection') navSetActive('navStake');
+        });
+      }, {threshold:.45});
+
+      ['homeSection','assetsSection','stakingSection'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+    }
+
+    function openSettings() {
+      document.getElementById('settingsOverlay').classList.add('active');
+      navSetActive('navSettings');
+      renderSettings();
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsOverlay').classList.remove('active');
+      navSetActive('navHome');
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme',theme);
+      localStorage.setItem('blue_theme',theme);
+      renderReceiveAssets();
+      toast(`${theme} mode enabled`);
+    }
+
+    function setDisplayCurrency(cur) {
+      displayCurrency = cur;
+      localStorage.setItem('blue_display_currency',cur);
+      renderPriceOnly();
+    }
+
+    function rpcUrl(key = activeNetworkKey) {
+      return localStorage.getItem(`blue_rpc_${key}`) || NETWORKS[key].rpc;
+    }
+
+    function provider(key = activeNetworkKey) {
+      return new ethers.JsonRpcProvider(rpcUrl(key),NETWORKS[key].chainId);
+    }
+
+    function getPublicWallet() {
+      const local = JSON.parse(localStorage.getItem('bluecrypto_public_wallets') || '[]');
+      return local[0] || SERVER_WALLET?.publicWallets?.[0] || null;
+    }
+
+    function currentAddress() {
+      return getPublicWallet()?.address || ACTIVE_DECRYPTED_WALLET?.wallets?.[0]?.address || null;
+    }
+
+    function bytesToBase64(bytes) {
+      return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+    }
+
+    function base64ToBytes(base64) {
+      return Uint8Array.from(atob(base64),c => c.charCodeAt(0));
+    }
+
+    async function getOrCreateDeviceKey() {
+      let key = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
+
+      if (!key) {
+        const bytes = crypto.getRandomValues(new Uint8Array(32));
+        key = bytesToBase64(bytes);
+        localStorage.setItem(`blue_device_key_${CURRENT_EMAIL}`,key);
+      }
+
+      return key;
+    }
+
+    async function deriveAesKey(secret,saltBase64) {
+      const salt = base64ToBytes(saltBase64);
+      const keyMaterial = await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),'PBKDF2',false,['deriveKey']);
+
+      return crypto.subtle.deriveKey(
+        {name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},
+        keyMaterial,
+        {name:'AES-GCM',length:256},
+        false,
+        ['encrypt','decrypt']
+      );
+    }
+
+    async function encryptVault(vaultObject,secret) {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const saltBase64 = bytesToBase64(salt);
+      const key = await deriveAesKey(secret,saltBase64);
+      const encrypted = await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(vaultObject)));
+
+      return {
+        version:1,
+        encryptionMode:'device-key',
+        kdf:'PBKDF2-SHA256',
+        cipher:'AES-GCM',
+        iterations:250000,
+        salt:saltBase64,
+        iv:bytesToBase64(iv),
+        data:bytesToBase64(encrypted)
+      };
+    }
+
+    async function decryptVault(encryptedVault,secret) {
+      const key = await deriveAesKey(secret,encryptedVault.salt);
+      const iv = base64ToBytes(encryptedVault.iv);
+      const encryptedData = base64ToBytes(encryptedVault.data);
+      const decrypted = await crypto.subtle.decrypt({name:'AES-GCM',iv},key,encryptedData);
+      return JSON.parse(new TextDecoder().decode(decrypted));
+    }
+
+    function generateWallet() {
+      const wallet = ethers.Wallet.createRandom();
+
+      return {
+        type:'evm',
+        phrase:wallet.mnemonic.phrase,
+        privateKey:wallet.privateKey,
+        address:wallet.address,
+        createdAt:new Date().toISOString()
+      };
+    }
+
+    async function saveVault(encryptedVault,publicWallets) {
+      const res = await fetch('/api/wallet/vault',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({encryptedVault,publicWallets})
+      });
+
+      if (!res.ok) throw new Error('Could not save wallet vault');
+      return res.json();
+    }
+
+    async function createWalletNoPin() {
+      try {
+        if (SERVER_WALLET?.encryptedVault || getPublicWallet()) return await unlockDeviceWallet();
+
+        const real = generateWallet();
+        const vault = {wallets:[real],createdAt:new Date().toISOString(),encryptionMode:'device-key'};
+        const deviceKey = await getOrCreateDeviceKey();
+        const secret = `${CURRENT_EMAIL}:${deviceKey}`;
+        const encryptedVault = await encryptVault(vault,secret);
+
+        const publicWallets = [{
+          type:'evm',
+          address:real.address,
+          networks:Object.values(NETWORKS).map(n => n.name),
+          createdAt:real.createdAt
+        }];
+
+        await saveVault(encryptedVault,publicWallets);
+        localStorage.setItem('bluecrypto_public_wallets',JSON.stringify(publicWallets));
+
+        ACTIVE_DECRYPTED_WALLET = vault;
+        activeProvider = provider(activeNetworkKey);
+        activeSigner = new ethers.Wallet(real.privateKey,activeProvider);
+
+        updateUi();
+        refreshAllBalances(true);
+        return vault;
+      } catch (err) {
+        console.error(err);
+        toast(err.message || 'Wallet creation failed');
+        return null;
+      }
+    }
+
+    async function unlockDeviceWallet() {
+      try {
+        if (!SERVER_WALLET?.encryptedVault) return await createWalletNoPin();
+
+        const deviceKey = localStorage.getItem(`blue_device_key_${CURRENT_EMAIL}`);
+        if (!deviceKey) {
+          toast('This browser cannot decrypt the saved wallet.');
+          return null;
         }
-      }, 1000);
+
+        const secret = `${CURRENT_EMAIL}:${deviceKey}`;
+        ACTIVE_DECRYPTED_WALLET = await decryptVault(SERVER_WALLET.encryptedVault,secret);
+
+        activeProvider = provider(activeNetworkKey);
+        activeSigner = new ethers.Wallet(ACTIVE_DECRYPTED_WALLET.wallets[0].privateKey,activeProvider);
+
+        updateUi();
+        return ACTIVE_DECRYPTED_WALLET;
+      } catch (err) {
+        console.error(err);
+        toast('Could not load wallet');
+        return null;
+      }
     }
-  </script>
-</body>
-</html>
+
+    async function ensureUnlocked() {
+      if (activeSigner) return activeSigner;
+      const wallet = await unlockDeviceWallet();
+      if (!wallet) throw new Error('Wallet not available');
+      return activeSigner;
+    }
+
+    function normalizeRawSymbol(symbol) {
+      if (symbol === 'WETH') return 'ETH';
+      if (symbol === 'WBNB') return 'BNB';
+      if (symbol === 'WMATIC') return 'MATIC';
+      if (symbol === 'WAVAX') return 'AVAX';
+      return symbol;
+    }
+
+    function binanceForSymbol(symbol) {
+      const pair = BINANCE_SYMBOLS[normalizeRawSymbol(symbol)];
+      return pair ? binancePrices[pair] : null;
+    }
+
+    async function fetchPricesForAll() {
+      const ids = new Set();
+
+      for (const key of Object.keys(NETWORKS)) {
+        ids.add(NATIVE_GECKO[key]);
+
+        for (const token of ERC20_TOKENS[key] || []) {
+          if (token.gecko) ids.add(token.gecko);
+        }
+      }
+
+      for (const watch of WATCH_ASSETS) ids.add(watch.gecko);
+
+      const geckoIds = [...ids];
+      const symbols = Object.values(BINANCE_SYMBOLS);
+
+      const binancePromise = fetch(`/api/binance-prices?symbols=${encodeURIComponent(symbols.join(','))}`,{cache:'no-store'})
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+
+      const geckoPromise = fetch(`/api/prices?ids=${encodeURIComponent(geckoIds.join(','))}`,{cache:'no-store'})
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+
+      const metaPromise = fetch(`/api/market-meta?ids=${encodeURIComponent(geckoIds.join(','))}`,{cache:'no-store'})
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+
+      const [bp,gp,meta] = await Promise.all([binancePromise,geckoPromise,metaPromise]);
+
+      binancePrices = bp || {};
+      prices = gp || {};
+      marketMeta = meta || {};
+    }
+
+    function priceFor(asset) {
+      const b = binanceForSymbol(asset.symbol);
+      if (b?.lastPrice) return Number(b.lastPrice);
+
+      if (asset.type === 'native') return prices[NATIVE_GECKO[asset.networkKey]]?.usd || 0;
+      return prices[asset
