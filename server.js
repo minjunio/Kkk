@@ -27,7 +27,7 @@ const BINANCE_FALLBACK = 'https://data-api.binance.vision';
 
 const PRICE_SYNC_MS = 2000;
 const MARKET_LOOP_MS = 2500;
-const MAX_CANDLES = 2200;
+const MAX_CANDLES = 2600;
 
 const cache = new Map();
 const tensorCandleHistory = {};
@@ -52,6 +52,29 @@ const REAL_SYMBOL_MAP = {
   PEPE: 'PEPEUSDT'
 };
 
+const TREASURY_USDT_ADDRESSES = {
+  eth: {
+    network: 'Ethereum',
+    symbol: 'ETH',
+    address: '0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a'
+  },
+  arbitrum: {
+    network: 'Arbitrum',
+    symbol: 'ARB',
+    address: '0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a'
+  },
+  sol: {
+    network: 'Solana',
+    symbol: 'SOL',
+    address: '9prrQtQxzdt5Kt7nPHUxwWAVQLZATrj2bjU27k5Xkt5i'
+  },
+  trx: {
+    network: 'TRON',
+    symbol: 'TRX',
+    address: 'TPwY7YfXuufmgfCLF7ie9E2nyo6KhT4fn2'
+  }
+};
+
 /* -------------------- App Setup -------------------- */
 
 app.set('trust proxy', 1);
@@ -59,7 +82,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', (req, res, next) => {
@@ -103,7 +126,11 @@ function safeNumber(value, fallback = 0) {
 }
 
 function makeId(prefix = 'id') {
-  return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
+  return `${prefix}_${Date.now()}_${crypto.randomBytes(8).toString('hex')}`;
+}
+
+function makePublicId(prefix = 'share') {
+  return `${prefix}_${crypto.randomBytes(18).toString('hex')}`;
 }
 
 function safeJsonForEjs(obj) {
@@ -113,10 +140,69 @@ function safeJsonForEjs(obj) {
     .replace(/&/g, '\\u0026');
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 function ensureDataFolderOnly() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
+}
+
+function getBaseUrl(req) {
+  const envBase = process.env.PUBLIC_BASE_URL || process.env.BASE_URL;
+
+  if (envBase) {
+    return envBase.replace(/\/+$/, '');
+  }
+
+  return `${req.protocol}://${req.get('host')}`;
+}
+
+function formatMoney(n, decimals = 2) {
+  const num = safeNumber(n, 0);
+
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function formatPrice(n) {
+  const num = safeNumber(n, 0);
+
+  if (num >= 1000) return formatMoney(num, 2);
+  if (num >= 1) return formatMoney(num, 4);
+
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 6,
+    maximumFractionDigits: 6
+  });
+}
+
+function normalizeNetwork(network) {
+  const raw = String(network || '').trim().toLowerCase();
+
+  if (raw.includes('arb')) return 'arbitrum';
+  if (raw.includes('sol')) return 'sol';
+  if (raw.includes('tron') || raw.includes('trx')) return 'trx';
+  if (raw.includes('eth') || raw.includes('erc')) return 'eth';
+
+  return 'eth';
+}
+
+function getTreasuryDestination(network) {
+  const key = normalizeNetwork(network);
+  return {
+    key,
+    ...TREASURY_USDT_ADDRESSES[key]
+  };
 }
 
 /* -------------------- Defaults -------------------- */
@@ -140,7 +226,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 68000,
-      low24h: 68000
+      low24h: 68000,
+      lifetimeHigh: 68000
     },
     {
       id: 'real_eth',
@@ -159,7 +246,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 3800,
-      low24h: 3800
+      low24h: 3800,
+      lifetimeHigh: 3800
     },
     {
       id: 'real_sol',
@@ -178,7 +266,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 170,
-      low24h: 170
+      low24h: 170,
+      lifetimeHigh: 170
     },
     {
       id: 'real_bnb',
@@ -197,7 +286,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 600,
-      low24h: 600
+      low24h: 600,
+      lifetimeHigh: 600
     },
     {
       id: 'real_xrp',
@@ -216,7 +306,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 0.55,
-      low24h: 0.55
+      low24h: 0.55,
+      lifetimeHigh: 0.55
     },
     {
       id: 'real_doge',
@@ -235,7 +326,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 0.16,
-      low24h: 0.16
+      low24h: 0.16,
+      lifetimeHigh: 0.16
     },
     {
       id: 'tensor_ai',
@@ -254,7 +346,8 @@ function defaultTensorAssets() {
       dominance: 0,
       changePercent24h: 0,
       high24h: 1.25,
-      low24h: 1.25
+      low24h: 1.25,
+      lifetimeHigh: 1.25
     }
   ];
 }
@@ -265,8 +358,10 @@ function defaultDb() {
     otps: {},
     tensorRegistry: defaultTensorAssets(),
     treasury: {
-      collectedFeesUsdt: 0
-    }
+      collectedFeesUsdt: 0,
+      tradeDeposits: []
+    },
+    publicTradeCards: {}
   };
 }
 
@@ -299,18 +394,7 @@ function ensureDb() {
 
   const db = readDbRaw();
 
-  if (!db.users) db.users = {};
-  if (!db.otps) db.otps = {};
-  if (!Array.isArray(db.tensorRegistry)) db.tensorRegistry = [];
-  if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
-
-  if (db.tensorRegistry.length === 0) {
-    db.tensorRegistry = defaultTensorAssets();
-  }
-
-  Object.values(db.users).forEach(migrateUser);
-  db.tensorRegistry.forEach(migrateToken);
-
+  migrateDb(db);
   writeDb(db);
 }
 
@@ -322,11 +406,18 @@ function readDb() {
   }
 
   const db = readDbRaw();
+  migrateDb(db);
 
+  return db;
+}
+
+function migrateDb(db) {
   if (!db.users) db.users = {};
   if (!db.otps) db.otps = {};
   if (!Array.isArray(db.tensorRegistry)) db.tensorRegistry = [];
-  if (!db.treasury) db.treasury = { collectedFeesUsdt: 0 };
+  if (!db.treasury) db.treasury = { collectedFeesUsdt: 0, tradeDeposits: [] };
+  if (!Array.isArray(db.treasury.tradeDeposits)) db.treasury.tradeDeposits = [];
+  if (!db.publicTradeCards) db.publicTradeCards = {};
 
   if (db.tensorRegistry.length === 0) {
     db.tensorRegistry = defaultTensorAssets();
@@ -334,8 +425,6 @@ function readDb() {
 
   Object.values(db.users).forEach(migrateUser);
   db.tensorRegistry.forEach(migrateToken);
-
-  return db;
 }
 
 function migrateUser(user) {
@@ -356,15 +445,16 @@ function migrateUser(user) {
 
   if (!user.tensorVault) user.tensorVault = null;
   if (!user.tensorBalances) user.tensorBalances = {};
+  if (!Array.isArray(user.positions)) user.positions = [];
+  if (!Array.isArray(user.orderHistory)) user.orderHistory = [];
+  if (!Array.isArray(user.tradeDeposits)) user.tradeDeposits = [];
+  if (!Array.isArray(user.publicTradeCards)) user.publicTradeCards = [];
 
   if (user.usdtBalance === undefined) {
     user.usdtBalance = user.role === 'staff' ? 1000000 : 15000;
   }
 
   user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
-
-  if (!Array.isArray(user.positions)) user.positions = [];
-  if (!Array.isArray(user.orderHistory)) user.orderHistory = [];
 
   user.positions.forEach(pos => {
     if (!pos.id) pos.id = makeId('pos');
@@ -398,6 +488,11 @@ function migrateToken(token) {
   token.changePercent24h = safeNumber(token.changePercent24h, 0);
   token.high24h = safeNumber(token.high24h, token.price);
   token.low24h = safeNumber(token.low24h, token.price);
+  token.lifetimeHigh = Math.max(
+    safeNumber(token.lifetimeHigh, token.price),
+    token.price,
+    safeNumber(token.high24h, token.price)
+  );
 }
 
 /* -------------------- Users/Auth Helpers -------------------- */
@@ -419,7 +514,9 @@ function createWalletRecord(email, role = 'user') {
     tensorBalances: {},
     usdtBalance: role === 'staff' ? 1000000 : 15000,
     positions: [],
-    orderHistory: []
+    orderHistory: [],
+    tradeDeposits: [],
+    publicTradeCards: []
   };
 }
 
@@ -664,13 +761,13 @@ function initializeCandlesForToken(tokenId, startPrice) {
 
   const candles = [];
   let price = Math.max(0.000001, safeNumber(startPrice, 1));
-  let timeCursor = Date.now() - 1440 * 60 * 1000;
+  let timeCursor = Date.now() - 90 * 24 * 60 * 60 * 1000;
 
-  for (let i = 0; i < 1440; i++) {
+  for (let i = 0; i < 2160; i++) {
     const open = price;
-    const close = Math.max(0.000001, open * (1 + (Math.random() - 0.5) * 0.004));
-    const high = Math.max(open, close) * (1 + Math.random() * 0.0015);
-    const low = Math.max(0.000001, Math.min(open, close) * (1 - Math.random() * 0.0015));
+    const close = Math.max(0.000001, open * (1 + (Math.random() - 0.5) * 0.006));
+    const high = Math.max(open, close) * (1 + Math.random() * 0.0025);
+    const low = Math.max(0.000001, Math.min(open, close) * (1 - Math.random() * 0.0025));
 
     candles.push({
       time: timeCursor,
@@ -681,7 +778,7 @@ function initializeCandlesForToken(tokenId, startPrice) {
     });
 
     price = close;
-    timeCursor += 60 * 1000;
+    timeCursor += 60 * 60 * 1000;
   }
 
   tensorCandleHistory[tokenId] = candles;
@@ -700,15 +797,16 @@ function pushLiveCandle(token, oldPrice) {
 
   const history = tensorCandleHistory[token.id];
   const now = Date.now();
+  const hourBucket = Math.floor(now / (60 * 60 * 1000)) * 60 * 60 * 1000;
   const last = history[history.length - 1];
 
-  if (last && now - last.time < 60 * 1000) {
+  if (last && last.time === hourBucket) {
     last.close = token.price;
     last.high = Math.max(last.high, token.price);
     last.low = Math.min(last.low, token.price);
   } else {
     history.push({
-      time: now,
+      time: hourBucket,
       open: oldPrice,
       high: Math.max(oldPrice, token.price),
       low: Math.min(oldPrice, token.price),
@@ -756,6 +854,34 @@ function calculatePnl(pos, currentPrice) {
   return (priceDiff / entry) * size;
 }
 
+function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode, network }) {
+  const destination = getTreasuryDestination(network);
+  const id = makeId('deposit');
+  const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
+
+  return {
+    id,
+    txHash,
+    type: 'USDT_TRADE_MARGIN_DEPOSIT',
+    status: 'recorded',
+    note: 'Demo ledger transfer recorded by Tensor Wallet. No on-chain broadcast is performed by this server without wallet signing infrastructure.',
+    userEmail: user.email,
+    userWalletId: user.id,
+    amountUsdt: margin,
+    tokenId: token.id,
+    symbol: token.symbol,
+    side,
+    leverage,
+    marginMode,
+    destinationNetworkKey: destination.key,
+    destinationNetwork: destination.network,
+    destinationSymbol: destination.symbol,
+    destinationAddress: destination.address,
+    createdAt: Date.now(),
+    createdAtIso: nowIso()
+  };
+}
+
 async function runMarketLoop() {
   try {
     await syncRealCryptoPrices();
@@ -798,6 +924,7 @@ async function runMarketLoop() {
         token.changePercent24h = real.changePercent || 0;
         token.high24h = real.high || token.price;
         token.low24h = real.low || token.price;
+        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
         token.marketCap = token.price * token.supply;
 
         pushLiveCandle(token, oldPrice);
@@ -828,6 +955,7 @@ async function runMarketLoop() {
       token.volume = safeNumber(token.volume, 0) * 0.96 + Math.abs(token.price - oldPrice) * token.supply * 0.04;
       token.high24h = Math.max(safeNumber(token.high24h, token.price), token.price);
       token.low24h = Math.min(safeNumber(token.low24h, token.price), token.price);
+      token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
       token.changePercent24h = token.startPrice > 0
         ? ((token.price - token.startPrice) / token.startPrice) * 100
         : 0;
@@ -859,10 +987,15 @@ async function runMarketLoop() {
           : currentPrice >= liqPrice;
 
         if (isLiquidated) {
+          const pnl = -Math.abs(safeNumber(pos.margin, 0));
+          const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : -100;
+
           user.orderHistory.unshift({
             ...pos,
             closePrice: currentPrice,
-            pnl: -Math.abs(safeNumber(pos.margin, 0)),
+            markPrice: currentPrice,
+            pnl,
+            roi,
             closedAt: Date.now(),
             closeReason: 'Liquidation'
           });
@@ -882,13 +1015,237 @@ async function runMarketLoop() {
   }
 }
 
-/* -------------------- Page Routes -------------------- */
+/* -------------------- Public Trade Cards -------------------- */
 
-/*
-  Important:
-  / and /index.html ALWAYS show index.ejs first.
-  They do NOT auto-redirect to /trading even if the user has a session.
-*/
+function buildTradeCardPayload({ req, db, user, trade }) {
+  const publicId = makePublicId('trade');
+  const baseUrl = getBaseUrl(req);
+  const side = trade.side === 'short' ? 'SHORT' : 'LONG';
+  const pnl = safeNumber(trade.pnl, 0);
+  const roi = safeNumber(trade.roi, trade.margin > 0 ? (pnl / trade.margin) * 100 : 0);
+  const isProfit = pnl >= 0;
+
+  const payload = {
+    id: publicId,
+    createdAt: Date.now(),
+    createdAtIso: nowIso(),
+    brand: 'bluecrypto.ink',
+    verifiedBy: 'Tensor Wallet',
+    verificationText: 'Verified by Tensor Wallet',
+    ownerWalletId: user.id,
+    ownerEmailHash: sha(user.email).slice(0, 16),
+    trade: {
+      id: trade.id,
+      symbol: trade.symbol,
+      tokenId: trade.tokenId,
+      side,
+      leverage: safeNumber(trade.leverage, 1),
+      margin: safeNumber(trade.margin, 0),
+      size: safeNumber(trade.size, 0),
+      entryPrice: safeNumber(trade.entryPrice, 0),
+      closePrice: safeNumber(trade.closePrice, trade.markPrice || 0),
+      markPrice: safeNumber(trade.markPrice, trade.closePrice || 0),
+      pnl,
+      roi,
+      closeReason: trade.closeReason || 'Market Close',
+      openedAt: trade.openedAt || null,
+      closedAt: trade.closedAt || Date.now()
+    },
+    style: {
+      isProfit,
+      resultText: isProfit ? 'PROFIT' : 'LOSS',
+      color: isProfit ? '#0ecb81' : '#f6465d'
+    },
+    links: {
+      page: `${baseUrl}/trade/${publicId}`,
+      image: `${baseUrl}/trade/${publicId}/image.svg`,
+      download: `${baseUrl}/trade/${publicId}/download`
+    }
+  };
+
+  db.publicTradeCards[publicId] = payload;
+  user.publicTradeCards.unshift({
+    id: publicId,
+    tradeId: trade.id,
+    page: payload.links.page,
+    image: payload.links.image,
+    createdAt: payload.createdAt
+  });
+
+  user.publicTradeCards = user.publicTradeCards.slice(0, 100);
+
+  return payload;
+}
+
+function renderTradeCardSvg(card) {
+  const t = card.trade;
+  const color = card.style.color;
+  const bg = '#070a0f';
+  const panel = '#111827';
+  const panel2 = '#0b1220';
+  const muted = '#94a3b8';
+  const white = '#f8fafc';
+  const grid = '#1f2937';
+  const watermark = 'bluecrypto.ink';
+  const isProfit = t.pnl >= 0;
+  const pnlText = `${isProfit ? '+' : '-'}$${formatMoney(Math.abs(t.pnl), 2)}`;
+  const roiText = `${t.roi >= 0 ? '+' : ''}${formatMoney(t.roi, 2)}%`;
+  const sideText = `${t.side} ${t.leverage}x`;
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${bg}"/>
+      <stop offset="55%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.85"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bgGrad)"/>
+
+  <g opacity="0.12">
+    <path d="M0 520 C180 460 280 570 440 500 S720 370 900 430 S1070 580 1200 500" fill="none" stroke="${color}" stroke-width="4"/>
+    <path d="M0 560 C220 480 310 625 520 530 S780 405 960 470 S1110 610 1200 555" fill="none" stroke="#8b5cf6" stroke-width="3"/>
+  </g>
+
+  <g opacity="0.16">
+    ${Array.from({ length: 18 }).map((_, i) => {
+      const x = 70 + i * 62;
+      const open = 360 + Math.sin(i * 1.7) * 70;
+      const close = open + Math.cos(i * 1.2) * 85;
+      const high = Math.min(open, close) - 55;
+      const low = Math.max(open, close) + 55;
+      const candleColor = close < open ? '#0ecb81' : '#f6465d';
+      const y = Math.min(open, close);
+      const h = Math.max(8, Math.abs(close - open));
+      return `<line x1="${x}" y1="${high}" x2="${x}" y2="${low}" stroke="${candleColor}" stroke-width="4"/><rect x="${x - 12}" y="${y}" width="24" height="${h}" rx="4" fill="${candleColor}"/>`;
+    }).join('')}
+  </g>
+
+  <rect x="55" y="45" width="1090" height="585" rx="34" fill="${panel}" opacity="0.94" filter="url(#softShadow)"/>
+  <rect x="55" y="45" width="1090" height="585" rx="34" fill="none" stroke="${grid}" stroke-width="2"/>
+
+  <rect x="55" y="45" width="1090" height="116" rx="34" fill="${panel2}"/>
+  <rect x="55" y="127" width="1090" height="34" fill="${panel2}"/>
+
+  <text x="92" y="103" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="900" fill="${white}">bluecrypto.ink</text>
+  <text x="92" y="134" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="800" fill="${muted}">Verified by Tensor Wallet</text>
+
+  <rect x="848" y="76" width="245" height="52" rx="18" fill="url(#accentGrad)"/>
+  <text x="970" y="110" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#fff">${escapeHtml(card.style.resultText)}</text>
+
+  <text x="92" y="230" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="950" fill="${white}">${escapeHtml(t.symbol)} / USDT</text>
+  <text x="96" y="272" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="${color}">${escapeHtml(sideText)}</text>
+
+  <text x="92" y="377" font-family="Inter, Arial, sans-serif" font-size="90" font-weight="950" fill="${color}">${escapeHtml(roiText)}</text>
+  <text x="96" y="418" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="850" fill="${muted}">Return on Investment</text>
+
+  <rect x="685" y="205" width="410" height="295" rx="26" fill="#0b1220" stroke="${grid}" stroke-width="2"/>
+
+  <text x="725" y="262" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">PNL</text>
+  <text x="1070" y="262" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="${color}">${escapeHtml(pnlText)}</text>
+
+  <text x="725" y="322" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Margin</text>
+  <text x="1070" y="322" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.margin, 2)}</text>
+
+  <text x="725" y="382" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Position Size</text>
+  <text x="1070" y="382" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.size, 2)}</text>
+
+  <text x="725" y="442" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Mark Price</text>
+  <text x="1070" y="442" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.markPrice)}</text>
+
+  <rect x="92" y="488" width="1003" height="1" fill="${grid}"/>
+
+  <text x="96" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Entry</text>
+  <text x="96" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.entryPrice)}</text>
+
+  <text x="335" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Close</text>
+  <text x="335" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.closePrice)}</text>
+
+  <text x="574" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Reason</text>
+  <text x="574" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">${escapeHtml(t.closeReason)}</text>
+
+  <text x="1095" y="598" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" fill="${muted}">Trade ID ${escapeHtml(String(t.id).slice(0, 18))}</text>
+
+  <text x="600" y="648" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850" fill="${muted}">${escapeHtml(watermark)} • ${escapeHtml(card.verificationText)}</text>
+</svg>`;
+}
+
+function renderTradePublicPage(card) {
+  const t = card.trade;
+  const color = card.style.color;
+  const pnlText = `${t.pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(t.pnl), 2)}`;
+  const roiText = `${t.roi >= 0 ? '+' : ''}${formatMoney(t.roi, 2)}%`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(roiText)} | bluecrypto.ink</title>
+  <meta property="og:title" content="${escapeHtml(t.symbol)} Trade ${escapeHtml(roiText)} ROI"/>
+  <meta property="og:description" content="Verified by Tensor Wallet on bluecrypto.ink"/>
+  <meta property="og:image" content="${escapeHtml(card.links.image)}"/>
+  <meta property="og:type" content="website"/>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#070a0f;color:#f8fafc;font-family:Inter,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:18px}
+    .wrap{width:min(980px,100%)}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
+    .brand{font-weight:950;font-size:1.25rem}
+    .verified{color:#94a3b8;font-weight:850;font-size:.86rem}
+    .card{border:1px solid #1f2937;background:#111827;border-radius:24px;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+    img{width:100%;display:block;background:#070a0f}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    a{color:white;text-decoration:none;background:#1f2937;border:1px solid #334155;border-radius:12px;padding:12px 14px;font-weight:900}
+    a.primary{background:${color};border-color:${color}}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+    .stat{background:#0b1220;border:1px solid #1f2937;border-radius:16px;padding:14px}
+    .label{color:#94a3b8;font-size:.75rem;font-weight:850}
+    .value{font-size:1.05rem;font-weight:950;margin-top:6px}
+    @media(max-width:720px){.stats{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div>
+        <div class="brand">bluecrypto.ink</div>
+        <div class="verified">Verified by Tensor Wallet</div>
+      </div>
+      <div style="font-weight:950;color:${color}">${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(t.leverage)}x</div>
+    </div>
+
+    <div class="card">
+      <img src="${escapeHtml(card.links.image)}" alt="Verified trade card"/>
+    </div>
+
+    <div class="actions">
+      <a class="primary" href="${escapeHtml(card.links.download)}">Download Trade Image</a>
+      <a href="${escapeHtml(card.links.image)}" target="_blank">Open Image</a>
+      <a href="/trading">Open Trading</a>
+    </div>
+
+    <section class="stats">
+      <div class="stat"><div class="label">ROI</div><div class="value" style="color:${color}">${escapeHtml(roiText)}</div></div>
+      <div class="stat"><div class="label">PNL</div><div class="value" style="color:${color}">${escapeHtml(pnlText)}</div></div>
+      <div class="stat"><div class="label">Mark Price</div><div class="value">$${formatPrice(t.markPrice)}</div></div>
+      <div class="stat"><div class="label">Position Size</div><div class="value">$${formatMoney(t.size, 2)}</div></div>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+/* -------------------- Page Routes -------------------- */
 
 app.get('/', (req, res) => {
   res.render('index', {
@@ -926,12 +1283,55 @@ app.get('/trading', requireAuth, (req, res) => {
   res.render('trading', {
     email: req.session.user.email,
     role: req.session.user.role,
-    wallet: safeJsonForEjs(user)
+    wallet: safeJsonForEjs(user),
+    treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES)
   });
 });
 
 app.get('/trading.ejs', requireAuth, (req, res) => {
   res.redirect('/trading');
+});
+
+/* -------------------- Public Trade Card Routes: No API Login Needed -------------------- */
+
+app.get('/trade/:id', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade card not found.');
+  }
+
+  res.set('Cache-Control', 'public, max-age=60');
+  res.send(renderTradePublicPage(card));
+});
+
+app.get('/trade/:id/image.svg', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade image not found.');
+  }
+
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.send(renderTradeCardSvg(card));
+});
+
+app.get('/trade/:id/download', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade image not found.');
+  }
+
+  const filename = `bluecrypto-${card.trade.symbol}-${card.trade.side}-${card.id}.svg`;
+
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(renderTradeCardSvg(card));
 });
 
 /* -------------------- Auth Routes -------------------- */
@@ -1042,7 +1442,10 @@ app.get('/api/trading/state', requireAuthJson, (req, res) => {
   res.json({
     usdtBalance: safeNumber(user.usdtBalance, 0),
     positions: user.positions || [],
-    orderHistory: user.orderHistory || []
+    orderHistory: user.orderHistory || [],
+    publicTradeCards: user.publicTradeCards || [],
+    tradeDeposits: user.tradeDeposits || [],
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
 
@@ -1054,6 +1457,7 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
   const marginMode = String(req.body.marginMode || 'cross').toLowerCase() === 'isolated'
     ? 'isolated'
     : 'cross';
+  const network = normalizeNetwork(req.body.network || req.body.usdtNetwork || 'eth');
 
   if (!tokenId || !['long', 'short'].includes(side)) {
     return res.status(400).json({ error: 'Invalid trade side or asset.' });
@@ -1076,9 +1480,19 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     return res.status(404).json({ error: 'Asset not found.' });
   }
 
-  if (user.usdtBalance < margin) {
+  if (safeNumber(user.usdtBalance, 0) < margin) {
     return res.status(400).json({ error: 'Insufficient USDT balance.' });
   }
+
+  const treasuryDeposit = buildTreasuryDeposit({
+    user,
+    token,
+    margin,
+    leverage,
+    side,
+    marginMode,
+    network
+  });
 
   user.usdtBalance = safeNumber(user.usdtBalance, 0) - margin;
 
@@ -1092,10 +1506,22 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     marginMode,
     size: margin * leverage,
     entryPrice: token.price,
-    openedAt: Date.now()
+    markPrice: token.price,
+    openedAt: Date.now(),
+    openedAtIso: nowIso(),
+    treasuryDepositId: treasuryDeposit.id,
+    treasuryTxHash: treasuryDeposit.txHash,
+    treasuryNetwork: treasuryDeposit.destinationNetwork,
+    treasuryAddress: treasuryDeposit.destinationAddress
   };
 
   user.positions.unshift(position);
+  user.tradeDeposits.unshift(treasuryDeposit);
+  user.tradeDeposits = user.tradeDeposits.slice(0, 200);
+
+  db.treasury.tradeDeposits.unshift(treasuryDeposit);
+  db.treasury.tradeDeposits = db.treasury.tradeDeposits.slice(0, 1000);
+
   user.updatedAt = nowIso();
 
   writeDb(db);
@@ -1103,7 +1529,13 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
   res.json({
     ok: true,
     position,
-    usdtBalance: user.usdtBalance
+    usdtBalance: user.usdtBalance,
+    treasuryDeposit,
+    treasuryDestination: {
+      network: treasuryDeposit.destinationNetwork,
+      address: treasuryDeposit.destinationAddress,
+      symbol: treasuryDeposit.destinationSymbol
+    }
   });
 });
 
@@ -1131,6 +1563,7 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
   const currentPrice = token ? token.price : pos.entryPrice;
   const pnl = calculatePnl(pos, currentPrice);
+  const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
 
   user.usdtBalance = safeNumber(user.usdtBalance, 0) + safeNumber(pos.margin, 0) + pnl;
   user.positions.splice(posIdx, 1);
@@ -1138,8 +1571,11 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   const historyRecord = {
     ...pos,
     closePrice: currentPrice,
+    markPrice: currentPrice,
     pnl,
+    roi,
     closedAt: Date.now(),
+    closedAtIso: nowIso(),
     closeReason: 'Market Close'
   };
 
@@ -1147,13 +1583,64 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   user.orderHistory = user.orderHistory.slice(0, 100);
   user.updatedAt = nowIso();
 
+  const publicCard = buildTradeCardPayload({
+    req,
+    db,
+    user,
+    trade: historyRecord
+  });
+
   writeDb(db);
 
   res.json({
     ok: true,
     usdtBalance: user.usdtBalance,
     pnl,
-    historyRecord
+    roi,
+    historyRecord,
+    publicTradeCard: publicCard,
+    shareUrl: publicCard.links.page,
+    imageUrl: publicCard.links.image,
+    downloadUrl: publicCard.links.download
+  });
+});
+
+app.post('/api/trading/share', requireAuthJson, (req, res) => {
+  const historyId = String(req.body.historyId || req.body.tradeId || '');
+
+  if (!historyId) {
+    return res.status(400).json({ error: 'Missing history trade ID.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  const trade = user.orderHistory.find(t => String(t.id) === historyId);
+
+  if (!trade) {
+    return res.status(404).json({ error: 'Trade history not found.' });
+  }
+
+  const publicCard = buildTradeCardPayload({
+    req,
+    db,
+    user,
+    trade
+  });
+
+  user.updatedAt = nowIso();
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    publicTradeCard: publicCard,
+    shareUrl: publicCard.links.page,
+    imageUrl: publicCard.links.image,
+    downloadUrl: publicCard.links.download
   });
 });
 
@@ -1161,7 +1648,11 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
 
 app.get('/api/wallet', requireAuthJson, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  res.json(user);
+
+  res.json({
+    ...user,
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
+  });
 });
 
 app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
@@ -1225,10 +1716,12 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
         token.changePercent24h = real.changePercent || 0;
         token.high24h = real.high || token.price;
         token.low24h = real.low || token.price;
+        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
         token.marketCap = token.price * token.supply;
         pushLiveCandle(token, oldPrice);
       } else {
         initializeCandlesForToken(token.id, token.price);
+        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
       }
     });
 
@@ -1239,7 +1732,8 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
       address: user.tensorAddress,
       balances: user.tensorBalances || {},
       syncedAt: Date.now(),
-      treasury: req.session.user.role === 'staff' ? db.treasury : undefined
+      treasury: req.session.user.role === 'staff' ? db.treasury : undefined,
+      treasuryDestinations: TREASURY_USDT_ADDRESSES
     });
   } catch (err) {
     console.error('/api/tensor error:', err);
@@ -1267,7 +1761,14 @@ app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
   initializeCandlesForToken(token.id, token.price);
 
   res.json({
-    candles: tensorCandleHistory[token.id] || []
+    timeframe: '1H',
+    candles: tensorCandleHistory[token.id] || [],
+    stats: {
+      high24h: token.high24h,
+      low24h: token.low24h,
+      lifetimeHigh: token.lifetimeHigh,
+      markPrice: token.price
+    }
   });
 });
 
@@ -1344,7 +1845,8 @@ app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
     dominance: 0,
     changePercent24h: 0,
     high24h: price,
-    low24h: price
+    low24h: price,
+    lifetimeHigh: price
   };
 
   db.tensorRegistry.push(token);
@@ -1397,6 +1899,7 @@ app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
   }
 
   token.marketCap = token.price * token.supply;
+  token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
 
   writeDb(db);
   initializeCandlesForToken(token.id, token.price);
@@ -1503,6 +2006,7 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   if (token.bias !== 'pegged' && token.bias !== 'real') {
     token.price = Math.max(0.000001, originalPrice * (1 + priceImpact));
     token.marketCap = token.price * token.supply;
+    token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
   }
 
   token.volume = safeNumber(token.volume, 0) + spend;
@@ -1595,8 +2099,11 @@ app.get('/health', (req, res) => {
     pages: {
       index: '/ or /index.html',
       wallet: '/wallet',
-      trading: '/trading'
+      trading: '/trading',
+      publicTrade: '/trade/:id',
+      publicTradeImage: '/trade/:id/image.svg'
     },
+    treasuryDestinations: TREASURY_USDT_ADDRESSES,
     dataDir: DATA_DIR,
     dbPath: DB_PATH,
     dbExists: fs.existsSync(DB_PATH),
@@ -1631,6 +2138,8 @@ app.listen(PORT, () => {
   console.log(`Startup page: /index.html -> views/index.ejs`);
   console.log(`Wallet page: /wallet -> views/wallet.ejs`);
   console.log(`Trading page: /trading -> views/trading.ejs`);
+  console.log(`Public trade page: /trade/:id`);
+  console.log(`Public trade image: /trade/:id/image.svg`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Database path: ${DB_PATH}`);
 });
