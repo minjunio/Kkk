@@ -158,17 +158,14 @@ function ensureDataFolderOnly() {
 
 function getBaseUrl(req) {
   const envBase = process.env.PUBLIC_BASE_URL || process.env.BASE_URL;
-
   if (envBase) {
     return envBase.replace(/\/+$/, '');
   }
-
   return `${req.protocol}://${req.get('host')}`;
 }
 
 function formatMoney(n, decimals = 2) {
   const num = safeNumber(n, 0);
-
   return num.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals
@@ -177,10 +174,8 @@ function formatMoney(n, decimals = 2) {
 
 function formatPrice(n) {
   const num = safeNumber(n, 0);
-
   if (num >= 1000) return formatMoney(num, 2);
   if (num >= 1) return formatMoney(num, 4);
-
   return num.toLocaleString('en-US', {
     minimumFractionDigits: 6,
     maximumFractionDigits: 6
@@ -189,18 +184,15 @@ function formatPrice(n) {
 
 function normalizeNetwork(network) {
   const raw = String(network || '').trim().toLowerCase();
-
   if (raw.includes('arb')) return 'arbitrum';
   if (raw.includes('sol')) return 'sol';
   if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
   if (raw.includes('eth') || raw.includes('erc')) return 'eth';
-
   return 'eth';
 }
 
 function inferUserUsdtNetwork(user) {
   const candidates = [];
-
   if (Array.isArray(user.assets)) candidates.push(...user.assets);
   if (Array.isArray(user.publicWallets)) candidates.push(...user.publicWallets);
   if (Array.isArray(user.wallets)) candidates.push(...user.wallets);
@@ -212,7 +204,6 @@ function inferUserUsdtNetwork(user) {
   });
 
   const text = JSON.stringify(usdtItem || user || {}).toLowerCase();
-
   if (text.includes('arbitrum') || text.includes('arb')) return 'arbitrum';
   if (text.includes('solana') || text.includes('sol')) return 'sol';
   if (text.includes('tron') || text.includes('trc') || text.includes('trx')) return 'trx';
@@ -298,7 +289,6 @@ function readDbRaw() {
 
 function writeDb(db) {
   ensureDataFolderOnly();
-
   const tempPath = `${DB_PATH}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
   fs.renameSync(tempPath, DB_PATH);
@@ -306,12 +296,10 @@ function writeDb(db) {
 
 function ensureDb() {
   ensureDataFolderOnly();
-
   if (!fs.existsSync(DB_PATH)) {
     writeDb(defaultDb());
     return;
   }
-
   const db = readDbRaw();
   migrateDb(db);
   writeDb(db);
@@ -319,14 +307,11 @@ function ensureDb() {
 
 function readDb() {
   ensureDataFolderOnly();
-
   if (!fs.existsSync(DB_PATH)) {
     writeDb(defaultDb());
   }
-
   const db = readDbRaw();
   migrateDb(db);
-
   return db;
 }
 
@@ -376,7 +361,6 @@ function migrateUser(user) {
   if (!Array.isArray(user.tradeDeposits)) user.tradeDeposits = [];
   if (!Array.isArray(user.publicTradeCards)) user.publicTradeCards = [];
 
-  // OUSD and Copy Trading Enhancements
   user.ousdBalance = safeNumber(user.ousdBalance, 0);
   user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
   user.usdtNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
@@ -468,7 +452,6 @@ function getOrCreateUser(email, role = 'user') {
     writeDb(db);
   } else {
     migrateUser(db.users[normEmail]);
-
     if (role === 'staff' && db.users[normEmail].role !== 'staff') {
       db.users[normEmail].role = 'staff';
       writeDb(db);
@@ -487,7 +470,6 @@ function requireAuthJson(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
-
   next();
 }
 
@@ -495,7 +477,6 @@ function requireAdminJson(req, res, next) {
   if (!req.session.user || req.session.user.role !== 'staff') {
     return res.status(403).json({ error: 'Admin access required.' });
   }
-
   next();
 }
 
@@ -599,14 +580,6 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
-}
-
-async function cachedJson(key, ttlMs, fetcher) {
-  const hit = cache.get(key);
-  if (hit && Date.now() - hit.time < ttlMs) return hit.data;
-  const data = await fetcher();
-  cache.set(key, { time: Date.now(), data });
-  return data;
 }
 
 async function syncRealCryptoPrices(force = false) {
@@ -766,38 +739,11 @@ app.post('/api/auth/logout', (req, res) => {
 
 // View Routes
 app.get('/', (req, res) => {
+  // If the user is logged in, redirect straight to the dashboard
   if (req.session.user) return res.redirect('/trading');
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head><title>Tensor Login</title><style>body{background:#0b0e11;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;} .card{background:#1e2329;padding:2rem;border-radius:8px;} input,button{width:100%;padding:10px;margin-bottom:10px;border-radius:4px;border:none;} button{background:#8b5cf6;color:#fff;font-weight:bold;cursor:pointer;}</style></head>
-    <body>
-      <div class="card">
-        <h2>Login / Register</h2>
-        <input type="email" id="email" placeholder="Email Address">
-        <button onclick="requestOtp()">Send Code</button>
-        <input type="text" id="otp" placeholder="6-digit Code" style="display:none;margin-top:10px;">
-        <button id="verifyBtn" style="display:none;" onclick="verifyOtp()">Verify & Login</button>
-      </div>
-      <script>
-        async function requestOtp() {
-          const email = document.getElementById('email').value;
-          const res = await fetch('/api/auth/request-otp', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email})});
-          const data = await res.json();
-          if(data.ok) { document.getElementById('otp').style.display='block'; document.getElementById('verifyBtn').style.display='block'; alert(data.message); }
-          else alert(data.error);
-        }
-        async function verifyOtp() {
-          const email = document.getElementById('email').value;
-          const otp = document.getElementById('otp').value;
-          const res = await fetch('/api/auth/verify-otp', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, otp})});
-          const data = await res.json();
-          if(data.ok) window.location.href='/trading'; else alert(data.error);
-        }
-      </script>
-    </body>
-    </html>
-  `);
+  
+  // If not logged in, cleanly serve your own index.html from the public directory
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/trading', requireAuth, (req, res) => {
@@ -915,7 +861,7 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
   
   user.tradeDeposits.unshift(depositRecord);
   db.treasury.tradeDeposits.push({ userEmail: user.email, ...depositRecord });
-  db.treasury.collectedFeesUsdt += (mgn * 0.001); // 0.1% simulated fee
+  db.treasury.collectedFeesUsdt += (mgn * 0.001);
 
   const position = {
     id: makeId('pos'),
@@ -1027,7 +973,7 @@ app.get('/api/trading/copy-profiles', requireAuthJson, (req, res) => {
     walletId: p.walletId,
     traderName: p.traderName,
     followers: p.copierCount,
-    totalPnl: p.roi * 100, // mock PnL based on ROI
+    totalPnl: p.roi * 100,
     link: `/u/${p.walletId}`
   }));
   res.json({ ok: true, profiles });
@@ -1094,7 +1040,7 @@ app.post('/api/trading/copy/stop', requireAuthJson, (req, res) => {
     db.copyProfiles[user.copyingTarget].copierCount = Math.max(0, db.copyProfiles[user.copyingTarget].copierCount - 1);
   }
 
-  user.usdtBalance += user.copyBalance; // Default return to USDT for simplicity, logic can be expanded
+  user.usdtBalance += user.copyBalance;
   user.copyBalance = 0;
   user.copyingTarget = null;
   user.activeCopyTrades = [];
