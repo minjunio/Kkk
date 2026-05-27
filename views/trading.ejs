@@ -1,906 +1,522 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>BlueCrypto | Advanced Trading</title>
+  <title>Tensor | Pro Trading Terminal</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 
   <style>
     :root {
       color-scheme: light;
-      --bg1: #e0f2fe; --bg2: #f0f9ff; --bg3: #bae6fd;
-      
-      --glass: rgba(255, 255, 255, 0.65);
-      --glass-solid: rgba(255, 255, 255, 0.95);
-      --glass-border: rgba(255, 255, 255, 0.8);
-      
-      --solid: #ffffff;
-      --soft: rgba(255, 255, 255, 0.65);
-      --soft-hover: rgba(255, 255, 255, 0.9);
-      
-      --text: #0c4a6e;
-      --muted: #0284c7;
-      --muted2: #7dd3fc;
-      
-      --blue: #0284c7; --blue2: #0369a1; --cyan: #38bdf8;
-      --pink: #e11d48; --green: #10b981; --orange: #d97706;
+      --bg1: #e9f8ff; --bg2: #f8fcff; --bg3: #d7f0ff;
+      --glass: rgba(255,255,255,0.85); --glass2: rgba(255,255,255,0.7);
+      --solid: #ffffff; --soft: #f0f7ff; --soft-hover: #e0f0ff;
+      --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
+      --blue: #0284c7; --blue2: #2563eb; --cyan: #38bdf8;
+      --pink: #e11d48; --green: #10b981;
       --tensor: #8b5cf6; --tensor2: #d946ef; 
-      
-      --border: rgba(2, 132, 199, 0.15);
-      --shadow: 0 16px 40px rgba(2, 132, 199, 0.12);
-      --shadow2: 0 8px 24px rgba(2, 132, 199, 0.08);
-      
-      --safe-top: env(safe-area-inset-top);
-      --safe-bottom: env(safe-area-inset-bottom);
+      --border: rgba(2,132,199,0.12);
+      --shadow2: 0 12px 32px rgba(2,132,199,0.08);
     }
 
     [data-theme="dark"] {
       color-scheme: dark;
-      --bg1: #082f49; --bg2: #0c4a6e; --bg3: #0369a1;
-      
-      --glass: rgba(8, 47, 73, 0.65);
-      --glass-solid: rgba(8, 47, 73, 0.95);
-      --glass-border: rgba(56, 189, 248, 0.2);
-      
-      --solid: #0c4a6e;
-      --soft: rgba(3, 105, 161, 0.4);
-      --soft-hover: rgba(3, 105, 161, 0.7);
-      
-      --text: #f0f9ff;
-      --muted: #7dd3fc;
-      --muted2: #38bdf8;
-      
-      --border: rgba(56, 189, 248, 0.15);
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-      --shadow2: 0 8px 24px rgba(0, 0, 0, 0.25);
+      --bg1: #060b13; --bg2: #050816; --bg3: #0a1929;
+      --glass: rgba(13,22,40,0.88); --glass2: rgba(17,29,51,0.72);
+      --solid: #0d1628; --soft: #111d33; --soft-hover: #1e293b;
+      --text: #f8fafc; --muted: #94a3b8; --muted2: #64748b;
+      --blue: #38bdf8; --tensor: #a78bfa; --tensor2: #e879f9;
+      --border: rgba(125,211,252,0.12);
+      --shadow2: 0 14px 38px rgba(0,0,0,0.4);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100vh; overflow-x: hidden; background: var(--bg2); color: var(--text); }
     
-    html, body { 
-      width: 100%; height: 100vh; overflow: hidden; 
-      background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.8), transparent 40%),
-                  radial-gradient(circle at 100% 0%, rgba(56,189,248,0.3), transparent 40%),
-                  radial-gradient(circle at 50% 100%, rgba(2,132,199,0.2), transparent 50%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-      color: var(--text); 
-    }
-    
-    [data-theme="dark"] body {
-      background: radial-gradient(circle at 0% 0%, rgba(56,189,248,0.15), transparent 40%),
-                  radial-gradient(circle at 100% 100%, rgba(2,132,199,0.2), transparent 50%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-    }
+    /* Topbar */
+    .topbar { position: sticky; top: 0; z-index: 50; padding: 12px 16px; background: var(--solid); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+    .logo { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; color: white; font-weight: 900; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); }
+    .brand-title { font-weight: 900; font-size: 1.1rem; }
+    .top-actions { display: flex; gap: 12px; }
+    .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--soft); border: 1px solid var(--border); color: var(--text); display: grid; place-items: center; cursor: pointer; transition: 0.1s; }
+    .icon-btn:hover { background: var(--soft-hover); }
 
-    button, input { outline: none; border: none; background: transparent; font: inherit; }
-    button { cursor: pointer; transition: 0.15s ease; }
-    button:active { transform: scale(0.96); }
+    /* Main Layout */
+    .trading-layout { display: grid; grid-template-columns: 1fr 340px; gap: 16px; max-width: 1600px; margin: 0 auto; padding: 16px; height: calc(100vh - 61px); overflow: hidden; }
+    
+    .left-col { display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+    .right-col { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 4px; }
+    .right-col::-webkit-scrollbar { width: 4px; }
+    .right-col::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* Desktop Grid Layout */
-    .terminal-wrapper { 
-      display: grid; 
-      grid-template-columns: 280px 1fr 340px; 
-      grid-template-rows: auto 1fr 300px; 
-      height: 100vh; width: 100vw; 
-    }
-    
-    /* Header */
-    .terminal-header { 
-      grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; 
-      padding: calc(12px + var(--safe-top)) 20px 12px; 
-      background: var(--glass); border-bottom: 1px solid var(--glass-border); 
-      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); z-index: 20; 
-    }
-    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; font-weight: 900; font-size: 1.25rem; }
-    .logo { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--blue2), var(--cyan)); color: white; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(2,132,199,0.3); }
-    .nav-btn { height: 40px; padding: 0 18px; border-radius: 14px; font-weight: 800; font-size: 0.9rem; color: var(--text); background: var(--glass-solid); border: 1px solid var(--glass-border); box-shadow: var(--shadow2); }
-    
-    /* Left Sidebar: Token List */
-    .sidebar { 
-      grid-row: 2 / -1; grid-column: 1; 
-      border-right: 1px solid var(--border); background: var(--glass2); 
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .sidebar-head { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 900; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); display:flex; justify-content:space-between; align-items:center; }
-    
-    .token-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px; scrollbar-width: none; }
-    .token-list::-webkit-scrollbar { display: none; }
-    
-    .token-item { 
-      display: flex; justify-content: space-between; align-items: center; 
-      padding: 14px; border-radius: 20px; transition: 0.2s; cursor: pointer; 
-      background: var(--soft); border: 1px solid var(--glass-border); 
-    }
-    .token-item:hover { background: var(--soft-hover); }
-    .token-item.active { background: var(--glass-solid); border-color: var(--tensor); box-shadow: 0 0 0 4px rgba(139,92,246,0.15); }
-    
-    .token-name { font-weight: 900; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
-    .token-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); color: var(--tensor); box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 4px; border: 1px solid var(--border); }
-    .token-icon svg { width: 100%; height: 100%; }
-    .token-price { text-align: right; font-weight: 900; font-size: 1rem; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
-    .token-change { font-size: 0.75rem; font-weight: 800; margin-top: 2px; }
-    .up { color: var(--tensor); } .down { color: var(--pink); }
+    .panel { background: var(--solid); border: 1px solid var(--border); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; }
 
-    /* Flash Effects */
-    .flash-up { animation: flashUp 0.6s ease-out; }
-    .flash-down { animation: flashDown 0.6s ease-out; }
-    @keyframes flashUp { 0% { color: #a855f7; text-shadow: 0 0 12px rgba(168,85,247,0.8); transform: scale(1.02); } 100% { color: inherit; text-shadow: none; transform: scale(1); } }
-    @keyframes flashDown { 0% { color: #e11d48; text-shadow: 0 0 12px rgba(225,29,72,0.8); transform: scale(1.02); } 100% { color: inherit; text-shadow: none; transform: scale(1); } }
+    /* Chart Header */
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 16px; flex-wrap: wrap; }
+    .asset-selector { appearance: none; background: transparent; border: none; font-size: 1.8rem; font-weight: 900; color: var(--text); outline: none; cursor: pointer; }
+    .price-display { font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+    .price-up { color: var(--green); } .price-down { color: var(--pink); }
+    .stat-box { display: flex; flex-direction: column; gap: 2px; }
+    .stat-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+    .stat-val { font-size: 0.9rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-    /* Center Chart Area */
-    .chart-area { 
-      grid-column: 2; grid-row: 2; 
-      display: flex; flex-direction: column; 
-      background: var(--glass); position: relative; 
-    }
-    .chart-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px; }
-    .chart-ticker { display: flex; align-items: baseline; gap: 14px; }
-    .chart-ticker h2 { font-size: 1.8rem; font-weight: 900; margin: 0; letter-spacing: -0.04em; }
-    .chart-ticker span { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; transition: color 0.2s; }
-    
-    .chart-controls { display: flex; gap: 8px; flex-wrap: wrap; }
-    .pill-toggle { display: flex; background: var(--soft); border-radius: 14px; padding: 4px; border: 1px solid var(--glass-border); }
-    .pill-toggle button { padding: 6px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 800; color: var(--muted); }
-    .pill-toggle button.active { background: var(--solid); color: var(--text); box-shadow: var(--shadow2); }
-    
-    .chart-canvas-wrapper { flex: 1; width: 100%; height: 100%; min-height: 250px; position: relative; overflow: hidden; }
-    #customChartCanvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+    /* Chart Area */
+    .chart-controls { display: flex; gap: 8px; margin-bottom: 8px; }
+    .pill-btn { padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800; background: var(--soft); color: var(--muted); border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+    .pill-btn.active { background: var(--tensor); color: white; box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+    .chart-container { flex: 1; min-height: 400px; width: 100%; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 
-    /* Bottom: Positions */
-    .positions-area { 
-      grid-column: 2; grid-row: 3; 
-      border-top: 1px solid var(--border); background: var(--glass2); 
-      display: flex; flex-direction: column; 
-    }
-    .pos-head { padding: 16px 24px; border-bottom: 1px solid var(--border); font-weight: 900; font-size: 1rem; background: var(--glass); display:flex; justify-content:space-between; align-items:center; }
-    .pos-table-wrap { flex: 1; overflow-y: auto; padding: 0 24px 24px; scrollbar-width: none; }
-    .pos-table-wrap::-webkit-scrollbar { display: none; }
-    
-    .pos-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-    .pos-table th { padding: 16px 0 8px; color: var(--muted); font-weight: 800; position: sticky; top: 0; background: var(--glass2); z-index: 2; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .pos-table td { padding: 16px 0; border-bottom: 1px solid var(--border); font-weight: 800; font-variant-numeric: tabular-nums; }
-    
-    .close-btn { background: var(--soft); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; transition: 0.2s; }
-    .close-btn:hover { background: rgba(225,29,72,0.1); color: var(--pink); border-color: rgba(225,29,72,0.3); }
+    /* Positions Table */
+    .positions-panel { flex: 0 0 280px; overflow: hidden; padding: 0; }
+    .pos-tabs { display: flex; gap: 16px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); }
+    .pos-tab { padding: 8px 4px; font-size: 0.9rem; font-weight: 800; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+    .pos-tab.active { color: var(--text); border-bottom-color: var(--tensor); }
+    .table-wrap { overflow: auto; height: calc(100% - 41px); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
+    th { font-size: 0.75rem; color: var(--muted); font-weight: 700; padding: 12px 16px; position: sticky; top: 0; background: var(--solid); z-index: 10; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 16px; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: var(--soft); }
+    .side-long { color: var(--green); font-weight: 800; } .side-short { color: var(--pink); font-weight: 800; }
+    .pnl-pos { color: var(--green); } .pnl-neg { color: var(--pink); }
 
-    /* Right Sidebar: Order Entry */
-    .order-area { 
-      grid-column: 3; grid-row: 2 / -1; 
-      border-left: 1px solid var(--border); background: var(--glass-solid); 
-      padding: 24px; display: flex; flex-direction: column; gap: 20px; 
-      overflow-y: auto; scrollbar-width: none;
-    }
-    .order-area::-webkit-scrollbar { display: none; }
-    
-    .order-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--soft); padding: 6px; border-radius: 18px; border: 1px solid var(--glass-border); }
-    .order-tabs button { height: 44px; border-radius: 14px; font-weight: 900; color: var(--muted); font-size: 0.95rem; transition: 0.2s; }
-    .order-tabs button.long.active { background: var(--tensor); color: white; box-shadow: 0 8px 20px rgba(139,92,246,0.3); }
-    .order-tabs button.short.active { background: var(--pink); color: white; box-shadow: 0 8px 20px rgba(225,29,72,0.3); }
-    
-    .field-group { display: flex; flex-direction: column; gap: 8px; }
-    .field-group label { font-size: 0.75rem; font-weight: 800; color: var(--muted); text-transform: uppercase; display: flex; justify-content: space-between; letter-spacing: 0.05em; }
-    
-    .input-box { display: flex; align-items: center; background: var(--solid); border: 1px solid var(--border); border-radius: 18px; padding: 0 16px; height: 58px; transition: 0.2s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-    .input-box:focus-within { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
-    .input-box input { flex: 1; font-weight: 900; font-size: 1.25rem; color: var(--text); width: 100%; }
-    .input-box input::placeholder { color: var(--muted2); opacity: 0.6; }
-    .input-box span { font-weight: 800; color: var(--muted); font-size: 0.95rem; background: var(--soft); padding: 4px 10px; border-radius: 10px; }
-    
-    /* Enhanced Slider */
-    .slider-wrap { padding: 16px 0; }
-    .slider-track-container { position: relative; width: 100%; height: 8px; background: var(--soft); border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; }
-    input[type=range] { -webkit-appearance: none; width: 100%; position: absolute; background: transparent; z-index: 2; height: 100%; margin: 0; outline: none; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: var(--tensor); cursor: pointer; box-shadow: 0 4px 12px rgba(139,92,246,0.5); border: 3px solid var(--solid); transition: transform 0.1s; }
-    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.1); }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 100%; cursor: pointer; background: transparent; }
-    
-    .order-summary { background: var(--soft); border-radius: 20px; padding: 20px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 12px; }
-    .summary-row { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; }
-    .summary-row.main { font-size: 1.1rem; color: var(--text); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
-    
-    .exec-btn { height: 64px; border-radius: 22px; font-weight: 900; font-size: 1.15rem; color: white; background: var(--muted); transition: 0.2s; border: none; }
-    .exec-btn.long { background: linear-gradient(135deg, #a855f7, #8b5cf6); box-shadow: 0 16px 32px rgba(139,92,246,0.3); }
-    .exec-btn.short { background: linear-gradient(135deg, #f43f5e, #e11d48); box-shadow: 0 16px 32px rgba(225,29,72,0.3); }
+    /* Order Entry */
+    .order-type-tabs { display: flex; background: var(--soft); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+    .order-tab { flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; font-weight: 800; color: var(--muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
+    .order-tab.active { background: var(--solid); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-    .toast { position: fixed; left: 50%; bottom: calc(40px + var(--safe-bottom)); transform: translateX(-50%) translateY(20px); z-index: 150; padding: 14px 28px; border-radius: 99px; background: #0f172a; color: white; font-weight: 800; font-size: 0.95rem; box-shadow: 0 16px 40px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); white-space:nowrap; }
-    .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .input-group { background: var(--soft); border-radius: 16px; padding: 12px 16px; border: 1px solid var(--border); margin-bottom: 16px; transition: 0.2s; display: flex; align-items: center; justify-content: space-between; }
+    .input-group:focus-within { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); background: var(--solid); }
+    .input-group input { width: 100%; background: transparent; border: none; font-size: 1.2rem; font-weight: 900; color: var(--text); outline: none; font-variant-numeric: tabular-nums; }
+    .input-suffix { font-size: 0.85rem; font-weight: 800; color: var(--muted); margin-left: 8px; }
 
-    /* Mobile Responsive Overrides */
-    @media (max-width: 950px) {
-      body { overflow-y: auto; }
-      .terminal-wrapper { 
-        display: flex; flex-direction: column; 
-        height: auto; min-height: 100vh;
-      }
-      
-      .terminal-header { position: sticky; top: 0; }
-      
-      .sidebar { 
-        border-right: none; border-bottom: 1px solid var(--border); 
-        padding: 12px; background: var(--glass);
-      }
-      .sidebar-head { display: none; }
-      .token-list { 
-        flex-direction: row; padding: 0; gap: 12px; 
-        overflow-x: auto; scroll-snap-type: x proximity;
-      }
-      .token-item { 
-        flex: 0 0 auto; scroll-snap-align: start; min-width: 170px; 
-        padding: 12px 16px; border-radius: 18px; 
-      }
-      
-      .chart-area { 
-        border-bottom: 1px solid var(--border); 
-        height: 45vh; min-height: 380px; flex-shrink: 0;
-      }
-      .chart-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
-      
-      .order-area { border-left: none; padding: 20px 16px; border-bottom: 1px solid var(--border); }
-      
-      .positions-area { padding-bottom: calc(40px + var(--safe-bottom)); }
-      .pos-head { padding: 16px; }
-      .pos-table-wrap { padding: 16px; }
-      .pos-table thead { display: none; }
-      .pos-table tr { 
-        display: flex; flex-direction: column; gap: 8px; 
-        padding: 16px; margin-bottom: 16px; 
-        background: var(--solid); border: 1px solid var(--border); 
-        border-radius: 20px; box-shadow: var(--shadow2);
-      }
-      .pos-table td { 
-        display: flex; justify-content: space-between; align-items: center; 
-        border-bottom: none; padding: 4px 0; font-size: 0.95rem;
-      }
-      .pos-table td::before { 
-        content: attr(data-label); 
-        color: var(--muted); font-weight: 800; font-size: 0.8rem; text-transform: uppercase;
-      }
-      .pos-table td:last-child { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border); justify-content: flex-end; }
-      .close-btn { width: 100%; height: 44px; border-radius: 12px; }
+    /* Advanced Custom Leverage Slider */
+    .leverage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .lev-badge { background: rgba(139,92,246,0.1); color: var(--tensor); padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 0.9rem; border: 1px solid rgba(139,92,246,0.2); }
+    .slider-container { position: relative; width: 100%; margin-bottom: 24px; padding: 10px 0; }
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; position: relative; z-index: 3; cursor: pointer; }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: var(--border); border-radius: 4px; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: white; border: 3px solid var(--tensor); margin-top: -7px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.1s; }
+    input[type=range]:active::-webkit-slider-thumb { transform: scale(1.2); }
+    .slider-progress { position: absolute; top: 10px; left: 0; height: 6px; background: var(--tensor); border-radius: 4px; pointer-events: none; z-index: 2; width: 10%; }
+    .lev-marks { display: flex; justify-content: space-between; margin-top: -4px; padding: 0 4px; position: relative; z-index: 1; }
+    .lev-marks span { font-size: 0.7rem; font-weight: 700; color: var(--muted2); cursor: pointer; }
+
+    .order-details { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding: 12px; background: var(--soft); border-radius: 12px; }
+    .detail-row { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; }
+    .detail-label { color: var(--muted); }
+    .detail-val { color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .action-btn { width: 100%; height: 56px; border-radius: 16px; font-size: 1.05rem; font-weight: 900; color: white; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.15s; }
+    .action-btn:active { transform: scale(0.97); }
+    .btn-long { background: var(--green); box-shadow: 0 8px 24px rgba(16,185,129,0.2); margin-bottom: 12px; }
+    .btn-long:hover { background: #059669; }
+    .btn-short { background: var(--pink); box-shadow: 0 8px 24px rgba(225,29,72,0.2); }
+    .btn-short:hover { background: #be123c; }
+
+    .close-btn { background: var(--soft); color: var(--text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+    .close-btn:hover { border-color: var(--tensor); color: var(--tensor); }
+
+    @media (max-width: 1000px) {
+      .trading-layout { grid-template-columns: 1fr; overflow-y: auto; height: auto; padding-bottom: 100px; }
+      .chart-container { min-height: 350px; }
+      .positions-panel { min-height: 300px; }
     }
   </style>
 </head>
 <body>
-  <div class="terminal-wrapper">
-    <header class="terminal-header">
-      <a href="/wallet" class="brand"><div class="logo">B</div> BlueCrypto</a>
-      <button class="nav-btn" onclick="window.location.href='/wallet'">Vault</button>
-    </header>
 
-    <aside class="sidebar">
-      <div class="sidebar-head">
-        <span>Markets</span>
-        <span style="font-size:0.7rem; color:var(--tensor);">TENSOR AI</span>
+  <header class="topbar">
+    <a href="/wallet" class="brand">
+      <div class="logo">T</div>
+      <div class="brand-title">Tensor Trade</div>
+    </a>
+    <div class="top-actions">
+      <div class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </div>
-      <div class="token-list" id="tokenList"></div>
-    </aside>
+      <a href="/wallet" class="icon-btn" title="Back to Wallet">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+      </a>
+    </div>
+  </header>
 
-    <main class="chart-area">
-      <div class="chart-header">
-        <div class="chart-ticker">
-          <h2 id="actSymbol">---</h2>
-          <span id="actPrice" style="color: var(--text);">$0.00</span>
-          <span id="actChange" class="up">0.00%</span>
-        </div>
-        <div class="chart-controls">
-          <div class="pill-toggle">
-            <button class="active" id="btnCandle" onclick="setChartType('candle')">Candle</button>
-            <button id="btnLine" onclick="setChartType('line')">Line</button>
+  <main class="trading-layout">
+    
+    <div class="left-col">
+      <div class="panel" style="flex: 1; display: flex; flex-direction: column;">
+        
+        <div class="chart-header">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <select id="assetSelect" class="asset-selector" onchange="switchAsset(this.value)">
+              <option value="none">Loading...</option>
+            </select>
+            <div id="tickerPrice" class="price-display">$0.00</div>
           </div>
-          <div class="pill-toggle">
-            <button class="active tf-btn" onclick="setTF(5, this)">5m</button>
-            <button class="tf-btn" onclick="setTF(15, this)">15m</button>
-            <button class="tf-btn" onclick="setTF(60, this)">1H</button>
+          
+          <div style="display: flex; gap: 24px;">
+            <div class="stat-box"><span class="stat-label">24h Change</span><span id="tickerChange" class="stat-val price-up">+0.00%</span></div>
+            <div class="stat-box"><span class="stat-label">24h Vol (USDT)</span><span id="tickerVol" class="stat-val">0.00</span></div>
+            <div class="stat-box"><span class="stat-label">Funding / 8h</span><span class="stat-val" style="color: var(--tensor);">0.0150%</span></div>
           </div>
         </div>
-      </div>
-      
-      <div class="chart-canvas-wrapper" id="canvasWrapper">
-         <canvas id="customChartCanvas"></canvas>
-      </div>
-    </main>
 
-    <aside class="order-area">
-      <div class="order-tabs">
-        <button class="long active" id="btnLong" onclick="setOrderSide('long')">Long</button>
-        <button class="short" id="btnShort" onclick="setOrderSide('short')">Short</button>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="chart-controls">
+              <button class="pill-btn tf-btn active" onclick="setTF(1, this)">1m</button>
+              <button class="pill-btn tf-btn" onclick="setTF(5, this)">5m</button>
+              <button class="pill-btn tf-btn" onclick="setTF(15, this)">15m</button>
+              <button class="pill-btn tf-btn" onclick="setTF(60, this)">1H</button>
+              <button class="pill-btn tf-btn" onclick="setTF(1440, this)">1D</button>
+            </div>
+            <div class="chart-controls">
+              <button class="pill-btn type-btn active" onclick="setType('candle', this)">Candles</button>
+              <button class="pill-btn type-btn" onclick="setType('line', this)">Line</button>
+            </div>
+        </div>
+
+        <div class="chart-container" id="chartContainer"></div>
       </div>
 
-      <div class="field-group">
-        <label>Margin <span style="color:var(--text);" id="availUsdt">Bal: 0.00 USDT</span></label>
-        <div class="input-box">
-          <input type="number" id="orderMargin" placeholder="0.00" oninput="calcOrder()" />
-          <span>USDT</span>
+      <div class="panel positions-panel">
+        <div class="pos-tabs">
+          <div class="pos-tab active" onclick="switchTab('positions', this)">Active Positions (1)</div>
+          <div class="pos-tab" onclick="switchTab('history', this)">Trade History</div>
+        </div>
+        
+        <div class="table-wrap" id="tabPositions">
+          <table>
+            <thead>
+              <tr>
+                <th>Symbol</th><th>Side</th><th>Size (USDT)</th><th>Entry Price</th><th>Mark Price</th><th>Liq. Price</th><th>Margin Ratio</th><th>Unrealized PnL</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="positionsBody">
+              </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap" id="tabHistory" style="display: none;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th><th>Symbol</th><th>Side</th><th>Exec. Price</th><th>Size</th><th>Realized PnL</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+               </tbody>
+          </table>
         </div>
       </div>
+    </div>
 
-      <div class="field-group slider-wrap">
-        <label>Leverage <span style="color:var(--tensor); font-size:0.9rem;" id="levValTxt">10x</span></label>
-        <div class="slider-track-container" id="sliderTrack">
-          <input type="range" id="orderLeverage" min="1" max="50" value="10" oninput="updateLevUI()" />
+    <div class="right-col">
+      <div class="panel">
+        <div class="order-type-tabs">
+          <div class="order-tab active">Cross Margin</div>
+          <div class="order-tab">Isolated</div>
         </div>
-      </div>
 
-      <div class="order-summary">
-        <div class="summary-row"><span style="color:var(--muted)">Position Size</span><span id="estSize">0.00 USDT</span></div>
-        <div class="summary-row"><span style="color:var(--muted)">Est. Liq. Price</span><span id="estLiq">--</span></div>
-        <div class="summary-row"><span style="color:var(--muted)">Est. Impact</span><span id="estImpact">< 0.01%</span></div>
-        <div class="summary-row main"><span style="color:var(--muted)">Required Margin</span><span id="reqMargin" style="color:var(--tensor);">0.00 USDT</span></div>
-      </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem;">
+          <span style="color: var(--muted); font-weight:700;">Avail. Margin</span>
+          <span style="font-weight: 800; font-variant-numeric: tabular-nums;" id="availBal">0.00 USDT</span>
+        </div>
 
-      <button class="exec-btn long" id="btnSubmitOrder" onclick="executeTrade()">Open Long</button>
-    </aside>
+        <div class="input-group">
+          <div><div class="stat-label">Order Size</div><input type="number" id="tradeAmt" placeholder="0.00" oninput="updateCalculations()"></div>
+          <div class="input-suffix">USDT</div>
+        </div>
 
-    <section class="positions-area">
-      <div class="pos-head">
-        <span>Active Trades</span>
-      </div>
-      <div class="pos-table-wrap">
-        <table class="pos-table">
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Side</th>
-              <th>Size</th>
-              <th>Entry Price</th>
-              <th>Liq. Price</th>
-              <th>PnL / ROI</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="positionsBody">
-             </tbody>
-        </table>
-      </div>
-    </section>
-  </div>
+        <div class="leverage-header">
+          <span class="stat-label">Leverage Adjustment</span>
+          <span class="lev-badge" id="levValText">10x</span>
+        </div>
+        
+        <div class="slider-container">
+          <div class="slider-progress" id="levProgress" style="width: 6.66%;"></div>
+          <input type="range" id="levSlider" min="1" max="150" value="10" oninput="updateLevSlider(this.value)">
+          <div class="lev-marks">
+            <span onclick="setLev(1)">1x</span><span onclick="setLev(25)">25x</span><span onclick="setLev(50)">50x</span><span onclick="setLev(100)">100x</span><span onclick="setLev(150)">150x</span>
+          </div>
+        </div>
 
-  <div class="toast" id="toast"></div>
+        <div class="order-details">
+          <div class="detail-row"><span class="detail-label">Position Size</span><span class="detail-val" id="detPosSize">0.00 USDT</span></div>
+          <div class="detail-row"><span class="detail-label">Est. Liq Price (Long)</span><span class="detail-val price-up" id="detLiqLong">-</span></div>
+          <div class="detail-row"><span class="detail-label">Est. Liq Price (Short)</span><span class="detail-val price-down" id="detLiqShort">-</span></div>
+          <div class="detail-row"><span class="detail-label">Est. Maker Fee</span><span class="detail-val" id="detFee">0.00 USDT</span></div>
+        </div>
+
+        <button class="action-btn btn-long" onclick="executeTrade('long')">
+          Buy / Long
+        </button>
+        <button class="action-btn btn-short" onclick="executeTrade('short')">
+          Sell / Short
+        </button>
+
+      </div>
+    </div>
+  </main>
 
   <script>
-    const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
-    const USER_ROLE = "<%= typeof role !== 'undefined' ? role : 'user' %>";
-    const IS_ADMIN = USER_ROLE === 'staff';
+    // System Variables
+    let currentTheme = localStorage.getItem('blue_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
     
-    let activeToken = null;
-    let tokenData = [];
-    let tensorBalancesMap = {};
-    let positionsData = [];
+    let baseTensorData = [];
+    let currentAsset = null;
+    let livePrice = 0;
     
-    // Chart Engine Vars
-    let rawCandleData = [];
-    let chartType = 'candle';
-    let currentTF = 5; 
-    let chartOffsetX = 0;
-    let chartZoom = 1;
-    let isDragging = false;
-    let lastDragX = 0;
-    
-    // Live Animation Vars
-    let targetPrice = 0;
-    let lerpedPrice = 0;
-    let flashTimer = null;
-    let flashIntensity = 0;
-    let priceDirection = 'none'; // 'up' or 'down'
+    // Chart Variables
+    let tvChart = null, candleSeries = null, lineSeries = null;
+    let currentTF = 1;
+    let currentChartType = 'candle';
+    let chartInterval;
 
-    let orderSide = 'long';
-    let toastTimer;
-
-    // --- Trading Balance Logic (Combined Real USDT + Pegged Tensor Tokens) ---
-    let combinedTradingBal = 0;
-
-    function calculateCombinedBalance() {
-      // 1. Get Tensor Pegged Tokens
-      let tensorStableUsd = 0;
-      tokenData.forEach(t => {
-        if (t.bias === 'pegged' && tensorBalancesMap[t.id]) {
-          tensorStableUsd += tensorBalancesMap[t.id] * t.price;
-        }
-      });
-
-      // 2. Get Real Crypto USDT from localStorage (Matches Wallet.ejs format)
-      let cryptoUsdt = 0;
+    // --- Core Logic ---
+    async function initTerminal() {
+      // 1. Fetch Registry
       try {
-        if (IS_ADMIN) {
-          const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || { usdt: 25000 };
-          cryptoUsdt = saved.usdt;
-        } else {
-          const cachedBal = JSON.parse(localStorage.getItem(`blue_bal_${CURRENT_EMAIL}`));
-          if (cachedBal && cachedBal.bal) {
-            cryptoUsdt = cachedBal.bal.filter(b => b.symbol === 'USDT').reduce((sum, b) => sum + Number(b.balance || 0), 0);
-          }
-        }
-      } catch(e) {}
-
-      combinedTradingBal = cryptoUsdt + tensorStableUsd;
-    }
-
-    function formatUsd(val) { return Number(val).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4, maximumFractionDigits: 6 }); }
-    function formatDec(val, dec=2) { return Number(val).toLocaleString(undefined, {minimumFractionDigits:dec, maximumFractionDigits:dec}); }
-    function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('active'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('active'), 2500); }
-
-    // --- Custom Canvas Charting Engine with Smooth Animation ---
-    function initCustomChart() {
-      const cvs = document.getElementById('customChartCanvas');
-      if(!cvs) return;
-      
-      const wrapper = document.getElementById('canvasWrapper');
-      new ResizeObserver(() => drawCustomChart()).observe(wrapper);
-
-      // Mouse/Touch Interaction for Zoom and Pan
-      cvs.addEventListener('mousedown', e => { isDragging = true; lastDragX = e.clientX; cvs.style.cursor = 'grabbing'; });
-      window.addEventListener('mouseup', () => { isDragging = false; cvs.style.cursor = 'crosshair'; });
-      window.addEventListener('mousemove', e => {
-        if(!isDragging) return;
-        chartOffsetX += (e.clientX - lastDragX);
-        lastDragX = e.clientX;
-      });
-
-      cvs.addEventListener('touchstart', e => { isDragging = true; lastDragX = e.touches[0].clientX; });
-      window.addEventListener('touchend', () => { isDragging = false; });
-      window.addEventListener('touchmove', e => {
-        if(!isDragging) return;
-        chartOffsetX += (e.touches[0].clientX - lastDragX);
-        lastDragX = e.touches[0].clientX;
-      }, {passive: false});
-
-      cvs.addEventListener('wheel', e => {
-        e.preventDefault();
-        chartZoom -= e.deltaY * 0.002;
-        if(chartZoom < 0.2) chartZoom = 0.2;
-        if(chartZoom > 5) chartZoom = 5;
-      }, {passive: false});
-
-      // Start Animation Loop
-      requestAnimationFrame(animationLoop);
-    }
-
-    function animationLoop() {
-      // Smoothly interpolate the price
-      if (lerpedPrice === 0) lerpedPrice = targetPrice;
-      lerpedPrice += (targetPrice - lerpedPrice) * 0.15;
-      
-      // Decrease flash intensity
-      if (flashIntensity > 0) flashIntensity -= 0.05;
-      if (flashIntensity < 0) flashIntensity = 0;
-
-      drawCustomChart();
-      requestAnimationFrame(animationLoop);
-    }
-
-    function setChartType(type) {
-      chartType = type;
-      document.getElementById('btnCandle').classList.toggle('active', type === 'candle');
-      document.getElementById('btnLine').classList.toggle('active', type === 'line');
-    }
-
-    function setTF(tf, btn) {
-      currentTF = tf;
-      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      chartOffsetX = 0;
-      fetchChartData();
-    }
-
-    async function fetchChartData() {
-      if(!activeToken) return;
-      try {
-        const res = await fetch(`/api/tensor/chart?tokenId=${activeToken.id}`);
-        const data = await res.json();
-        if(data.candles && data.candles.length) {
-          rawCandleData = data.candles;
-        } else {
-          rawCandleData = [];
-        }
-      } catch(e) {}
-    }
-
-    function aggregateCandles(raw, tfMins) {
-      const ms = tfMins * 60 * 1000;
-      let agg = [];
-      let cur = null;
-      raw.forEach(c => {
-        const bTime = Math.floor(c.time / ms) * ms;
-        if(!cur || cur.orig !== bTime) {
-          if(cur) agg.push(cur);
-          cur = { time: Math.floor(bTime/1000), orig: bTime, open: c.open, high: c.high, low: c.low, close: c.close };
-        } else {
-          cur.high = Math.max(cur.high, c.high);
-          cur.low = Math.min(cur.low, c.low);
-          cur.close = c.close;
-        }
-      });
-      if(cur) agg.push(cur);
-      return Array.from(new Map(agg.map(i => [i.time, i])).values());
-    }
-
-    function drawCustomChart() {
-      const canvas = document.getElementById('customChartCanvas');
-      const wrapper = document.getElementById('canvasWrapper');
-      if(!canvas || !wrapper) return;
-
-      const dpr = window.devicePixelRatio || 2;
-      const rect = wrapper.getBoundingClientRect();
-      
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, rect.width, rect.height);
-
-      if(!rawCandleData.length) {
-        ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px Inter'; ctx.textAlign = 'center';
-        ctx.fillText('Awaiting Market Data...', rect.width/2, rect.height/2);
-        return;
-      }
-
-      const processed = aggregateCandles(rawCandleData, currentTF);
-      if(!processed.length) return;
-
-      const w = rect.width;
-      const h = rect.height;
-      const pT = 20, pB = 30, pR = 64, pL = 10; // pB increased for X axis
-
-      const baseCandleWidth = 8 * chartZoom;
-      const spacing = 4 * chartZoom;
-      const totalCandleWidth = baseCandleWidth + spacing;
-      
-      const visibleCount = Math.floor((w - pL - pR) / totalCandleWidth);
-      let maxOffset = processed.length - visibleCount;
-      if (maxOffset < 0) maxOffset = 0;
-      
-      let currentOffset = maxOffset - Math.floor(chartOffsetX / totalCandleWidth);
-      if(currentOffset > maxOffset) currentOffset = maxOffset;
-      if(currentOffset < 0) currentOffset = 0;
-
-      const visibleData = processed.slice(currentOffset, currentOffset + visibleCount);
-      if(!visibleData.length) return;
-
-      const maxP = Math.max(...visibleData.map(c => c.high), lerpedPrice);
-      const minP = Math.min(...visibleData.map(c => c.low), lerpedPrice);
-      const range = maxP - minP || maxP * 0.01;
-      
-      const y = (val) => pT + ((maxP - val) / range) * (h - pT - pB);
-
-      // --- Draw Grid, X & Y Axis ---
-      ctx.fillStyle = 'rgba(100,116,139,0.8)';
-      ctx.font = '600 11px Inter';
-      ctx.textBaseline = 'middle';
-      
-      // Horizontal lines (Y axis)
-      ctx.textAlign = 'left';
-      for(let i=0; i<=4; i++) {
-        const val = maxP - (i * range / 4);
-        const yPos = Math.floor(y(val));
-        ctx.beginPath(); ctx.moveTo(pL, yPos); ctx.lineTo(w - pR, yPos); 
-        ctx.strokeStyle = 'rgba(2,132,199,0.06)'; ctx.lineWidth = 1; ctx.stroke();
-        ctx.fillText(val.toFixed(4), w - pR + 8, yPos);
-      }
-
-      // Vertical lines (X axis - Time)
-      ctx.textAlign = 'center';
-      const timeSkip = Math.max(1, Math.floor(visibleData.length / 5));
-      for(let i=0; i<visibleData.length; i+=timeSkip) {
-        const c = visibleData[i];
-        const cx = Math.floor(w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2);
-        
-        ctx.beginPath(); ctx.moveTo(cx, pT); ctx.lineTo(cx, h - pB + 5);
-        ctx.strokeStyle = 'rgba(2,132,199,0.03)'; ctx.lineWidth = 1; ctx.stroke();
-
-        const timeStr = new Date(c.time * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        ctx.fillText(timeStr, cx, h - pB + 16);
-      }
-
-      // --- Draw Candles / Line ---
-      if (chartType === 'line') {
-        ctx.beginPath();
-        visibleData.forEach((c, i) => {
-          const cx = w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2;
-          const pointY = (i === visibleData.length - 1 && currentOffset === maxOffset) ? y(lerpedPrice) : y(c.close);
-          if (i === 0) ctx.moveTo(cx, pointY);
-          else ctx.lineTo(cx, pointY);
-        });
-        ctx.strokeStyle = '#8b5cf6'; // Tensor Purple
-        ctx.lineWidth = 2.5;
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-      } else {
-        visibleData.forEach((c, i) => {
-          const cx = Math.floor(w - pR - (visibleData.length - 1 - i) * totalCandleWidth - totalCandleWidth/2);
-          
-          // Use lerped price for the very last active candle
-          const closeVal = (i === visibleData.length - 1 && currentOffset === maxOffset) ? lerpedPrice : c.close;
-          const isUp = closeVal >= c.open;
-          
-          // Purple (#8b5cf6) for UP, Pink (#e11d48) for DOWN
-          const color = isUp ? '#8b5cf6' : '#e11d48'; 
-          
-          ctx.strokeStyle = color;
-          ctx.fillStyle = color;
-          ctx.lineWidth = 1.5;
-          
-          ctx.beginPath();
-          ctx.moveTo(cx, Math.floor(y(Math.max(c.high, closeVal))));
-          ctx.lineTo(cx, Math.floor(y(Math.min(c.low, closeVal))));
-          ctx.stroke();
-          
-          const top = Math.floor(y(Math.max(c.open, closeVal)));
-          const bot = Math.floor(y(Math.min(c.open, closeVal)));
-          const bodyH = Math.max(1, bot - top);
-          const cW = Math.max(1, Math.floor(baseCandleWidth));
-          
-          ctx.fillRect(Math.floor(cx - cW/2), top, cW, bodyH);
-        });
-      }
-
-      // --- Live Price Line & Glow Effect ---
-      if (currentOffset === maxOffset) {
-         const ly = Math.floor(y(lerpedPrice));
-         const flashColor = priceDirection === 'up' ? 'rgba(168,85,247,' : 'rgba(225,29,72,'; // Purple vs Pink
-         
-         ctx.save();
-         // Add Dramatic Glow if intensity > 0
-         if (flashIntensity > 0) {
-            ctx.shadowBlur = 15 * flashIntensity;
-            ctx.shadowColor = flashColor + flashIntensity + ')';
-         }
-
-         ctx.beginPath(); ctx.moveTo(pL, ly); ctx.lineTo(w, ly);
-         ctx.setLineDash([4, 4]); ctx.strokeStyle = flashColor + (0.5 + flashIntensity*0.5) + ')'; 
-         ctx.lineWidth = 1 + flashIntensity; ctx.stroke();
-         ctx.setLineDash([]);
-         
-         ctx.fillStyle = priceDirection === 'up' ? '#8b5cf6' : '#e11d48';
-         ctx.fillRect(w - pR + 2, ly - 10, pR - 4, 20);
-         ctx.fillStyle = 'white';
-         ctx.fillText(lerpedPrice.toFixed(4), w - pR + 8, ly);
-         
-         ctx.restore();
-      }
-    }
-
-
-    // --- Market Data & UI ---
-    async function fetchMarket() {
-      try {
-        const res = await fetch(`/api/tensor`);
-        const data = await res.json();
-        tokenData = data.registry || [];
-        positionsData = data.positions || [];
-        tensorBalancesMap = data.balances || {};
-        
-        calculateCombinedBalance();
-        renderSidebar();
-        renderPositions();
-
-        if(!activeToken && tokenData.length > 0) {
-          selectToken(tokenData[0].id);
-        } else if (activeToken) {
-          const updated = tokenData.find(t => t.id === activeToken.id);
-          if (updated) {
-            triggerPriceUpdate(updated);
-          }
-        }
-      } catch(e) {}
-    }
-
-    function triggerPriceUpdate(updatedToken) {
-      const oldPrice = activeToken.price;
-      activeToken = updatedToken;
-      
-      targetPrice = activeToken.price;
-
-      if (activeToken.price !== oldPrice && oldPrice > 0) {
-        priceDirection = activeToken.price > oldPrice ? 'up' : 'down';
-        flashIntensity = 1.0; // Trigger dramatic glow
-        
-        const priceEl = document.getElementById('actPrice');
-        priceEl.textContent = formatUsd(activeToken.price);
-        
-        // CSS Flash
-        priceEl.classList.remove('flash-up', 'flash-down');
-        void priceEl.offsetWidth; // trigger reflow
-        priceEl.classList.add(priceDirection === 'up' ? 'flash-up' : 'flash-down');
-      }
-
-      updateHeaderUI();
-      calcOrder(); 
-    }
-
-    function renderSidebar() {
-      const list = document.getElementById('tokenList');
-      if(!tokenData.length) { list.innerHTML = `<div style="padding:16px; color:var(--muted); font-size:0.85rem; text-align:center;">No assets deployed.</div>`; return; }
-      
-      list.innerHTML = tokenData.map(t => {
-        const diff = t.startPrice ? (((t.price - t.startPrice)/t.startPrice)*100) : 0;
-        const isActive = activeToken && activeToken.id === t.id;
-        
-        return `
-          <div class="token-item ${isActive ? 'active' : ''}" onclick="selectToken('${t.id}')">
-            <div class="token-name">
-              <div class="token-icon">${t.icon || 'T'}</div>
-              ${t.symbol}
-            </div>
-            <div style="text-align:right;">
-              <div class="token-price" id="sidebar_price_${t.id}">${Number(t.price).toFixed(4)}</div>
-              <div class="token-change ${diff>=0?'up':'down'}">${diff>=0?'+':''}${diff.toFixed(2)}%</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function selectToken(id) {
-      activeToken = tokenData.find(t => t.id === id);
-      if(!activeToken) return;
-      
-      targetPrice = activeToken.price;
-      lerpedPrice = activeToken.price; // Instant snap on change
-      flashIntensity = 0;
-
-      renderSidebar();
-      updateHeaderUI();
-      chartOffsetX = 0; 
-      fetchChartData();
-      calcOrder();
-    }
-
-    function updateHeaderUI() {
-      document.getElementById('actSymbol').textContent = activeToken.symbol;
-      document.getElementById('actPrice').textContent = formatUsd(activeToken.price);
-
-      const diff = activeToken.startPrice ? (((activeToken.price - activeToken.startPrice)/activeToken.startPrice)*100) : 0;
-      const chgEl = document.getElementById('actChange');
-      chgEl.textContent = `${diff>=0?'+':''}${diff.toFixed(2)}%`;
-      chgEl.className = diff>=0 ? 'up' : 'down';
-    }
-
-    // --- Order Engine (Enhanced Leverage Slider) ---
-    function setOrderSide(side) {
-      orderSide = side;
-      document.getElementById('btnLong').classList.toggle('active', side === 'long');
-      document.getElementById('btnShort').classList.toggle('active', side === 'short');
-      
-      const btnSub = document.getElementById('btnSubmitOrder');
-      btnSub.textContent = `Open ${side.charAt(0).toUpperCase() + side.slice(1)}`;
-      btnSub.className = `exec-btn ${side}`;
-      calcOrder();
-    }
-
-    function updateLevUI() {
-      const slider = document.getElementById('orderLeverage');
-      const track = document.getElementById('sliderTrack');
-      const lev = slider.value;
-      
-      document.getElementById('levValTxt').textContent = `${lev}x`;
-      
-      const pct = ((lev - slider.min) / (slider.max - slider.min)) * 100;
-      track.style.background = `linear-gradient(to right, var(--tensor) ${pct}%, var(--soft) ${pct}%)`;
-      
-      calcOrder();
-    }
-
-    function calcOrder() {
-      document.getElementById('availUsdt').textContent = `Bal: ${formatDec(combinedTradingBal)} USDT`;
-      
-      if(!activeToken) return;
-      
-      const margin = Number(document.getElementById('orderMargin').value || 0);
-      const lev = Number(document.getElementById('orderLeverage').value || 1);
-      
-      const size = margin * lev;
-      document.getElementById('estSize').textContent = `${formatDec(size)} USDT`;
-      document.getElementById('reqMargin').textContent = `${formatDec(margin)} USDT`;
-
-      if (margin > 0 && activeToken.price > 0) {
-        const marginPct = 1 / lev;
-        const liq = orderSide === 'long' 
-            ? activeToken.price * (1 - marginPct) 
-            : activeToken.price * (1 + marginPct);
-        document.getElementById('estLiq').textContent = formatUsd(liq);
-        
-        const impact = (size / (activeToken.marketCap || 100000)) * 100;
-        document.getElementById('estImpact').textContent = impact < 0.01 ? '< 0.01%' : `${impact.toFixed(3)}%`;
-        document.getElementById('estImpact').style.color = impact > 1 ? 'var(--pink)' : 'var(--text)';
-      } else {
-        document.getElementById('estLiq').textContent = '--';
-        document.getElementById('estImpact').textContent = '--';
-      }
-    }
-
-    async function executeTrade() {
-      if(!activeToken) return;
-      const margin = Number(document.getElementById('orderMargin').value || 0);
-      const lev = Number(document.getElementById('orderLeverage').value || 1);
-      
-      if(margin <= 0 || margin > combinedTradingBal) return toast('Invalid or insufficient margin.');
-
-      try {
-        const res = await fetch('/api/tensor/trade', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ tokenId: activeToken.id, marginUsdt: margin, leverage: lev, side: orderSide })
-        });
-        if(res.ok) {
-           // Assume local base was spent first for simulation smoothness
-           if (localUsdtBase >= margin) localUsdtBase -= margin;
-           localStorage.setItem('blue_base_usdt', localUsdtBase);
-           
-           document.getElementById('orderMargin').value = '';
-           toast('Position Opened Successfully');
-           fetchMarket();
-        } else {
-           const err = await res.json(); toast(err.error);
-        }
-      } catch(e) { toast('Network error'); }
-    }
-
-    async function closeTrade(id) {
-      try {
-        const res = await fetch('/api/tensor/close-trade', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ positionId: id })
-        });
+        const res = await fetch(`/api/tensor?_t=${Date.now()}`);
         if(res.ok) {
            const data = await res.json();
-           const pos = positionsData.find(p=>p.id===id);
-           localUsdtBase += (pos.marginUsdt + data.pnl); 
-           localStorage.setItem('blue_base_usdt', localUsdtBase);
-           toast('Position Closed');
-           fetchMarket();
+           baseTensorData = data.registry || [];
+           // Populate Dropdown
+           const sel = document.getElementById('assetSelect');
+           sel.innerHTML = baseTensorData.map(t => `<option value="${t.id}">${t.symbol}/USDT</option>`).join('');
+           if(baseTensorData.length > 0) switchAsset(baseTensorData[0].id);
         }
-      } catch(e) { toast('Failed to close trade'); }
+      } catch(e) { console.error('Failed to load assets.'); }
+
+      // 2. Initialize Chart
+      initChart();
+      
+      // 3. Mock Balances / Positions for demonstration
+      document.getElementById('availBal').textContent = '2,450.50 USDT';
+      renderPositions();
+      renderHistory();
+      updateLevSlider(document.getElementById('levSlider').value);
     }
 
-    // --- Positions UI ---
+    function switchAsset(id) {
+        currentAsset = baseTensorData.find(t => t.id === id);
+        if(!currentAsset) return;
+        
+        livePrice = currentAsset.price;
+        document.getElementById('tickerPrice').textContent = money(livePrice);
+        
+        const diff = currentAsset.startPrice ? (((livePrice - currentAsset.startPrice)/currentAsset.startPrice)*100) : 0;
+        const chgEl = document.getElementById('tickerChange');
+        chgEl.textContent = `${diff >= 0 ? '+' : ''}${diff.toFixed(2)}%`;
+        chgEl.className = `stat-val ${diff >= 0 ? 'price-up' : 'price-down'}`;
+        
+        document.getElementById('tickerVol').textContent = formatCompact(currentAsset.volume || 0);
+
+        clearInterval(chartInterval);
+        fetchAndDrawChart();
+        chartInterval = setInterval(fetchAndDrawChart, 3000); // Fast poll for terminal
+        updateCalculations();
+    }
+
+    // --- Leveraged Calculations ---
+    function updateLevSlider(val) {
+        document.getElementById('levValText').innerText = val + 'x';
+        document.getElementById('levSlider').value = val;
+        // Calculate fill percentage (min is 1, max is 150)
+        const pct = ((val - 1) / (150 - 1)) * 100;
+        document.getElementById('levProgress').style.width = pct + '%';
+        updateCalculations();
+    }
+    function setLev(val) { updateLevSlider(val); }
+
+    function updateCalculations() {
+        const amt = Number(document.getElementById('tradeAmt').value || 0);
+        const lev = Number(document.getElementById('levSlider').value);
+        const posSize = amt * lev;
+        
+        document.getElementById('detPosSize').textContent = `${fmt(posSize)} USDT`;
+        document.getElementById('detFee').textContent = `${fmt(posSize * 0.0004)} USDT`; // 0.04% maker fee example
+
+        if (livePrice > 0 && amt > 0) {
+            // Simplified Liquidation Formula: Entry * (1 ± (1/Leverage))
+            const mmr = 0.005; // 0.5% Maintenance margin
+            const liqLong = livePrice * (1 - (1/lev) + mmr);
+            const liqShort = livePrice * (1 + (1/lev) - mmr);
+            
+            document.getElementById('detLiqLong').textContent = money(Math.max(0, liqLong));
+            document.getElementById('detLiqShort').textContent = money(Math.max(0, liqShort));
+        } else {
+            document.getElementById('detLiqLong').textContent = '-';
+            document.getElementById('detLiqShort').textContent = '-';
+        }
+    }
+
+    function executeTrade(side) {
+        const amt = Number(document.getElementById('tradeAmt').value || 0);
+        if (amt <= 0) return alert('Enter a valid amount');
+        const lev = Number(document.getElementById('levSlider').value);
+        alert(`Request Sent: ${side.toUpperCase()} ${currentAsset.symbol} | Size: ${fmt(amt*lev)} USDT @ ${lev}x Leverage`);
+        // Here you would post to /api/trading/execute
+        document.getElementById('tradeAmt').value = '';
+        updateCalculations();
+    }
+
+    // --- Charting Engine (Lightweight Charts) ---
+    function initChart() {
+        const container = document.getElementById('chartContainer');
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(56,189,248,0.05)' : 'rgba(2,132,199,0.08)';
+
+        tvChart = LightweightCharts.createChart(container, {
+            layout: { background: { type: 'solid', color: 'transparent' }, textColor: textColor },
+            grid: { vertLines: { color: gridColor }, horzLines: { color: gridColor } },
+            rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.1, bottom: 0.1 } },
+            timeScale: { 
+                borderVisible: false, 
+                timeVisible: true, 
+                secondsVisible: false, 
+                fixLeftEdge: true,
+                tickMarkFormatter: (time) => {
+                    const date = new Date(time * 1000);
+                    return date.toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
+                }
+            },
+            crosshair: { mode: 0, vertLine: { color: '#8b5cf6', labelBackgroundColor: '#8b5cf6' }, horzLine: { color: '#8b5cf6', labelBackgroundColor: '#8b5cf6' } }
+        });
+        
+        candleSeries = tvChart.addCandlestickSeries({ upColor: '#10b981', downColor: '#e11d48', borderVisible: false, wickUpColor: '#10b981', wickDownColor: '#e11d48' });
+        lineSeries = tvChart.addLineSeries({ color: '#a78bfa', lineWidth: 2, crosshairMarkerVisible: true, lastValueVisible: true });
+        lineSeries.applyOptions({ visible: false });
+        
+        new ResizeObserver(entries => {
+            if (entries.length === 0 || entries[0].target !== container) return;
+            const newRect = entries[0].contentRect;
+            tvChart.applyOptions({ height: newRect.height, width: newRect.width });
+        }).observe(container);
+    }
+
+    function setTF(minutes, btn) {
+        currentTF = minutes;
+        document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fetchAndDrawChart(); // Re-fetch immediately
+    }
+
+    function setType(type, btn) {
+        currentChartType = type;
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (type === 'candle') { candleSeries.applyOptions({visible:true}); lineSeries.applyOptions({visible:false}); } 
+        else { candleSeries.applyOptions({visible:false}); lineSeries.applyOptions({visible:true}); }
+    }
+
+    async function fetchAndDrawChart() {
+      if (!currentAsset) return;
+      try {
+        const response = await fetch(`/api/tensor/chart?tokenId=${currentAsset.id}&_t=${Date.now()}`);
+        const data = await response.json();
+        if (data && data.candles) processAndRenderChartData(data.candles);
+      } catch (e) { }
+    }
+
+    function processAndRenderChartData(raw) {
+        if(!raw || raw.length === 0 || !tvChart) return;
+        
+        let aggregated = [];
+        let currentBucket = null;
+        let msInterval = currentTF * 60 * 1000;
+
+        raw.forEach(c => {
+            const bucketTime = Math.floor(c.time / msInterval) * msInterval;
+            if (!currentBucket || currentBucket.originalTime !== bucketTime) {
+                if (currentBucket) aggregated.push(currentBucket);
+                currentBucket = { time: Math.floor(bucketTime / 1000), originalTime: bucketTime, open: c.open, high: c.high, low: c.low, close: c.close, value: c.close };
+            } else {
+                currentBucket.high = Math.max(currentBucket.high, c.high);
+                currentBucket.low = Math.min(currentBucket.low, c.low);
+                currentBucket.close = c.close;
+                currentBucket.value = c.close;
+            }
+        });
+        if(currentBucket) aggregated.push(currentBucket);
+
+        const unique = Array.from(new Map(aggregated.map(item => [item.time, item])).values());
+        candleSeries.setData(unique);
+        lineSeries.setData(unique);
+    }
+
+    // --- UI Helpers ---
+    function toggleTheme() {
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('blue_theme', newTheme);
+        currentTheme = newTheme;
+        location.reload(); // Quickest way to force chart re-render with new colors
+    }
+
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.pos-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tabPositions').style.display = tab === 'positions' ? 'block' : 'none';
+        document.getElementById('tabHistory').style.display = tab === 'history' ? 'block' : 'none';
+    }
+
+    // --- Formatters ---
+    function money(val) { return `$${Number(val||0).toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:4})}`; }
+    function fmt(val, dec=2) { return Number(val||0).toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
+    function formatCompact(num) { return new Intl.NumberFormat('en-US',{notation:'compact', compactDisplay:'short'}).format(num); }
+
+    // --- Mock Data Renderers ---
     function renderPositions() {
-      const tbody = document.getElementById('positionsBody');
-      if(!positionsData.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding:32px 16px;">No active trades.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = positionsData.map(p => {
-        const t = tokenData.find(x => x.id === p.tokenId);
-        let pnl = 0, roi = 0;
-        if(t) {
-          const diff = t.price - p.entryPrice;
-          const pct = diff / p.entryPrice;
-          pnl = p.side === 'long' ? pct * p.sizeUsd : -pct * p.sizeUsd;
-          roi = (pnl / p.marginUsdt) * 100;
-        }
-
-        const colorClass = pnl >= 0 ? 'up' : 'down';
-        const sideColor = p.side === 'long' ? 'var(--tensor)' : 'var(--pink)'; // Purple for longs
-
-        return `
-          <tr>
-            <td data-label="Asset"><strong style="color:var(--text); font-size:1.05rem;">${p.symbol}</strong> <span style="background:var(--soft); padding:2px 6px; border-radius:6px; font-size:0.75rem; color:var(--muted); border:1px solid var(--border);">${p.leverage}x</span></td>
-            <td data-label="Side" style="color:${sideColor}; font-weight:900;">${p.side.toUpperCase()}</td>
-            <td data-label="Size">${formatDec(p.sizeUsd)} USDT</td>
-            <td data-label="Entry Price">${formatUsd(p.entryPrice)}</td>
-            <td data-label="Liq. Price" style="color:var(--orange);">${formatUsd(p.liqPrice)}</td>
-            <td data-label="PnL / ROI" class="${colorClass}">${pnl>=0?'+':''}${formatDec(pnl)} USDT (${roi.toFixed(2)}%)</td>
-            <td><button class="close-btn" onclick="closeTrade('${p.id}')">Close</button></td>
-          </tr>
+        // Example Active Position
+        const tbody = document.getElementById('positionsBody');
+        tbody.innerHTML = `
+            <tr>
+                <td><strong style="color:var(--text);">NRL</strong><div style="font-size:0.7rem; color:var(--tensor); font-weight:800;">50x</div></td>
+                <td class="side-long">LONG</td>
+                <td>5,000.00</td>
+                <td>$1.0452</td>
+                <td>$1.0620</td>
+                <td class="price-down">$1.0245</td>
+                <td>12.4%</td>
+                <td class="pnl-pos">+ $80.36 (16.07%)</td>
+                <td><button class="close-btn" onclick="alert('Closing position...')">Close</button></td>
+            </tr>
         `;
-      }).join('');
     }
 
-    // --- Init ---
-    window.onload = () => {
-      setTheme(localStorage.getItem('blue_theme') || 'light');
-      initCustomChart();
-      updateLevUI(); // Init slider style
-      fetchMarket();
-      setInterval(fetchMarket, 2500); // Live price & PnL polling
-    };
-    
-    function setTheme(t) { document.documentElement.setAttribute('data-theme',t); localStorage.setItem('blue_theme',t); }
+    function renderHistory() {
+        const tbody = document.getElementById('historyBody');
+        tbody.innerHTML = `
+            <tr>
+                <td style="color:var(--muted);">${new Date(Date.now() - 3600000).toLocaleTimeString()}</td>
+                <td><strong style="color:var(--text);">NRL</strong></td>
+                <td class="side-short">SHORT</td>
+                <td>$1.0820</td>
+                <td>2,000.00</td>
+                <td class="pnl-pos">+ $120.45</td>
+                <td style="color:var(--muted);">Closed</td>
+            </tr>
+            <tr>
+                <td style="color:var(--muted);">${new Date(Date.now() - 86400000).toLocaleTimeString()}</td>
+                <td><strong style="color:var(--text);">SYN</strong></td>
+                <td class="side-long">LONG</td>
+                <td>$0.4510</td>
+                <td>1,000.00</td>
+                <td class="pnl-neg">- $450.00</td>
+                <td class="price-down">Liquidated</td>
+            </tr>
+        `;
+    }
+
+    window.onload = initTerminal;
   </script>
 </body>
 </html>
