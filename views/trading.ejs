@@ -58,8 +58,7 @@
     }
 
     button,
-    input,
-    select {
+    input {
       font: inherit;
       outline: none;
       border: none;
@@ -954,24 +953,18 @@
       return `${a.slice(0, 6)}...${a.slice(-5)}`;
     }
 
-    function normalizeNetworkKey(network) {
+    function normalizeNetwork(network) {
       const raw = String(network || '').toLowerCase();
 
       if (raw.includes('arb')) return 'arbitrum';
       if (raw.includes('sol')) return 'sol';
-      if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
+      if (raw.includes('trx') || raw.includes('tron') || raw.includes('trc')) return 'trx';
       if (raw.includes('eth') || raw.includes('erc')) return 'eth';
 
       return 'eth';
     }
 
     function getWalletUsdtNetwork() {
-      const serverNetwork = liveState.usdtNetwork || SERVER_WALLET?.usdtNetwork;
-
-      if (serverNetwork) {
-        return normalizeNetworkKey(serverNetwork);
-      }
-
       const wallet = SERVER_WALLET || {};
       const candidates = [];
 
@@ -992,11 +985,7 @@
       if (text.includes('tron') || text.includes('trc') || text.includes('trx')) return 'trx';
       if (text.includes('ethereum') || text.includes('erc') || text.includes('eth')) return 'eth';
 
-      return 'eth';
-    }
-
-    function getSelectedNetwork() {
-      return getWalletUsdtNetwork();
+      return normalizeNetwork(liveState.usdtNetwork || 'eth');
     }
 
     function updateNetworkDestination() {
@@ -1050,4 +1039,1038 @@
     function savePaperState() {
       localStorage.setItem('paper_balance', paperState.usdtBalance);
       localStorage.setItem('paper_positions', JSON.stringify(paperState.positions));
-      localStorage.setItem('paper_history
+      localStorage.setItem('paper_history', JSON.stringify(paperState.orderHistory));
+    }
+
+    function setGraphMood(isUp) {
+      const chartWrap = document.getElementById('chartWrap');
+
+      if (!chartWrap) return;
+
+      chartWrap.classList.remove('pump', 'dump');
+      void chartWrap.offsetWidth;
+
+      chartWrap.classList.add(isUp ? 'pump' : 'dump');
+
+      setTimeout(() => {
+        chartWrap.classList.remove('pump', 'dump');
+      }, 420);
+    }
+
+    function getLifetimeHigh(currentPrice = 0) {
+      let highest = Number(currentPrice) || 0;
+
+      if (activeToken) {
+        highest = Math.max(
+          highest,
+          Number(activeToken.lifetimeHigh || 0),
+          Number(activeToken.allTimeHigh || 0),
+          Number(activeToken.highestPrice || 0),
+          Number(activeToken.high24h || 0)
+        );
+      }
+
+      if (rawChartData && rawChartData.length) {
+        rawChartData.forEach(c => {
+          highest = Math.max(
+            highest,
+            Number(c.high || 0),
+            Number(c.close || 0),
+            Number(c.open || 0)
+          );
+        });
+      }
+
+      return highest;
+    }
+
+    function updateLivePriceUI(price, previousPrice) {
+      if (!activeToken) return;
+
+      const p = Number(price) || 0;
+      const prev = Number(previousPrice) || p;
+      const isUp = p >= prev;
+
+      const h24 = Number(activeToken.high24h || activeToken.high24 || p);
+      const l24 = Number(activeToken.low24h || activeToken.low24 || p);
+      const lifetimeHigh = getLifetimeHigh(p);
+      const movePct = Number(activeToken.changePercent24h) || (prev > 0 ? ((p - prev) / prev) * 100 : 0);
+
+      const colorClass = isUp ? 'text-green' : 'text-red';
+      const moveClass = movePct >= 0 ? 'text-green' : 'text-red';
+      const sign = movePct >= 0 ? '+' : '';
+
+      const chartSub = document.getElementById('chartSub');
+      const livePriceMove = document.getElementById('livePriceMove');
+      const liveMarkMini = document.getElementById('liveMarkMini');
+      const high24hVal = document.getElementById('high24hVal');
+      const low24hVal = document.getElementById('low24hVal');
+      const lifetimeHighVal = document.getElementById('lifetimeHighVal');
+
+      if (chartSub) {
+        chartSub.innerText = `$${formatPriceSmart(p)}`;
+        chartSub.className = `chart-price ${colorClass}`;
+      }
+
+      if (liveMarkMini) {
+        liveMarkMini.innerText = `$${formatPriceSmart(p)}`;
+        liveMarkMini.className = `chart-stat-value chart-live-mark ${colorClass}`;
+      }
+
+      if (livePriceMove) {
+        livePriceMove.innerText = `${sign}${movePct.toFixed(2)}%`;
+        livePriceMove.className = `chart-stat-value ${moveClass}`;
+      }
+
+      if (high24hVal) high24hVal.innerText = `$${formatPriceSmart(h24)}`;
+      if (low24hVal) low24hVal.innerText = `$${formatPriceSmart(l24)}`;
+      if (lifetimeHighVal) lifetimeHighVal.innerText = `$${formatPriceSmart(lifetimeHigh)}`;
+
+      const stripPrice = document.getElementById(`price-${activeToken.id}`);
+
+      if (stripPrice) {
+        stripPrice.innerText = `$${formatPriceSmart(p)}`;
+        stripPrice.style.color = isUp ? 'var(--green)' : 'var(--red)';
+      }
+
+      if (Math.abs(p - prev) / Math.max(prev, 1) > 0.00001) {
+        setGraphMood(isUp);
+      }
+    }
+
+    function updateChartPriceLabel(price, previousPrice) {
+      if (!chartInstance || !activeToken) return;
+
+      const p = Number(price) || 0;
+      const prev = Number(previousPrice) || p;
+      const isUp = p >= prev;
+      const labelColor = isUp ? '#0ecb81' : '#f6465d';
+
+      chartInstance.clearAnnotations();
+
+      chartInstance.addYaxisAnnotation({
+        y: p,
+        borderColor: labelColor,
+        strokeDashArray: 0,
+        label: {
+          borderColor: labelColor,
+          position: 'right',
+          offsetX: -6,
+          offsetY: 28,
+          text: `$${formatPriceSmart(p)}`,
+          style: {
+            color: '#fff',
+            background: labelColor,
+            fontSize: '11px',
+            fontWeight: 900,
+            padding: { left: 6, right: 6, top: 3, bottom: 3 }
+          }
+        }
+      }, false);
+    }
+
+    function makeDramaticVisualPrice(serverPrice) {
+      const truePrice = Number(serverPrice) || 0;
+
+      if (!truePrice) return 0;
+
+      if (!localVisualPrice) {
+        localVisualPrice = truePrice;
+        lastServerPrice = truePrice;
+        return truePrice;
+      }
+
+      const realMove = lastServerPrice > 0 ? (truePrice - lastServerPrice) / lastServerPrice : 0;
+
+      visualTrendPower = visualTrendPower * 0.72 + realMove * 10;
+
+      const dramaticNoise = (Math.random() - 0.5) * 0.00045;
+      const dramaticMove = visualTrendPower + dramaticNoise;
+
+      localVisualPrice = localVisualPrice + (truePrice - localVisualPrice) * 0.4;
+      localVisualPrice = localVisualPrice * (1 + dramaticMove);
+
+      const maxDistance = truePrice * 0.0035;
+
+      if (Math.abs(localVisualPrice - truePrice) > maxDistance) {
+        localVisualPrice = truePrice + Math.sign(localVisualPrice - truePrice) * maxDistance;
+      }
+
+      lastServerPrice = truePrice;
+
+      return Math.max(0.000001, localVisualPrice);
+    }
+
+    async function fetchCoreData() {
+      try {
+        const tokenRes = await fetch(`/api/tensor?_t=${Date.now()}`);
+
+        if (tokenRes.ok) {
+          const data = await tokenRes.json();
+
+          if (data.treasuryDestinations) {
+            treasuryDestinations = data.treasuryDestinations;
+            updateNetworkDestination();
+          }
+
+          const newAssets = data.registry || [];
+          tensorAssets = newAssets;
+
+          if (activeToken) {
+            const updatedActive = tensorAssets.find(t => t.id === activeToken.id);
+
+            if (updatedActive) {
+              const oldPrice = Number(activeToken.price) || 0;
+              activeToken = updatedActive;
+
+              if (!localVisualPrice) {
+                localVisualPrice = activeToken.price;
+              }
+
+              updateLivePriceUI(activeToken.price, oldPrice || activeToken.price);
+              updateChartPriceLabel(activeToken.price, oldPrice || activeToken.price);
+            }
+          }
+
+          renderAssetStrip();
+
+          if (!activeToken && tensorAssets.length > 0) {
+            selectAsset(tensorAssets[0].id);
+          }
+        }
+
+        const stateRes = await fetch(`/api/trading/state?_t=${Date.now()}`);
+
+        if (stateRes.ok) {
+          const nextState = await stateRes.json();
+
+          liveState = {
+            usdtBalance: Number(nextState.usdtBalance || 0),
+            usdtNetwork: nextState.usdtNetwork || liveState.usdtNetwork || 'eth',
+            positions: nextState.positions || [],
+            orderHistory: nextState.orderHistory || [],
+            publicTradeCards: nextState.publicTradeCards || [],
+            tradeDeposits: nextState.tradeDeposits || []
+          };
+
+          if (nextState.treasuryDestinations) {
+            treasuryDestinations = nextState.treasuryDestinations;
+          }
+
+          updateNetworkDestination();
+          renderBalancesAndPositions();
+        }
+      } catch (e) {
+        console.error('fetchCoreData error:', e);
+      }
+    }
+
+    async function loadChartDataForActive() {
+      if (!activeToken) return;
+
+      try {
+        const res = await fetch(`/api/tensor/chart?tokenId=${activeToken.id}&_t=${Date.now()}`);
+        const data = await res.json();
+
+        rawChartData = data.candles || [];
+
+        if (data.stats && activeToken) {
+          activeToken.high24h = data.stats.high24h || activeToken.high24h;
+          activeToken.low24h = data.stats.low24h || activeToken.low24h;
+          activeToken.lifetimeHigh = data.stats.lifetimeHigh || activeToken.lifetimeHigh;
+          activeToken.changePercent24h = data.stats.changePercent24h ?? activeToken.changePercent24h;
+        }
+
+        renderChart();
+        updateLivePriceUI(activeToken.price, activeToken.price);
+      } catch (e) {
+        console.error('loadChartDataForActive error:', e);
+      }
+    }
+
+    function startLiveTicker() {
+      if (priceInterval) clearInterval(priceInterval);
+
+      priceInterval = setInterval(() => {
+        if (!activeToken || !chartInstance || !rawChartData.length) return;
+
+        const serverPrice = Number(activeToken.price) || 0;
+        const previousPrice = lastDisplayedPrice || serverPrice;
+        const visualPrice = makeDramaticVisualPrice(serverPrice);
+
+        updateLivePriceUI(visualPrice, previousPrice);
+
+        const lastCandle = rawChartData[rawChartData.length - 1];
+
+        const tempCandle = {
+          ...lastCandle,
+          close: visualPrice,
+          high: Math.max(lastCandle.high, visualPrice),
+          low: Math.min(lastCandle.low, visualPrice)
+        };
+
+        renderChart(tempCandle);
+        updateChartPriceLabel(visualPrice, previousPrice);
+        renderActivePositionsOnly(visualPrice);
+
+        lastDisplayedPrice = visualPrice;
+      }, 450);
+    }
+
+    function initApexChart() {
+      const isDark = currentTheme === 'dark';
+      const textCol = '#848E9C';
+      const gridCol = isDark ? '#2b3139' : '#eaecef';
+
+      const options = {
+        series: [{ data: [] }],
+        chart: {
+          type: currentChartStyle,
+          height: '100%',
+          background: 'transparent',
+          animations: {
+            enabled: true,
+            easing: 'easeout',
+            speed: 180,
+            dynamicAnimation: { enabled: true, speed: 180 }
+          },
+          toolbar: { show: false },
+          zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+          selection: { enabled: false },
+          fontFamily: 'Inter, sans-serif',
+          events: {
+            mounted: function(chartContext) {
+              const el = chartContext.el;
+
+              el.addEventListener('wheel', function(e) {
+                if (!latestFormattedChartData.length) return;
+
+                e.preventDefault();
+
+                const minX = chartContext.w.globals.minX;
+                const maxX = chartContext.w.globals.maxX;
+
+                if (!Number.isFinite(minX) || !Number.isFinite(maxX)) return;
+
+                const range = maxX - minX;
+                const direction = e.deltaY > 0 ? 1 : -1;
+                const shift = range * 0.12 * direction;
+
+                const allMin = latestFormattedChartData[0].x;
+                const allMax = latestFormattedChartData[latestFormattedChartData.length - 1].x;
+
+                let nextMin = minX + shift;
+                let nextMax = maxX + shift;
+
+                if (nextMin < allMin) {
+                  nextMin = allMin;
+                  nextMax = allMin + range;
+                }
+
+                if (nextMax > allMax) {
+                  nextMax = allMax;
+                  nextMin = allMax - range;
+                }
+
+                chartContext.zoomX(nextMin, nextMax);
+              }, { passive: false });
+            }
+          }
+        },
+        theme: { mode: isDark ? 'dark' : 'light' },
+        plotOptions: {
+          candlestick: {
+            colors: { upward: '#0ecb81', downward: '#f6465d' },
+            wick: { useFillColor: true }
+          }
+        },
+        stroke: {
+          curve: 'straight',
+          width: currentChartStyle === 'line' ? 2 : 1,
+          colors: ['#8b5cf6']
+        },
+        xaxis: {
+          type: 'datetime',
+          labels: {
+            style: { colors: textCol },
+            datetimeFormatter: { hour: 'HH:mm', day: 'dd MMM' },
+            datetimeUTC: false
+          },
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          tooltip: {
+            enabled: true,
+            formatter: val => new Date(val).toLocaleString([], {
+              month: 'short',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          },
+          crosshairs: {
+            show: true,
+            position: 'back',
+            stroke: { color: '#8b5cf6', width: 1, dashArray: 3 }
+          }
+        },
+        yaxis: {
+          opposite: true,
+          labels: {
+            offsetX: -4,
+            style: { colors: textCol },
+            formatter: v => formatPriceSmart(v)
+          },
+          tooltip: { enabled: true },
+          crosshairs: {
+            show: true,
+            stroke: { color: '#8b5cf6', width: 1, dashArray: 3 }
+          }
+        },
+        tooltip: {
+          enabled: true,
+          theme: isDark ? 'dark' : 'light',
+          x: { format: 'dd MMM HH:mm' }
+        },
+        grid: {
+          borderColor: gridCol,
+          strokeDashArray: 0,
+          padding: { top: 42, right: 18, bottom: 0, left: 10 }
+        },
+        noData: {
+          text: 'Loading chart...',
+          align: 'center',
+          verticalAlign: 'middle',
+          style: {
+            color: textCol,
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif'
+          }
+        }
+      };
+
+      chartInstance = new ApexCharts(document.querySelector('#apexChartContainer'), options);
+      chartInstance.render();
+    }
+
+    function updateChartTheme() {
+      if (!chartInstance) return;
+
+      const isDark = currentTheme === 'dark';
+
+      chartInstance.updateOptions({
+        theme: { mode: isDark ? 'dark' : 'light' },
+        xaxis: { labels: { style: { colors: '#848E9C' } } },
+        yaxis: { labels: { style: { colors: '#848E9C' } } },
+        tooltip: { theme: isDark ? 'dark' : 'light' },
+        grid: { borderColor: isDark ? '#2b3139' : '#eaecef' }
+      });
+    }
+
+    function setChartStyle(style) {
+      currentChartStyle = style;
+
+      document.getElementById('btnStyleCandle').className = style === 'candlestick' ? 'active' : '';
+      document.getElementById('btnStyleLine').className = style === 'line' ? 'active' : '';
+
+      if (chartInstance) {
+        chartInstance.updateOptions({
+          chart: { type: style },
+          stroke: {
+            curve: 'straight',
+            width: style === 'line' ? 2 : 1,
+            colors: ['#8b5cf6']
+          }
+        });
+
+        renderChart();
+      }
+    }
+
+    function setChartTF(minutes, btn) {
+      currentTF = Number(minutes) || 5;
+
+      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      hasInitialZoomed = false;
+      renderChart();
+    }
+
+    function renderChart(visualLastCandle = null) {
+      if (!chartInstance || !rawChartData.length) return;
+
+      const dataToProcess = [...rawChartData];
+
+      if (visualLastCandle) {
+        dataToProcess[dataToProcess.length - 1] = visualLastCandle;
+      }
+
+      let aggregated = [];
+      let currentBucket = null;
+      const msInterval = currentTF * 60 * 1000;
+
+      dataToProcess.forEach(c => {
+        const bucketTime = Math.floor(c.time / msInterval) * msInterval;
+
+        if (!currentBucket || currentBucket.originalTime !== bucketTime) {
+          if (currentBucket) aggregated.push(currentBucket);
+
+          currentBucket = {
+            time: bucketTime,
+            originalTime: bucketTime,
+            open: Number(c.open),
+            high: Number(c.high),
+            low: Number(c.low),
+            close: Number(c.close)
+          };
+        } else {
+          currentBucket.high = Math.max(currentBucket.high, Number(c.high));
+          currentBucket.low = Math.min(currentBucket.low, Number(c.low));
+          currentBucket.close = Number(c.close);
+        }
+      });
+
+      if (currentBucket) aggregated.push(currentBucket);
+
+      const formattedData = aggregated.map(b => {
+        if (currentChartStyle === 'candlestick') {
+          return { x: b.time, y: [b.open, b.high, b.low, b.close] };
+        }
+
+        return { x: b.time, y: b.close };
+      });
+
+      latestFormattedChartData = formattedData;
+
+      chartInstance.updateSeries([{ data: formattedData }], false);
+
+      const latest = aggregated[aggregated.length - 1];
+
+      if (latest) {
+        const prev = lastDisplayedPrice || latest.open;
+        updateChartPriceLabel(latest.close, prev);
+      }
+
+      if (!hasInitialZoomed && formattedData.length > 20) {
+        const visibleBars = currentTF === 5 ? 120 : currentTF === 15 ? 100 : currentTF === 30 ? 90 : 80;
+        const minX = formattedData[Math.max(0, formattedData.length - visibleBars)].x;
+        const maxX = formattedData[formattedData.length - 1].x;
+
+        chartInstance.zoomX(minX, maxX);
+        hasInitialZoomed = true;
+      }
+    }
+
+    function renderAssetStrip() {
+      const strip = document.getElementById('assetStrip');
+
+      if (!tensorAssets.length) {
+        strip.innerHTML = `
+          <div class="market-card">
+            <div style="font-weight:900;color:var(--text-muted);font-size:.8rem;">Loading markets...</div>
+            <div style="font-weight:900; font-size:1rem; margin-top:4px;">Please wait</div>
+          </div>
+        `;
+        return;
+      }
+
+      strip.innerHTML = tensorAssets.map(t => {
+        const chg = Number(t.changePercent24h) || (t.startPrice > 0 ? ((t.price - t.startPrice) / t.startPrice) * 100 : 0);
+        const colClass = chg >= 0 ? 'text-green' : 'text-red';
+
+        return `
+          <div class="market-card ${activeToken?.id === t.id ? 'active' : ''}" id="strip-${t.id}" onclick="selectAsset('${t.id}')">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${t.symbol}</span>
+              <span class="${colClass}" style="font-size:0.75rem; font-weight:800;">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span>
+            </div>
+            <div style="font-weight:900; font-size:1.1rem; margin-top:4px; color:var(--text-main);" id="price-${t.id}">
+              $${formatPriceSmart(t.price)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectAsset(id) {
+      hasInitialZoomed = false;
+
+      activeToken = tensorAssets.find(x => x.id === id);
+      if (!activeToken) return;
+
+      lastDisplayedPrice = activeToken.price;
+      lastServerPrice = activeToken.price;
+      localVisualPrice = activeToken.price;
+      visualTrendPower = 0;
+
+      document.querySelectorAll('.market-card').forEach(c => c.classList.remove('active'));
+
+      const selectedCard = document.getElementById(`strip-${id}`);
+      if (selectedCard) selectedCard.classList.add('active');
+
+      document.getElementById('chartTitle').innerHTML = `
+        ${activeToken.symbol}
+        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">/USDT</span>
+      `;
+
+      updateLivePriceUI(activeToken.price, activeToken.price);
+      updateMetrics();
+      loadChartDataForActive();
+      startLiveTicker();
+    }
+
+    function getLiqPrice(entry, sizeUsd, marginUsd, side, mode, availBal) {
+      if (sizeUsd <= 0 || marginUsd <= 0) return 0;
+
+      if (mode === 'isolated') {
+        const drop = (marginUsd / sizeUsd) * entry;
+        return side === 'long' ? entry - drop : entry + drop;
+      }
+
+      const drop = ((marginUsd + availBal) / sizeUsd) * entry;
+      return Math.max(0, side === 'long' ? entry - drop : entry + drop);
+    }
+
+    function updateLeverage(val) {
+      document.getElementById('levSlider').value = val;
+      document.getElementById('levValDisplay').innerText = val;
+      updateMetrics();
+    }
+
+    function updateMetrics() {
+      const margin = Number(document.getElementById('tradeAmt').value) || 0;
+      const lev = Number(document.getElementById('levSlider').value) || 1;
+      const price = activeToken ? activeToken.price : 1;
+      const state = isPaper ? paperState : liveState;
+      const posSize = margin * lev;
+
+      document.getElementById('posSize').innerText = `${posSize.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} USDT`;
+
+      if (margin > 0 && price > 0) {
+        const liqL = getLiqPrice(price, posSize, margin, 'long', marginMode, state.usdtBalance);
+        const liqS = getLiqPrice(price, posSize, margin, 'short', marginMode, state.usdtBalance);
+
+        document.getElementById('liqLong').innerText = liqL > 0 ? `${formatPriceSmart(liqL)}` : '--';
+        document.getElementById('liqShort').innerText = liqS > 0 ? `${formatPriceSmart(liqS)}` : '--';
+      } else {
+        document.getElementById('liqLong').innerText = '0.00';
+        document.getElementById('liqShort').innerText = '0.00';
+      }
+
+      updateNetworkDestination();
+    }
+
+    function findTradeShare(tradeId) {
+      const cards = liveState.publicTradeCards || [];
+      return cards.find(c => String(c.tradeId) === String(tradeId));
+    }
+
+    async function copyShareLink(url) {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Share link copied.');
+      } catch {
+        prompt('Copy share link:', url);
+      }
+    }
+
+    async function generateShareLink(historyId) {
+      try {
+        const res = await fetch('/api/trading/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ historyId })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Could not generate share link.');
+          return;
+        }
+
+        liveState.publicTradeCards = liveState.publicTradeCards || [];
+        liveState.publicTradeCards.unshift({
+          id: data.publicTradeCard.id,
+          tradeId: historyId,
+          page: data.shareUrl,
+          image: data.imageUrl,
+          createdAt: Date.now()
+        });
+
+        renderBalancesAndPositions();
+        await copyShareLink(data.shareUrl);
+      } catch (e) {
+        alert('Network error while generating share link.');
+      }
+    }
+
+    function renderBalancesAndPositions() {
+      const state = isPaper ? paperState : liveState;
+
+      document.getElementById('availUsdt').innerText = state.usdtBalance.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      renderActivePositionsOnly();
+
+      const hView = document.getElementById('historyPosView');
+
+      if (!state.orderHistory || state.orderHistory.length === 0) {
+        hView.innerHTML = `
+          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
+            No history.
+          </div>
+        `;
+      } else {
+        hView.innerHTML = state.orderHistory.slice(0, 20).map(p => {
+          const pnl = Number(p.pnl || 0);
+          const roi = Number(p.roi !== undefined ? p.roi : (p.margin > 0 ? (pnl / p.margin) * 100 : 0));
+          const col = pnl >= 0 ? 'text-green' : 'text-red';
+          const sign = pnl >= 0 ? '+' : '';
+          const share = !isPaper ? findTradeShare(p.id) : null;
+
+          return `
+            <div class="pos-card">
+              <div class="pos-header" style="border:none; margin:0; padding:0;">
+                <div>
+                  <span style="font-weight:900;">${p.symbol}</span>
+                  <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
+                </div>
+                <div style="text-align:right;">
+                  <div class="${col}" style="font-weight:900;">${sign}$${pnl.toFixed(2)}</div>
+                  <div class="${col}" style="font-size:.78rem;font-weight:850;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
+                </div>
+              </div>
+
+              <div class="pos-grid" style="margin-top:10px;">
+                <div class="pos-item"><span class="pos-label">Entry</span><span class="pos-val">$${formatPriceSmart(p.entryPrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Mark</span><span class="pos-val">$${formatPriceSmart(p.markPrice || p.closePrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Close</span><span class="pos-val">$${formatPriceSmart(p.closePrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${Number(p.size || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+              </div>
+
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
+                Closed via ${p.closeReason || 'Market'} @ $${formatPriceSmart(p.closePrice || 0)}
+              </div>
+
+              ${!isPaper ? `
+                <div class="share-row">
+                  ${share ? `
+                    <button class="share-btn" onclick="copyShareLink('${share.page}')">Copy Link</button>
+                    <a class="download-btn" href="${share.id ? `/trade/${share.id}/download` : share.image}" target="_blank">Download Image</a>
+                  ` : `
+                    <button class="share-btn" onclick="generateShareLink('${p.id}')">Generate Link</button>
+                    <button class="download-btn" onclick="generateShareLink('${p.id}')">Create Image</button>
+                  `}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      updateMetrics();
+    }
+
+    function renderActivePositionsOnly(overrideVisualPrice = null) {
+      const state = isPaper ? paperState : liveState;
+
+      document.getElementById('posCount').innerText = state.positions.length;
+
+      const container = document.getElementById('activePosView');
+
+      if (!state.positions || state.positions.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
+            No open positions.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.positions.map(p => {
+        const token = tensorAssets.find(t => t.id === p.tokenId);
+        const currentPrice = overrideVisualPrice && token && activeToken && token.id === activeToken.id
+          ? overrideVisualPrice
+          : token ? token.price : p.entryPrice;
+
+        const pnlRaw = p.side === 'long'
+          ? currentPrice - p.entryPrice
+          : p.entryPrice - currentPrice;
+
+        const pnl = (pnlRaw / p.entryPrice) * p.size;
+        const roi = (pnl / p.margin) * 100;
+        const liq = getLiqPrice(p.entryPrice, p.size, p.margin, p.side, p.marginMode || 'cross', state.usdtBalance);
+
+        const col = pnl >= 0 ? 'text-green' : 'text-red';
+        const sign = pnl >= 0 ? '+' : '';
+
+        return `
+          <div class="pos-card">
+            <div class="pos-header">
+              <div>
+                <span style="font-weight:900; font-size:1.1rem; color:var(--text-main);">${p.symbol}</span>
+                <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
+              </div>
+
+              <div style="text-align:right;">
+                <div class="${col}" style="font-weight:900; font-size:1.1rem;">${sign}$${pnl.toFixed(2)}</div>
+                <div class="${col}" style="font-size:0.8rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
+              </div>
+            </div>
+
+            <div class="pos-grid">
+              <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${p.size.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+              <div class="pos-item"><span class="pos-label">Margin</span><span class="pos-val">$${p.margin.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+              <div class="pos-item"><span class="pos-label">Entry Price</span><span class="pos-val">$${formatPriceSmart(p.entryPrice)}</span></div>
+              <div class="pos-item"><span class="pos-label">Mark Price</span><span class="pos-val">$${formatPriceSmart(currentPrice)}</span></div>
+              <div class="pos-item"><span class="pos-label">Liq. Price</span><span class="pos-val" style="color:#f59e0b;">$${formatPriceSmart(Math.max(0, liq))}</span></div>
+              <div class="pos-item"><span class="pos-label">Mode</span><span class="pos-val" style="text-transform:capitalize;">${p.marginMode || 'Cross'}</span></div>
+              ${p.treasuryNetwork ? `<div class="pos-item"><span class="pos-label">USDT Route</span><span class="pos-val">${p.treasuryNetwork}</span></div>` : ''}
+              ${p.treasuryAddress ? `<div class="pos-item"><span class="pos-label">Deposit</span><span class="pos-val">${shortenAddress(p.treasuryAddress)}</span></div>` : ''}
+            </div>
+
+            <button class="close-btn" onclick="closePosition('${p.id}')">Close Position</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById('activePosView').style.display = tab === 'active' ? 'grid' : 'none';
+      document.getElementById('historyPosView').style.display = tab === 'history' ? 'grid' : 'none';
+    }
+
+    async function executeTrade(side) {
+      const margin = Number(document.getElementById('tradeAmt').value);
+      const lev = Number(document.getElementById('levSlider').value);
+
+      if (!margin || margin <= 0) return alert('Enter margin amount');
+      if (!activeToken) return alert('No asset selected');
+
+      if (isPaper) {
+        if (margin > paperState.usdtBalance) {
+          return alert('Insufficient Paper USDT Balance');
+        }
+
+        const posSize = margin * lev;
+
+        paperState.usdtBalance -= margin;
+
+        paperState.positions.unshift({
+          id: Date.now().toString(),
+          tokenId: activeToken.id,
+          symbol: activeToken.symbol,
+          side,
+          margin,
+          leverage: lev,
+          size: posSize,
+          entryPrice: activeToken.price,
+          markPrice: activeToken.price,
+          marginMode
+        });
+
+        savePaperState();
+
+        document.getElementById('tradeAmt').value = '';
+
+        renderBalancesAndPositions();
+        switchTab('active', document.querySelector('.tab:first-child'));
+
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/trading/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tokenId: activeToken.id,
+            side,
+            margin,
+            leverage: lev,
+            marginMode
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          liveState.usdtBalance = data.usdtBalance;
+          liveState.usdtNetwork = data.usdtNetwork || liveState.usdtNetwork;
+          liveState.positions.unshift(data.position);
+          liveState.tradeDeposits = liveState.tradeDeposits || [];
+
+          if (data.treasuryDeposit) {
+            liveState.tradeDeposits.unshift(data.treasuryDeposit);
+          }
+
+          document.getElementById('tradeAmt').value = '';
+
+          updateNetworkDestination();
+          renderBalancesAndPositions();
+          switchTab('active', document.querySelector('.tab:first-child'));
+        } else {
+          alert(data.error || 'Trade failed');
+        }
+      } catch (e) {
+        alert('Network error');
+      }
+    }
+
+    async function closePosition(id) {
+      if (isPaper) {
+        const idx = paperState.positions.findIndex(p => String(p.id) === String(id));
+
+        if (idx === -1) return;
+
+        const pos = paperState.positions[idx];
+        const token = tensorAssets.find(t => t.id === pos.tokenId);
+        const currentPrice = token ? token.price : pos.entryPrice;
+
+        const pnl = (
+          pos.side === 'long'
+            ? currentPrice - pos.entryPrice
+            : pos.entryPrice - currentPrice
+        ) / pos.entryPrice * pos.size;
+
+        const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
+
+        paperState.usdtBalance += pos.margin + pnl;
+        paperState.positions.splice(idx, 1);
+        paperState.orderHistory.unshift({
+          ...pos,
+          closePrice: currentPrice,
+          markPrice: currentPrice,
+          pnl,
+          roi,
+          closeReason: 'Market Close'
+        });
+
+        savePaperState();
+        renderBalancesAndPositions();
+
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/trading/close', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ positionId: id })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          liveState.usdtBalance = data.usdtBalance;
+
+          liveState.positions = liveState.positions.filter(p => String(p.id) !== String(id));
+          liveState.orderHistory.unshift(data.historyRecord);
+
+          if (data.publicTradeCard) {
+            liveState.publicTradeCards = liveState.publicTradeCards || [];
+            liveState.publicTradeCards.unshift({
+              id: data.publicTradeCard.id,
+              tradeId: data.historyRecord.id,
+              page: data.shareUrl,
+              image: data.imageUrl,
+              createdAt: Date.now()
+            });
+          }
+
+          renderBalancesAndPositions();
+          switchTab('history', document.querySelectorAll('.tab')[1]);
+        } else {
+          alert(data.error || 'Failed to close position.');
+        }
+      } catch (e) {
+        console.error('closePosition error:', e);
+      }
+    }
+
+    function checkPaperLiquidations() {
+      if (!isPaper || paperState.positions.length === 0) return;
+
+      let changed = false;
+
+      paperState.positions = paperState.positions.filter(pos => {
+        const token = tensorAssets.find(t => t.id === pos.tokenId);
+
+        if (!token) return true;
+
+        const liqPrice = getLiqPrice(
+          pos.entryPrice,
+          pos.size,
+          pos.margin,
+          pos.side,
+          pos.marginMode || 'cross',
+          paperState.usdtBalance
+        );
+
+        const isLiq = pos.side === 'long'
+          ? token.price <= liqPrice
+          : token.price >= liqPrice;
+
+        if (isLiq) {
+          paperState.orderHistory.unshift({
+            ...pos,
+            closePrice: token.price,
+            markPrice: token.price,
+            pnl: -pos.margin,
+            roi: -100,
+            closeReason: 'LIQUIDATION'
+          });
+
+          changed = true;
+          return false;
+        }
+
+        return true;
+      });
+
+      if (changed) {
+        savePaperState();
+        renderBalancesAndPositions();
+      }
+    }
+
+    async function bootTradingPage() {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+
+      renderAssetStrip();
+      initApexChart();
+      updateNetworkDestination();
+
+      document.getElementById('availUsdt').innerText = liveState.usdtBalance.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      await fetchCoreData();
+
+      if (activeToken) {
+        await loadChartDataForActive();
+        startLiveTicker();
+      }
+
+      if (dataInterval) clearInterval(dataInterval);
+
+      dataInterval = setInterval(async () => {
+        await fetchCoreData();
+        checkPaperLiquidations();
+      }, 1800);
+    }
+
+    window.addEventListener('load', bootTradingPage);
+  </script>
+</body>
+</html>
