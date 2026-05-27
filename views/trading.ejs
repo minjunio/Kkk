@@ -13,30 +13,44 @@
 
   <style>
     :root {
-      --bg-base: #0b0e11;
-      --bg-panel: #1e2329;
-      --bg-hover: #2b3139;
-      --text-main: #EAECEF;
-      --text-muted: #848E9C;
-      --border: #2b3139;
+      --bg-base: #070a0f;
+      --bg-base-2: #0b0f17;
+      --bg-panel: rgba(17, 24, 39, 0.86);
+      --bg-panel-solid: #111827;
+      --bg-card: rgba(15, 23, 42, 0.72);
+      --bg-hover: rgba(45, 55, 72, 0.9);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.24);
+
       --green: #0ecb81;
-      --green-glow: rgba(14, 203, 129, 0.15);
+      --green-glow: rgba(14, 203, 129, 0.18);
       --red: #f6465d;
-      --red-glow: rgba(246, 70, 93, 0.15);
+      --red-glow: rgba(246, 70, 93, 0.18);
       --tensor: #8b5cf6;
-      --tensor-soft: rgba(139, 92, 246, 0.16);
+      --tensor-2: #3b82f6;
+      --tensor-soft: rgba(139, 92, 246, 0.18);
       --yellow: #f59e0b;
+
+      --shadow: 0 22px 70px rgba(0,0,0,0.38);
+      --radius: 18px;
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
 
     [data-theme="light"] {
-      --bg-base: #f8f9fa;
-      --bg-panel: #ffffff;
-      --bg-hover: #f0f1f2;
-      --text-main: #1e2329;
-      --text-muted: #848E9C;
-      --border: #eaecef;
+      --bg-base: #f6f8fb;
+      --bg-base-2: #eef2f8;
+      --bg-panel: rgba(255,255,255,0.90);
+      --bg-panel-solid: #ffffff;
+      --bg-card: rgba(255,255,255,0.84);
+      --bg-hover: rgba(226, 232, 240, 0.9);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: rgba(15, 23, 42, 0.10);
+      --border-strong: rgba(15, 23, 42, 0.18);
+      --shadow: 0 18px 55px rgba(15,23,42,0.10);
     }
 
     * {
@@ -51,10 +65,26 @@
     body {
       width: 100%;
       min-height: 100%;
-      background: var(--bg-base);
+      background:
+        radial-gradient(circle at top left, rgba(139, 92, 246, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-base), var(--bg-base-2));
       color: var(--text-main);
       font-variant-numeric: tabular-nums;
       overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 70%);
+      z-index: 0;
     }
 
     button,
@@ -70,7 +100,7 @@
 
     button {
       cursor: pointer;
-      transition: transform 0.08s ease, opacity 0.12s ease, background 0.12s ease;
+      transition: transform 0.08s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
     }
 
     button:active {
@@ -84,15 +114,21 @@
 
     a {
       color: inherit;
+      text-decoration: none;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
     }
 
     .topbar {
       position: sticky;
       top: 0;
       z-index: 50;
-      padding: calc(10px + var(--safe-top)) 16px 10px;
-      background: rgba(30, 35, 41, 0.96);
-      backdrop-filter: blur(14px);
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      background: rgba(7, 10, 15, 0.78);
+      backdrop-filter: blur(22px);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -100,59 +136,119 @@
     }
 
     [data-theme="light"] .topbar {
-      background: rgba(255,255,255,0.96);
+      background: rgba(255,255,255,0.78);
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 900;
-      font-size: 1.1rem;
+      gap: 10px;
+      font-weight: 950;
+      font-size: 1.08rem;
       color: var(--text-main);
-      text-decoration: none;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 22%),
+        linear-gradient(135deg, var(--tensor), var(--tensor-2));
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.35);
+    }
+
+    .brand-logo svg {
+      width: 19px;
+      height: 19px;
+      stroke: white;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .mode-switch,
     .pill-toggle,
     .margin-mode {
       display: flex;
-      background: var(--bg-base);
-      border-radius: 6px;
-      padding: 2px;
+      background: rgba(15, 23, 42, 0.76);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      backdrop-filter: blur(12px);
+    }
+
+    [data-theme="light"] .mode-switch,
+    [data-theme="light"] .pill-toggle,
+    [data-theme="light"] .margin-mode {
+      background: rgba(241,245,249,0.86);
     }
 
     .mode-switch button,
     .pill-toggle button,
     .margin-mode button {
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 900;
       color: var(--text-muted);
+      white-space: nowrap;
     }
 
     .mode-switch button.active,
     .pill-toggle button.active,
     .margin-mode button.active {
-      background: var(--bg-panel);
+      background: linear-gradient(135deg, rgba(139,92,246,0.95), rgba(59,130,246,0.9));
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(59,130,246,0.20);
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       color: var(--text-main);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .admin-badge {
+      display: none;
+      padding: 7px 10px;
+      border: 1px solid rgba(139,92,246,0.42);
+      background: rgba(139,92,246,0.16);
+      color: #c4b5fd;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .admin-badge.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .market-strip-container {
       width: 100%;
-      padding: 8px 12px 0;
-      background: var(--bg-base);
+      padding: 10px 12px 0;
     }
 
     .market-strip {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       overflow-x: auto;
       scroll-snap-type: x proximity;
       scrollbar-width: none;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
     }
 
     .market-strip::-webkit-scrollbar {
@@ -161,220 +257,183 @@
 
     .market-card {
       flex: 0 0 auto;
-      min-width: 130px;
+      min-width: 148px;
       scroll-snap-align: start;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 11px 12px;
+      border-radius: 16px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.16);
       cursor: pointer;
+      transition: 0.16s ease;
+      backdrop-filter: blur(18px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .market-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--tensor), transparent);
+      opacity: 0;
       transition: 0.16s ease;
     }
 
     .market-card.active {
-      border-color: var(--tensor);
-      background: var(--tensor-soft);
+      border-color: rgba(139,92,246,0.72);
+      background: linear-gradient(180deg, rgba(139,92,246,0.20), var(--bg-panel));
+    }
+
+    .market-card.active::after {
+      opacity: 1;
     }
 
     .shell {
       width: 100%;
-      padding: 8px 12px calc(80px + var(--safe-bottom));
+      padding: 4px 12px calc(82px + var(--safe-bottom));
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1100px) {
       .shell {
-        grid-template-columns: minmax(0, 1fr) 332px;
+        grid-template-columns: minmax(0, 1fr) 350px;
         align-items: start;
-        max-width: 1600px;
+        max-width: 1640px;
         margin: 0 auto;
-        padding-bottom: 14px;
+        padding-bottom: 18px;
       }
     }
 
-    .panel {
-      border-radius: 10px;
-      padding: 12px;
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .panel,
+    .copy-panel {
+      border-radius: var(--radius);
+      padding: 14px;
       background: var(--bg-panel);
       border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
-    .copy-panel {
-      border-radius: 12px;
-      padding: 12px;
-      background:
-        radial-gradient(circle at top left, rgba(139,92,246,0.20), transparent 32%),
-        var(--bg-panel);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .copy-head {
+    .panel-title-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 10px;
     }
 
-    .copy-title {
+    .section-title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       font-size: 1rem;
       font-weight: 950;
     }
 
-    .copy-sub {
-      color: var(--text-muted);
-      font-size: 0.74rem;
-      font-weight: 750;
-      margin-top: 4px;
-      line-height: 1.35;
-    }
-
-    .copy-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    @media (min-width: 850px) {
-      .copy-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    .copy-profile-card,
-    .copy-admin-box {
-      background: rgba(11,14,17,0.60);
-      border: 1px solid var(--border);
+    .section-title-icon {
+      width: 28px;
+      height: 28px;
       border-radius: 10px;
-      padding: 12px;
-      min-width: 0;
+      display: grid;
+      place-items: center;
+      background: var(--tensor-soft);
+      color: #c4b5fd;
     }
 
-    [data-theme="light"] .copy-profile-card,
-    [data-theme="light"] .copy-admin-box {
-      background: rgba(248,249,250,0.72);
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 750;
+      line-height: 1.42;
+      margin-top: 4px;
     }
 
-    .copy-profile-card.featured {
-      border-color: rgba(139,92,246,0.8);
-      box-shadow: 0 0 0 1px rgba(139,92,246,0.12) inset;
+    .copy-panel {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(139,92,246,0.22), transparent 30%),
+        radial-gradient(circle at 100% 0%, rgba(14,203,129,0.10), transparent 22%),
+        var(--bg-panel);
     }
 
-    .copy-admin-box {
-      margin-bottom: 10px;
+    .copy-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .admin-form {
+    .copy-profile-wrap {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 12px;
     }
 
-    @media (min-width: 850px) {
-      .admin-form {
-        grid-template-columns: 1.2fr 0.8fr 0.8fr auto;
-        align-items: end;
-      }
+    .copy-profile-card {
+      background: rgba(7, 10, 15, 0.52);
+      border: 1px solid rgba(139,92,246,0.34);
+      border-radius: 18px;
+      padding: 14px;
+      min-width: 0;
+      position: relative;
+      overflow: hidden;
     }
 
-    .field {
-      display: grid;
-      gap: 5px;
+    [data-theme="light"] .copy-profile-card {
+      background: rgba(248,250,252,0.82);
     }
 
-    .field label {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .field input,
-    .field select,
-    .field textarea {
-      min-height: 38px;
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 8px 10px;
-      font-size: 0.82rem;
-      font-weight: 800;
-      width: 100%;
-    }
-
-    .field textarea {
-      min-height: 70px;
-      resize: vertical;
-    }
-
-    .mini-btn,
-    .primary-btn,
-    .copy-btn,
-    .danger-btn {
-      min-height: 36px;
-      border-radius: 7px;
-      padding: 8px 10px;
-      font-size: 0.78rem;
-      font-weight: 900;
-      text-align: center;
-    }
-
-    .mini-btn {
-      background: var(--bg-hover);
-      color: var(--text-main);
-    }
-
-    .primary-btn {
-      background: var(--tensor);
-      color: white;
-    }
-
-    .copy-btn {
-      background: var(--green);
-      color: white;
-      width: 100%;
-    }
-
-    .danger-btn {
-      background: var(--red-glow);
-      color: var(--red);
-      width: 100%;
+    .copy-profile-card::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -90px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(139,92,246,0.26), transparent 68%);
+      pointer-events: none;
     }
 
     .profile-top {
       display: flex;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
       align-items: flex-start;
       margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
     }
 
     .profile-name {
-      font-size: 0.95rem;
+      font-size: 1.08rem;
       font-weight: 950;
+      line-height: 1.2;
     }
 
     .profile-tag {
       color: var(--text-muted);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 850;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .profile-status {
       flex: 0 0 auto;
-      padding: 3px 7px;
+      padding: 4px 8px;
       border-radius: 999px;
       background: var(--green-glow);
       color: var(--green);
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       font-weight: 950;
       text-transform: uppercase;
     }
@@ -386,57 +445,50 @@
 
     .copy-stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
       margin: 10px 0;
+      position: relative;
+      z-index: 1;
     }
 
     .copy-stat {
-      background: var(--bg-base);
+      background: rgba(15, 23, 42, 0.74);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px;
+      border-radius: 14px;
+      padding: 9px;
       min-width: 0;
+    }
+
+    [data-theme="light"] .copy-stat {
+      background: rgba(255,255,255,0.82);
     }
 
     .copy-stat-label {
       color: var(--text-muted);
       font-size: 0.62rem;
-      font-weight: 850;
+      font-weight: 950;
       white-space: nowrap;
     }
 
     .copy-stat-val {
-      margin-top: 3px;
-      font-size: 0.84rem;
+      margin-top: 4px;
+      font-size: 0.86rem;
       font-weight: 950;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .copy-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-      margin-top: 10px;
-    }
-
-    .copy-note {
-      color: var(--text-muted);
-      font-size: 0.68rem;
-      line-height: 1.35;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-
     .profile-position-mini {
-      margin-top: 8px;
+      margin-top: 9px;
       display: grid;
-      gap: 5px;
-      max-height: 106px;
+      gap: 6px;
+      max-height: 128px;
       overflow: auto;
       padding-right: 3px;
+      position: relative;
+      z-index: 1;
     }
 
     .profile-position-row {
@@ -444,119 +496,213 @@
       grid-template-columns: 1fr auto auto;
       gap: 8px;
       align-items: center;
-      padding: 7px 8px;
-      border-radius: 7px;
+      padding: 8px 9px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      background: var(--bg-base);
+      background: rgba(15,23,42,0.70);
       font-size: 0.7rem;
-      font-weight: 850;
+      font-weight: 900;
+    }
+
+    [data-theme="light"] .profile-position-row {
+      background: rgba(255,255,255,0.82);
+    }
+
+    .copy-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 11px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .copy-note {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.42;
+      font-weight: 760;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mini-btn,
+    .primary-btn,
+    .copy-btn,
+    .danger-btn {
+      min-height: 38px;
+      border-radius: 12px;
+      padding: 8px 11px;
+      font-size: 0.76rem;
+      font-weight: 950;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .mini-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--tensor), var(--tensor-2));
+      color: white;
+      box-shadow: 0 14px 30px rgba(59,130,246,0.18);
+    }
+
+    .copy-btn {
+      background: linear-gradient(135deg, #0ecb81, #10b981);
+      color: white;
+      box-shadow: 0 12px 26px rgba(14,203,129,0.14);
+      width: 100%;
+    }
+
+    .danger-btn {
+      background: var(--red-glow);
+      color: var(--red);
+      border-color: rgba(246,70,93,0.24);
+      width: 100%;
+    }
+
+    .chart-panel {
+      padding: 14px;
     }
 
     .chart-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      margin-bottom: 11px;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .chart-title {
-      font-size: 1.3rem;
-      font-weight: 900;
+    .chart-title-wrap {
+      min-width: 0;
+    }
+
+    .chart-symbol {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      font-weight: 950;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chart-big-price {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 950;
+      letter-spacing: -0.05em;
+      line-height: 1.05;
+      margin-top: 2px;
+    }
+
+    .chart-mini-stats {
       display: flex;
-      align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
     }
 
-    .chart-price {
-      font-size: 1.2rem;
+    .chart-mini-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.72);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
       font-weight: 900;
-      transition: color 0.2s;
+      color: var(--text-muted);
+    }
+
+    [data-theme="light"] .chart-mini-pill {
+      background: rgba(248,250,252,0.82);
+    }
+
+    .chart-mini-pill b {
+      color: var(--text-main);
+      margin-left: 5px;
     }
 
     .chart-wrapper {
       width: 100%;
-      height: 46vh;
-      min-height: 340px;
-      max-height: 560px;
-      background: var(--bg-base);
-      border-radius: 8px;
-      border: 1px solid var(--border);
+      height: 50vh;
+      min-height: 390px;
+      max-height: 620px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(59,130,246,0.10), transparent 40%),
+        rgba(7,10,15,0.72);
+      border-radius: 18px;
+      border: 1px solid var(--border-strong);
       overflow: hidden;
       position: relative;
       transition: box-shadow 0.25s ease;
       touch-action: pan-x pan-y;
     }
 
+    [data-theme="light"] .chart-wrapper {
+      background: rgba(255,255,255,0.76);
+    }
+
     .chart-wrapper.pump {
-      box-shadow: inset 0 0 42px rgba(14,203,129,0.12);
+      box-shadow: inset 0 0 56px rgba(14,203,129,0.15), 0 0 0 1px rgba(14,203,129,0.15);
     }
 
     .chart-wrapper.dump {
-      box-shadow: inset 0 0 42px rgba(246,70,93,0.12);
-    }
-
-    .chart-stats-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 42px;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 6px 10px;
-      background: linear-gradient(to bottom, rgba(11,14,17,0.94), rgba(11,14,17,0.58));
-      border-bottom: 1px solid var(--border);
-      pointer-events: none;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .chart-stats-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    [data-theme="light"] .chart-stats-bar {
-      background: linear-gradient(to bottom, rgba(255,255,255,0.94), rgba(255,255,255,0.62));
-    }
-
-    .chart-stat {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-      font-size: 0.72rem;
-      font-weight: 850;
-    }
-
-    .chart-stat-label {
-      color: var(--text-muted);
-      font-weight: 800;
-    }
-
-    .chart-stat-value {
-      color: var(--text-main);
-      font-weight: 950;
-    }
-
-    .chart-live-mark {
-      font-size: 0.86rem;
-      font-weight: 950;
+      box-shadow: inset 0 0 56px rgba(246,70,93,0.15), 0 0 0 1px rgba(246,70,93,0.15);
     }
 
     .chart-watermark {
       position: absolute;
-      right: 12px;
-      bottom: 10px;
+      right: 15px;
+      bottom: 12px;
       z-index: 15;
       pointer-events: none;
       font-size: 0.72rem;
-      font-weight: 900;
-      color: rgba(132,142,156,0.42);
+      font-weight: 950;
+      color: rgba(148,163,184,0.35);
       letter-spacing: 0.04em;
+    }
+
+    .chart-hover-box {
+      position: absolute;
+      z-index: 30;
+      display: none;
+      min-width: 178px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(7,10,15,0.86);
+      border: 1px solid rgba(148,163,184,0.22);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.34);
+      backdrop-filter: blur(16px);
+      pointer-events: none;
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    [data-theme="light"] .chart-hover-box {
+      background: rgba(255,255,255,0.90);
+    }
+
+    .hover-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 5px;
+    }
+
+    .hover-row:first-child {
+      margin-top: 0;
+    }
+
+    .hover-label {
+      color: var(--text-muted);
+    }
+
+    .hover-val {
+      color: var(--text-main);
+      font-weight: 950;
     }
 
     .text-green {
@@ -571,6 +717,12 @@
       color: var(--yellow);
     }
 
+    .side-panel {
+      position: sticky;
+      top: 68px;
+      height: fit-content;
+    }
+
     .order-header {
       display: flex;
       justify-content: space-between;
@@ -583,32 +735,37 @@
       justify-content: flex-end;
       align-items: center;
       gap: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 0.76rem;
+      font-weight: 850;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
     .input-box {
       display: flex;
       align-items: center;
-      background: var(--bg-base);
-      border-radius: 7px;
+      background: rgba(7,10,15,0.58);
+      border-radius: 14px;
       border: 1px solid var(--border);
-      padding: 0 10px;
-      height: 38px;
+      padding: 0 11px;
+      height: 42px;
       margin-bottom: 12px;
     }
 
+    [data-theme="light"] .input-box {
+      background: rgba(248,250,252,0.82);
+    }
+
     .input-box:focus-within {
-      border-color: var(--tensor);
+      border-color: rgba(139,92,246,0.72);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.10);
     }
 
     .input-label {
       color: var(--text-muted);
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 850;
       width: 62px;
       flex: 0 0 auto;
     }
@@ -617,7 +774,7 @@
       flex: 1;
       height: 100%;
       color: var(--text-main);
-      font-weight: 800;
+      font-weight: 900;
       font-size: 0.95rem;
       text-align: right;
       padding: 0 8px;
@@ -628,7 +785,31 @@
     .input-suffix {
       color: var(--text-main);
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 900;
+    }
+
+    .copy-trade-toggle {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      margin: 4px 0 13px;
+      padding: 10px;
+      background: rgba(139,92,246,0.10);
+      border: 1px solid rgba(139,92,246,0.24);
+      border-radius: 14px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 850;
+    }
+
+    .copy-trade-toggle.show {
+      display: flex;
+    }
+
+    .copy-trade-toggle input {
+      width: 16px;
+      height: 16px;
+      accent-color: #8b5cf6;
     }
 
     .leverage-bar {
@@ -638,30 +819,32 @@
     .lev-top {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
-      margin-bottom: 6px;
-      font-weight: 700;
+      margin-bottom: 8px;
+      font-weight: 850;
     }
 
     .slider {
       -webkit-appearance: none;
       width: 100%;
-      height: 4px;
-      border-radius: 4px;
-      background: var(--border);
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--tensor), var(--tensor-2));
       outline: none;
-      margin-bottom: 8px;
+      margin-bottom: 9px;
     }
 
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
-      background: var(--text-main);
+      background: white;
+      border: 3px solid var(--tensor);
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
     }
 
     .lev-marks {
@@ -670,21 +853,26 @@
     }
 
     .lev-marks span {
-      font-size: 0.65rem;
+      font-size: 0.66rem;
       color: var(--text-muted);
-      font-weight: 700;
+      font-weight: 850;
       cursor: pointer;
     }
 
     .metrics {
       display: grid;
-      gap: 6px;
+      gap: 7px;
       margin-bottom: 12px;
       font-size: 0.75rem;
       color: var(--text-muted);
-      background: var(--bg-base);
-      padding: 8px;
-      border-radius: 7px;
+      background: rgba(7,10,15,0.46);
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 14px;
+    }
+
+    [data-theme="light"] .metrics {
+      background: rgba(248,250,252,0.82);
     }
 
     .metrics-row {
@@ -694,7 +882,7 @@
     }
 
     .metrics-val {
-      font-weight: 800;
+      font-weight: 900;
       color: var(--text-main);
       text-align: right;
       word-break: break-all;
@@ -703,40 +891,49 @@
     .trade-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 9px;
     }
 
     .btn-long,
     .btn-short {
-      height: 40px;
-      border-radius: 7px;
-      font-weight: 800;
-      font-size: 0.9rem;
+      height: 44px;
+      border-radius: 14px;
+      font-weight: 950;
+      font-size: 0.92rem;
       color: white;
     }
 
     .btn-long {
-      background: var(--green);
+      background: linear-gradient(135deg, #0ecb81, #10b981);
+      box-shadow: 0 15px 30px rgba(14,203,129,0.16);
     }
 
     .btn-short {
-      background: var(--red);
+      background: linear-gradient(135deg, #f6465d, #ef4444);
+      box-shadow: 0 15px 30px rgba(246,70,93,0.16);
     }
 
     .tabs {
       display: flex;
-      gap: 16px;
+      gap: 7px;
       border-bottom: 1px solid var(--border);
       margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .tab {
-      padding: 6px 0;
-      font-weight: 800;
+      padding: 8px 10px;
+      font-weight: 900;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       border-bottom: 2px solid transparent;
+      white-space: nowrap;
     }
 
     .tab.active {
@@ -750,10 +947,14 @@
     }
 
     .pos-card {
-      background: var(--bg-base);
+      background: rgba(7,10,15,0.48);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 16px;
       padding: 12px;
+    }
+
+    [data-theme="light"] .pos-card {
+      background: rgba(255,255,255,0.82);
     }
 
     .pos-header {
@@ -762,15 +963,15 @@
       align-items: center;
       margin-bottom: 10px;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
+      padding-bottom: 9px;
       gap: 10px;
     }
 
     .type-badge {
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 0.7rem;
-      font-weight: 900;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 950;
       text-transform: uppercase;
     }
 
@@ -800,11 +1001,11 @@
 
     .pos-label {
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 800;
     }
 
     .pos-val {
-      font-weight: 800;
+      font-weight: 900;
       color: var(--text-main);
       text-align: right;
     }
@@ -813,16 +1014,18 @@
       width: 100%;
       background: var(--bg-hover);
       color: var(--text-main);
-      padding: 8px;
-      border-radius: 7px;
+      padding: 9px;
+      border-radius: 12px;
       font-size: 0.8rem;
-      font-weight: 800;
-      margin-top: 10px;
+      font-weight: 950;
+      margin-top: 11px;
+      border: 1px solid var(--border);
     }
 
     .close-btn:hover {
       background: var(--red-glow);
       color: var(--red);
+      border-color: rgba(246,70,93,0.26);
     }
 
     .share-row {
@@ -836,21 +1039,23 @@
     .download-btn {
       background: var(--bg-hover);
       color: var(--text-main);
-      padding: 8px;
-      border-radius: 7px;
+      padding: 9px;
+      border-radius: 12px;
       font-size: 0.76rem;
-      font-weight: 850;
+      font-weight: 950;
       text-align: center;
-      text-decoration: none;
       display: block;
+      border: 1px solid var(--border);
     }
 
     .share-btn:hover {
-      color: var(--tensor);
+      color: #c4b5fd;
+      border-color: rgba(139,92,246,0.35);
     }
 
     .download-btn:hover {
       color: var(--green);
+      border-color: rgba(14,203,129,0.30);
     }
 
     .bottom-nav {
@@ -858,14 +1063,19 @@
       left: 0;
       bottom: 0;
       width: 100%;
-      height: calc(56px + var(--safe-bottom));
-      background: var(--bg-panel);
+      height: calc(60px + var(--safe-bottom));
+      background: rgba(7,10,15,0.86);
+      backdrop-filter: blur(22px);
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-around;
       align-items: center;
       padding-bottom: var(--safe-bottom);
       z-index: 60;
+    }
+
+    [data-theme="light"] .bottom-nav {
+      background: rgba(255,255,255,0.86);
     }
 
     @media (min-width: 1024px) {
@@ -881,7 +1091,7 @@
       gap: 4px;
       color: var(--text-muted);
       font-size: 0.7rem;
-      font-weight: 700;
+      font-weight: 800;
       width: 100%;
       height: 100%;
       justify-content: center;
@@ -903,11 +1113,12 @@
       position: fixed;
       inset: 0;
       z-index: 100;
-      background: rgba(0,0,0,0.62);
+      background: rgba(0,0,0,0.66);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 18px;
+      backdrop-filter: blur(12px);
     }
 
     .modal-backdrop.show {
@@ -915,52 +1126,76 @@
     }
 
     .modal {
-      width: min(520px, 100%);
+      width: min(580px, 100%);
       max-height: 90vh;
       overflow: auto;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.50);
     }
 
     .modal-title {
-      font-size: 1rem;
+      font-size: 1.08rem;
       font-weight: 950;
     }
 
     .modal-desc {
       color: var(--text-muted);
-      font-size: 0.76rem;
-      font-weight: 750;
-      line-height: 1.4;
-      margin-top: 5px;
+      font-size: 0.78rem;
+      font-weight: 780;
+      line-height: 1.44;
+      margin-top: 6px;
     }
 
     .modal-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 9px;
+      margin-top: 13px;
     }
 
-    @media (max-width: 520px) {
-      .chart-stats-bar {
-        gap: 10px;
-        padding-right: 12px;
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-top: 11px;
+    }
+
+    .field label {
+      font-size: 0.67rem;
+      color: var(--text-muted);
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      min-height: 42px;
+      background: rgba(7,10,15,0.70);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 11px;
+      font-size: 0.84rem;
+      font-weight: 850;
+      width: 100%;
+    }
+
+    [data-theme="light"] .field input,
+    [data-theme="light"] .field select,
+    [data-theme="light"] .field textarea {
+      background: rgba(248,250,252,0.92);
+    }
+
+    @media (max-width: 720px) {
+      .brand span:last-child {
+        display: none;
       }
 
-      .chart-stat {
-        font-size: 0.66rem;
-      }
-
-      .chart-live-mark {
-        font-size: 0.76rem;
-      }
-
-      .pos-grid {
-        grid-template-columns: 1fr;
+      .admin-badge {
+        display: none !important;
       }
 
       .copy-stats {
@@ -970,320 +1205,355 @@
       .copy-actions {
         grid-template-columns: 1fr;
       }
+
+      .chart-wrapper {
+        height: 56vh;
+        min-height: 430px;
+      }
+
+      .pos-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="app">
+    <script>
+      const SERVER_EMAIL = <%- JSON.stringify(typeof email !== 'undefined' ? email : '') %>;
+      const SERVER_ROLE = <%- JSON.stringify(typeof role !== 'undefined' ? role : '') %>;
+      const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
+      const SERVER_TREASURY = <%- typeof treasury !== 'undefined' ? treasury : '{}' %>;
+    </script>
 
-  <script>
-    const SERVER_EMAIL = <%- JSON.stringify(typeof email !== 'undefined' ? email : '') %>;
-    const SERVER_ROLE = <%- JSON.stringify(typeof role !== 'undefined' ? role : '') %>;
-    const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
-    const SERVER_TREASURY = <%- typeof treasury !== 'undefined' ? treasury : '{}' %>;
-  </script>
+    <header class="topbar">
+      <a href="/trading" class="brand">
+        <span class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <path d="M3 3v18h18"/>
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+          </svg>
+        </span>
+        <span>Tensor Pro</span>
+      </a>
 
-  <header class="topbar">
-    <a href="/trading" class="brand">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--tensor)" stroke-width="2.5" stroke-linecap="round">
-        <path d="M3 3v18h18"/>
-        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-      </svg>
-      Tensor Pro
-    </a>
+      <div class="top-actions">
+        <div id="adminDetectedBadge" class="admin-badge">● Admin</div>
 
-    <div style="display:flex; gap:8px; align-items:center;">
-      <div class="mode-switch">
-        <button id="modeLive" class="active" onclick="setTradingMode('live')">Live</button>
-        <button id="modePaper" onclick="setTradingMode('paper')">Paper</button>
-      </div>
-
-      <button onclick="toggleTheme()" style="width:28px; height:28px; background:var(--bg-base); border-radius:4px; display:grid; place-items:center;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <div class="market-strip-container">
-    <div class="market-strip" id="assetStrip"></div>
-  </div>
-
-  <main class="shell">
-    <div style="display:flex; flex-direction:column; gap:12px; min-width:0;">
-      <section class="copy-panel" id="copyTradingSection">
-        <div class="copy-head">
-          <div>
-            <div class="copy-title">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tensor)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              Copy Trading
-            </div>
-            <div class="copy-sub">
-              Copy profiles are based on the admin trader’s real running positions, closed trade history, total PNL, and ROI. When the admin opens new trades, copiers follow the new trades through the server copy engine.
-            </div>
-          </div>
-
-          <button class="mini-btn" onclick="loadCopyProfiles(true)">Refresh</button>
+        <div class="mode-switch">
+          <button id="modeLive" class="active" onclick="setTradingMode('live')">Live</button>
+          <button id="modePaper" onclick="setTradingMode('paper')">Paper</button>
         </div>
 
-        <div class="copy-admin-box" id="copyAdminBox" style="display:none;">
-          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="market-strip-container">
+      <div class="market-strip" id="assetStrip"></div>
+    </div>
+
+    <main class="shell">
+      <div class="main-column">
+        <section class="copy-panel" id="copyTradingSection">
+          <div class="panel-title-row">
             <div>
-              <div style="font-weight:950;">Admin Copy Profile</div>
-              <div class="copy-sub">
-                ROI, PNL, and active positions are calculated from your admin trades. Do not enter fake ROI here. Create a profile, then keep trading normally from this page.
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </span>
+                Copy Portfolio
+              </div>
+              <div class="section-sub">
+                One public admin copy portfolio. Users can view, copy, and stop copying. Admin can edit stats, days trading, publish status, and delete from settings.
               </div>
             </div>
 
-            <button class="mini-btn" onclick="copyAdminShareUrl()">Copy Profile Link</button>
-          </div>
-
-          <div class="admin-form">
-            <div class="field">
-              <label>Profile name</label>
-              <input id="adminCopyName" maxlength="42" placeholder="Example: Tensor Alpha Trader">
-            </div>
-
-            <div class="field">
-              <label>Risk</label>
-              <select id="adminCopyRisk">
-                <option value="Low">Low</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label>Min copy USDT</label>
-              <input id="adminCopyMin" type="number" step="any" placeholder="50" value="50">
-            </div>
-
-            <button class="primary-btn" onclick="createCopyProfile()">Create / Publish</button>
-          </div>
-
-          <div class="copy-note" id="adminCopyStatsHint">
-            Admin live stats will sync from your open positions and closed history after the server copy profile endpoints are updated.
-          </div>
-        </div>
-
-        <div class="copy-grid" id="copyProfilesGrid">
-          <div class="copy-profile-card">
-            <div class="profile-name">Loading profiles...</div>
-            <div class="copy-note">Checking available admin copy trading profiles.</div>
-          </div>
-        </div>
-      </section>
-
-      <div class="panel">
-        <div class="chart-header">
-          <div class="chart-title" id="chartTitle">
-            Loading...
-            <span class="chart-price" id="chartSub"></span>
-          </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <div class="pill-toggle">
-              <button class="tf-btn active" onclick="setChartTF(5, this)">5m</button>
-              <button class="tf-btn" onclick="setChartTF(15, this)">15m</button>
-              <button class="tf-btn" onclick="setChartTF(30, this)">30m</button>
-              <button class="tf-btn" onclick="setChartTF(60, this)">1H</button>
-            </div>
-
-            <div class="pill-toggle">
-              <button id="btnStyleCandle" class="active" onclick="setChartStyle('candlestick')">Candle</button>
-              <button id="btnStyleLine" onclick="setChartStyle('line')">Line</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="chart-wrapper" id="chartWrap">
-          <div class="chart-stats-bar">
-            <div class="chart-stat">
-              <span class="chart-stat-label">Mark</span>
-              <span class="chart-stat-value chart-live-mark" id="liveMarkMini">$0.0000</span>
-            </div>
-
-            <div class="chart-stat">
-              <span class="chart-stat-label">Move</span>
-              <span class="chart-stat-value" id="livePriceMove">+0.00%</span>
-            </div>
-
-            <div class="chart-stat">
-              <span class="chart-stat-label">24H High</span>
-              <span class="chart-stat-value" id="high24hVal">$0.0000</span>
-            </div>
-
-            <div class="chart-stat">
-              <span class="chart-stat-label">24H Low</span>
-              <span class="chart-stat-value" id="low24hVal">$0.0000</span>
-            </div>
-
-            <div class="chart-stat">
-              <span class="chart-stat-label">Lifetime High</span>
-              <span class="chart-stat-value" id="lifetimeHighVal">$0.0000</span>
+            <div class="copy-toolbar">
+              <button class="mini-btn" onclick="loadCopyPortfolio(true)">Refresh</button>
+              <button class="primary-btn" id="copySettingsBtn" style="display:none;" onclick="openCopySettingsModal()">Settings</button>
             </div>
           </div>
 
-          <div class="chart-watermark">bluecrypto.ink • verified by Tensor Wallet</div>
-          <div id="apexChartContainer" style="width:100%; height:100%;"></div>
-        </div>
+          <div class="copy-profile-wrap" id="copyProfileWrap">
+            <div class="copy-profile-card">
+              <div class="profile-name">Loading portfolio...</div>
+              <div class="copy-note">Syncing USDT balance and admin copy data.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel chart-panel">
+          <div class="chart-header">
+            <div class="chart-title-wrap">
+              <div class="chart-symbol" id="chartTitle">Loading / USDT</div>
+              <div class="chart-big-price" id="chartSub">$0.0000</div>
+              <div class="chart-mini-stats">
+                <div class="chart-mini-pill">24H High <b id="high24hVal">$0.0000</b></div>
+                <div class="chart-mini-pill">24H Low <b id="low24hVal">$0.0000</b></div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <div class="pill-toggle">
+                <button class="tf-btn active" onclick="setChartTF(5, this)">5m</button>
+                <button class="tf-btn" onclick="setChartTF(15, this)">15m</button>
+                <button class="tf-btn" onclick="setChartTF(30, this)">30m</button>
+                <button class="tf-btn" onclick="setChartTF(60, this)">1H</button>
+              </div>
+
+              <div class="pill-toggle">
+                <button id="btnStyleCandle" class="active" onclick="setChartStyle('candlestick')">Candle</button>
+                <button id="btnStyleLine" onclick="setChartStyle('line')">Line</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-wrapper" id="chartWrap">
+            <div class="chart-watermark">bluecrypto.ink • Tensor Wallet</div>
+            <div id="chartHoverBox" class="chart-hover-box"></div>
+            <div id="apexChartContainer" style="width:100%; height:100%;"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('active', this)">
+              Positions (<span id="posCount">0</span>)
+            </div>
+            <div class="tab" onclick="switchTab('history', this)">History</div>
+            <div class="tab" onclick="switchTab('copy', this)">Copy Trades</div>
+          </div>
+
+          <div id="activePosView" class="pos-list">
+            <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
+              No open positions.
+            </div>
+          </div>
+
+          <div id="historyPosView" class="pos-list" style="display:none;">
+            <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
+              No history.
+            </div>
+          </div>
+
+          <div id="copyTradesView" class="pos-list" style="display:none;">
+            <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
+              No active copy trades.
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div class="panel">
-        <div class="tabs">
-          <div class="tab active" onclick="switchTab('active', this)">
-            Positions (<span id="posCount">0</span>)
+      <aside class="panel side-panel">
+        <div class="order-header">
+          <div class="section-title" style="font-size:0.96rem;">
+            <span class="section-title-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 3v18h18"/>
+                <path d="M7 15l4-4 3 3 5-6"/>
+              </svg>
+            </span>
+            Order
           </div>
-          <div class="tab" onclick="switchTab('history', this)">History</div>
-          <div class="tab" onclick="switchTab('copy', this)">Copy Trades</div>
-        </div>
 
-        <div id="activePosView" class="pos-list">
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
-            No open positions.
-          </div>
-        </div>
-
-        <div id="historyPosView" class="pos-list" style="display:none;">
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
-            No history.
+          <div class="margin-mode">
+            <button id="modeCross" class="active" onclick="setMarginMode('cross')">Cross</button>
+            <button id="modeIsolated" onclick="setMarginMode('isolated')">Isolated</button>
           </div>
         </div>
 
-        <div id="copyTradesView" class="pos-list" style="display:none;">
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
-            No active copy trades.
+        <div class="avail-balance">
+          Avail:
+          <span id="availUsdt" style="color:var(--text-main);">0.00</span>
+          USDT
+          <button id="addFundsBtn" style="display:none; background:var(--bg-hover); padding:3px 8px; border-radius:999px; font-size:0.66rem; border:1px solid var(--border);" onclick="addPaperFunds()">+ Add</button>
+        </div>
+
+        <div class="input-box">
+          <span class="input-label">Price</span>
+          <input type="text" value="Market" readonly style="color:var(--text-muted);">
+        </div>
+
+        <div class="input-box">
+          <span class="input-label">Margin</span>
+          <input type="number" id="tradeAmt" step="any" placeholder="0.00" oninput="updateMetrics()">
+          <span class="input-suffix">USDT</span>
+        </div>
+
+        <label class="copy-trade-toggle" id="copyPortfolioToggleWrap">
+          <input type="checkbox" id="includeInCopyPortfolio" checked>
+          <span>Display this trade in copy portfolio and mirror to copiers</span>
+        </label>
+
+        <div class="leverage-bar">
+          <div class="lev-top">
+            <span>Leverage</span>
+            <span><span id="levValDisplay">10</span>x</span>
           </div>
+
+          <input type="range" class="slider" id="levSlider" min="1" max="150" value="10" step="1" oninput="updateLeverage(this.value)">
+
+          <div class="lev-marks">
+            <span onclick="updateLeverage(1)">1x</span>
+            <span onclick="updateLeverage(50)">50x</span>
+            <span onclick="updateLeverage(100)">100x</span>
+            <span onclick="updateLeverage(150)">150x</span>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metrics-row">
+            <span>Position Size</span>
+            <span class="metrics-val" id="posSize">0.00 USDT</span>
+          </div>
+
+          <div class="metrics-row">
+            <span>Est. Long Liq.</span>
+            <span class="metrics-val" style="color:#f59e0b;" id="liqLong">0.00</span>
+          </div>
+
+          <div class="metrics-row">
+            <span>Est. Short Liq.</span>
+            <span class="metrics-val" style="color:#f59e0b;" id="liqShort">0.00</span>
+          </div>
+
+          <div class="metrics-row">
+            <span>USDT Route</span>
+            <span class="metrics-val" id="treasuryRoute">Auto</span>
+          </div>
+
+          <div class="metrics-row">
+            <span>Destination</span>
+            <span class="metrics-val" id="treasuryAddress">Auto</span>
+          </div>
+        </div>
+
+        <div class="trade-grid">
+          <button class="btn-long" onclick="executeTrade('long')">Long</button>
+          <button class="btn-short" onclick="executeTrade('short')">Short</button>
+        </div>
+      </aside>
+    </main>
+
+    <nav class="bottom-nav">
+      <button onclick="window.location.href='/wallet'">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Wallet
+      </button>
+
+      <button class="active" onclick="window.location.href='/trading'">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3v18h18"/>
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+        </svg>
+        Trading
+      </button>
+    </nav>
+
+    <div class="modal-backdrop" id="copySettingsModal">
+      <div class="modal">
+        <div class="modal-title">Copy Portfolio Settings</div>
+        <div class="modal-desc">
+          Publish, edit, pause, or delete the admin copy portfolio. ROI and PNL can be edited manually, and each admin trade can add on top of the current ROI/PNL.
+        </div>
+
+        <div class="field">
+          <label>Portfolio Name</label>
+          <input id="settingsProfileName" placeholder="Tensor Alpha Copy">
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <textarea id="settingsProfileDesc" rows="3" placeholder="Admin live trading copy portfolio"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Current ROI %</label>
+          <input id="settingsProfileRoi" type="number" step="any" placeholder="0">
+        </div>
+
+        <div class="field">
+          <label>Current PNL USDT</label>
+          <input id="settingsProfilePnl" type="number" step="any" placeholder="0">
+        </div>
+
+        <div class="field">
+          <label>Days Trading</label>
+          <input id="settingsProfileDays" type="number" step="1" placeholder="1">
+        </div>
+
+        <div class="field">
+          <label>Minimum Copy USDT</label>
+          <input id="settingsProfileMin" type="number" step="any" placeholder="50">
+        </div>
+
+        <div class="field">
+          <label>Risk</label>
+          <select id="settingsProfileRisk">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="settingsProfileStatus">
+            <option value="active">Active / Published</option>
+            <option value="paused">Paused</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="danger-btn" onclick="deleteCopyPortfolio()">Delete</button>
+          <button class="primary-btn" onclick="saveCopyPortfolioSettings()">Save / Publish</button>
+        </div>
+
+        <button class="mini-btn" style="width:100%; margin-top:10px;" onclick="closeCopySettingsModal()">Close</button>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="copyModal">
+      <div class="modal">
+        <div class="modal-title" id="copyModalTitle">Copy Portfolio</div>
+        <div class="modal-desc" id="copyModalDesc">Choose how much USDT to allocate.</div>
+
+        <div id="copyModalPositions" style="margin-top:12px;"></div>
+
+        <div class="field">
+          <label>Amount USDT</label>
+          <input id="copyAmountInput" type="number" step="any" placeholder="100">
+        </div>
+
+        <div class="modal-actions">
+          <button class="mini-btn" onclick="closeCopyModal()">Cancel</button>
+          <button class="copy-btn" onclick="confirmCopyPortfolio()">Start Copying</button>
         </div>
       </div>
     </div>
 
-    <div class="panel" style="position: sticky; top: 60px; height: fit-content;">
-      <div class="order-header">
-        <div class="margin-mode">
-          <button id="modeCross" class="active" onclick="setMarginMode('cross')">Cross</button>
-          <button id="modeIsolated" onclick="setMarginMode('isolated')">Isolated</button>
+    <div class="modal-backdrop" id="profilePositionsModal">
+      <div class="modal">
+        <div class="modal-title" id="profilePositionsTitle">Copy Portfolio Positions</div>
+        <div class="modal-desc" id="profilePositionsDesc">Running admin positions displayed in this copy portfolio.</div>
+        <div id="profilePositionsBody" style="margin-top:12px;"></div>
+        <div class="modal-actions">
+          <button class="mini-btn" onclick="closeProfilePositionsModal()">Close</button>
+          <button class="copy-btn" onclick="openCopyModal()">Copy</button>
         </div>
-      </div>
-
-      <div class="avail-balance">
-        Avail:
-        <span id="availUsdt" style="color:var(--text-main);">0.00</span>
-        USDT
-        <button id="addFundsBtn" style="display:none; background:var(--bg-hover); padding:2px 6px; border-radius:3px; font-size:0.65rem;" onclick="addPaperFunds()">+ Add</button>
-      </div>
-
-      <div class="input-box">
-        <span class="input-label">Price</span>
-        <input type="text" value="Market" readonly style="color:var(--text-muted);">
-      </div>
-
-      <div class="input-box">
-        <span class="input-label">Margin</span>
-        <input type="number" id="tradeAmt" step="any" placeholder="0.00" oninput="updateMetrics()">
-        <span class="input-suffix">USDT</span>
-      </div>
-
-      <div class="leverage-bar">
-        <div class="lev-top">
-          <span>Leverage</span>
-          <span><span id="levValDisplay">10</span>x</span>
-        </div>
-
-        <input type="range" class="slider" id="levSlider" min="1" max="150" value="10" step="1" oninput="updateLeverage(this.value)">
-
-        <div class="lev-marks">
-          <span onclick="updateLeverage(1)">1x</span>
-          <span onclick="updateLeverage(50)">50x</span>
-          <span onclick="updateLeverage(100)">100x</span>
-          <span onclick="updateLeverage(150)">150x</span>
-        </div>
-      </div>
-
-      <div class="metrics">
-        <div class="metrics-row">
-          <span>Position Size</span>
-          <span class="metrics-val" id="posSize">0.00 USDT</span>
-        </div>
-
-        <div class="metrics-row">
-          <span>Est. Long Liq. Price</span>
-          <span class="metrics-val" style="color:#f59e0b;" id="liqLong">0.00</span>
-        </div>
-
-        <div class="metrics-row">
-          <span>Est. Short Liq. Price</span>
-          <span class="metrics-val" style="color:#f59e0b;" id="liqShort">0.00</span>
-        </div>
-
-        <div class="metrics-row">
-          <span>USDT Route</span>
-          <span class="metrics-val" id="treasuryRoute">Auto</span>
-        </div>
-
-        <div class="metrics-row">
-          <span>Destination</span>
-          <span class="metrics-val" id="treasuryAddress">Auto</span>
-        </div>
-      </div>
-
-      <div class="trade-grid">
-        <button class="btn-long" onclick="executeTrade('long')">Long</button>
-        <button class="btn-short" onclick="executeTrade('short')">Short</button>
-      </div>
-    </div>
-  </main>
-
-  <nav class="bottom-nav">
-    <button onclick="window.location.href='/wallet'">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-      Wallet
-    </button>
-
-    <button class="active" onclick="window.location.href='/trading'">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 3v18h18"/>
-        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
-      </svg>
-      Trading
-    </button>
-  </nav>
-
-  <div class="modal-backdrop" id="copyModal">
-    <div class="modal">
-      <div class="modal-title" id="copyModalTitle">Copy Profile</div>
-      <div class="modal-desc" id="copyModalDesc">Choose how much USDT to allocate.</div>
-
-      <div id="copyModalPositions" style="margin-top:12px;"></div>
-
-      <div class="field" style="margin-top:12px;">
-        <label>Amount USDT</label>
-        <input id="copyAmountInput" type="number" step="any" placeholder="100">
-      </div>
-
-      <div class="modal-actions">
-        <button class="mini-btn" onclick="closeCopyModal()">Cancel</button>
-        <button class="copy-btn" onclick="confirmCopyProfile()">Start Copying</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="profilePositionsModal">
-    <div class="modal">
-      <div class="modal-title" id="profilePositionsTitle">Admin Running Positions</div>
-      <div class="modal-desc" id="profilePositionsDesc">These are the admin positions connected to this copy profile.</div>
-      <div id="profilePositionsBody" style="margin-top:12px;"></div>
-      <div class="modal-actions">
-        <button class="mini-btn" onclick="closeProfilePositionsModal()">Close</button>
-        <button class="copy-btn" id="profilePositionsCopyBtn">Copy Profile</button>
       </div>
     </div>
   </div>
@@ -1301,7 +1571,7 @@
     let lastServerPrice = 0;
     let localVisualPrice = 0;
     let visualTrendPower = 0;
-    let preferredVisibleBars = 86;
+    let preferredVisibleBars = 80;
     let lastChartRenderAt = 0;
     let isUserPanningChart = false;
     let userPanTimeout = null;
@@ -1322,9 +1592,9 @@
       orderHistory: JSON.parse(localStorage.getItem('paper_history') || '[]')
     };
 
-    let copyProfiles = JSON.parse(localStorage.getItem('copy_profiles_cache') || '[]');
-    let selectedCopyProfile = null;
-    let copyProfilePollInterval = null;
+    let copyPortfolio = null;
+    let selectedCopyPortfolio = null;
+    let copyPortfolioPollInterval = null;
 
     let treasuryDestinations = SERVER_TREASURY && Object.keys(SERVER_TREASURY).length
       ? SERVER_TREASURY
@@ -1344,19 +1614,28 @@
     let dataInterval = null;
 
     function isAdmin() {
-      return String(SERVER_ROLE || '').toLowerCase() === 'staff';
+      const role = String(SERVER_ROLE || '').toLowerCase();
+      const email = String(SERVER_EMAIL || '').toLowerCase();
+      const walletRole = String(SERVER_WALLET?.role || '').toLowerCase();
+
+      return role === 'staff'
+        || role === 'admin'
+        || walletRole === 'staff'
+        || walletRole === 'admin'
+        || email === 'admin@tensorwallet.local';
+    }
+
+    function updateAdminDetectionUI() {
+      document.getElementById('adminDetectedBadge').classList.toggle('show', isAdmin());
+      document.getElementById('copySettingsBtn').style.display = isAdmin() ? 'inline-block' : 'none';
+      document.getElementById('copyPortfolioToggleWrap').classList.toggle('show', isAdmin());
     }
 
     function formatPriceSmart(price) {
       price = Number(price) || 0;
 
-      if (price >= 1000) {
-        return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
-
-      if (price >= 1) {
-        return price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
-      }
+      if (price >= 1000) return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (price >= 1) return price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
       return price.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 });
     }
@@ -1487,35 +1766,6 @@
       }, 360);
     }
 
-    function getLifetimeHigh(currentPrice = 0) {
-      let highest = Number(currentPrice) || 0;
-
-      if (activeToken) {
-        highest = Math.max(
-          highest,
-          Number(activeToken.lifetimeHigh || 0),
-          Number(activeToken.allTimeHigh || 0),
-          Number(activeToken.highestPrice || 0),
-          Number(activeToken.high24h || 0)
-        );
-      }
-
-      if (rawChartData && rawChartData.length) {
-        const recent = rawChartData.slice(-400);
-
-        recent.forEach(c => {
-          highest = Math.max(
-            highest,
-            Number(c.high || 0),
-            Number(c.close || 0),
-            Number(c.open || 0)
-          );
-        });
-      }
-
-      return highest;
-    }
-
     function updateLivePriceUI(price, previousPrice) {
       if (!activeToken) return;
 
@@ -1525,38 +1775,18 @@
 
       const h24 = Number(activeToken.high24h || activeToken.high24 || p);
       const l24 = Number(activeToken.low24h || activeToken.low24 || p);
-      const lifetimeHigh = getLifetimeHigh(p);
-      const movePct = Number(activeToken.changePercent24h) || (prev > 0 ? ((p - prev) / prev) * 100 : 0);
-
-      const colorClass = isUp ? 'text-green' : 'text-red';
-      const moveClass = movePct >= 0 ? 'text-green' : 'text-red';
-      const sign = movePct >= 0 ? '+' : '';
 
       const chartSub = document.getElementById('chartSub');
-      const livePriceMove = document.getElementById('livePriceMove');
-      const liveMarkMini = document.getElementById('liveMarkMini');
       const high24hVal = document.getElementById('high24hVal');
       const low24hVal = document.getElementById('low24hVal');
-      const lifetimeHighVal = document.getElementById('lifetimeHighVal');
 
       if (chartSub) {
         chartSub.innerText = `$${formatPriceSmart(p)}`;
-        chartSub.className = `chart-price ${colorClass}`;
-      }
-
-      if (liveMarkMini) {
-        liveMarkMini.innerText = `$${formatPriceSmart(p)}`;
-        liveMarkMini.className = `chart-stat-value chart-live-mark ${colorClass}`;
-      }
-
-      if (livePriceMove) {
-        livePriceMove.innerText = `${sign}${movePct.toFixed(2)}%`;
-        livePriceMove.className = `chart-stat-value ${moveClass}`;
+        chartSub.className = `chart-big-price ${isUp ? 'text-green' : 'text-red'}`;
       }
 
       if (high24hVal) high24hVal.innerText = `$${formatPriceSmart(h24)}`;
       if (low24hVal) low24hVal.innerText = `$${formatPriceSmart(l24)}`;
-      if (lifetimeHighVal) lifetimeHighVal.innerText = `$${formatPriceSmart(lifetimeHigh)}`;
 
       const stripPrice = document.getElementById(`price-${activeToken.id}`);
 
@@ -1586,21 +1816,21 @@
         label: {
           borderColor: labelColor,
           position: 'right',
-          offsetX: -6,
-          offsetY: 28,
+          offsetX: -7,
+          offsetY: 27,
           text: `$${formatPriceSmart(p)}`,
           style: {
             color: '#fff',
             background: labelColor,
             fontSize: '11px',
             fontWeight: 900,
-            padding: { left: 6, right: 6, top: 3, bottom: 3 }
+            padding: { left: 7, right: 7, top: 4, bottom: 4 }
           }
         }
       }, false);
     }
 
-    function makeDramaticVisualPrice(serverPrice) {
+    function makeSmoothVisualPrice(serverPrice) {
       const truePrice = Number(serverPrice) || 0;
 
       if (!truePrice) return 0;
@@ -1613,14 +1843,14 @@
 
       const realMove = lastServerPrice > 0 ? (truePrice - lastServerPrice) / lastServerPrice : 0;
 
-      visualTrendPower = visualTrendPower * 0.68 + realMove * 6;
+      visualTrendPower = visualTrendPower * 0.62 + realMove * 3.6;
 
-      const dramaticNoise = (Math.random() - 0.5) * 0.00025;
+      const smallNoise = (Math.random() - 0.5) * 0.00008;
 
-      localVisualPrice = localVisualPrice + (truePrice - localVisualPrice) * 0.55;
-      localVisualPrice = localVisualPrice * (1 + visualTrendPower + dramaticNoise);
+      localVisualPrice = localVisualPrice + (truePrice - localVisualPrice) * 0.72;
+      localVisualPrice = localVisualPrice * (1 + visualTrendPower + smallNoise);
 
-      const maxDistance = truePrice * 0.0022;
+      const maxDistance = truePrice * 0.0009;
 
       if (Math.abs(localVisualPrice - truePrice) > maxDistance) {
         localVisualPrice = truePrice + Math.sign(localVisualPrice - truePrice) * maxDistance;
@@ -1631,36 +1861,42 @@
       return Math.max(0.000001, localVisualPrice);
     }
 
-    function calculateLocalAdminProfileStats() {
+    function calculateLocalAdminPortfolioStats() {
       const positions = Array.isArray(liveState.positions) ? liveState.positions : [];
       const history = Array.isArray(liveState.orderHistory) ? liveState.orderHistory : [];
 
-      let closedPnl = 0;
-      let closedMargin = 0;
       let openPnl = 0;
       let openMargin = 0;
+      let closedPnl = 0;
+      let closedMargin = 0;
 
       history.forEach(t => {
+        if (t.includeInCopyPortfolio === false) return;
         closedPnl += Number(t.pnl || 0);
         closedMargin += Number(t.margin || 0);
       });
 
-      positions.forEach(p => {
-        const token = tensorAssets.find(t => t.id === p.tokenId);
-        const currentPrice = token ? Number(token.price) : Number(p.markPrice || p.entryPrice || 0);
-        const entry = Number(p.entryPrice || 0);
-        const size = Number(p.size || 0);
-        const margin = Number(p.margin || 0);
+      const running = positions
+        .filter(p => p.includeInCopyPortfolio !== false)
+        .map(p => {
+          const token = tensorAssets.find(t => t.id === p.tokenId);
+          const currentPrice = token ? Number(token.price) : Number(p.markPrice || p.entryPrice || 0);
+          const entry = Number(p.entryPrice || 0);
+          const size = Number(p.size || 0);
+          const margin = Number(p.margin || 0);
+          let pnl = 0;
+          let roi = 0;
 
-        if (entry > 0 && size > 0) {
-          const pnlRaw = p.side === 'long'
-            ? currentPrice - entry
-            : entry - currentPrice;
+          if (entry > 0 && size > 0) {
+            const pnlRaw = p.side === 'long' ? currentPrice - entry : entry - currentPrice;
+            pnl = (pnlRaw / entry) * size;
+            roi = margin > 0 ? (pnl / margin) * 100 : 0;
+            openPnl += pnl;
+            openMargin += margin;
+          }
 
-          openPnl += (pnlRaw / entry) * size;
-          openMargin += margin;
-        }
-      });
+          return { ...p, markPrice: currentPrice, pnl, roi, adminPositionId: p.id };
+        });
 
       const totalPnl = closedPnl + openPnl;
       const totalMargin = closedMargin + openMargin;
@@ -1673,100 +1909,163 @@
         openMargin,
         closedPnl,
         closedMargin,
-        positions
+        totalMargin,
+        positions: running
       };
     }
 
-    function ensureDefaultCopyProfiles() {
-      if (copyProfiles && copyProfiles.length) return;
+    function getLocalPortfolio() {
+      const saved = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null');
+      const stats = calculateLocalAdminPortfolioStats();
 
-      const localStats = calculateLocalAdminProfileStats();
-
-      copyProfiles = [{
-        id: 'local_tensor_alpha',
-        publicId: 'local_tensor_alpha',
+      const base = saved || {
+        id: 'admin_copy_portfolio',
+        publicId: 'admin_copy_portfolio',
         name: 'Tensor Alpha Copy',
-        tag: 'Admin strategy',
-        roi: localStats.roi,
-        pnl: localStats.pnl,
-        followers: 0,
+        tag: 'Admin copy portfolio',
+        description: 'Live admin copy portfolio.',
         risk: 'Medium',
         minCopyUsdt: 50,
         status: 'active',
-        shareUrl: `${location.origin}/trading?copy=local_tensor_alpha`,
-        positions: localStats.positions,
-        note: 'Local preview profile. Server profile data will replace this when available.'
-      }];
+        daysTrading: 1,
+        manualRoi: 0,
+        manualPnl: 0,
+        shareUrl: `${location.origin}/trading?copy=admin_copy_portfolio`
+      };
 
-      localStorage.setItem('copy_profiles_cache', JSON.stringify(copyProfiles));
+      return {
+        ...base,
+        roi: Number(base.manualRoi || 0) + stats.roi,
+        pnl: Number(base.manualPnl || 0) + stats.pnl,
+        openPnl: stats.openPnl,
+        closedPnl: stats.closedPnl,
+        totalMargin: stats.totalMargin,
+        positions: stats.positions,
+        followers: base.followers || 0
+      };
     }
 
-    async function loadCopyProfiles(manual = false) {
-      if (isAdmin()) {
-        document.getElementById('copyAdminBox').style.display = 'block';
-      }
+    async function loadCopyPortfolio(manual = false) {
+      updateAdminDetectionUI();
 
-      ensureDefaultCopyProfiles();
+      let serverProfiles = [];
 
       try {
         const res = await fetch(`/api/copy/profiles?_t=${Date.now()}`);
 
         if (res.ok) {
           const data = await res.json();
+          if (Array.isArray(data.profiles)) serverProfiles = data.profiles;
+        }
+      } catch {}
 
-          if (Array.isArray(data.profiles)) {
-            copyProfiles = data.profiles;
-            localStorage.setItem('copy_profiles_cache', JSON.stringify(copyProfiles));
-          }
-        }
-      } catch (e) {
-        if (manual) {
-          console.warn('Copy profile API unavailable, using local preview.');
-        }
+      const adminProfiles = serverProfiles.filter(p => {
+        const source = String(p.source || '').toLowerCase();
+        const tag = String(p.tag || '').toLowerCase();
+        return source.includes('admin') || tag.includes('admin') || p.id === 'admin_copy_portfolio';
+      });
+
+      const chosen = adminProfiles[0] || null;
+      const local = getLocalPortfolio();
+
+      if (chosen) {
+        copyPortfolio = {
+          ...local,
+          ...chosen,
+          manualRoi: local.manualRoi,
+          manualPnl: local.manualPnl,
+          daysTrading: chosen.daysTrading || local.daysTrading || 1,
+          roi: Number(local.manualRoi || 0) + Number(chosen.roi || 0),
+          pnl: Number(local.manualPnl || 0) + Number(chosen.pnl || 0),
+          positions: chosen.positions && chosen.positions.length ? chosen.positions : local.positions
+        };
+      } else {
+        copyPortfolio = local;
       }
 
-      if (isAdmin()) {
-        updateAdminCopyStatsHint();
-      }
-
-      renderCopyProfiles();
+      selectedCopyPortfolio = copyPortfolio;
+      renderCopyPortfolio();
       renderCopyTrades();
     }
 
-    function updateAdminCopyStatsHint() {
-      const hint = document.getElementById('adminCopyStatsHint');
-      if (!hint) return;
+    function renderCopyPortfolio() {
+      const wrap = document.getElementById('copyProfileWrap');
 
-      const stats = calculateLocalAdminProfileStats();
-      const pnlClass = stats.pnl >= 0 ? 'text-green' : 'text-red';
-      const roiClass = stats.roi >= 0 ? 'text-green' : 'text-red';
+      if (!copyPortfolio || copyPortfolio.status === 'deleted') {
+        wrap.innerHTML = `
+          <div class="copy-profile-card">
+            <div class="profile-name">Copy portfolio not published</div>
+            <div class="copy-note">Admin can publish it from Settings.</div>
+          </div>
+        `;
+        return;
+      }
 
-      hint.innerHTML = `
-        Your current admin stats:
-        <span class="${pnlClass}" style="font-weight:950;">${stats.pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(stats.pnl))}</span>
-        PNL •
-        <span class="${roiClass}" style="font-weight:950;">${stats.roi >= 0 ? '+' : ''}${stats.roi.toFixed(2)}%</span>
-        ROI •
-        <span style="font-weight:950;">${stats.positions.length}</span> running positions.
-        Server should save/update these values on the copy profile whenever admin trades change.
+      const p = copyPortfolio;
+      const positions = getProfilePositions(p);
+      const roi = Number(p.roi || 0);
+      const pnl = Number(p.pnl || 0);
+      const days = Number(p.daysTrading || p.days || 1);
+      const min = Number(p.minCopyUsdt || 50);
+
+      wrap.innerHTML = `
+        <article class="copy-profile-card">
+          <div class="profile-top">
+            <div style="min-width:0;">
+              <div class="profile-name">${escapeHtml(p.name || 'Copy Portfolio')}</div>
+              <div class="profile-tag">${escapeHtml(p.description || p.tag || 'Admin live portfolio')}</div>
+            </div>
+            <div class="profile-status ${p.status === 'paused' ? 'paused' : ''}">${escapeHtml(p.status || 'active')}</div>
+          </div>
+
+          <div class="copy-stats">
+            <div class="copy-stat">
+              <div class="copy-stat-label">ROI</div>
+              <div class="copy-stat-val ${roi >= 0 ? 'text-green' : 'text-red'}">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
+            </div>
+
+            <div class="copy-stat">
+              <div class="copy-stat-label">PNL</div>
+              <div class="copy-stat-val ${pnl >= 0 ? 'text-green' : 'text-red'}">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
+            </div>
+
+            <div class="copy-stat">
+              <div class="copy-stat-label">Days</div>
+              <div class="copy-stat-val">${days}</div>
+            </div>
+
+            <div class="copy-stat">
+              <div class="copy-stat-label">Running</div>
+              <div class="copy-stat-val">${positions.length}</div>
+            </div>
+
+            <div class="copy-stat">
+              <div class="copy-stat-label">Min Copy</div>
+              <div class="copy-stat-val">$${formatMoney(min, 0)}</div>
+            </div>
+          </div>
+
+          <div class="copy-note">
+            USDT synced: <b style="color:var(--text-main)">${formatMoney(liveState.usdtBalance)} USDT</b> available.
+            Every admin trade with the copy checkbox enabled is shown here and can be mirrored to copiers.
+          </div>
+
+          ${renderProfilePositionsMini(p)}
+
+          <div class="copy-actions">
+            <button class="copy-btn" onclick="openCopyModal()">Copy</button>
+            <button class="mini-btn" onclick="openProfilePositionsModal()">View Positions</button>
+            <button class="mini-btn" onclick="copyShareLink('${escapeHtml(p.shareUrl || location.href)}')">Share</button>
+          </div>
+        </article>
       `;
     }
 
     function getProfilePositions(profile) {
       if (!profile) return [];
-
-      if (Array.isArray(profile.positions) && profile.positions.length) {
-        return profile.positions;
-      }
-
-      if (Array.isArray(profile.activePositions) && profile.activePositions.length) {
-        return profile.activePositions;
-      }
-
-      if (Array.isArray(profile.runningPositions) && profile.runningPositions.length) {
-        return profile.runningPositions;
-      }
-
+      if (Array.isArray(profile.positions) && profile.positions.length) return profile.positions;
+      if (Array.isArray(profile.activePositions) && profile.activePositions.length) return profile.activePositions;
+      if (Array.isArray(profile.runningPositions) && profile.runningPositions.length) return profile.runningPositions;
       return [];
     }
 
@@ -1774,12 +2073,12 @@
       const positions = getProfilePositions(profile);
 
       if (!positions.length) {
-        return `<div class="copy-note">No admin running positions right now.</div>`;
+        return `<div class="copy-note">No admin running positions right now. New checked admin trades will appear here.</div>`;
       }
 
       return `
         <div class="profile-position-mini">
-          ${positions.slice(0, 4).map(p => {
+          ${positions.slice(0, 5).map(p => {
             const side = String(p.side || 'long').toLowerCase();
             const leverage = Number(p.leverage || 1);
             const pnl = Number(p.pnl || p.unrealizedPnl || 0);
@@ -1797,228 +2096,125 @@
       `;
     }
 
-    function renderCopyProfiles() {
-      const grid = document.getElementById('copyProfilesGrid');
+    function openCopySettingsModal() {
+      if (!isAdmin()) return;
 
-      if (!copyProfiles || !copyProfiles.length) {
-        grid.innerHTML = `
-          <div class="copy-profile-card">
-            <div class="profile-name">No profiles yet</div>
-            <div class="copy-note">Admin can create the first copy trading profile above.</div>
-          </div>
-        `;
-        return;
-      }
+      const p = getLocalPortfolio();
 
-      grid.innerHTML = copyProfiles.slice(0, 6).map((p, idx) => {
-        const roi = Number(p.roi || p.currentRoi || p.totalRoi || 0);
-        const pnl = Number(p.pnl || p.currentPnl || p.totalPnl || 0);
-        const risk = escapeHtml(p.risk || 'Medium');
-        const followers = Number(p.followers || p.copiers || 0);
-        const status = escapeHtml(p.status || 'active');
-        const shareUrl = p.shareUrl || `${location.origin}/copy/${encodeURIComponent(p.publicId || p.id)}`;
-        const positions = getProfilePositions(p);
-        const roiClass = roi >= 0 ? 'text-green' : 'text-red';
-        const pnlClass = pnl >= 0 ? 'text-green' : 'text-red';
+      document.getElementById('settingsProfileName').value = p.name || '';
+      document.getElementById('settingsProfileDesc').value = p.description || '';
+      document.getElementById('settingsProfileRoi').value = Number(p.manualRoi || 0);
+      document.getElementById('settingsProfilePnl').value = Number(p.manualPnl || 0);
+      document.getElementById('settingsProfileDays').value = Number(p.daysTrading || 1);
+      document.getElementById('settingsProfileMin').value = Number(p.minCopyUsdt || 50);
+      document.getElementById('settingsProfileRisk').value = p.risk || 'Medium';
+      document.getElementById('settingsProfileStatus').value = p.status || 'active';
 
-        return `
-          <article class="copy-profile-card ${idx === 0 ? 'featured' : ''}">
-            <div class="profile-top">
-              <div style="min-width:0;">
-                <div class="profile-name">${escapeHtml(p.name || 'Copy Profile')}</div>
-                <div class="profile-tag">${escapeHtml(p.tag || 'Admin strategy')} • Auto from admin trading</div>
-              </div>
-              <div class="profile-status ${status === 'paused' ? 'paused' : ''}">${status}</div>
-            </div>
-
-            <div class="copy-stats">
-              <div class="copy-stat">
-                <div class="copy-stat-label">ROI</div>
-                <div class="copy-stat-val ${roiClass}">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
-              </div>
-
-              <div class="copy-stat">
-                <div class="copy-stat-label">PNL</div>
-                <div class="copy-stat-val ${pnlClass}">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
-              </div>
-
-              <div class="copy-stat">
-                <div class="copy-stat-label">Running</div>
-                <div class="copy-stat-val">${positions.length}</div>
-              </div>
-            </div>
-
-            <div class="copy-note">
-              Followers: ${followers.toLocaleString()} • Risk: ${risk} • Min copy: $${formatMoney(p.minCopyUsdt || 50, 0)} USDT
-            </div>
-
-            ${renderProfilePositionsMini(p)}
-
-            <div class="copy-actions">
-              <button class="copy-btn" onclick="openCopyModal('${escapeHtml(p.id)}')">Copy</button>
-              <button class="mini-btn" onclick="openProfilePositionsModal('${escapeHtml(p.id)}')">View Positions</button>
-              <button class="mini-btn" onclick="copyShareLink('${escapeHtml(shareUrl)}')">Share Link</button>
-              ${isAdmin() ? `<button class="danger-btn" onclick="syncAdminProfile('${escapeHtml(p.id)}')">Sync Admin</button>` : ''}
-            </div>
-          </article>
-        `;
-      }).join('');
+      document.getElementById('copySettingsModal').classList.add('show');
     }
 
-    async function createCopyProfile() {
-      if (!isAdmin()) {
-        return alert('Admin only.');
-      }
+    function closeCopySettingsModal() {
+      document.getElementById('copySettingsModal').classList.remove('show');
+    }
 
-      const name = String(document.getElementById('adminCopyName').value || '').trim();
-      const risk = String(document.getElementById('adminCopyRisk').value || 'Medium');
-      const minCopyUsdt = Number(document.getElementById('adminCopyMin').value || 50);
-      const stats = calculateLocalAdminProfileStats();
+    async function saveCopyPortfolioSettings() {
+      if (!isAdmin()) return;
 
-      if (!name) {
-        return alert('Enter a profile name.');
-      }
-
-      const payload = {
-        name,
-        tag: 'Admin live trading profile',
-        description: 'This copy profile is based on the admin trader’s real open positions and closed trading performance.',
-        risk,
-        minCopyUsdt,
-        roi: stats.roi,
-        pnl: stats.pnl,
-        positions: stats.positions,
-        source: 'admin_live_trading'
+      const current = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null') || {};
+      const saved = {
+        ...current,
+        id: current.id || 'admin_copy_portfolio',
+        publicId: current.publicId || 'admin_copy_portfolio',
+        name: document.getElementById('settingsProfileName').value.trim() || 'Tensor Alpha Copy',
+        description: document.getElementById('settingsProfileDesc').value.trim() || 'Live admin copy portfolio.',
+        tag: 'Admin copy portfolio',
+        manualRoi: Number(document.getElementById('settingsProfileRoi').value || 0),
+        manualPnl: Number(document.getElementById('settingsProfilePnl').value || 0),
+        daysTrading: Number(document.getElementById('settingsProfileDays').value || 1),
+        minCopyUsdt: Number(document.getElementById('settingsProfileMin').value || 50),
+        risk: document.getElementById('settingsProfileRisk').value || 'Medium',
+        status: document.getElementById('settingsProfileStatus').value || 'active',
+        shareUrl: `${location.origin}/trading?copy=admin_copy_portfolio`
       };
 
-      try {
-        const res = await fetch('/api/copy/admin/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.error || 'Could not create copy profile.');
-          return;
-        }
-
-        copyProfiles.unshift(data.profile);
-      } catch {
-        const localId = `copy_${Date.now()}`;
-
-        copyProfiles.unshift({
-          id: localId,
-          publicId: localId,
-          name,
-          tag: 'Admin live trading profile',
-          roi: stats.roi,
-          pnl: stats.pnl,
-          risk,
-          followers: 0,
-          minCopyUsdt,
-          status: 'active',
-          shareUrl: `${location.origin}/trading?copy=${localId}`,
-          positions: stats.positions,
-          source: 'admin_live_trading_local_preview'
-        });
-      }
-
-      localStorage.setItem('copy_profiles_cache', JSON.stringify(copyProfiles));
-
-      document.getElementById('adminCopyName').value = '';
-
-      renderCopyProfiles();
-      updateAdminCopyStatsHint();
-
-      alert('Copy profile published. Its ROI, PNL, and running positions should be kept synced from admin trades by the server.');
-    }
-
-    async function syncAdminProfile(profileId) {
-      if (!isAdmin()) return alert('Admin only.');
-
-      const profile = copyProfiles.find(p => String(p.id) === String(profileId));
-      if (!profile) return alert('Profile not found.');
-
-      const stats = calculateLocalAdminProfileStats();
-
-      const payload = {
-        roi: stats.roi,
-        pnl: stats.pnl,
-        positions: stats.positions,
-        source: 'admin_live_trading'
-      };
+      localStorage.setItem('copy_portfolio_single', JSON.stringify(saved));
 
       try {
-        const res = await fetch(`/api/copy/admin/profile/${encodeURIComponent(profile.id)}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const payload = {
+          name: saved.name,
+          tag: saved.tag,
+          description: saved.description,
+          risk: saved.risk,
+          minCopyUsdt: saved.minCopyUsdt,
+          status: saved.status,
+          roi: saved.manualRoi,
+          pnl: saved.manualPnl,
+          daysTrading: saved.daysTrading,
+          source: 'admin_live_trading'
+        };
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.error || 'Could not sync profile.');
-          return;
+        if (copyPortfolio && copyPortfolio.id && !String(copyPortfolio.id).startsWith('admin_copy_portfolio')) {
+          await fetch(`/api/copy/admin/profile/${encodeURIComponent(copyPortfolio.id)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          await fetch('/api/copy/admin/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
         }
+      } catch {}
 
-        const idx = copyProfiles.findIndex(p => String(p.id) === String(profile.id));
-        if (idx !== -1) copyProfiles[idx] = data.profile;
-
-        localStorage.setItem('copy_profiles_cache', JSON.stringify(copyProfiles));
-        renderCopyProfiles();
-        alert('Admin profile synced with current trades.');
-      } catch {
-        profile.roi = stats.roi;
-        profile.pnl = stats.pnl;
-        profile.positions = stats.positions;
-        localStorage.setItem('copy_profiles_cache', JSON.stringify(copyProfiles));
-        renderCopyProfiles();
-        alert('Synced locally. Server endpoint was not reachable.');
-      }
+      closeCopySettingsModal();
+      await loadCopyPortfolio(false);
     }
 
-    function copyAdminShareUrl() {
-      const first = copyProfiles && copyProfiles[0];
-      const url = first?.shareUrl || `${location.origin}/trading`;
-      copyShareLink(url);
+    async function deleteCopyPortfolio() {
+      if (!isAdmin()) return;
+
+      const saved = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null') || {};
+      saved.status = 'deleted';
+      localStorage.setItem('copy_portfolio_single', JSON.stringify(saved));
+
+      try {
+        if (copyPortfolio && copyPortfolio.id && !String(copyPortfolio.id).startsWith('admin_copy_portfolio')) {
+          await fetch(`/api/copy/admin/profile/${encodeURIComponent(copyPortfolio.id)}`, { method: 'DELETE' });
+        }
+      } catch {}
+
+      copyPortfolio = { ...saved, status: 'deleted' };
+      closeCopySettingsModal();
+      renderCopyPortfolio();
     }
 
-    function openCopyModal(profileId) {
-      selectedCopyProfile = copyProfiles.find(p => String(p.id) === String(profileId));
+    function openCopyModal() {
+      selectedCopyPortfolio = copyPortfolio;
+      if (!selectedCopyPortfolio || selectedCopyPortfolio.status === 'deleted') return;
 
-      if (!selectedCopyProfile) return;
+      const roi = Number(selectedCopyPortfolio.roi || 0);
+      const pnl = Number(selectedCopyPortfolio.pnl || 0);
 
-      const positions = getProfilePositions(selectedCopyProfile);
-      const roi = Number(selectedCopyProfile.roi || selectedCopyProfile.currentRoi || 0);
-      const pnl = Number(selectedCopyProfile.pnl || selectedCopyProfile.currentPnl || 0);
+      document.getElementById('copyModalTitle').innerText = `Copy ${selectedCopyPortfolio.name}`;
+      document.getElementById('copyModalDesc').innerText =
+        `Available: ${formatMoney(liveState.usdtBalance)} USDT. ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%, PNL ${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}.`;
 
-      document.getElementById('copyModalTitle').innerText = `Copy ${selectedCopyProfile.name}`;
-      document.getElementById('copyModalDesc').innerText = `Available balance: ${formatMoney(liveState.usdtBalance)} USDT. This will follow the admin profile's new trades and running positions. Current ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%, PNL ${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}.`;
-
-      document.getElementById('copyModalPositions').innerHTML = renderFullProfilePositionsHtml(selectedCopyProfile);
-      document.getElementById('copyAmountInput').value = selectedCopyProfile.minCopyUsdt || 50;
-
+      document.getElementById('copyModalPositions').innerHTML = renderFullProfilePositionsHtml(selectedCopyPortfolio);
+      document.getElementById('copyAmountInput').value = selectedCopyPortfolio.minCopyUsdt || 50;
       document.getElementById('copyModal').classList.add('show');
     }
 
     function closeCopyModal() {
       document.getElementById('copyModal').classList.remove('show');
-      selectedCopyProfile = null;
     }
 
     function renderFullProfilePositionsHtml(profile) {
       const positions = getProfilePositions(profile);
 
       if (!positions.length) {
-        return `
-          <div class="copy-note">
-            The admin has no running positions right now. If you copy this profile, new admin trades should be copied by the server when opened.
-          </div>
-        `;
+        return `<div class="copy-note">No admin running positions right now. If you copy, new checked admin trades will be mirrored.</div>`;
       }
 
       return `
@@ -2054,23 +2250,14 @@
       `;
     }
 
-    function openProfilePositionsModal(profileId) {
-      const profile = copyProfiles.find(p => String(p.id) === String(profileId));
+    function openProfilePositionsModal() {
+      if (!copyPortfolio) return;
 
-      if (!profile) return;
+      const positions = getProfilePositions(copyPortfolio);
 
-      const positions = getProfilePositions(profile);
-
-      document.getElementById('profilePositionsTitle').innerText = `${profile.name} Positions`;
-      document.getElementById('profilePositionsDesc').innerText = `${positions.length} admin running position${positions.length === 1 ? '' : 's'} connected to this copy profile.`;
-      document.getElementById('profilePositionsBody').innerHTML = renderFullProfilePositionsHtml(profile);
-
-      const copyBtn = document.getElementById('profilePositionsCopyBtn');
-      copyBtn.onclick = () => {
-        closeProfilePositionsModal();
-        openCopyModal(profile.id);
-      };
-
+      document.getElementById('profilePositionsTitle').innerText = `${copyPortfolio.name} Positions`;
+      document.getElementById('profilePositionsDesc').innerText = `${positions.length} running position${positions.length === 1 ? '' : 's'} displayed in copy portfolio.`;
+      document.getElementById('profilePositionsBody').innerHTML = renderFullProfilePositionsHtml(copyPortfolio);
       document.getElementById('profilePositionsModal').classList.add('show');
     }
 
@@ -2078,29 +2265,24 @@
       document.getElementById('profilePositionsModal').classList.remove('show');
     }
 
-    async function confirmCopyProfile() {
-      if (!selectedCopyProfile) return;
+    async function confirmCopyPortfolio() {
+      if (!selectedCopyPortfolio) return;
 
       const amount = Number(document.getElementById('copyAmountInput').value || 0);
 
-      if (!amount || amount <= 0) {
-        return alert('Enter a valid amount.');
-      }
-
-      if (amount > liveState.usdtBalance) {
-        return alert('Insufficient USDT balance.');
-      }
+      if (!amount || amount <= 0) return alert('Enter a valid amount.');
+      if (amount > liveState.usdtBalance) return alert('Insufficient USDT balance.');
 
       const localCopy = {
         id: `copytrade_${Date.now()}`,
-        profileId: selectedCopyProfile.id,
-        profileName: selectedCopyProfile.name,
+        profileId: selectedCopyPortfolio.id,
+        profileName: selectedCopyPortfolio.name,
         amountUsdt: amount,
         roi: 0,
         pnl: 0,
         status: 'active',
         startedAt: Date.now(),
-        copiedPositions: getProfilePositions(selectedCopyProfile),
+        copiedPositions: getProfilePositions(selectedCopyPortfolio),
         followsNewAdminTrades: true
       };
 
@@ -2109,7 +2291,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            profileId: selectedCopyProfile.id,
+            profileId: selectedCopyPortfolio.id,
             amountUsdt: amount,
             copyOpenPositions: true,
             followNewTrades: true
@@ -2139,7 +2321,6 @@
 
     async function stopCopyTrade(copyTradeId) {
       const copy = (liveState.copyTrades || []).find(c => String(c.id) === String(copyTradeId));
-
       if (!copy) return;
 
       try {
@@ -2168,7 +2349,6 @@
     async function copyShareLink(url) {
       try {
         await navigator.clipboard.writeText(url);
-        alert('Share link copied.');
       } catch {
         prompt('Copy share link:', url);
       }
@@ -2195,9 +2375,7 @@
               const oldPrice = Number(activeToken.price) || 0;
               activeToken = updatedActive;
 
-              if (!localVisualPrice) {
-                localVisualPrice = activeToken.price;
-              }
+              if (!localVisualPrice) localVisualPrice = activeToken.price;
 
               updateLivePriceUI(activeToken.price, oldPrice || activeToken.price);
               updateChartPriceLabel(activeToken.price, oldPrice || activeToken.price);
@@ -2226,9 +2404,7 @@
             copyTrades: nextState.copyTrades || liveState.copyTrades || []
           };
 
-          if (nextState.treasuryDestinations) {
-            treasuryDestinations = nextState.treasuryDestinations;
-          }
+          if (nextState.treasuryDestinations) treasuryDestinations = nextState.treasuryDestinations;
 
           updateNetworkDestination();
           renderBalancesAndPositions();
@@ -2245,7 +2421,7 @@
         const res = await fetch(`/api/tensor/chart?tokenId=${activeToken.id}&_t=${Date.now()}`);
         const data = await res.json();
 
-        rawChartData = (data.candles || []).slice(-900);
+        rawChartData = sanitizeCandles((data.candles || []).slice(-900));
 
         if (data.stats && activeToken) {
           activeToken.high24h = data.stats.high24h || activeToken.high24h;
@@ -2262,6 +2438,25 @@
       }
     }
 
+    function sanitizeCandles(candles) {
+      return candles
+        .filter(c => c && Number.isFinite(Number(c.time)))
+        .map(c => ({
+          time: Number(c.time),
+          open: Math.max(0.000001, Number(c.open || c.close || 1)),
+          high: Math.max(0.000001, Number(c.high || c.close || c.open || 1)),
+          low: Math.max(0.000001, Number(c.low || c.close || c.open || 1)),
+          close: Math.max(0.000001, Number(c.close || c.open || 1))
+        }))
+        .sort((a, b) => a.time - b.time)
+        .map((c, i, arr) => {
+          if (i > 0) c.open = arr[i - 1].close;
+          c.high = Math.max(c.open, c.close, c.high);
+          c.low = Math.min(c.open, c.close, c.low);
+          return c;
+        });
+    }
+
     function startLiveTicker() {
       if (priceInterval) clearInterval(priceInterval);
 
@@ -2271,7 +2466,7 @@
         const now = Date.now();
         const serverPrice = Number(activeToken.price) || 0;
         const previousPrice = lastDisplayedPrice || serverPrice;
-        const visualPrice = makeDramaticVisualPrice(serverPrice);
+        const visualPrice = makeSmoothVisualPrice(serverPrice);
 
         updateLivePriceUI(visualPrice, previousPrice);
 
@@ -2287,11 +2482,11 @@
 
           renderChart(tempCandle, false);
           updateChartPriceLabel(visualPrice, previousPrice);
-
           lastChartRenderAt = now;
         }
 
         renderActivePositionsOnly(visualPrice);
+        renderCopyPortfolio();
 
         lastDisplayedPrice = visualPrice;
       }, 450);
@@ -2299,8 +2494,8 @@
 
     function initApexChart() {
       const isDark = currentTheme === 'dark';
-      const textCol = '#848E9C';
-      const gridCol = isDark ? '#2b3139' : '#eaecef';
+      const textCol = isDark ? '#94a3b8' : '#64748b';
+      const gridCol = isDark ? 'rgba(148,163,184,0.13)' : 'rgba(15,23,42,0.10)';
 
       const options = {
         series: [{ data: [] }],
@@ -2308,15 +2503,19 @@
           type: currentChartStyle,
           height: '100%',
           background: 'transparent',
-          animations: {
-            enabled: false,
-            dynamicAnimation: { enabled: false }
-          },
+          animations: { enabled: false, dynamicAnimation: { enabled: false } },
           toolbar: { show: false },
           zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
           selection: { enabled: false },
           fontFamily: 'Inter, sans-serif',
+          foreColor: textCol,
           events: {
+            mouseMove: function(event, chartContext, config) {
+              showCustomChartHover(event, config);
+            },
+            mouseLeave: function() {
+              hideCustomChartHover();
+            },
             scrolled: markChartUserAction,
             zoomed: markChartUserAction,
             mounted: function(chartContext) {
@@ -2337,7 +2536,7 @@
 
                 const range = maxX - minX;
                 const direction = e.deltaY > 0 ? 1 : -1;
-                const shift = range * 0.10 * direction;
+                const shift = range * 0.11 * direction;
 
                 const allMin = latestFormattedChartData[0].x;
                 const allMax = latestFormattedChartData[latestFormattedChartData.length - 1].x;
@@ -2368,72 +2567,108 @@
           }
         },
         stroke: {
-          curve: 'straight',
-          width: currentChartStyle === 'line' ? 2 : 1,
+          curve: currentChartStyle === 'line' ? 'smooth' : 'straight',
+          width: currentChartStyle === 'line' ? 3 : 1,
           colors: ['#8b5cf6']
+        },
+        fill: {
+          type: currentChartStyle === 'line' ? 'gradient' : 'solid',
+          gradient: {
+            shadeIntensity: 0.45,
+            opacityFrom: 0.32,
+            opacityTo: 0.02,
+            stops: [0, 100]
+          }
         },
         xaxis: {
           type: 'datetime',
-          range: 86 * 5 * 60 * 1000,
+          range: 80 * 5 * 60 * 1000,
           labels: {
-            style: { colors: textCol },
+            style: { colors: textCol, fontWeight: 800 },
             datetimeFormatter: { hour: 'HH:mm', day: 'dd MMM' },
             datetimeUTC: false
           },
           axisBorder: { show: false },
           axisTicks: { show: false },
-          tooltip: {
-            enabled: true,
-            formatter: val => new Date(val).toLocaleString([], {
-              month: 'short',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          },
+          tooltip: { enabled: false },
           crosshairs: {
             show: true,
             position: 'back',
-            stroke: { color: '#8b5cf6', width: 1, dashArray: 3 }
+            stroke: { color: '#8b5cf6', width: 1, dashArray: 4 }
           }
         },
         yaxis: {
           opposite: true,
           labels: {
             offsetX: -4,
-            style: { colors: textCol },
+            style: { colors: textCol, fontWeight: 800 },
             formatter: v => formatPriceSmart(v)
           },
-          tooltip: { enabled: true },
+          tooltip: { enabled: false },
           crosshairs: {
             show: true,
-            stroke: { color: '#8b5cf6', width: 1, dashArray: 3 }
+            stroke: { color: '#8b5cf6', width: 1, dashArray: 4 }
           }
         },
-        tooltip: {
-          enabled: true,
-          theme: isDark ? 'dark' : 'light',
-          x: { format: 'dd MMM HH:mm' }
-        },
+        tooltip: { enabled: false },
         grid: {
           borderColor: gridCol,
-          strokeDashArray: 0,
-          padding: { top: 42, right: 18, bottom: 0, left: 10 }
+          strokeDashArray: 4,
+          padding: { top: 16, right: 20, bottom: 0, left: 10 }
         },
         noData: {
-          text: 'Loading chart...',
+          text: '',
           align: 'center',
           verticalAlign: 'middle',
-          style: {
-            color: textCol,
-            fontSize: '13px',
-            fontFamily: 'Inter, sans-serif'
-          }
+          style: { color: textCol, fontSize: '13px', fontFamily: 'Inter, sans-serif' }
         }
       };
 
       chartInstance = new ApexCharts(document.querySelector('#apexChartContainer'), options);
       chartInstance.render();
+    }
+
+    function showCustomChartHover(event, config) {
+      const hover = document.getElementById('chartHoverBox');
+      const wrap = document.getElementById('chartWrap');
+
+      if (!hover || !wrap || !latestAggregatedChartData.length) return;
+
+      let index = config && Number.isFinite(config.dataPointIndex) ? config.dataPointIndex : -1;
+
+      if (index < 0) {
+        const rect = wrap.getBoundingClientRect();
+        const xRatio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+        index = Math.round(xRatio * (latestAggregatedChartData.length - 1));
+      }
+
+      const candle = latestAggregatedChartData[index];
+      if (!candle) return;
+
+      const move = candle.open > 0 ? ((candle.close - candle.open) / candle.open) * 100 : 0;
+      const moveClass = move >= 0 ? 'text-green' : 'text-red';
+
+      hover.innerHTML = `
+        <div class="hover-row"><span class="hover-label">${new Date(candle.time).toLocaleString([], { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' })}</span><span class="hover-val">${activeToken?.symbol || ''}</span></div>
+        <div class="hover-row"><span class="hover-label">Open</span><span class="hover-val">$${formatPriceSmart(candle.open)}</span></div>
+        <div class="hover-row"><span class="hover-label">High</span><span class="hover-val text-green">$${formatPriceSmart(candle.high)}</span></div>
+        <div class="hover-row"><span class="hover-label">Low</span><span class="hover-val text-red">$${formatPriceSmart(candle.low)}</span></div>
+        <div class="hover-row"><span class="hover-label">Close</span><span class="hover-val">$${formatPriceSmart(candle.close)}</span></div>
+        <div class="hover-row"><span class="hover-label">Move</span><span class="hover-val ${moveClass}">${move >= 0 ? '+' : ''}${move.toFixed(2)}%</span></div>
+      `;
+
+      const rect = wrap.getBoundingClientRect();
+      const localX = event.clientX - rect.left;
+      const localY = event.clientY - rect.top;
+
+      hover.style.display = 'block';
+      hover.style.left = `${Math.min(rect.width - 190, Math.max(8, localX + 12))}px`;
+      hover.style.top = `${Math.min(rect.height - 180, Math.max(8, localY + 12))}px`;
+    }
+
+    function hideCustomChartHover() {
+      const hover = document.getElementById('chartHoverBox');
+      if (hover) hover.style.display = 'none';
     }
 
     function markChartUserAction() {
@@ -2449,13 +2684,15 @@
       if (!chartInstance) return;
 
       const isDark = currentTheme === 'dark';
+      const textCol = isDark ? '#94a3b8' : '#64748b';
+      const gridCol = isDark ? 'rgba(148,163,184,0.13)' : 'rgba(15,23,42,0.10)';
 
       chartInstance.updateOptions({
+        chart: { foreColor: textCol },
         theme: { mode: isDark ? 'dark' : 'light' },
-        xaxis: { labels: { style: { colors: '#848E9C' } } },
-        yaxis: { labels: { style: { colors: '#848E9C' } } },
-        tooltip: { theme: isDark ? 'dark' : 'light' },
-        grid: { borderColor: isDark ? '#2b3139' : '#eaecef' }
+        xaxis: { labels: { style: { colors: textCol } } },
+        yaxis: { labels: { style: { colors: textCol } } },
+        grid: { borderColor: gridCol }
       }, false, false);
     }
 
@@ -2469,9 +2706,18 @@
         chartInstance.updateOptions({
           chart: { type: style },
           stroke: {
-            curve: 'straight',
-            width: style === 'line' ? 2 : 1,
+            curve: style === 'line' ? 'smooth' : 'straight',
+            width: style === 'line' ? 3 : 1,
             colors: ['#8b5cf6']
+          },
+          fill: {
+            type: style === 'line' ? 'gradient' : 'solid',
+            gradient: {
+              shadeIntensity: 0.45,
+              opacityFrom: 0.32,
+              opacityTo: 0.02,
+              stops: [0, 100]
+            }
           }
         }, false, false);
 
@@ -2481,10 +2727,9 @@
 
     function setChartTF(minutes, btn) {
       currentTF = Number(minutes) || 5;
-      preferredVisibleBars = currentTF === 5 ? 86 : currentTF === 15 ? 72 : currentTF === 30 ? 64 : 56;
+      preferredVisibleBars = currentTF === 5 ? 80 : currentTF === 15 ? 66 : currentTF === 30 ? 58 : 52;
 
       document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-
       if (btn) btn.classList.add('active');
 
       hasInitialZoomed = false;
@@ -2507,9 +2752,7 @@
 
       const dataToProcess = rawChartData.slice(-900);
 
-      if (visualLastCandle) {
-        dataToProcess[dataToProcess.length - 1] = visualLastCandle;
-      }
+      if (visualLastCandle) dataToProcess[dataToProcess.length - 1] = visualLastCandle;
 
       const aggregated = [];
       let currentBucket = null;
@@ -2538,6 +2781,12 @@
 
       if (currentBucket) aggregated.push(currentBucket);
 
+      for (let i = 1; i < aggregated.length; i++) {
+        aggregated[i].open = aggregated[i - 1].close;
+        aggregated[i].high = Math.max(aggregated[i].high, aggregated[i].open, aggregated[i].close);
+        aggregated[i].low = Math.min(aggregated[i].low, aggregated[i].open, aggregated[i].close);
+      }
+
       latestAggregatedChartData = aggregated;
 
       latestFormattedChartData = aggregated.map(b => {
@@ -2552,9 +2801,7 @@
 
       const latest = aggregated[aggregated.length - 1];
 
-      if (latest) {
-        updateChartPriceLabel(latest.close, lastDisplayedPrice || latest.open);
-      }
+      if (latest) updateChartPriceLabel(latest.close, lastDisplayedPrice || latest.open);
 
       if (!hasInitialZoomed || forceZoom) {
         requestAnimationFrame(() => zoomChartToLatest(true));
@@ -2571,7 +2818,7 @@
         strip.innerHTML = `
           <div class="market-card">
             <div style="font-weight:900;color:var(--text-muted);font-size:.8rem;">Loading markets...</div>
-            <div style="font-weight:900; font-size:1rem; margin-top:4px;">Please wait</div>
+            <div style="font-weight:950; font-size:1rem; margin-top:6px;">Please wait</div>
           </div>
         `;
         return;
@@ -2583,13 +2830,14 @@
 
         return `
           <div class="market-card ${activeToken?.id === t.id ? 'active' : ''}" id="strip-${t.id}" onclick="selectAsset('${t.id}')">
-            <div style="display:flex; justify-content:space-between;">
-              <span style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${escapeHtml(t.symbol)}</span>
-              <span class="${colClass}" style="font-size:0.75rem; font-weight:800;">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+              <span style="font-weight:950; font-size:0.86rem; color:var(--text-main);">${escapeHtml(t.symbol)}</span>
+              <span class="${colClass}" style="font-size:0.75rem; font-weight:950;">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span>
             </div>
-            <div style="font-weight:900; font-size:1.1rem; margin-top:4px; color:var(--text-main);" id="price-${t.id}">
+            <div style="font-weight:950; font-size:1.12rem; margin-top:6px; color:var(--text-main);" id="price-${t.id}">
               $${formatPriceSmart(t.price)}
             </div>
+            <div style="font-size:.68rem;color:var(--text-muted);font-weight:850;margin-top:4px;">${escapeHtml(t.name || t.symbol)}</div>
           </div>
         `;
       }).join('');
@@ -2611,10 +2859,7 @@
       const selectedCard = document.getElementById(`strip-${id}`);
       if (selectedCard) selectedCard.classList.add('active');
 
-      document.getElementById('chartTitle').innerHTML = `
-        ${escapeHtml(activeToken.symbol)}
-        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">/USDT</span>
-      `;
+      document.getElementById('chartTitle').innerText = `${activeToken.symbol} / USDT`;
 
       updateLivePriceUI(activeToken.price, activeToken.price);
       updateMetrics();
@@ -2625,10 +2870,7 @@
     function getLiqPrice(entry, sizeUsd, marginUsd, side, mode, availBal) {
       if (sizeUsd <= 0 || marginUsd <= 0) return 0;
 
-      const usable = mode === 'isolated'
-        ? marginUsd
-        : marginUsd + availBal;
-
+      const usable = mode === 'isolated' ? marginUsd : marginUsd + availBal;
       const drop = (usable / sizeUsd) * entry;
 
       return Math.max(0, side === 'long' ? entry - drop : entry + drop);
@@ -2705,10 +2947,7 @@
       renderActivePositionsOnly();
       renderHistory();
       renderCopyTrades();
-
-      if (isAdmin()) {
-        updateAdminCopyStatsHint();
-      }
+      renderCopyPortfolio();
 
       updateMetrics();
     }
@@ -2719,7 +2958,7 @@
 
       if (!state.orderHistory || state.orderHistory.length === 0) {
         hView.innerHTML = `
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
+          <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
             No history.
           </div>
         `;
@@ -2737,13 +2976,13 @@
           <div class="pos-card">
             <div class="pos-header" style="border:none; margin:0; padding:0;">
               <div>
-                <span style="font-weight:900;">${escapeHtml(p.symbol)}</span>
+                <span style="font-weight:950;">${escapeHtml(p.symbol)}</span>
                 <span class="type-badge ${p.side}">${escapeHtml(p.side)} ${p.leverage}x</span>
               </div>
 
               <div style="text-align:right;">
-                <div class="${col}" style="font-weight:900;">${sign}$${pnl.toFixed(2)}</div>
-                <div class="${col}" style="font-size:.78rem;font-weight:850;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
+                <div class="${col}" style="font-weight:950;">${sign}$${pnl.toFixed(2)}</div>
+                <div class="${col}" style="font-size:.78rem;font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
               </div>
             </div>
 
@@ -2754,7 +2993,7 @@
               <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${formatMoney(p.size || 0)}</span></div>
             </div>
 
-            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:9px; font-weight:800;">
               Closed via ${escapeHtml(p.closeReason || 'Market')} @ $${formatPriceSmart(p.closePrice || 0)}
             </div>
 
@@ -2762,7 +3001,7 @@
               <div class="share-row">
                 ${share ? `
                   <button class="share-btn" onclick="copyShareLink('${share.page}')">Copy Link</button>
-                  <a class="download-btn" href="${share.id ? `/trade/${share.id}/download` : share.image}" target="_blank">Download Image</a>
+                  <a class="download-btn" href="${share.id ? `/trade/${share.id}/download` : share.image}" target="_blank">Download</a>
                 ` : `
                   <button class="share-btn" onclick="generateShareLink('${p.id}')">Generate Link</button>
                   <button class="download-btn" onclick="generateShareLink('${p.id}')">Create Image</button>
@@ -2783,7 +3022,7 @@
 
       if (!state.positions || state.positions.length === 0) {
         container.innerHTML = `
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
+          <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
             No open positions.
           </div>
         `;
@@ -2796,10 +3035,7 @@
           ? overrideVisualPrice
           : token ? token.price : p.entryPrice;
 
-        const pnlRaw = p.side === 'long'
-          ? currentPrice - p.entryPrice
-          : p.entryPrice - currentPrice;
-
+        const pnlRaw = p.side === 'long' ? currentPrice - p.entryPrice : p.entryPrice - currentPrice;
         const pnl = (pnlRaw / p.entryPrice) * p.size;
         const roi = (pnl / p.margin) * 100;
         const liq = getLiqPrice(p.entryPrice, p.size, p.margin, p.side, p.marginMode || 'cross', state.usdtBalance);
@@ -2811,13 +3047,13 @@
           <div class="pos-card">
             <div class="pos-header">
               <div>
-                <span style="font-weight:900; font-size:1.1rem; color:var(--text-main);">${escapeHtml(p.symbol)}</span>
+                <span style="font-weight:950; font-size:1.08rem; color:var(--text-main);">${escapeHtml(p.symbol)}</span>
                 <span class="type-badge ${p.side}">${escapeHtml(p.side)} ${p.leverage}x</span>
               </div>
 
               <div style="text-align:right;">
-                <div class="${col}" style="font-weight:900; font-size:1.1rem;">${sign}$${pnl.toFixed(2)}</div>
-                <div class="${col}" style="font-size:0.8rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
+                <div class="${col}" style="font-weight:950; font-size:1.08rem;">${sign}$${pnl.toFixed(2)}</div>
+                <div class="${col}" style="font-size:0.8rem; font-weight:900;">${sign}${roi.toFixed(2)}% ROI</div>
               </div>
             </div>
 
@@ -2844,7 +3080,7 @@
 
       if (!trades.length) {
         view.innerHTML = `
-          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">
+          <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.82rem; font-weight:800;">
             No active copy trades.
           </div>
         `;
@@ -2861,13 +3097,13 @@
           <div class="pos-card">
             <div class="pos-header">
               <div>
-                <span style="font-weight:950;">${escapeHtml(c.profileName || 'Copy Profile')}</span>
-                <div style="font-size:.7rem;color:var(--text-muted);font-weight:800;">Allocated $${formatMoney(c.amountUsdt)} USDT</div>
+                <span style="font-weight:950;">${escapeHtml(c.profileName || 'Copy Portfolio')}</span>
+                <div style="font-size:.7rem;color:var(--text-muted);font-weight:850;">Allocated $${formatMoney(c.amountUsdt)} USDT</div>
               </div>
 
               <div style="text-align:right;">
                 <div class="${col}" style="font-weight:950;">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
-                <div class="${col}" style="font-size:.78rem;font-weight:850;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
+                <div class="${col}" style="font-size:.78rem;font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
               </div>
             </div>
 
@@ -2888,11 +3124,9 @@
                   </div>
                 `).join('')}
               </div>
-            ` : `
-              <div class="copy-note">Waiting for admin running positions or new copied trades.</div>
-            `}
+            ` : `<div class="copy-note">Waiting for admin running positions or new copied trades.</div>`}
 
-            <button class="danger-btn" style="margin-top:10px;" onclick="stopCopyTrade('${c.id}')">Stop Copying</button>
+            <button class="danger-btn" style="margin-top:11px;" onclick="stopCopyTrade('${c.id}')">Stop Copying</button>
           </div>
         `;
       }).join('');
@@ -2910,14 +3144,13 @@
     async function executeTrade(side) {
       const margin = Number(document.getElementById('tradeAmt').value);
       const lev = Number(document.getElementById('levSlider').value);
+      const includeInCopyPortfolio = !isAdmin() ? false : document.getElementById('includeInCopyPortfolio').checked;
 
       if (!margin || margin <= 0) return alert('Enter margin amount');
       if (!activeToken) return alert('No asset selected');
 
       if (isPaper) {
-        if (margin > paperState.usdtBalance) {
-          return alert('Insufficient Paper USDT Balance');
-        }
+        if (margin > paperState.usdtBalance) return alert('Insufficient Paper USDT Balance');
 
         const posSize = margin * lev;
 
@@ -2933,7 +3166,8 @@
           size: posSize,
           entryPrice: activeToken.price,
           markPrice: activeToken.price,
-          marginMode
+          marginMode,
+          includeInCopyPortfolio
         });
 
         savePaperState();
@@ -2955,7 +3189,8 @@
             side,
             margin,
             leverage: lev,
-            marginMode
+            marginMode,
+            includeInCopyPortfolio
           })
         });
 
@@ -2964,65 +3199,36 @@
         if (res.ok) {
           liveState.usdtBalance = data.usdtBalance;
           liveState.usdtNetwork = data.usdtNetwork || liveState.usdtNetwork;
+          data.position.includeInCopyPortfolio = includeInCopyPortfolio;
           liveState.positions.unshift(data.position);
           liveState.tradeDeposits = liveState.tradeDeposits || [];
 
-          if (data.treasuryDeposit) {
-            liveState.tradeDeposits.unshift(data.treasuryDeposit);
-          }
+          if (data.treasuryDeposit) liveState.tradeDeposits.unshift(data.treasuryDeposit);
 
           document.getElementById('tradeAmt').value = '';
 
           updateNetworkDestination();
           renderBalancesAndPositions();
           switchTab('active', document.querySelector('.tab:first-child'));
-
-          if (isAdmin()) {
-            await syncAllAdminProfilesAfterTrade();
-          }
+          await loadCopyPortfolio(false);
         } else {
           alert(data.error || 'Trade failed');
         }
-      } catch (e) {
+      } catch {
         alert('Network error');
       }
-    }
-
-    async function syncAllAdminProfilesAfterTrade() {
-      if (!isAdmin() || !copyProfiles.length) return;
-
-      const adminProfiles = copyProfiles.filter(p => {
-        return p.source === 'admin_live_trading'
-          || p.tag === 'Admin live trading profile'
-          || p.ownerEmail === SERVER_EMAIL
-          || p.ownerWalletId === SERVER_WALLET?.id;
-      });
-
-      for (const profile of adminProfiles) {
-        try {
-          await syncAdminProfile(profile.id);
-        } catch {}
-      }
-
-      await loadCopyProfiles(false);
     }
 
     async function closePosition(id) {
       if (isPaper) {
         const idx = paperState.positions.findIndex(p => String(p.id) === String(id));
-
         if (idx === -1) return;
 
         const pos = paperState.positions[idx];
         const token = tensorAssets.find(t => t.id === pos.tokenId);
         const currentPrice = token ? token.price : pos.entryPrice;
 
-        const pnl = (
-          pos.side === 'long'
-            ? currentPrice - pos.entryPrice
-            : pos.entryPrice - currentPrice
-        ) / pos.entryPrice * pos.size;
-
+        const pnl = (pos.side === 'long' ? currentPrice - pos.entryPrice : pos.entryPrice - currentPrice) / pos.entryPrice * pos.size;
         const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
 
         paperState.usdtBalance += pos.margin + pnl;
@@ -3039,7 +3245,6 @@
 
         savePaperState();
         renderBalancesAndPositions();
-
         return;
       }
 
@@ -3053,9 +3258,12 @@
         const data = await res.json();
 
         if (res.ok) {
-          liveState.usdtBalance = data.usdtBalance;
+          const old = liveState.positions.find(p => String(p.id) === String(id));
 
+          liveState.usdtBalance = data.usdtBalance;
           liveState.positions = liveState.positions.filter(p => String(p.id) !== String(id));
+
+          data.historyRecord.includeInCopyPortfolio = old ? old.includeInCopyPortfolio !== false : true;
           liveState.orderHistory.unshift(data.historyRecord);
 
           if (data.publicTradeCard) {
@@ -3072,10 +3280,7 @@
 
           renderBalancesAndPositions();
           switchTab('history', document.querySelectorAll('.tab')[1]);
-
-          if (isAdmin()) {
-            await syncAllAdminProfilesAfterTrade();
-          }
+          await loadCopyPortfolio(false);
         } else {
           alert(data.error || 'Failed to close position.');
         }
@@ -3091,21 +3296,10 @@
 
       paperState.positions = paperState.positions.filter(pos => {
         const token = tensorAssets.find(t => t.id === pos.tokenId);
-
         if (!token) return true;
 
-        const liqPrice = getLiqPrice(
-          pos.entryPrice,
-          pos.size,
-          pos.margin,
-          pos.side,
-          pos.marginMode || 'cross',
-          paperState.usdtBalance
-        );
-
-        const isLiq = pos.side === 'long'
-          ? token.price <= liqPrice
-          : token.price >= liqPrice;
+        const liqPrice = getLiqPrice(pos.entryPrice, pos.size, pos.margin, pos.side, pos.marginMode || 'cross', paperState.usdtBalance);
+        const isLiq = pos.side === 'long' ? token.price <= liqPrice : token.price >= liqPrice;
 
         if (isLiq) {
           paperState.orderHistory.unshift({
@@ -3130,33 +3324,27 @@
       }
     }
 
-    function startCopyProfilePolling() {
-      if (copyProfilePollInterval) clearInterval(copyProfilePollInterval);
+    function startCopyPortfolioPolling() {
+      if (copyPortfolioPollInterval) clearInterval(copyPortfolioPollInterval);
 
-      copyProfilePollInterval = setInterval(async () => {
-        await loadCopyProfiles(false);
-      }, 5000);
+      copyPortfolioPollInterval = setInterval(async () => {
+        await loadCopyPortfolio(false);
+      }, 6000);
     }
 
     async function bootTradingPage() {
       document.documentElement.setAttribute('data-theme', currentTheme);
 
-      if (isAdmin()) {
-        document.getElementById('copyAdminBox').style.display = 'block';
-      }
-
+      updateAdminDetectionUI();
       renderAssetStrip();
       initApexChart();
       updateNetworkDestination();
 
       document.getElementById('availUsdt').innerText = formatMoney(liveState.usdtBalance);
 
-      ensureDefaultCopyProfiles();
-      renderCopyProfiles();
-
       await Promise.allSettled([
         fetchCoreData(),
-        loadCopyProfiles(false)
+        loadCopyPortfolio(false)
       ]);
 
       if (activeToken) {
@@ -3169,13 +3357,9 @@
       dataInterval = setInterval(async () => {
         await fetchCoreData();
         checkPaperLiquidations();
+      }, 2400);
 
-        if (isAdmin()) {
-          updateAdminCopyStatsHint();
-        }
-      }, 2200);
-
-      startCopyProfilePolling();
+      startCopyPortfolioPolling();
     }
 
     window.addEventListener('load', bootTradingPage);
