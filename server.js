@@ -479,7 +479,7 @@ function getOrCreateUser(email, role = 'user') {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/index.html');
+  if (!req.session.user) return res.redirect('/');
   next();
 }
 
@@ -667,1105 +667,449 @@ function initializeCandlesForToken(tokenId, startPrice) {
     price = close;
     timeCursor += BASE_CANDLE_MS;
   }
+  
   tensorCandleHistory[tokenId] = candles;
 }
 
-function hydrateAllCandles() {
-  const db = readDb();
-  db.tensorRegistry.forEach(token => initializeCandlesForToken(token.id, token.price));
-}
-
-function pushLiveCandle(token, oldPrice) {
-  initializeCandlesForToken(token.id, oldPrice);
-
-  const history = tensorCandleHistory[token.id];
-  const now = Date.now();
-  const fiveMinuteBucket = Math.floor(now / BASE_CANDLE_MS) * BASE_CANDLE_MS;
-  const last = history[history.length - 1];
-
-  if (last && last.time === fiveMinuteBucket) {
-    last.close = token.price;
-    last.high = Math.max(last.high, token.price);
-    last.low = Math.min(last.low, token.price);
-  } else {
-    history.push({
-      time: fiveMinuteBucket, open: oldPrice,
-      high: Math.max(oldPrice, token.price), low: Math.min(oldPrice, token.price), close: token.price
-    });
-    while (history.length > MAX_CANDLES) history.shift();
+function updateCandles(tokenId, currentPrice) {
+  let candles = tensorCandleHistory[tokenId];
+  if (!candles) {
+    initializeCandlesForToken(tokenId, currentPrice);
+    candles = tensorCandleHistory[tokenId];
   }
-}
+  if (!candles || candles.length === 0) return;
 
-function getLiquidationPrice(pos, availableBalance = 0) {
-  const entry = safeNumber(pos.entryPrice, 0);
-  const size = safeNumber(pos.size, 0);
-  const margin = safeNumber(pos.margin, 0);
-  const side = pos.side === 'short' ? 'short' : 'long';
-  const mode = pos.marginMode || 'cross';
+  const now = Date.now();
+  const lastCandle = candles[candles.length - 1];
 
-  if (entry <= 0 || size <= 0 || margin <= 0) return 0;
-  const usableMargin = mode === 'cross' ? margin + Math.max(0, safeNumber(availableBalance, 0)) : margin;
-  const priceMove = (usableMargin / size) * entry;
-
-  return side === 'long' ? Math.max(0, entry - priceMove) : entry + priceMove;
-}
-
-function calculatePnl(pos, currentPrice) {
-  const entry = safeNumber(pos.entryPrice, 0);
-  const size = safeNumber(pos.size, 0);
-  if (entry <= 0 || size <= 0) return 0;
-
-  const priceDiff = pos.side === 'long' ? currentPrice - entry : entry - currentPrice;
-  return (priceDiff / entry) * size;
-}
-
-function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode, network, forceAddress = null, noteOverride = null }) {
-  const selectedNetwork = normalizeNetwork(network || user.usdtNetwork || inferUserUsdtNetwork(user));
-  const destination = getTreasuryDestination(selectedNetwork);
-  const id = makeId('deposit');
-  const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
-
-  return {
-    id, txHash,
-    type: 'USDT_TRADE_MARGIN_DEPOSIT',
-    status: 'recorded',
-    note: noteOverride || 'Demo ledger transfer recorded by Tensor Wallet.',
-    userEmail: user.email,
-    userWalletId: user.id,
-    amountUsdt: margin,
-    tokenId: token ? token.id : null,
-    symbol: token ? token.symbol : null,
-    side, leverage, marginMode,
-    sourceUsdtNetwork: selectedNetwork,
-    destinationNetworkKey: forceAddress ? 'sol' : destination.key,
-    destinationNetwork: forceAddress ? 'Solana' : destination.network,
-    destinationSymbol: forceAddress ? 'SOL' : destination.symbol,
-    destinationAddress: forceAddress || destination.address,
-    createdAt: Date.now(),
-    createdAtIso: nowIso()
-  };
+  if (now - lastCandle.time >= BASE_CANDLE_MS) {
+    candles.push({ time: now, open: currentPrice, high: currentPrice, low: currentPrice, close: currentPrice });
+    if (candles.length > MAX_CANDLES) candles.shift();
+  } else {
+    lastCandle.close = currentPrice;
+    lastCandle.high = Math.max(lastCandle.high, currentPrice);
+    lastCandle.low = Math.min(lastCandle.low, currentPrice);
+  }
 }
 
 async function runMarketLoop() {
-  try {
-    await syncRealCryptoPrices();
-    if (!fs.existsSync(DB_PATH)) return;
+  await syncRealCryptoPrices();
+  const db = readDb();
+  let dbChanged = false;
 
-    const db = readDb();
-    if (!db.tensorRegistry.length) db.tensorRegistry = defaultTensorAssets();
-
-    let totalMarketCap = 0;
-    db.tensorRegistry.forEach(token => {
-      migrateToken(token);
-      token.marketCap = token.price * token.supply;
-      totalMarketCap += token.marketCap;
-    });
-
-    let alphaDrift = 0;
-    db.tensorRegistry.forEach(token => {
-      token.dominance = totalMarketCap > 0 ? (token.marketCap / totalMarketCap) * 100 : 0;
-      if (token.dominance > 30 && token.bias !== 'pegged' && token.bias !== 'real') {
-        alphaDrift += (Math.random() - 0.5) * 0.003 * (token.dominance / 100);
+  db.tensorRegistry.forEach(token => {
+    if (token.bias === 'real') {
+      const symbolMap = REAL_SYMBOL_MAP[token.symbol];
+      if (symbolMap && latestRealPrices[symbolMap]) {
+        const rp = latestRealPrices[symbolMap];
+        token.price = rp.price;
+        token.changePercent24h = rp.changePercent;
+        token.high24h = rp.high;
+        token.low24h = rp.low;
       }
-    });
-
-    db.tensorRegistry.forEach(token => {
-      const oldPrice = token.price;
-      const mappedSymbol = REAL_SYMBOL_MAP[String(token.symbol || '').toUpperCase()];
-      const real = mappedSymbol ? latestRealPrices[mappedSymbol] : null;
-
-      if (real && real.price > 0) {
-        token.bias = 'real'; token.price = real.price; token.volume = real.volume || token.volume || 0;
-        token.changePercent24h = real.changePercent || 0; token.high24h = real.high || token.price;
-        token.low24h = real.low || token.price; token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
-        token.marketCap = token.price * token.supply;
-        pushLiveCandle(token, oldPrice);
-        return;
-      }
-
-      if (token.bias === 'pegged') {
-        token.price = token.startPrice || 1;
-      } else {
-        const bullChance = Math.max(0, Math.min(100, safeNumber(token.bullChance, 50)));
-        const direction = Math.random() * 100 <= bullChance ? 1 : -1;
-        const minPct = Math.max(0, safeNumber(token.minPct, 0.0005));
-        const maxPct = Math.max(minPct, safeNumber(token.maxPct, 0.004));
-        const magnitude = minPct + Math.random() * (maxPct - minPct);
-        const dominanceDampener = token.dominance > 35 ? 0.25 : Math.max(0.35, 1 - token.dominance / 100);
-        const randomMove = direction * magnitude * dominanceDampener;
-        token.price = Math.max(0.000001, oldPrice * (1 + randomMove + alphaDrift));
-      }
-
-      token.marketCap = token.price * token.supply;
-      token.volume = safeNumber(token.volume, 0) * 0.96 + Math.abs(token.price - oldPrice) * token.supply * 0.04;
-      token.high24h = Math.max(safeNumber(token.high24h, token.price), token.price);
-      token.low24h = Math.min(safeNumber(token.low24h, token.price), token.price);
-      token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
-      token.changePercent24h = token.startPrice > 0 ? ((token.price - token.startPrice) / token.startPrice) * 100 : 0;
-      pushLiveCandle(token, oldPrice);
-    });
-
-    Object.keys(db.users).forEach(email => {
-      const user = db.users[email];
-      migrateUser(user);
-      if (!Array.isArray(user.positions) || user.positions.length === 0) return;
-
-      const keptPositions = [];
-      user.positions.forEach(pos => {
-        const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
-        if (!token) { keptPositions.push(pos); return; }
-
-        pos.markPrice = token.price;
-        const liqPrice = getLiquidationPrice(pos, user.usdtBalance + user.ousdBalance); // Combined backing
-        const isLiquidated = pos.side === 'long' ? token.price <= liqPrice : token.price >= liqPrice;
-
-        if (isLiquidated) {
-          const pnl = -Math.abs(safeNumber(pos.margin, 0));
-          const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : -100;
-          user.orderHistory.unshift({
-            ...pos, closePrice: token.price, markPrice: token.price, pnl, roi,
-            closedAt: Date.now(), closedAtIso: nowIso(), closeReason: 'Liquidation'
-          });
-        } else {
-          keptPositions.push(pos);
-        }
-      });
-
-      user.positions = keptPositions;
-      user.orderHistory = user.orderHistory.slice(0, 100);
-      user.updatedAt = nowIso();
-    });
-
-    writeDb(db);
-  } catch (err) {
-    console.error('Market loop error:', err);
-  }
-}
-
-/* -------------------- Public Trade Cards & SVG to PNG Generator -------------------- */
-
-function buildTradeCardPayload({ req, db, user, trade }) {
-  const publicId = makePublicId('trade');
-  const baseUrl = getBaseUrl(req);
-  const side = trade.side === 'short' ? 'SHORT' : 'LONG';
-  const pnl = safeNumber(trade.pnl, 0);
-  const roi = safeNumber(trade.roi, trade.margin > 0 ? (pnl / trade.margin) * 100 : 0);
-  const isProfit = pnl >= 0;
-
-  const payload = {
-    id: publicId, createdAt: Date.now(), createdAtIso: nowIso(),
-    brand: 'bluecrypto.ink', verifiedBy: 'Tensor Wallet', verificationText: 'Verified by Tensor Wallet',
-    ownerWalletId: user.id, ownerEmailHash: sha(user.email).slice(0, 16),
-    trade: {
-      id: trade.id, symbol: trade.symbol, tokenId: trade.tokenId, side,
-      leverage: safeNumber(trade.leverage, 1), margin: safeNumber(trade.margin, 0),
-      size: safeNumber(trade.size, 0), entryPrice: safeNumber(trade.entryPrice, 0),
-      closePrice: safeNumber(trade.closePrice, trade.markPrice || 0),
-      markPrice: safeNumber(trade.markPrice, trade.closePrice || 0),
-      pnl, roi, closeReason: trade.closeReason || 'Market Close',
-      openedAt: trade.openedAt || null, closedAt: trade.closedAt || Date.now()
-    },
-    style: { isProfit, resultText: isProfit ? 'PROFIT' : 'LOSS', color: isProfit ? '#0ecb81' : '#f6465d' },
-    links: {
-      page: `${baseUrl}/trade/${publicId}`,
-      image: `${baseUrl}/trade/${publicId}/image.svg`,
-      download: `${baseUrl}/trade/${publicId}/download`
+    } else {
+      const isBull = Math.random() * 100 < token.bullChance;
+      const change = (Math.random() * (token.maxPct - token.minPct) + token.minPct);
+      token.price = Math.max(0.000001, token.price * (1 + (isBull ? change : -change)));
     }
-  };
+    
+    token.lifetimeHigh = Math.max(token.lifetimeHigh || 0, token.price, token.high24h || 0);
+    updateCandles(token.id, token.price);
+    dbChanged = true;
+  });
 
-  db.publicTradeCards[publicId] = payload;
-  user.publicTradeCards.unshift({ id: publicId, tradeId: trade.id, page: payload.links.page, image: payload.links.image, createdAt: payload.createdAt });
-  user.publicTradeCards = user.publicTradeCards.slice(0, 100);
-
-  return payload;
+  if (dbChanged) writeDb(db);
+  setTimeout(runMarketLoop, MARKET_LOOP_MS);
 }
 
-function renderTradeCardSvg(card) {
-  const t = card.trade; const color = card.style.color; const bg = '#070a0f'; const panel = '#111827';
-  const panel2 = '#0b1220'; const muted = '#94a3b8'; const white = '#f8fafc'; const grid = '#1f2937';
-  const watermark = 'bluecrypto.ink'; const isProfit = t.pnl >= 0;
-  const pnlText = `${isProfit ? '+' : '-'}$${formatMoney(Math.abs(t.pnl), 2)}`;
-  const roiText = `${t.roi >= 0 ? '+' : ''}${formatMoney(t.roi, 2)}%`;
-  const sideText = `${t.side} ${t.leverage}x`;
+// Start Engine
+ensureDb();
+const initialDb = readDb();
+initialDb.tensorRegistry.forEach(t => initializeCandlesForToken(t.id, t.price));
+runMarketLoop();
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${bg}"/><stop offset="55%" stop-color="#0b1020"/><stop offset="100%" stop-color="#111827"/></linearGradient>
-    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.95"/><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.85"/></linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/></filter>
-  </defs>
-  <rect width="1200" height="675" fill="url(#bgGrad)"/>
-  <g opacity="0.12">
-    <path d="M0 520 C180 460 280 570 440 500 S720 370 900 430 S1070 580 1200 500" fill="none" stroke="${color}" stroke-width="4"/>
-    <path d="M0 560 C220 480 310 625 520 530 S780 405 960 470 S1110 610 1200 555" fill="none" stroke="#8b5cf6" stroke-width="3"/>
-  </g>
-  <g opacity="0.16">
-    ${Array.from({ length: 18 }).map((_, i) => {
-      const x = 70 + i * 62; const open = 360 + Math.sin(i * 1.7) * 70; const close = open + Math.cos(i * 1.2) * 85;
-      const high = Math.min(open, close) - 55; const low = Math.max(open, close) + 55;
-      const candleColor = close < open ? '#0ecb81' : '#f6465d'; const y = Math.min(open, close); const h = Math.max(8, Math.abs(close - open));
-      return `<line x1="${x}" y1="${high}" x2="${x}" y2="${low}" stroke="${candleColor}" stroke-width="4"/><rect x="${x - 12}" y="${y}" width="24" height="${h}" rx="4" fill="${candleColor}"/>`;
-    }).join('')}
-  </g>
-  <rect x="55" y="45" width="1090" height="585" rx="34" fill="${panel}" opacity="0.94" filter="url(#softShadow)"/>
-  <rect x="55" y="45" width="1090" height="585" rx="34" fill="none" stroke="${grid}" stroke-width="2"/>
-  <rect x="55" y="45" width="1090" height="116" rx="34" fill="${panel2}"/>
-  <rect x="55" y="127" width="1090" height="34" fill="${panel2}"/>
-  <text x="92" y="103" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="900" fill="${white}">bluecrypto.ink</text>
-  <text x="92" y="134" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="800" fill="${muted}">Verified by Tensor Wallet</text>
-  <rect x="848" y="76" width="245" height="52" rx="18" fill="url(#accentGrad)"/>
-  <text x="970" y="110" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#fff">${escapeHtml(card.style.resultText)}</text>
-  <text x="92" y="230" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="950" fill="${white}">${escapeHtml(t.symbol)} / USDT</text>
-  <text x="96" y="272" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="${color}">${escapeHtml(sideText)}</text>
-  <text x="92" y="377" font-family="Inter, Arial, sans-serif" font-size="90" font-weight="950" fill="${color}">${escapeHtml(roiText)}</text>
-  <text x="96" y="418" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="850" fill="${muted}">Return on Investment</text>
-  <rect x="685" y="205" width="410" height="295" rx="26" fill="#0b1220" stroke="${grid}" stroke-width="2"/>
-  <text x="725" y="262" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">PNL</text>
-  <text x="1070" y="262" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="${color}">${escapeHtml(pnlText)}</text>
-  <text x="725" y="322" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Margin</text>
-  <text x="1070" y="322" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.margin, 2)}</text>
-  <text x="725" y="382" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Position Size</text>
-  <text x="1070" y="382" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.size, 2)}</text>
-  <text x="725" y="442" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Mark Price</text>
-  <text x="1070" y="442" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.markPrice)}</text>
-  <rect x="92" y="488" width="1003" height="1" fill="${grid}"/>
-  <text x="96" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Entry</text>
-  <text x="96" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.entryPrice)}</text>
-  <text x="335" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Close</text>
-  <text x="335" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.closePrice)}</text>
-  <text x="574" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Reason</text>
-  <text x="574" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">${escapeHtml(t.closeReason)}</text>
-  <text x="1095" y="598" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" fill="${muted}">Trade ID ${escapeHtml(String(t.id).slice(0, 18))}</text>
-  <text x="600" y="648" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850" fill="${muted}">${escapeHtml(watermark)} • ${escapeHtml(card.verificationText)}</text>
-</svg>`;
-}
+/* -------------------- Express Routes -------------------- */
 
-function renderTradePublicPage(card) {
-  const t = card.trade; const color = card.style.color;
-  const pnlText = `${t.pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(t.pnl), 2)}`;
-  const roiText = `${t.roi >= 0 ? '+' : ''}${formatMoney(t.roi, 2)}%`;
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(roiText)} | bluecrypto.ink</title>
-  <meta property="og:title" content="${escapeHtml(t.symbol)} Trade ${escapeHtml(roiText)} ROI"/>
-  <meta property="og:description" content="Verified by Tensor Wallet on bluecrypto.ink"/>
-  <meta property="og:image" content="${escapeHtml(card.links.image)}"/>
-  <meta property="og:type" content="website"/>
-  <style>
-    *{box-sizing:border-box} body{margin:0;background:#070a0f;color:#f8fafc;font-family:Inter,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:18px}
-    .wrap{width:min(980px,100%)} .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
-    .brand{font-weight:950;font-size:1.25rem} .verified{color:#94a3b8;font-weight:850;font-size:.86rem}
-    .card{border:1px solid #1f2937;background:#111827;border-radius:24px;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.45)}
-    img{width:100%;display:block;background:#070a0f} .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    a{color:white;text-decoration:none;background:#1f2937;border:1px solid #334155;border-radius:12px;padding:12px 14px;font-weight:900}
-    a.primary{background:${color};border-color:${color}}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-    .stat{background:#0b1220;border:1px solid #1f2937;border-radius:16px;padding:14px}
-    .label{color:#94a3b8;font-size:.75rem;font-weight:850} .value{font-size:1.05rem;font-weight:950;margin-top:6px}
-    @media(max-width:720px){.stats{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
-  </style>
-</head>
-<body>
-  <main class="wrap">
-    <div class="top"><div><div class="brand">bluecrypto.ink</div><div class="verified">Verified by Tensor Wallet</div></div><div style="font-weight:950;color:${color}">${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(t.leverage)}x</div></div>
-    <div class="card"><img src="${escapeHtml(card.links.image)}" alt="Verified trade card"/></div>
-    <div class="actions">
-      <a class="primary" href="${escapeHtml(card.links.download)}">Download Trade Image (PNG)</a>
-      <a href="${escapeHtml(card.links.image)}" target="_blank">Open Image</a>
-      <a href="/trading">Open Trading</a>
-    </div>
-    <section class="stats">
-      <div class="stat"><div class="label">ROI</div><div class="value" style="color:${color}">${escapeHtml(roiText)}</div></div>
-      <div class="stat"><div class="label">PNL</div><div class="value" style="color:${color}">${escapeHtml(pnlText)}</div></div>
-      <div class="stat"><div class="label">Mark Price</div><div class="value">$${formatPrice(t.markPrice)}</div></div>
-      <div class="stat"><div class="label">Position Size</div><div class="value">$${formatMoney(t.size, 2)}</div></div>
-    </section>
-  </main>
-</body>
-</html>`;
-}
-
-// Renders the Copy Profile Public Page
-function renderCopyProfilePage(profile) {
-  const pnlText = `${profile.totalPnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(profile.totalPnl), 2)}`;
-  const color = profile.totalPnl >= 0 ? '#0ecb81' : '#f6465d';
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Copy Trader: ${escapeHtml(profile.traderName)} | Tensor Wallet</title>
-  <style>
-    *{box-sizing:border-box} body{margin:0;background:#0b0e11;color:#f8fafc;font-family:Inter,Arial,sans-serif;min-height:100vh;padding:24px}
-    .wrap{max-width:800px;margin:0 auto}
-    .header{text-align:center;margin-bottom:30px} .header h1{margin:0 0 10px;font-size:2rem}
-    .stats{display:flex;gap:15px;justify-content:center;margin-bottom:30px}
-    .stat{background:#1e2329;border:1px solid #2b3139;border-radius:12px;padding:20px;text-align:center;flex:1}
-    .label{color:#848e9c;font-size:0.85rem;font-weight:700;margin-bottom:8px} .val{font-size:1.5rem;font-weight:900}
-    .pos-table{width:100%;border-collapse:collapse;margin-top:20px;background:#1e2329;border-radius:12px;overflow:hidden}
-    th,td{padding:15px;text-align:left;border-bottom:1px solid #2b3139} th{color:#848e9c;font-size:0.85rem}
-    .btn{display:inline-block;background:#8b5cf6;color:white;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:800;margin-top:20px}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="header">
-      <h1>Copy Trading Profile</h1>
-      <div style="color:#848e9c;font-weight:600">${escapeHtml(profile.traderName)}</div>
-    </div>
-    <div class="stats">
-      <div class="stat"><div class="label">Total PNL</div><div class="val" style="color:${color}">${pnlText}</div></div>
-      <div class="stat"><div class="label">Copiers</div><div class="val">${profile.followers}</div></div>
-      <div class="stat"><div class="label">Active Trades</div><div class="val">${profile.activePositions.length}</div></div>
-    </div>
-    <div style="text-align:center;"><a href="/trading" class="btn">Copy This Trader</a></div>
-    <h3 style="margin-top:40px">Active Positions</h3>
-    <table class="pos-table">
-      <thead><tr><th>Symbol</th><th>Side</th><th>Mark Price</th><th>ROI</th></tr></thead>
-      <tbody>
-        ${profile.activePositions.length ? profile.activePositions.map(p => `<tr><td><strong>${p.symbol}</strong></td><td>${p.side} ${p.leverage}x</td><td>$${formatPrice(p.markPrice)}</td><td style="color:${p.roi >= 0 ? '#0ecb81' : '#f6465d'}">${p.roi.toFixed(2)}%</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:#848e9c">No active positions.</td></tr>'}
-      </tbody>
-    </table>
-  </div>
-</body>
-</html>`;
-}
-
-/* -------------------- Page Routes -------------------- */
-
-app.get('/', (req, res) => res.render('index', { error: null, success: null, otpEmail: null }));
-app.get('/index.html', (req, res) => res.render('index', { error: null, success: null, otpEmail: null }));
-
-app.get('/wallet', requireAuth, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  res.render('wallet', { email: req.session.user.email, role: req.session.user.role, wallet: safeJsonForEjs(user) });
+// Auth Routes
+app.post('/api/auth/request-otp', async (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@')) return res.status(400).json({ error: 'Valid email required' });
+  
+  const otp = generateOtp();
+  saveOtp(email, otp);
+  const emailed = await sendOtpEmail(email, otp);
+  
+  res.json({ ok: true, message: emailed ? 'OTP sent via email' : 'OTP generated (Check console in dev)' });
 });
-app.get('/wallet.ejs', requireAuth, (req, res) => res.redirect('/wallet'));
+
+app.post('/api/auth/verify-otp', (req, res) => {
+  const { email, otp, adminOverride } = req.body;
+  
+  if (adminOverride === STAFF_PASSWORD && email === STAFF_USERNAME) {
+    const user = getOrCreateUser(email, 'staff');
+    req.session.user = user;
+    return res.json({ ok: true });
+  }
+
+  const result = verifyOtp(email, otp);
+  if (!result.ok) return res.status(400).json({ error: result.reason });
+
+  const user = getOrCreateUser(email, 'user');
+  req.session.user = user;
+  res.json({ ok: true });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ ok: true });
+});
+
+// View Routes
+app.get('/', (req, res) => {
+  if (req.session.user) return res.redirect('/trading');
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><title>Tensor Login</title><style>body{background:#0b0e11;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;} .card{background:#1e2329;padding:2rem;border-radius:8px;} input,button{width:100%;padding:10px;margin-bottom:10px;border-radius:4px;border:none;} button{background:#8b5cf6;color:#fff;font-weight:bold;cursor:pointer;}</style></head>
+    <body>
+      <div class="card">
+        <h2>Login / Register</h2>
+        <input type="email" id="email" placeholder="Email Address">
+        <button onclick="requestOtp()">Send Code</button>
+        <input type="text" id="otp" placeholder="6-digit Code" style="display:none;margin-top:10px;">
+        <button id="verifyBtn" style="display:none;" onclick="verifyOtp()">Verify & Login</button>
+      </div>
+      <script>
+        async function requestOtp() {
+          const email = document.getElementById('email').value;
+          const res = await fetch('/api/auth/request-otp', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email})});
+          const data = await res.json();
+          if(data.ok) { document.getElementById('otp').style.display='block'; document.getElementById('verifyBtn').style.display='block'; alert(data.message); }
+          else alert(data.error);
+        }
+        async function verifyOtp() {
+          const email = document.getElementById('email').value;
+          const otp = document.getElementById('otp').value;
+          const res = await fetch('/api/auth/verify-otp', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, otp})});
+          const data = await res.json();
+          if(data.ok) window.location.href='/trading'; else alert(data.error);
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
 
 app.get('/trading', requireAuth, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  res.render('trading', { email: req.session.user.email, role: req.session.user.role, wallet: safeJsonForEjs(user), treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES) });
-});
-app.get('/trading.ejs', requireAuth, (req, res) => res.redirect('/trading'));
-
-/* -------------------- Public Routes -------------------- */
-
-app.get('/trade/:id', (req, res) => {
   const db = readDb();
-  const card = db.publicTradeCards[req.params.id];
-  if (!card) return res.status(404).send('Trade card not found.');
-  res.set('Cache-Control', 'public, max-age=60');
-  res.send(renderTradePublicPage(card));
+  const user = db.users[req.session.user.email];
+  res.render('trading', { 
+    wallet: safeJsonForEjs(user),
+    treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES)
+  });
 });
 
-app.get('/trade/:id/image.svg', (req, res) => {
+app.get('/wallet', requireAuth, (req, res) => {
   const db = readDb();
-  const card = db.publicTradeCards[req.params.id];
-  if (!card) return res.status(404).send('Trade image not found.');
-  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-  res.setHeader('Cache-Control', 'public, max-age=3600');
-  res.send(renderTradeCardSvg(card));
-});
-
-app.get('/trade/:id/download', (req, res) => {
-  const db = readDb();
-  const card = db.publicTradeCards[req.params.id];
-  if (!card) return res.status(404).send('Trade image not found.');
-
-  const svgData = renderTradeCardSvg(card);
-  const filename = `bluecrypto-${card.trade.symbol}-${card.trade.side}-${card.id}.png`;
-
-  // Provide an HTML wrapper that auto-converts SVG to PNG and triggers download locally
-  res.send(`<!DOCTYPE html>
-<html>
-<head><title>Downloading Trade PNG...</title></head>
-<body style="background:#070a0f; color:#f8fafc; text-align:center; padding:50px; font-family:sans-serif;">
-  <h2>Generating PNG Download...</h2>
-  <div id="svgContainer" style="display:none;">${svgData}</div>
-  <canvas id="canvas" style="display:none;"></canvas>
-  <script>
-    window.onload = function() {
-      const svg = document.querySelector('#svgContainer svg');
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-      const data = (new XMLSerializer()).serializeToString(svg);
-      const DOMURL = window.URL || window.webkitURL || window;
-      const img = new Image();
-      const svgBlob = new Blob([data], {type: 'image/svg+xml;charset=utf-8'});
-      const url = DOMURL.createObjectURL(svgBlob);
-      img.onload = function () {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        DOMURL.revokeObjectURL(url);
-        const imgURI = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-        const a = document.createElement('a');
-        a.download = '${filename}';
-        a.href = imgURI;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        document.querySelector('h2').innerText = 'Download Complete! You can close this window.';
-      };
-      img.src = url;
-    };
-  </script>
-</body>
-</html>`);
-});
-
-app.get('/copy-profile/:id', (req, res) => {
-  const db = readDb();
-  const profile = db.copyProfiles[req.params.id];
-  if (!profile || !profile.isActive) return res.status(404).send('Copy Profile not found or inactive.');
+  const user = db.users[req.session.user.email];
   
-  // Aggregate fresh live stats for the public page
-  const user = db.users[profile.walletId];
-  if (user) {
-    profile.activePositions = user.positions.map(p => {
-      const token = db.tensorRegistry.find(t => t.id === p.tokenId);
-      const mark = token ? token.price : p.entryPrice;
-      const pnlRaw = p.side === 'long' ? (mark - p.entryPrice) : (p.entryPrice - mark);
-      const pnl = (pnlRaw / p.entryPrice) * p.size;
-      return { symbol: p.symbol, side: p.side, leverage: p.leverage, markPrice: mark, roi: p.margin > 0 ? (pnl / p.margin) * 100 : 0 };
-    });
-  }
+  const profiles = Object.values(db.copyProfiles).filter(p => p.active);
+  const copyProfiles = profiles.map(p => ({
+    traderName: p.traderName || 'Pro Trader',
+    roi: p.roi || 0,
+    winRate: p.winRate || 0,
+    copierCount: p.copierCount || 0,
+    strategyDesc: p.strategyDesc || 'Algorithmic Trading'
+  }));
+
+  res.render('wallet', { 
+    user,
+    copyProfiles,
+    usdtBalance: user.usdtBalance,
+    ousdBalance: user.ousdBalance
+  });
+});
+
+// API Routes
+app.get('/api/tensor', (req, res) => {
+  const db = readDb();
+  res.json({
+    registry: db.tensorRegistry,
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
+  });
+});
+
+app.get('/api/tensor/chart', (req, res) => {
+  const { tokenId } = req.query;
+  const db = readDb();
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+  const candles = tensorCandleHistory[tokenId] || [];
   
-  res.send(renderCopyProfilePage(profile));
+  res.json({
+    candles,
+    stats: token ? {
+      high24h: token.high24h,
+      low24h: token.low24h,
+      lifetimeHigh: token.lifetimeHigh,
+      changePercent24h: token.changePercent24h
+    } : null
+  });
 });
-
-/* -------------------- Auth Routes -------------------- */
-
-app.post('/send-otp', async (req, res) => {
-  try {
-    const email = normalizeEmail(req.body.email);
-    if (!email || !email.includes('@')) return res.render('index', { error: 'Enter a valid email.', success: null, otpEmail: null });
-    const otp = generateOtp();
-    saveOtp(email, otp);
-    const sent = await sendOtpEmail(email, otp);
-    res.render('index', { error: null, success: sent ? 'OTP sent. Check your inbox.' : 'DEV mode: OTP was printed in your server logs.', otpEmail: email });
-  } catch (err) {
-    res.render('index', { error: 'Could not send OTP. Check server email settings.', success: null, otpEmail: normalizeEmail(req.body.email) });
-  }
-});
-
-app.post('/verify-otp', (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  const otp = String(req.body.otp || '').trim();
-  const result = verifyOtp(email, otp);
-  if (!result.ok) return res.render('index', { error: result.reason, success: null, otpEmail: email });
-  const user = getOrCreateUser(email, 'user');
-  req.session.user = { email, username: email.split('@')[0], role: user.role, walletId: user.id };
-  req.session.save(() => res.redirect('/trading'));
-});
-
-app.post('/staff-login', (req, res) => {
-  const username = String(req.body.username || '').trim();
-  const password = String(req.body.password || '');
-  if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) return res.render('index', { error: 'Invalid staff login.', success: null, otpEmail: null });
-  const adminEmail = 'admin@tensorwallet.local';
-  const user = getOrCreateUser(adminEmail, 'staff');
-  req.session.user = { email: adminEmail, username: 'admin', role: 'staff', walletId: user.id };
-  req.session.save(() => res.redirect('/trading'));
-});
-
-app.get('/logout', (req, res) => { req.session.destroy(() => { res.clearCookie('tensorwallet.sid'); res.redirect('/index.html'); }); });
-app.post('/logout', (req, res) => res.redirect('/logout'));
-
-/* -------------------- Trading APIs & Copy Trading -------------------- */
 
 app.get('/api/trading/state', requireAuthJson, (req, res) => {
   const db = readDb();
-  const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
-
+  const user = db.users[req.session.user.email];
+  
   res.json({
-    usdtBalance: safeNumber(user.usdtBalance, 0),
-    ousdBalance: safeNumber(user.ousdBalance, 0),
-    usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
-    positions: user.positions || [],
-    orderHistory: user.orderHistory || [],
-    publicTradeCards: user.publicTradeCards || [],
-    tradeDeposits: user.tradeDeposits || [],
-    treasuryDestinations: TREASURY_USDT_ADDRESSES,
+    role: user.role,
+    usdtBalance: user.usdtBalance,
+    ousdBalance: user.ousdBalance,
+    usdtNetwork: user.usdtNetwork,
+    positions: user.positions,
+    orderHistory: user.orderHistory,
+    tradeDeposits: user.tradeDeposits,
+    publicTradeCards: user.publicTradeCards,
     copyState: {
       isCopyTrader: user.isCopyTrader,
       copyingTarget: user.copyingTarget,
       copyBalance: user.copyBalance,
       activeCopyTrades: user.activeCopyTrades
-    }
+    },
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
 
-// Copy Trading Admin Profile Management
+app.post('/api/trading/execute', requireAuthJson, (req, res) => {
+  const { tokenId, side, margin, leverage, marginMode, currency } = req.body;
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+
+  if (!token) return res.status(404).json({ error: 'Asset not found' });
+  if (!margin || margin <= 0) return res.status(400).json({ error: 'Invalid margin' });
+  
+  const mgn = Number(margin);
+  const lev = Number(leverage || 1);
+  const size = mgn * lev;
+  const curr = currency === 'OUSD' ? 'OUSD' : 'USDT';
+
+  if (curr === 'OUSD' && user.ousdBalance < mgn) return res.status(400).json({ error: 'Insufficient OUSD balance' });
+  if (curr === 'USDT' && user.usdtBalance < mgn) return res.status(400).json({ error: 'Insufficient USDT balance' });
+
+  if (curr === 'OUSD') {
+    user.ousdBalance -= mgn;
+  } else {
+    user.usdtBalance -= mgn;
+  }
+
+  const dest = getTreasuryDestination(user.usdtNetwork);
+  const depositRecord = {
+    id: makeId('dep'),
+    amount: mgn,
+    currency: curr,
+    network: dest.network,
+    destinationAddress: dest.address,
+    status: 'routed',
+    createdAt: nowIso()
+  };
+  
+  user.tradeDeposits.unshift(depositRecord);
+  db.treasury.tradeDeposits.push({ userEmail: user.email, ...depositRecord });
+  db.treasury.collectedFeesUsdt += (mgn * 0.001); // 0.1% simulated fee
+
+  const position = {
+    id: makeId('pos'),
+    tokenId: token.id,
+    symbol: token.symbol,
+    side,
+    margin: mgn,
+    leverage: lev,
+    size,
+    entryPrice: token.price,
+    markPrice: token.price,
+    marginMode: marginMode || 'cross',
+    currency: curr,
+    treasuryNetwork: dest.network,
+    treasuryAddress: dest.address,
+    openedAt: nowIso()
+  };
+
+  user.positions.unshift(position);
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    position,
+    usdtBalance: user.usdtBalance,
+    ousdBalance: user.ousdBalance,
+    usdtNetwork: dest.key,
+    treasuryDeposit: depositRecord
+  });
+});
+
+app.post('/api/trading/close', requireAuthJson, (req, res) => {
+  const { positionId } = req.body;
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  
+  const posIndex = user.positions.findIndex(p => p.id === positionId);
+  if (posIndex === -1) return res.status(404).json({ error: 'Position not found' });
+  
+  const pos = user.positions[posIndex];
+  const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
+  const currentPrice = token ? token.price : pos.entryPrice;
+  
+  const pnlRaw = pos.side === 'long' ? currentPrice - pos.entryPrice : pos.entryPrice - currentPrice;
+  const pnl = (pnlRaw / pos.entryPrice) * pos.size;
+  const roi = (pnl / pos.margin) * 100;
+  
+  const returnAmt = Math.max(0, pos.margin + pnl);
+
+  if (pos.currency === 'OUSD') {
+    user.ousdBalance += returnAmt;
+  } else if (pos.currency === 'COPY') {
+    user.copyBalance += returnAmt;
+  } else {
+    user.usdtBalance += returnAmt;
+  }
+
+  user.positions.splice(posIndex, 1);
+  
+  const historyRecord = {
+    ...pos,
+    closePrice: currentPrice,
+    markPrice: currentPrice,
+    pnl,
+    roi,
+    closeReason: 'Market Close',
+    closedAt: nowIso()
+  };
+  
+  user.orderHistory.unshift(historyRecord);
+  writeDb(db);
+  
+  res.json({
+    ok: true,
+    historyRecord,
+    usdtBalance: user.usdtBalance,
+    ousdBalance: user.ousdBalance
+  });
+});
+
+app.post('/api/trading/share', requireAuthJson, (req, res) => {
+  const { historyId } = req.body;
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  
+  const history = user.orderHistory.find(h => h.id === historyId);
+  if (!history) return res.status(404).json({ error: 'Trade not found' });
+
+  const shareId = makePublicId();
+  const shareRecord = {
+    id: shareId,
+    tradeId: history.id,
+    page: `${getBaseUrl(req)}/t/${shareId}`,
+    image: `${getBaseUrl(req)}/api/og/${shareId}`,
+    createdAt: Date.now()
+  };
+
+  user.publicTradeCards.unshift(shareRecord);
+  db.publicTradeCards[shareId] = { ...shareRecord, data: history, userEmail: user.email };
+  writeDb(db);
+
+  res.json({ ok: true, ...shareRecord });
+});
+
+// Copy Trading Routes
 app.get('/api/trading/copy-profiles', requireAuthJson, (req, res) => {
   const db = readDb();
-  const profiles = Object.values(db.copyProfiles).filter(p => p.isActive);
+  const profiles = Object.values(db.copyProfiles).filter(p => p.active).map(p => ({
+    walletId: p.walletId,
+    traderName: p.traderName,
+    followers: p.copierCount,
+    totalPnl: p.roi * 100, // mock PnL based on ROI
+    link: `/u/${p.walletId}`
+  }));
   res.json({ ok: true, profiles });
 });
 
 app.post('/api/trading/copy-profile/toggle', requireAdminJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email];
+  
   user.isCopyTrader = !user.isCopyTrader;
   
   if (user.isCopyTrader) {
     db.copyProfiles[user.id] = {
       walletId: user.id,
-      traderName: user.email.split('@')[0],
-      isActive: true,
-      followers: 0,
-      totalPnl: 0,
-      link: `${getBaseUrl(req)}/copy-profile/${user.id}`
+      traderName: 'Admin Master Profile',
+      roi: 142.50,
+      winRate: 71.2,
+      copierCount: 1204,
+      strategyDesc: "Momentum & Volatility Arbitrage",
+      active: true
     };
   } else {
-    if (db.copyProfiles[user.id]) db.copyProfiles[user.id].isActive = false;
+    if (db.copyProfiles[user.id]) db.copyProfiles[user.id].active = false;
   }
   
   writeDb(db);
-  res.json({ ok: true, isCopyTrader: user.isCopyTrader, profile: db.copyProfiles[user.id] });
+  res.json({ ok: true, isCopyTrader: user.isCopyTrader });
 });
 
 app.post('/api/trading/copy/start', requireAuthJson, (req, res) => {
-  const { targetWalletId, amount, currency } = req.body; // currency can be USDT or OUSD
+  const { targetWalletId, amount, currency } = req.body;
   const db = readDb();
   const user = db.users[req.session.user.email];
-  const target = db.users[Object.keys(db.users).find(k => db.users[k].id === targetWalletId)];
 
-  if (!target || !target.isCopyTrader) return res.status(404).json({ error: 'Copy profile not found.' });
-  if (user.copyingTarget) return res.status(400).json({ error: 'You are already copying a trader.' });
-  
-  const m = safeNumber(amount, 0);
-  if (m <= 0) return res.status(400).json({ error: 'Invalid amount.' });
+  if (user.copyingTarget) return res.status(400).json({ error: 'Already copying a trader' });
+  if (amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
 
-  const useOusd = String(currency).toUpperCase() === 'OUSD';
-  if (useOusd) {
-    if (user.ousdBalance < m) return res.status(400).json({ error: 'Insufficient OUSD balance.' });
-    user.ousdBalance -= m;
-  } else {
-    if (user.usdtBalance < m) return res.status(400).json({ error: 'Insufficient USDT balance.' });
-    user.usdtBalance -= m;
-  }
+  const curr = currency === 'OUSD' ? 'OUSD' : 'USDT';
+  if (curr === 'OUSD' && user.ousdBalance < amount) return res.status(400).json({ error: 'Insufficient OUSD' });
+  if (curr === 'USDT' && user.usdtBalance < amount) return res.status(400).json({ error: 'Insufficient USDT' });
+
+  if (curr === 'OUSD') user.ousdBalance -= amount;
+  else user.usdtBalance -= amount;
 
   user.copyingTarget = targetWalletId;
-  user.copyBalance = m;
+  user.copyBalance = amount;
   user.activeCopyTrades = [];
 
-  // Register Follower
-  if (db.copyProfiles[targetWalletId]) db.copyProfiles[targetWalletId].followers += 1;
-
-  // Log Treasury Transfer for Exchange & Routing (Enforcing SOL routing 9prrQtQxzdt5Kt7nPHUxwWAVQLZATrj2bjU27k5Xkt5i)
-  const treasuryDeposit = buildTreasuryDeposit({
-    user, token: null, margin: m, leverage: 1, side: 'copy', marginMode: 'cross', network: 'sol',
-    forceAddress: '9prrQtQxzdt5Kt7nPHUxwWAVQLZATrj2bjU27k5Xkt5i',
-    noteOverride: `Exchange ${useOusd?'OUSD':'USDT'} to SOL for Copy Trading routing.`
-  });
-  
-  user.tradeDeposits.unshift(treasuryDeposit);
-  db.treasury.tradeDeposits.unshift(treasuryDeposit);
+  if (db.copyProfiles[targetWalletId]) {
+    db.copyProfiles[targetWalletId].copierCount += 1;
+  }
 
   writeDb(db);
-  res.json({ ok: true, copyBalance: user.copyBalance, treasuryDeposit });
+  res.json({ ok: true, copyBalance: user.copyBalance });
 });
 
 app.post('/api/trading/copy/stop', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email];
 
-  if (!user.copyingTarget) return res.status(400).json({ error: 'Not currently copying anyone.' });
-  
-  const targetId = user.copyingTarget;
-  if (db.copyProfiles[targetId]) db.copyProfiles[targetId].followers = Math.max(0, db.copyProfiles[targetId].followers - 1);
+  if (!user.copyingTarget) return res.status(400).json({ error: 'Not currently copying' });
 
-  // Return remaining funds to USDT balance
-  user.usdtBalance += user.copyBalance;
-  user.copyingTarget = null;
+  if (db.copyProfiles[user.copyingTarget]) {
+    db.copyProfiles[user.copyingTarget].copierCount = Math.max(0, db.copyProfiles[user.copyingTarget].copierCount - 1);
+  }
+
+  user.usdtBalance += user.copyBalance; // Default return to USDT for simplicity, logic can be expanded
   user.copyBalance = 0;
-  
+  user.copyingTarget = null;
+  user.activeCopyTrades = [];
+
   writeDb(db);
   res.json({ ok: true, usdtBalance: user.usdtBalance });
 });
 
-app.post('/api/trading/execute', requireAuthJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const side = String(req.body.side || '').toLowerCase();
-  const margin = safeNumber(req.body.margin, 0);
-  const leverage = safeNumber(req.body.leverage, 1);
-  const marginMode = String(req.body.marginMode || 'cross').toLowerCase() === 'isolated' ? 'isolated' : 'cross';
-  const currency = String(req.body.currency || 'USDT').toUpperCase(); // Supports OUSD
-
-  if (!tokenId || !['long', 'short'].includes(side)) return res.status(400).json({ error: 'Invalid trade side or asset.' });
-  if (margin <= 0 || leverage < 1 || leverage > 150) return res.status(400).json({ error: 'Invalid margin or leverage.' });
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-  if (!token) return res.status(404).json({ error: 'Asset not found.' });
-
-  const isOusd = currency === 'OUSD';
-  if (isOusd) {
-    if (safeNumber(user.ousdBalance, 0) < margin) return res.status(400).json({ error: 'Insufficient OUSD balance.' });
-    user.ousdBalance -= margin;
-  } else {
-    if (safeNumber(user.usdtBalance, 0) < margin) return res.status(400).json({ error: 'Insufficient USDT balance.' });
-    user.usdtBalance -= margin;
-  }
-
-  const automaticNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
-  const treasuryDeposit = buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode, network: automaticNetwork });
-
-  user.usdtNetwork = automaticNetwork;
-
-  const position = {
-    id: makeId('pos'), tokenId: token.id, symbol: token.symbol, side, margin, leverage, marginMode,
-    size: margin * leverage, entryPrice: token.price, markPrice: token.price,
-    openedAt: Date.now(), openedAtIso: nowIso(), currency,
-    treasuryDepositId: treasuryDeposit.id, treasuryTxHash: treasuryDeposit.txHash,
-    treasuryNetwork: treasuryDeposit.destinationNetwork, treasuryAddress: treasuryDeposit.destinationAddress
-  };
-
-  user.positions.unshift(position);
-  user.tradeDeposits.unshift(treasuryDeposit);
-  db.treasury.tradeDeposits.unshift(treasuryDeposit);
-
-  // Copy Trading Engine: Mirror trade to followers
-  if (user.isCopyTrader) {
-    Object.values(db.users).forEach(follower => {
-      if (follower.copyingTarget === user.id && follower.copyBalance > 0) {
-        // Calculate proportional margin based on a simplified fixed 10% allocation per trade (adjustable)
-        const mirrorMargin = Math.min(follower.copyBalance, follower.copyBalance * 0.10);
-        if (mirrorMargin < 1) return; // Ignore dust trades
-        
-        follower.copyBalance -= mirrorMargin;
-        const mirrorPos = {
-          ...position,
-          id: makeId('pos'),
-          parentPositionId: position.id,
-          margin: mirrorMargin,
-          size: mirrorMargin * leverage,
-          currency: 'COPY'
-        };
-        follower.positions.unshift(mirrorPos);
-        follower.activeCopyTrades.unshift(mirrorPos);
-      }
-    });
-  }
-
-  user.updatedAt = nowIso();
-  writeDb(db);
-
-  res.json({
-    ok: true, position, usdtBalance: user.usdtBalance, ousdBalance: user.ousdBalance,
-    usdtNetwork: automaticNetwork, treasuryDeposit,
-    treasuryDestination: { network: treasuryDeposit.destinationNetwork, address: treasuryDeposit.destinationAddress, symbol: treasuryDeposit.destinationSymbol }
-  });
-});
-
-app.post('/api/trading/close', requireAuthJson, (req, res) => {
-  const positionId = String(req.body.positionId || '');
-  if (!positionId) return res.status(400).json({ error: 'Missing position ID.' });
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-
-  const posIdx = user.positions.findIndex(p => String(p.id) === positionId);
-  if (posIdx === -1) return res.status(404).json({ error: 'Position not found.' });
-
-  const pos = user.positions[posIdx];
-  const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
-  const currentPrice = token ? token.price : pos.entryPrice;
-  const pnl = calculatePnl(pos, currentPrice);
-  const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
-
-  if (pos.currency === 'OUSD') {
-    user.ousdBalance = safeNumber(user.ousdBalance, 0) + safeNumber(pos.margin, 0) + pnl;
-  } else if (pos.currency === 'COPY') {
-    user.copyBalance = safeNumber(user.copyBalance, 0) + safeNumber(pos.margin, 0) + pnl;
-  } else {
-    user.usdtBalance = safeNumber(user.usdtBalance, 0) + safeNumber(pos.margin, 0) + pnl;
-  }
-
-  user.positions.splice(posIdx, 1);
-
-  const historyRecord = {
-    ...pos, closePrice: currentPrice, markPrice: currentPrice, pnl, roi,
-    closedAt: Date.now(), closedAtIso: nowIso(), closeReason: 'Market Close'
-  };
-
-  user.orderHistory.unshift(historyRecord);
-  user.orderHistory = user.orderHistory.slice(0, 100);
-  user.updatedAt = nowIso();
-
-  // If Admin copy trader closed, close all mirrored trades for followers
-  if (user.isCopyTrader) {
-    if(db.copyProfiles[user.id]) db.copyProfiles[user.id].totalPnl += pnl; // Record admin performance
-    
-    Object.values(db.users).forEach(follower => {
-      if (follower.copyingTarget === user.id) {
-        const followerPosIdx = follower.positions.findIndex(p => p.parentPositionId === positionId);
-        if (followerPosIdx !== -1) {
-          const fPos = follower.positions[followerPosIdx];
-          const fPnl = calculatePnl(fPos, currentPrice);
-          const fRoi = fPos.margin > 0 ? (fPnl / fPos.margin) * 100 : 0;
-          follower.copyBalance += (fPos.margin + fPnl);
-          follower.positions.splice(followerPosIdx, 1);
-          follower.activeCopyTrades = follower.activeCopyTrades.filter(t => t.id !== fPos.id);
-          follower.orderHistory.unshift({
-            ...fPos, closePrice: currentPrice, markPrice: currentPrice, pnl: fPnl, roi: fRoi,
-            closedAt: Date.now(), closedAtIso: nowIso(), closeReason: 'Master Close'
-          });
-        }
-      }
-    });
-  }
-
-  const publicCard = buildTradeCardPayload({ req, db, user, trade: historyRecord });
-  writeDb(db);
-
-  res.json({
-    ok: true, usdtBalance: user.usdtBalance, ousdBalance: user.ousdBalance, pnl, roi, historyRecord,
-    publicTradeCard: publicCard, shareUrl: publicCard.links.page, imageUrl: publicCard.links.image, downloadUrl: publicCard.links.download
-  });
-});
-
-app.post('/api/trading/share', requireAuthJson, (req, res) => {
-  const historyId = String(req.body.historyId || req.body.tradeId || '');
-  if (!historyId) return res.status(400).json({ error: 'Missing history trade ID.' });
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-
-  const trade = user.orderHistory.find(t => String(t.id) === historyId);
-  if (!trade) return res.status(404).json({ error: 'Trade history not found.' });
-
-  const publicCard = buildTradeCardPayload({ req, db, user, trade });
-  user.updatedAt = nowIso();
-  writeDb(db);
-
-  res.json({ ok: true, publicTradeCard: publicCard, shareUrl: publicCard.links.page, imageUrl: publicCard.links.image, downloadUrl: publicCard.links.download });
-});
-
-/* -------------------- Wallet APIs -------------------- */
-
-app.get('/api/wallet', requireAuthJson, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
-  res.json({ ...user, usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)), treasuryDestinations: TREASURY_USDT_ADDRESSES });
-});
-
-app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-  if (!req.body.encryptedVault) return res.status(400).json({ error: 'No vault data provided.' });
-
-  user.encryptedVault = req.body.encryptedVault;
-  user.publicWallets = Array.isArray(req.body.publicWallets) ? req.body.publicWallets : [];
-  user.updatedAt = nowIso();
-  writeDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/wallet/usdt-network', requireAuthJson, (req, res) => {
-  const network = normalizeNetwork(req.body.network || req.body.usdtNetwork || '');
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-
-  user.usdtNetwork = network;
-  user.updatedAt = nowIso();
-  writeDb(db);
-
-  res.json({ ok: true, usdtNetwork: network, treasuryDestination: getTreasuryDestination(network) });
-});
-
-app.post('/api/wallet/send', requireAuthJson, (req, res) => {
-  const network = String(req.body.network || '').trim();
-  const asset = String(req.body.asset || '').trim();
-  const amount = safeNumber(req.body.amount, 0);
-  const toAddress = String(req.body.toAddress || '').trim();
-
-  if (!network || !asset || amount <= 0 || !toAddress) return res.status(400).json({ error: 'Invalid request.' });
-  res.json({ ok: true, txHash: `0x${crypto.randomBytes(32).toString('hex')}`, status: 'demo-sent' });
-});
-
-/* -------------------- Tensor APIs -------------------- */
-
-app.get('/api/tensor', requireAuthJson, async (req, res) => {
-  try {
-    await syncRealCryptoPrices();
-    const db = readDb();
-    const user = db.users[req.session.user.email];
-
-    db.tensorRegistry.forEach(token => {
-      const oldPrice = token.price;
-      const mappedSymbol = REAL_SYMBOL_MAP[String(token.symbol || '').toUpperCase()];
-      const real = mappedSymbol ? latestRealPrices[mappedSymbol] : null;
-
-      if (real && real.price > 0) {
-        token.bias = 'real'; token.price = real.price; token.volume = real.volume || token.volume || 0;
-        token.changePercent24h = real.changePercent || 0; token.high24h = real.high || token.price;
-        token.low24h = real.low || token.price; token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
-        token.marketCap = token.price * token.supply;
-        pushLiveCandle(token, oldPrice);
-      } else {
-        initializeCandlesForToken(token.id, token.price);
-        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
-      }
-    });
-
-    writeDb(db);
-    res.json({
-      registry: db.tensorRegistry, address: user.tensorAddress, balances: user.tensorBalances || {},
-      syncedAt: Date.now(), treasury: req.session.user.role === 'staff' ? db.treasury : undefined, treasuryDestinations: TREASURY_USDT_ADDRESSES
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Could not load tensor registry.' });
-  }
-});
-
-app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
-  const tokenId = String(req.query.tokenId || '');
-  if (!tokenId) return res.json({ candles: [] });
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-  if (!token) return res.json({ candles: [] });
-
-  initializeCandlesForToken(token.id, token.price);
-  res.json({
-    baseTimeframe: '5m', supportedTimeframes: ['5m', '15m', '30m', '1h'],
-    candles: tensorCandleHistory[token.id] || [],
-    stats: { high24h: token.high24h, low24h: token.low24h, lifetimeHigh: token.lifetimeHigh, markPrice: token.price, changePercent24h: token.changePercent24h }
-  });
-});
-
-app.get('/api/live-prices', requireAuthJson, async (req, res) => {
-  try {
-    await syncRealCryptoPrices(true);
-    res.json({ ok: true, prices: latestRealPrices, syncedAt: lastRealPriceSync });
-  } catch {
-    res.status(500).json({ ok: false, error: 'Could not load live prices.' });
-  }
-});
-
-app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  if (!user) return res.status(401).json({ error: 'User not found.' });
-  if (!req.body.tensorVault) return res.status(400).json({ error: 'No Tensor vault data provided.' });
-
-  user.tensorVault = req.body.tensorVault;
-  user.updatedAt = nowIso();
-  writeDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
-  const name = String(req.body.name || '').trim();
-  const symbol = String(req.body.symbol || '').trim().toUpperCase();
-  const price = safeNumber(req.body.price, 0);
-  const bias = String(req.body.bias || 'balanced').trim();
-  const bullChance = safeNumber(req.body.bullChance, 50);
-  const minPct = safeNumber(req.body.minPct, 0.1) / 100;
-  const maxPct = safeNumber(req.body.maxPct, 0.5) / 100;
-  const icon = String(req.body.icon || symbol.slice(0, 1) || 'T').trim();
-  const supply = safeNumber(req.body.supply, 10000000);
-
-  if (!name || !symbol || price <= 0 || supply <= 0) return res.status(400).json({ error: 'Missing or invalid token parameters.' });
-
-  const db = readDb();
-  const id = `T0x${crypto.randomBytes(20).toString('hex')}`;
-
-  const token = {
-    id, name, symbol, price, startPrice: price, bias, bullChance: Math.max(0, Math.min(100, bullChance)),
-    minPct: Math.max(0, minPct), maxPct: Math.max(minPct, maxPct), icon, supply, marketCap: price * supply,
-    volume: 0, dominance: 0, changePercent24h: 0, high24h: price, low24h: price, lifetimeHigh: price
-  };
-
-  db.tensorRegistry.push(token);
-  writeDb(db);
-  initializeCandlesForToken(id, price);
-  res.json({ ok: true, id, token });
-});
-
-app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === req.params.id);
-  if (!token) return res.status(404).json({ error: 'Token not found.' });
-
-  if (req.body.name !== undefined) token.name = String(req.body.name || token.name);
-  if (req.body.symbol !== undefined) token.symbol = String(req.body.symbol || token.symbol).toUpperCase();
-  if (req.body.icon !== undefined) token.icon = String(req.body.icon || token.icon);
-  if (req.body.bias !== undefined) token.bias = String(req.body.bias || token.bias);
-  if (req.body.price !== undefined) token.price = Math.max(0.000001, safeNumber(req.body.price, token.price));
-  if (req.body.startPrice !== undefined) token.startPrice = Math.max(0.000001, safeNumber(req.body.startPrice, token.startPrice));
-  if (req.body.bullChance !== undefined) token.bullChance = Math.max(0, Math.min(100, safeNumber(req.body.bullChance, token.bullChance)));
-  if (req.body.minPct !== undefined) token.minPct = Math.max(0, safeNumber(req.body.minPct, token.minPct * 100) / 100);
-  if (req.body.maxPct !== undefined) token.maxPct = Math.max(token.minPct, safeNumber(req.body.maxPct, token.maxPct * 100) / 100);
-  if (req.body.supply !== undefined) token.supply = Math.max(1, safeNumber(req.body.supply, token.supply));
-
-  token.marketCap = token.price * token.supply;
-  token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
-
-  writeDb(db);
-  initializeCandlesForToken(token.id, token.price);
-  res.json({ ok: true, token });
-});
-
-app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const index = db.tensorRegistry.findIndex(t => t.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Token not found.' });
-
-  db.tensorRegistry.splice(index, 1);
-  delete tensorCandleHistory[req.params.id];
-
-  Object.values(db.users).forEach(user => {
-    if (user.tensorBalances) delete user.tensorBalances[req.params.id];
-    if (Array.isArray(user.positions)) user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
-  });
-
-  writeDb(db);
-  res.json({ ok: true });
-});
-
-app.post('/api/tensor/admin-mint', requireAdminJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const amount = safeNumber(req.body.amount, 0);
-  if (!tokenId || amount <= 0) return res.status(400).json({ error: 'Invalid parameters.' });
-
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-  if (!token) return res.status(404).json({ error: 'Token not found.' });
-
-  const user = db.users[req.session.user.email];
-  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + amount;
-  user.updatedAt = nowIso();
-  writeDb(db);
-  res.json({ ok: true, newBalance: user.tensorBalances[tokenId] });
-});
-
-app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const spend = safeNumber(req.body.usdtAmount, 0);
-  if (!tokenId || spend <= 0) return res.status(400).json({ error: 'Invalid payload.' });
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-  if (!token) return res.status(404).json({ error: 'Token missing.' });
-  if (safeNumber(user.usdtBalance, 0) < spend) return res.status(400).json({ error: 'Insufficient USDT balance.' });
-
-  const feeRate = 0.000001;
-  const feeAmount = spend * feeRate;
-  const netSpend = spend - feeAmount;
-  db.treasury.collectedFeesUsdt = safeNumber(db.treasury.collectedFeesUsdt, 0) + feeAmount;
-
-  let priceImpact = 0;
-  if (token.bias !== 'pegged' && token.bias !== 'real') {
-    const marketCap = Math.max(100, safeNumber(token.marketCap, token.price * token.supply));
-    const impactMultiplier = netSpend / marketCap;
-    priceImpact = Math.min(0.5, impactMultiplier * 0.8);
-  }
-
-  const originalPrice = token.price;
-  const executionPrice = originalPrice * (1 + priceImpact / 2);
-  const received = netSpend / executionPrice;
-
-  user.usdtBalance -= spend;
-  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + received;
-
-  if (token.bias !== 'pegged' && token.bias !== 'real') {
-    token.price = Math.max(0.000001, originalPrice * (1 + priceImpact));
-    token.marketCap = token.price * token.supply;
-    token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
-  }
-
-  token.volume = safeNumber(token.volume, 0) + spend;
-  pushLiveCandle(token, originalPrice);
-  user.updatedAt = nowIso();
-  writeDb(db);
-
-  res.json({ ok: true, received, impactPercent: Number((priceImpact * 100).toFixed(4)), feePaid: feeAmount, usdtBalance: user.usdtBalance });
-});
-
-app.post('/api/tensor/send', requireAuthJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const amount = safeNumber(req.body.amount, 0);
-  const toAddress = String(req.body.toAddress || '').trim();
-
-  if (!tokenId || amount <= 0 || !toAddress) return res.status(400).json({ error: 'Invalid parameters.' });
-
-  const db = readDb();
-  const sender = db.users[req.session.user.email];
-  if (safeNumber(sender.tensorBalances[tokenId], 0) < amount) return res.status(400).json({ error: 'Insufficient balance.' });
-
-  const recipientEmail = Object.keys(db.users).find(email => db.users[email].tensorAddress === toAddress);
-  if (!recipientEmail) return res.status(404).json({ error: 'Recipient not found.' });
-
-  const recipient = db.users[recipientEmail];
-  sender.tensorBalances[tokenId] -= amount;
-  recipient.tensorBalances[tokenId] = safeNumber(recipient.tensorBalances[tokenId], 0) + amount;
-  sender.updatedAt = nowIso();
-  recipient.updatedAt = nowIso();
-  writeDb(db);
-
-  res.json({ ok: true });
-});
-
-/* -------------------- Standard Market APIs -------------------- */
-
-app.get('/api/prices', requireAuthJson, async (req, res) => {
-  try {
-    const ids = String(req.query.ids || '').split(',').map(s => s.trim()).filter(Boolean);
-    if (!ids.length) return res.json({});
-    const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(ids.join(','))}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`;
-    const data = await cachedJson(`cg-prices:${ids.join(',')}`, 5000, () => fetchJsonWithTimeout(url, {}, 8000));
-    res.json(data);
-  } catch (err) {
-    res.json({});
-  }
-});
-
-/* -------------------- Health / Fallback -------------------- */
-
-app.get('/health', (req, res) => {
-  res.json({
-    ok: true, uptime: process.uptime(), startupPage: '/index.html',
-    pages: { index: '/ or /index.html', wallet: '/wallet', trading: '/trading', publicTrade: '/trade/:id', publicTradeImage: '/trade/:id/image.svg' },
-    candleBase: '5m', supportedChartTimeframes: ['5m', '15m', '30m', '1h'], treasuryDestinations: TREASURY_USDT_ADDRESSES,
-    dataDir: DATA_DIR, dbPath: DB_PATH, dbExists: fs.existsSync(DB_PATH), lastRealPriceSync, realPriceCount: Object.keys(latestRealPrices).length
-  });
-});
+/* -------------------- Boot -------------------- */
 
 app.use((req, res) => {
-  if (req.path.startsWith('/api')) return res.status(404).json({ error: 'API route not found.' });
-  return res.redirect('/index.html');
+  res.status(404).send('404: Route not found');
 });
 
-/* -------------------- Startup -------------------- */
-
-ensureDb();
-hydrateAllCandles();
-
-syncRealCryptoPrices(true).then(() => runMarketLoop()).catch(() => runMarketLoop());
-
-setInterval(() => { runMarketLoop(); }, MARKET_LOOP_MS);
-
 app.listen(PORT, () => {
-  console.log(`Tensor Wallet running on port ${PORT}`);
-  console.log(`Startup page: /index.html -> views/index.ejs`);
-  console.log(`Wallet page: /wallet -> views/wallet.ejs`);
-  console.log(`Trading page: /trading -> views/trading.ejs`);
-  console.log(`Chart base candles: 5m`);
-  console.log(`Supported chart timeframes: 5m, 15m, 30m, 1h`);
-  console.log(`Public trade page: /trade/:id`);
-  console.log(`Public trade image: /trade/:id/image.svg`);
-  console.log(`Data directory: ${DATA_DIR}`);
-  console.log(`Database path: ${DB_PATH}`);
+  console.log(`🚀 Tensor Engine running on port ${PORT}`);
+  console.log(`📂 Data directory: ${DATA_DIR}`);
 });
