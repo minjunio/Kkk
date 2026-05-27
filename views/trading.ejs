@@ -13,7 +13,6 @@
 
   <style>
     :root {
-      /* Deep Binance-style Dark Mode by Default */
       --bg-base: #0b0e11;
       --bg-panel: #1e2329;
       --bg-hover: #2b3139;
@@ -21,7 +20,6 @@
       --text-muted: #848E9C;
       --border: #2b3139;
       
-      /* Vibrant Exchange Colors */
       --green: #0ecb81;
       --green-glow: rgba(14, 203, 129, 0.15);
       --red: #f6465d;
@@ -42,7 +40,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; min-height: 100vh; background: var(--bg-base); color: var(--text-main); padding-bottom: 100px; font-variant-numeric: tabular-nums; }
+    html, body { width: 100%; height: 100%; background: var(--bg-base); color: var(--text-main); font-variant-numeric: tabular-nums; overflow-x: hidden; }
     button, input { font: inherit; outline: none; border: none; background: transparent; }
     button { cursor: pointer; transition: 0.1s ease; }
     button:active { transform: scale(0.98); }
@@ -56,181 +54,168 @@
     .mode-switch button.active { background: var(--bg-panel); color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
     
     /* Asset Strip */
-    .market-strip-container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 12px 16px 0; }
+    .market-strip-container { width: 100%; padding: 8px 12px 0; background: var(--bg-base); }
     .market-strip { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 8px; }
     .market-strip::-webkit-scrollbar { display: none; }
-    .market-card { flex: 0 0 auto; min-width: 140px; scroll-snap-align: start; padding: 10px 14px; border-radius: 8px; background: var(--bg-panel); border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-    .market-card:hover { background: var(--bg-hover); }
+    .market-card { flex: 0 0 auto; min-width: 130px; scroll-snap-align: start; padding: 8px 12px; border-radius: 6px; background: var(--bg-panel); border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
     .market-card.active { border-color: var(--tensor); background: rgba(139,92,246,0.08); }
     
-    .shell { width: 100%; max-width: 1400px; margin: 0 auto; padding: 8px 16px; display: grid; gap: 16px; }
-    @media (min-width: 1024px) { .shell { grid-template-columns: 1fr 340px; align-items: start; } }
+    /* Layout */
+    .shell { width: 100%; padding: 8px 12px calc(80px + var(--safe-bottom)); display: grid; gap: 12px; }
+    @media (min-width: 1024px) { 
+      .shell { grid-template-columns: 1fr 320px; align-items: start; max-width: 1600px; margin: 0 auto; padding-bottom: 12px; } 
+    }
 
-    .panel { border-radius: 8px; padding: 16px; background: var(--bg-panel); border: 1px solid var(--border); }
+    .panel { border-radius: 6px; padding: 12px; background: var(--bg-panel); border: 1px solid var(--border); }
     
-    /* Dramatic Flash Animations */
-    @keyframes flashGreen { 0% { background: var(--green-glow); color: var(--green); transform: scale(1.02); } 100% { background: transparent; transform: scale(1); } }
-    @keyframes flashRed { 0% { background: var(--red-glow); color: var(--red); transform: scale(1.02); } 100% { background: transparent; transform: scale(1); } }
-    .flash-up { animation: flashGreen 0.4s ease-out; }
-    .flash-down { animation: flashRed 0.4s ease-out; }
-
     /* Chart UI */
-    .chart-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
-    .chart-title { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 12px; }
-    .chart-price { font-size: 1.3rem; font-weight: 900; border-radius: 4px; padding: 2px 6px; transition: 0.2s; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+    .chart-title { font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .chart-price { font-size: 1.2rem; font-weight: 900; transition: color 0.2s; }
     
-    .chart-wrapper { width: 100%; height: 500px; background: var(--bg-base); border-radius: 4px; border: 1px solid var(--border); overflow: hidden; margin-top: 8px; }
+    /* Dynamic Screen Fit Chart */
+    .chart-wrapper { width: 100%; height: 45vh; min-height: 300px; max-height: 500px; background: var(--bg-base); border-radius: 4px; border: 1px solid var(--border); overflow: hidden; }
     
     .pill-toggle { display: flex; background: var(--bg-base); border-radius: 4px; padding: 2px; }
-    .pill-toggle button { padding: 4px 12px; border-radius: 3px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
+    .pill-toggle button { padding: 4px 10px; border-radius: 3px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
     .pill-toggle button.active { background: var(--bg-panel); color: var(--text-main); }
 
-    /* Order Entry - Binance Style */
-    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    
-    .margin-mode { display: flex; gap: 4px; background: var(--bg-base); padding: 3px; border-radius: 4px; }
-    .margin-mode button { padding: 6px 14px; font-size: 0.8rem; font-weight: 800; color: var(--text-muted); border-radius: 3px; }
-    .margin-mode button.active { background: var(--bg-hover); color: var(--text-main); }
-
-    .avail-balance { text-align: right; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; }
-    
-    .input-box { display: flex; align-items: center; background: var(--bg-base); border-radius: 4px; border: 1px solid var(--border); padding: 0 12px; height: 42px; margin-bottom: 16px; transition: 0.2s; }
-    .input-box:focus-within { border-color: var(--tensor); }
-    .input-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; width: 45px; }
-    .input-box input { flex: 1; height: 100%; color: var(--text-main); font-weight: 800; font-size: 1rem; text-align: right; padding: 0 8px; }
-    .input-suffix { color: var(--text-main); font-size: 0.8rem; font-weight: 700; }
-
-    /* Compact Leverage */
-    .leverage-bar { margin-bottom: 20px; }
-    .lev-top { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; }
-    .slider { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: var(--border); outline: none; margin-bottom: 10px; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 2px; background: var(--text-main); cursor: pointer; }
-    .lev-marks { display: flex; justify-content: space-between; }
-    .lev-marks span { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; cursor: pointer; }
-    .lev-marks span:hover { color: var(--text-main); }
-
-    /* Execution Info */
-    .metrics { display: grid; gap: 8px; margin-bottom: 16px; font-size: 0.75rem; color: var(--text-muted); }
-    .metrics-row { display: flex; justify-content: space-between; }
-    .metrics-val { font-weight: 800; color: var(--text-main); }
-    .metrics-val.highlight { color: var(--orange); }
-
-    .trade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .btn-long, .btn-short { height: 44px; border-radius: 4px; font-weight: 800; font-size: 0.95rem; color: white; }
-    .btn-long { background: var(--green); }
-    .btn-long:hover { background: #0b9e65; }
-    .btn-short { background: var(--red); }
-    .btn-short:hover { background: #c93649; }
-
-    /* Compact Active Trades Box */
-    .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
-    .tab { padding: 8px 0; font-weight: 800; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; border-bottom: 2px solid transparent; }
-    .tab.active { color: var(--text-main); border-bottom-color: var(--tensor); }
-
-    .pos-table { width: 100%; text-align: left; border-collapse: collapse; font-size: 0.8rem; }
-    .pos-table th { color: var(--text-muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
-    .pos-table td { padding: 12px 8px; border-bottom: 1px solid var(--border); font-weight: 700; vertical-align: middle; }
-    .pos-table tr:hover td { background: var(--bg-hover); }
-
-    .type-badge { padding: 2px 6px; border-radius: 2px; font-size: 0.7rem; font-weight: 900; }
-    .type-badge.long { background: var(--green-glow); color: var(--green); }
-    .type-badge.short { background: var(--red-glow); color: var(--red); }
-
+    /* Flash Animations */
+    @keyframes flashG { 0% { background: var(--green-glow); color: var(--green); } 100% { background: transparent; } }
+    @keyframes flashR { 0% { background: var(--red-glow); color: var(--red); } 100% { background: transparent; } }
+    .flash-up { animation: flashG 0.4s ease-out; }
+    .flash-down { animation: flashR 0.4s ease-out; }
     .text-green { color: var(--green); }
     .text-red { color: var(--red); }
 
-    .close-btn { background: var(--bg-hover); color: var(--text-main); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+    /* Order Entry */
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .margin-mode { display: flex; gap: 4px; background: var(--bg-base); padding: 2px; border-radius: 4px; }
+    .margin-mode button { padding: 4px 10px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); border-radius: 3px; }
+    .margin-mode button.active { background: var(--bg-hover); color: var(--text-main); }
+
+    .avail-balance { display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+    
+    .input-box { display: flex; align-items: center; background: var(--bg-base); border-radius: 4px; border: 1px solid var(--border); padding: 0 10px; height: 38px; margin-bottom: 12px; }
+    .input-box:focus-within { border-color: var(--tensor); }
+    .input-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; width: 40px; }
+    .input-box input { flex: 1; height: 100%; color: var(--text-main); font-weight: 800; font-size: 0.95rem; text-align: right; padding: 0 8px; width: 100%; }
+    .input-suffix { color: var(--text-main); font-size: 0.75rem; font-weight: 700; }
+
+    .leverage-bar { margin-bottom: 16px; }
+    .lev-top { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 700; }
+    .slider { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 4px; background: var(--border); outline: none; margin-bottom: 8px; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--text-main); cursor: pointer; }
+    .lev-marks { display: flex; justify-content: space-between; }
+    .lev-marks span { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; cursor: pointer; }
+
+    .metrics { display: grid; gap: 6px; margin-bottom: 12px; font-size: 0.75rem; color: var(--text-muted); background: var(--bg-base); padding: 8px; border-radius: 4px; }
+    .metrics-row { display: flex; justify-content: space-between; }
+    .metrics-val { font-weight: 800; color: var(--text-main); }
+
+    .trade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-long, .btn-short { height: 40px; border-radius: 4px; font-weight: 800; font-size: 0.9rem; color: white; }
+    .btn-long { background: var(--green); }
+    .btn-short { background: var(--red); }
+
+    /* Boxed Active Trades */
+    .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+    .tab { padding: 6px 0; font-weight: 800; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; border-bottom: 2px solid transparent; }
+    .tab.active { color: var(--text-main); border-bottom-color: var(--tensor); }
+
+    .pos-list { display: grid; gap: 10px; }
+    .pos-card { background: var(--bg-base); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
+    .pos-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .type-badge { padding: 2px 6px; border-radius: 2px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; }
+    .type-badge.long { background: var(--green-glow); color: var(--green); }
+    .type-badge.short { background: var(--red-glow); color: var(--red); }
+
+    .pos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 0.75rem; }
+    .pos-item { display: flex; justify-content: space-between; align-items: center; }
+    .pos-label { color: var(--text-muted); font-weight: 600; }
+    .pos-val { font-weight: 800; color: var(--text-main); }
+    
+    .close-btn { width: 100%; background: var(--bg-hover); color: var(--text-main); padding: 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 800; margin-top: 10px; }
     .close-btn:hover { background: var(--red-glow); color: var(--red); }
 
-    /* Nav */
-    .bottom-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: calc(60px + var(--safe-bottom)); background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; padding-bottom: var(--safe-bottom); z-index: 60; }
+    /* Bottom Nav */
+    .bottom-nav { position: fixed; left: 0; bottom: 0; width: 100%; height: calc(56px + var(--safe-bottom)); background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; padding-bottom: var(--safe-bottom); z-index: 60; }
+    @media (min-width: 1024px) { .bottom-nav { display: none; } }
     .bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.7rem; font-weight: 700; width: 100%; height: 100%; justify-content: center; }
-    .bottom-nav button svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+    .bottom-nav button svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .bottom-nav button.active { color: var(--text-main); }
   </style>
 </head>
 <body>
 
+  <!-- Server Data Injection: Guarantees Real USDT Balance Immediately -->
   <script>
     const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
   </script>
 
   <header class="topbar">
     <a href="/" class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tensor)" stroke-width="2.5" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--tensor)" stroke-width="2.5" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
       Tensor Pro
     </a>
-    
-    <div style="display:flex; gap:12px; align-items:center;">
+    <div style="display:flex; gap:8px; align-items:center;">
       <div class="mode-switch">
         <button id="modeLive" class="active" onclick="setTradingMode('live')">Live</button>
         <button id="modePaper" onclick="setTradingMode('paper')">Paper</button>
       </div>
-      <button class="icon-btn" onclick="toggleTheme()" style="width:32px; height:32px; border-radius:4px; padding:0; background:var(--bg-base);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      <button onclick="toggleTheme()" style="width:28px; height:28px; background:var(--bg-base); border-radius:4px; display:grid; place-items:center;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
   </header>
 
   <div class="market-strip-container">
-    <div class="market-strip" id="assetStrip">
-      <div style="color:var(--text-muted); font-size:0.8rem; padding:8px;">Loading T0x Network...</div>
-    </div>
+    <div class="market-strip" id="assetStrip"></div>
   </div>
 
   <main class="shell">
     
-    <div>
-      <div class="panel" style="padding:12px;">
+    <!-- Left: Chart & Positions -->
+    <div style="display:flex; flex-direction:column; gap:12px; min-width:0;">
+      <div class="panel">
         <div class="chart-header">
-          <div class="chart-title" id="chartTitle">
-            Select Asset 
-            <span class="chart-price" id="chartSub">$0.00</span>
+          <div class="chart-title" id="chartTitle">Loading... <span class="chart-price" id="chartSub"></span></div>
+          <div style="display:flex; gap:8px;">
+            <div class="pill-toggle">
+              <button class="tf-btn active" onclick="setChartTF(1, this)">1m</button>
+              <button class="tf-btn" onclick="setChartTF(5, this)">5m</button>
+              <button class="tf-btn" onclick="setChartTF(15, this)">15m</button>
+              <button class="tf-btn" onclick="setChartTF(60, this)">1H</button>
+            </div>
+            <div class="pill-toggle">
+              <button id="btnStyleCandle" class="active" onclick="setChartStyle('candlestick')">Candle</button>
+              <button id="btnStyleLine" onclick="setChartStyle('line')">Line</button>
+            </div>
           </div>
-          <div class="pill-toggle">
-            <button id="btnStyleCandle" class="active" onclick="setChartStyle('candlestick')">Candle</button>
-            <button id="btnStyleLine" onclick="setChartStyle('line')">Line</button>
-          </div>
-        </div>
-        
-        <div class="pill-toggle" style="display:inline-flex; background:transparent; border:none; gap:2px; margin-bottom:4px;">
-          <button class="tf-btn active" style="padding:2px 8px; height:24px;" onclick="setChartTF(1, this)">1m</button>
-          <button class="tf-btn" style="padding:2px 8px; height:24px;" onclick="setChartTF(5, this)">5m</button>
-          <button class="tf-btn" style="padding:2px 8px; height:24px;" onclick="setChartTF(15, this)">15m</button>
-          <button class="tf-btn" style="padding:2px 8px; height:24px;" onclick="setChartTF(60, this)">1H</button>
-          <button class="tf-btn" style="padding:2px 8px; height:24px;" onclick="setChartTF(1440, this)">1D</button>
         </div>
 
         <div class="chart-wrapper" id="apexChartContainer"></div>
       </div>
       
-      <div class="panel" style="margin-top: 16px; padding: 12px; overflow-x:auto;">
+      <!-- Boxed Positions -->
+      <div class="panel">
         <div class="tabs">
           <div class="tab active" onclick="switchTab('active', this)">Positions (<span id="posCount">0</span>)</div>
-          <div class="tab" onclick="switchTab('history', this)">Order History</div>
+          <div class="tab" onclick="switchTab('history', this)">History</div>
         </div>
         
-        <div id="activePosView">
-          <table class="pos-table">
-            <thead><tr><th>Symbol</th><th>Size</th><th>Entry Price</th><th>Mark Price</th><th>Liq. Price</th><th>Margin Ratio</th><th>PNL (ROI)</th><th>Action</th></tr></thead>
-            <tbody id="posTbody">
-               <tr><td colspan="8" style="text-align:center; padding: 20px; color:var(--text-muted);">No open positions.</td></tr>
-            </tbody>
-          </table>
+        <div id="activePosView" class="pos-list">
+           <div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">No open positions.</div>
         </div>
 
-        <div id="historyPosView" style="display:none;">
-          <table class="pos-table">
-             <thead><tr><th>Symbol</th><th>Side</th><th>Size</th><th>Close Price</th><th>Reason</th><th>Realized PNL</th></tr></thead>
-             <tbody id="histTbody">
-                <tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-muted);">No history.</td></tr>
-             </tbody>
-          </table>
+        <div id="historyPosView" class="pos-list" style="display:none;">
+           <div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">No history.</div>
         </div>
       </div>
     </div>
 
-    <div class="panel" style="position: sticky; top: 60px;">
+    <!-- Right: Order Entry -->
+    <div class="panel" style="position: sticky; top: 60px; height: fit-content;">
       
       <div class="order-header">
         <div class="margin-mode">
@@ -246,21 +231,17 @@
       
       <div class="input-box">
         <span class="input-label">Price</span>
-        <input type="text" value="Market" readonly style="color:var(--text-muted); cursor:not-allowed;">
-        <span class="input-suffix">USDT</span>
+        <input type="text" value="Market" readonly style="color:var(--text-muted);">
       </div>
 
       <div class="input-box">
-        <span class="input-label">Size</span>
+        <span class="input-label">Margin</span>
         <input type="number" id="tradeAmt" step="any" placeholder="0.00" oninput="updateMetrics()">
         <span class="input-suffix">USDT</span>
       </div>
 
       <div class="leverage-bar">
-        <div class="lev-top">
-          <span>Leverage</span>
-          <span><span id="levValDisplay">10</span>x</span>
-        </div>
+        <div class="lev-top"><span>Leverage</span><span><span id="levValDisplay">10</span>x</span></div>
         <input type="range" class="slider" id="levSlider" min="1" max="150" value="10" step="1" oninput="updateLeverage(this.value)">
         <div class="lev-marks">
           <span onclick="updateLeverage(1)">1x</span>
@@ -271,15 +252,14 @@
       </div>
 
       <div class="metrics">
-        <div class="metrics-row"><span>Position Size (Nominal)</span><span class="metrics-val" id="posSize">0.00 USDT</span></div>
-        <div class="metrics-row"><span>Est. Long Liq. Price</span><span class="metrics-val highlight" id="liqLong">0.00</span></div>
-        <div class="metrics-row"><span>Est. Short Liq. Price</span><span class="metrics-val highlight" id="liqShort">0.00</span></div>
-        <div class="metrics-row"><span>Est. Fee</span><span class="metrics-val" id="tradeFee">0.00 USDT</span></div>
+        <div class="metrics-row"><span>Position Size</span><span class="metrics-val" id="posSize">0.00 USDT</span></div>
+        <div class="metrics-row"><span>Est. Long Liq. Price</span><span class="metrics-val" style="color:#f59e0b;" id="liqLong">0.00</span></div>
+        <div class="metrics-row"><span>Est. Short Liq. Price</span><span class="metrics-val" style="color:#f59e0b;" id="liqShort">0.00</span></div>
       </div>
 
       <div class="trade-grid">
-        <button class="btn-long" onclick="executeTrade('long')">Buy / Long</button>
-        <button class="btn-short" onclick="executeTrade('short')">Sell / Short</button>
+        <button class="btn-long" onclick="executeTrade('long')">Long</button>
+        <button class="btn-short" onclick="executeTrade('short')">Short</button>
       </div>
     </div>
   </main>
@@ -290,24 +270,23 @@
   </nav>
 
   <script>
-    // State Initialization
+    // State
     let currentTheme = localStorage.getItem('blue_theme') || 'dark';
     let isPaper = false;
-    let marginMode = 'cross'; // 'cross' or 'isolated'
-    
+    let marginMode = 'cross'; 
     let tensorAssets = [];
     let activeToken = null;
-    let prevPrices = {}; // For flash effect
+    let prevPrices = {}; 
 
-    // Instantly inject real balance from backend to prevent 15,000 flash
+    // Directly use Real USDT from Wallet
     let liveState = { 
-      usdtBalance: SERVER_WALLET ? SERVER_WALLET.usdtBalance : 0.00, 
+      usdtBalance: SERVER_WALLET ? Number(SERVER_WALLET.usdtBalance) : 0, 
       positions: SERVER_WALLET && SERVER_WALLET.positions ? SERVER_WALLET.positions : [], 
       orderHistory: SERVER_WALLET && SERVER_WALLET.orderHistory ? SERVER_WALLET.orderHistory : [] 
     };
     
     let paperState = { 
-      usdtBalance: Number(localStorage.getItem('paper_balance')) || 10000, 
+      usdtBalance: Number(localStorage.getItem('paper_balance')) || 5000, 
       positions: JSON.parse(localStorage.getItem('paper_positions')) || [], 
       orderHistory: JSON.parse(localStorage.getItem('paper_history')) || [] 
     };
@@ -316,9 +295,9 @@
     let currentTF = 1; 
     let currentChartStyle = 'candlestick';
     let rawChartData = [];
-    let pollingInterval = null;
+    let priceInterval = null;
 
-    // --- UI Utilities ---
+    // --- UI Theme ---
     function toggleTheme() {
       currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', currentTheme);
@@ -342,13 +321,8 @@
     }
 
     function addPaperFunds() {
-      const amt = Number(prompt("Add Paper USDT (Max wallet limit: 30,000)", "5000"));
-      if(amt && amt > 0) {
-        if(paperState.usdtBalance + amt > 30000) return alert('Max paper balance is 30,000 USDT.');
-        paperState.usdtBalance += amt;
-        savePaperState();
-        renderBalancesAndPositions();
-      }
+      const amt = Number(prompt("Add Paper USDT", "1000"));
+      if(amt > 0) { paperState.usdtBalance += amt; savePaperState(); renderBalancesAndPositions(); }
     }
 
     function savePaperState() {
@@ -357,15 +331,7 @@
       localStorage.setItem('paper_history', JSON.stringify(paperState.orderHistory));
     }
 
-    // --- Price Flash Effect ---
-    function flashElement(el, oldPrice, newPrice) {
-      if(oldPrice === newPrice) return;
-      el.classList.remove('flash-up', 'flash-down');
-      void el.offsetWidth; // Trigger reflow
-      el.classList.add(newPrice > oldPrice ? 'flash-up' : 'flash-down');
-    }
-
-    // --- Core Data Sync ---
+    // --- Core Data Sync & Live Ticker ---
     async function fetchCoreData() {
       try {
         const tokenRes = await fetch(`/api/tensor?_t=${Date.now()}`);
@@ -375,12 +341,8 @@
           renderAssetStrip();
           if(!activeToken && tensorAssets.length > 0) selectAsset(tensorAssets[0].id);
         }
-        
         const stateRes = await fetch(`/api/trading/state?_t=${Date.now()}`);
-        if(stateRes.ok) {
-           liveState = await stateRes.json();
-           renderBalancesAndPositions();
-        }
+        if(stateRes.ok) { liveState = await stateRes.json(); renderBalancesAndPositions(); }
       } catch(e) {}
     }
 
@@ -394,7 +356,47 @@
       } catch(e) {}
     }
 
-    // --- ApexCharts Strict Styling ---
+    // High Frequency Local Ticker (Creates fast live Binance feel between server polls)
+    function startLiveTicker() {
+      if(priceInterval) clearInterval(priceInterval);
+      priceInterval = setInterval(() => {
+        if(!activeToken || !chartInstance || !rawChartData.length) return;
+        
+        // Slight random jitter around the actual price for visual effect
+        const jitter = activeToken.price * (1 + (Math.random() - 0.5) * 0.0005);
+        const isUp = jitter >= activeToken.price;
+        activeToken.price = jitter; // Temporarily mutate local price
+        
+        // Update Chart Last Candle
+        const lastCandle = rawChartData[rawChartData.length - 1];
+        lastCandle.close = jitter;
+        if(jitter > lastCandle.high) lastCandle.high = jitter;
+        if(jitter < lastCandle.low) lastCandle.low = jitter;
+        renderChart();
+
+        // Update UI
+        const subEl = document.getElementById('chartSub');
+        subEl.innerText = `$${jitter.toFixed(4)}`;
+        subEl.className = `chart-price ${isUp ? 'text-green' : 'text-red'}`;
+        
+        const stripPrice = document.getElementById(`price-${activeToken.id}`);
+        if(stripPrice) {
+          stripPrice.innerText = `$${jitter.toFixed(4)}`;
+          stripPrice.style.color = isUp ? 'var(--green)' : 'var(--red)';
+        }
+
+        // Live Line on Y-Axis
+        chartInstance.clearAnnotations();
+        chartInstance.addYaxisAnnotation({
+          y: jitter, borderColor: isUp ? '#0ecb81' : '#f6465d',
+          label: { style: { color: '#fff', background: isUp ? '#0ecb81' : '#f6465d' }, text: jitter.toFixed(4) }
+        }, false);
+        
+        renderActivePositionsOnly(); 
+      }, 800); 
+    }
+
+    // --- ApexCharts (Fixed Zoom/Pan) ---
     function initApexChart() {
       const isDark = currentTheme === 'dark';
       const textCol = isDark ? '#848E9C' : '#848E9C';
@@ -404,30 +406,20 @@
         series: [{ data: [] }],
         chart: {
           type: currentChartStyle,
-          height: 500,
+          height: '100%',
           background: 'transparent',
-          toolbar: { show: false }, // Cleaner look
-          animations: { dynamicAnimation: { enabled: true, speed: 350 } }, // Smooth real-time update
+          animations: { enabled: false }, // Crucial for fast updates without lag
+          toolbar: { autoSelected: 'pan', tools: { download: false, selection: false, zoom: true, pan: true } },
+          zoom: { enabled: true, type: 'x' },
+          selection: { enabled: false }, // Disables the annoying drag-to-zoom box
           fontFamily: 'Inter, sans-serif'
         },
         theme: { mode: isDark ? 'dark' : 'light' },
         plotOptions: { candlestick: { colors: { upward: '#0ecb81', downward: '#f6465d' }, wick: { useFillColor: true } } },
         stroke: { curve: 'straight', width: 2, colors: ['var(--tensor)'] },
-        xaxis: {
-          type: 'datetime',
-          labels: { style: { colors: textCol }, datetimeFormatter: { hour: 'HH:mm', minute: 'HH:mm' } },
-          axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false }
-        },
-        yaxis: {
-          opposite: true, // Binance aligns y-axis to the right
-          labels: { style: { colors: textCol }, formatter: (v) => v.toFixed(4) }
-        },
-        grid: {
-          borderColor: gridCol,
-          strokeDashArray: 0,
-          xaxis: { lines: { show: true } }, yaxis: { lines: { show: true } },
-          padding: { top: 0, right: 0, bottom: 0, left: 10 }
-        }
+        xaxis: { type: 'datetime', labels: { style: { colors: textCol }, datetimeFormatter: { hour: 'HH:mm' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
+        yaxis: { opposite: true, labels: { style: { colors: textCol }, formatter: (v) => v.toFixed(4) } },
+        grid: { borderColor: gridCol, strokeDashArray: 0, padding: { top: 0, right: 0, bottom: 0, left: 10 } }
       };
       chartInstance = new ApexCharts(document.querySelector("#apexChartContainer"), options);
       chartInstance.render();
@@ -481,27 +473,20 @@
       chartInstance.updateSeries([{ data: formattedData }]);
     }
 
-    // --- Engine & Math ---
+    // --- UI Builders ---
     function renderAssetStrip() {
       const strip = document.getElementById('assetStrip');
       strip.innerHTML = tensorAssets.map(t => {
         const startPrice = t.startPrice || t.price;
         const chg = startPrice > 0 ? ((t.price - startPrice) / startPrice) * 100 : 0;
         const colClass = chg >= 0 ? 'text-green' : 'text-red';
-        
-        // Trigger flash if price changed
-        const oldP = prevPrices[t.id];
-        if(oldP && oldP !== t.price) {
-           const el = document.getElementById(`price-${t.id}`);
-           if(el) flashElement(el, oldP, t.price);
-        }
-        prevPrices[t.id] = t.price;
-
         return `
         <div class="market-card ${activeToken?.id === t.id ? 'active' : ''}" id="strip-${t.id}" onclick="selectAsset('${t.id}')">
-          <div style="font-weight:800; font-size:0.9rem;">${t.symbol}</div>
-          <div style="font-weight:900; font-size:1.15rem; margin: 4px 0;" id="price-${t.id}">$${t.price.toFixed(4)}</div>
-          <div class="${colClass}" style="font-size:0.75rem; font-weight:800;">${chg>=0?'+':''}${chg.toFixed(2)}%</div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${t.symbol}</span>
+            <span class="${colClass}" style="font-size:0.75rem; font-weight:800;">${chg>=0?'+':''}${chg.toFixed(2)}%</span>
+          </div>
+          <div style="font-weight:900; font-size:1.1rem; margin-top: 4px; color:var(--text-main);" id="price-${t.id}">$${t.price.toFixed(4)}</div>
         </div>`;
       }).join('');
     }
@@ -510,31 +495,21 @@
       activeToken = tensorAssets.find(x => x.id === id);
       document.querySelectorAll('.market-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`strip-${id}`).classList.add('active');
-      
-      document.getElementById('chartTitle').innerHTML = `${activeToken.symbol} <span style="font-size:0.9rem; color:var(--text-muted); font-weight:600;">/USDT</span>`;
-      
-      const subEl = document.getElementById('chartSub');
-      flashElement(subEl, parseFloat(subEl.innerText.replace('$','')), activeToken.price);
-      subEl.innerText = `${activeToken.price.toFixed(4)}`;
-      subEl.className = `chart-price ${activeToken.price > (activeToken.startPrice||0) ? 'text-green' : 'text-red'}`;
+      document.getElementById('chartTitle').innerHTML = `${activeToken.symbol} <span style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">/USDT</span>`;
       
       updateMetrics();
       loadChartDataForActive();
+      startLiveTicker();
     }
 
     function getLiqPrice(entry, sizeUsd, marginUsd, side, mode, availBal) {
       if(sizeUsd <= 0 || marginUsd <= 0) return 0;
-      
       if(mode === 'isolated') {
-         // Isolated: Loss equals margin.
-         const priceDropAllowed = (marginUsd / sizeUsd) * entry;
-         return side === 'long' ? entry - priceDropAllowed : entry + priceDropAllowed;
+         const drop = (marginUsd / sizeUsd) * entry;
+         return side === 'long' ? entry - drop : entry + drop;
       } else {
-         // Cross: Loss equals margin + available balance.
-         // Note: If size is very small compared to balance, Liq goes to 0 (for longs).
-         const priceDropAllowed = ((marginUsd + availBal) / sizeUsd) * entry;
-         const liq = side === 'long' ? entry - priceDropAllowed : entry + priceDropAllowed;
-         return Math.max(0, liq); 
+         const drop = ((marginUsd + availBal) / sizeUsd) * entry;
+         return Math.max(0, side === 'long' ? entry - drop : entry + drop); 
       }
     }
 
@@ -552,98 +527,105 @@
       
       const posSize = margin * lev;
       document.getElementById('posSize').innerText = `${posSize.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} USDT`;
-      document.getElementById('tradeFee').innerText = `${(posSize * 0.001).toFixed(2)} USDT`;
 
       if (margin > 0 && price > 0) {
         const liqL = getLiqPrice(price, posSize, margin, 'long', marginMode, state.usdtBalance);
         const liqS = getLiqPrice(price, posSize, margin, 'short', marginMode, state.usdtBalance);
-        document.getElementById('liqLong').innerText = `${Math.max(0, liqL).toFixed(4)}`;
-        document.getElementById('liqShort').innerText = `${liqS.toFixed(4)}`;
+        document.getElementById('liqLong').innerText = liqL > 0 ? `${liqL.toFixed(4)}` : '--';
+        document.getElementById('liqShort').innerText = liqS > 0 ? `${liqS.toFixed(4)}` : '--';
       } else {
         document.getElementById('liqLong').innerText = `0.00`;
         document.getElementById('liqShort').innerText = `0.00`;
       }
     }
 
-    // --- Position Tables ---
+    // Render Boxed Positions
     function renderBalancesAndPositions() {
       const state = isPaper ? paperState : liveState;
       document.getElementById('availUsdt').innerText = state.usdtBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-      
-      // Render Active
-      document.getElementById('posCount').innerText = state.positions.length;
-      const tBody = document.getElementById('posTbody');
-      
-      if(state.positions.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px; color:var(--text-muted);">No open positions.</td></tr>`;
-      } else {
-        tBody.innerHTML = state.positions.map(p => {
-          const token = tensorAssets.find(t => t.id === p.tokenId);
-          const currentPrice = token ? token.price : p.entryPrice;
-          
-          const pnlRaw = p.side === 'long' ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice);
-          const pnl = (pnlRaw / p.entryPrice) * p.size;
-          const roi = (pnl / p.margin) * 100;
-          
-          const col = pnl >= 0 ? 'text-green' : 'text-red';
-          const sign = pnl >= 0 ? '+' : '';
-          
-          const liq = getLiqPrice(p.entryPrice, p.size, p.margin, p.side, p.marginMode || 'cross', state.usdtBalance);
-          const mRatio = ((p.margin + pnl) / p.margin * 100).toFixed(1); // Basic health metric
-
-          return `
-          <tr id="ptr-${p.id}">
-            <td>
-              <div style="font-weight:900;">${p.symbol}</div>
-              <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
-            </td>
-            <td>$${p.size.toLocaleString(undefined, {maximumFractionDigits:2})}</td>
-            <td>$${p.entryPrice.toFixed(4)}</td>
-            <td class="mark-price">$${currentPrice.toFixed(4)}</td>
-            <td style="color:var(--orange);">$${Math.max(0, liq).toFixed(4)}</td>
-            <td>${mRatio}%</td>
-            <td class="${col} pnl-display">${sign}$${pnl.toFixed(2)}<br><span style="font-size:0.7rem;">${sign}${roi.toFixed(2)}%</span></td>
-            <td><button class="close-btn" onclick="closePosition('${p.id}')">Close</button></td>
-          </tr>`;
-        }).join('');
-      }
+      renderActivePositionsOnly();
 
       // Render History
-      const hBody = document.getElementById('histTbody');
+      const hView = document.getElementById('historyPosView');
       if(state.orderHistory.length === 0) {
-         hBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:var(--text-muted);">No history.</td></tr>`;
+         hView.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">No history.</div>`;
       } else {
-         hBody.innerHTML = state.orderHistory.slice(0, 15).map(p => {
+         hView.innerHTML = state.orderHistory.slice(0, 15).map(p => {
             const col = p.pnl >= 0 ? 'text-green' : 'text-red';
             const sign = p.pnl >= 0 ? '+' : '';
             return `
-            <tr>
-              <td><div style="font-weight:900;">${p.symbol}</div></td>
-              <td><span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span></td>
-              <td>$${p.size.toLocaleString(undefined, {maximumFractionDigits:2})}</td>
-              <td>$${p.closePrice.toFixed(4)}</td>
-              <td style="font-size:0.75rem;">${p.closeReason || 'Market'}</td>
-              <td class="${col}">${sign}$${p.pnl.toFixed(2)}</td>
-            </tr>`;
+            <div class="pos-card">
+              <div class="pos-header" style="border:none; margin:0; padding:0;">
+                <div><span style="font-weight:900;">${p.symbol}</span> <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span></div>
+                <div class="${col} font-weight:900;">${sign}$${p.pnl.toFixed(2)}</div>
+              </div>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Closed via ${p.closeReason || 'Market'} @ $${p.closePrice.toFixed(4)}</div>
+            </div>`;
          }).join('');
       }
-      
       updateMetrics();
+    }
+
+    function renderActivePositionsOnly() {
+      const state = isPaper ? paperState : liveState;
+      document.getElementById('posCount').innerText = state.positions.length;
+      const container = document.getElementById('activePosView');
+      
+      if(state.positions.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">No open positions.</div>`;
+        return;
+      }
+
+      container.innerHTML = state.positions.map(p => {
+        const token = tensorAssets.find(t => t.id === p.tokenId);
+        const currentPrice = token ? token.price : p.entryPrice;
+        
+        const pnlRaw = p.side === 'long' ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice);
+        const pnl = (pnlRaw / p.entryPrice) * p.size;
+        const roi = (pnl / p.margin) * 100;
+        const liq = getLiqPrice(p.entryPrice, p.size, p.margin, p.side, p.marginMode || 'cross', state.usdtBalance);
+        
+        const col = pnl >= 0 ? 'text-green' : 'text-red';
+        const sign = pnl >= 0 ? '+' : '';
+
+        return `
+        <div class="pos-card">
+          <div class="pos-header">
+            <div>
+              <span style="font-weight:900; font-size:1rem; color:var(--text-main);">${p.symbol}</span> 
+              <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
+            </div>
+            <div style="text-align:right;">
+              <div class="${col}" style="font-weight:900; font-size:1rem;">${sign}$${pnl.toFixed(2)}</div>
+              <div class="${col}" style="font-size:0.75rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
+            </div>
+          </div>
+          <div class="pos-grid">
+            <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${p.size.toLocaleString(undefined, {maximumFractionDigits:2})}</span></div>
+            <div class="pos-item"><span class="pos-label">Margin</span><span class="pos-val">$${p.margin.toLocaleString(undefined, {maximumFractionDigits:2})}</span></div>
+            <div class="pos-item"><span class="pos-label">Entry Price</span><span class="pos-val">$${p.entryPrice.toFixed(4)}</span></div>
+            <div class="pos-item"><span class="pos-label">Mark Price</span><span class="pos-val">$${currentPrice.toFixed(4)}</span></div>
+            <div class="pos-item"><span class="pos-label">Liq. Price</span><span class="pos-val" style="color:#f59e0b;">$${Math.max(0, liq).toFixed(4)}</span></div>
+            <div class="pos-item"><span class="pos-label">Mode</span><span class="pos-val" style="text-transform:capitalize;">${p.marginMode || 'Cross'}</span></div>
+          </div>
+          <button class="close-btn" onclick="closePosition('${p.id}')">Close Position</button>
+        </div>`;
+      }).join('');
     }
 
     function switchTab(tab, el) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
-      document.getElementById('activePosView').style.display = tab === 'active' ? 'block' : 'none';
-      document.getElementById('historyPosView').style.display = tab === 'history' ? 'block' : 'none';
+      document.getElementById('activePosView').style.display = tab === 'active' ? 'grid' : 'none';
+      document.getElementById('historyPosView').style.display = tab === 'history' ? 'grid' : 'none';
     }
 
-    // --- Trade Execution & Liquidation Engine ---
+    // --- Execution ---
     async function executeTrade(side) {
       const margin = Number(document.getElementById('tradeAmt').value);
       const lev = Number(document.getElementById('levSlider').value);
       
-      if(!margin || margin <= 0) return alert('Enter a valid amount');
+      if(!margin || margin <= 0) return alert('Enter margin amount');
       if(!activeToken) return alert('No asset selected');
 
       if (isPaper) {
@@ -685,7 +667,7 @@
         
         paperState.usdtBalance += (pos.margin + pnl);
         paperState.positions.splice(idx, 1);
-        paperState.orderHistory.unshift({...pos, closePrice: currentPrice, pnl, closeReason: 'Market'});
+        paperState.orderHistory.unshift({...pos, closePrice: currentPrice, pnl, closeReason: 'Market Close'});
         savePaperState();
         renderBalancesAndPositions();
       } else {
@@ -694,55 +676,43 @@
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ positionId: id })
           });
-          if(res.ok) { await fetchCoreData(); } 
-          else { alert('Failed to close position.'); }
-        } catch(e) { alert('Network Error'); }
+          if(res.ok) { await fetchCoreData(); } else { alert('Failed to close position.'); }
+        } catch(e) {}
       }
     }
 
-    // Frontend Paper Liquidation Engine
     function checkPaperLiquidations() {
       if(!isPaper || paperState.positions.length === 0) return;
-      
       let changed = false;
       paperState.positions = paperState.positions.filter(pos => {
          const token = tensorAssets.find(t => t.id === pos.tokenId);
          if(!token) return true;
-         
          const liqPrice = getLiqPrice(pos.entryPrice, pos.size, pos.margin, pos.side, pos.marginMode || 'cross', paperState.usdtBalance);
-         const isLiquidated = pos.side === 'long' ? token.price <= liqPrice : token.price >= liqPrice;
+         const isLiq = pos.side === 'long' ? token.price <= liqPrice : token.price >= liqPrice;
          
-         if(isLiquidated) {
-            paperState.orderHistory.unshift({
-               ...pos, closePrice: token.price, pnl: -pos.margin, closeReason: 'LIQUIDATION'
-            });
-            // Note: In Cross mode, backend takes from balance. For frontend paper simplicity, we just lose margin.
-            changed = true;
-            return false;
+         if(isLiq) {
+            paperState.orderHistory.unshift({ ...pos, closePrice: token.price, pnl: -pos.margin, closeReason: 'LIQUIDATION' });
+            changed = true; return false;
          }
          return true;
       });
-      
-      if(changed) {
-        savePaperState();
-        renderBalancesAndPositions();
-      }
+      if(changed) { savePaperState(); renderBalancesAndPositions(); }
     }
 
-    // --- Main Loop ---
+    // --- Init ---
     window.onload = () => {
       document.documentElement.setAttribute('data-theme', currentTheme);
       initApexChart();
       
-      // Inject instant balance
+      // Inject instant balance UI
       document.getElementById('availUsdt').innerText = liveState.usdtBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
       
-      fetchCoreData(); // Syncs active tokens and pulls latest server state
+      fetchCoreData(); 
 
-      pollingInterval = setInterval(async () => {
+      // Slower interval strictly for server sync to save bandwidth
+      setInterval(async () => {
         await fetchCoreData();
-        if(activeToken) loadChartDataForActive();
-        checkPaperLiquidations(); // Ensure paper trades close if they hit liq 
+        checkPaperLiquidations(); 
       }, 5000); 
     };
   </script>
