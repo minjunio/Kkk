@@ -27,7 +27,8 @@ const BINANCE_FALLBACK = 'https://data-api.binance.vision';
 
 const PRICE_SYNC_MS = 2000;
 const MARKET_LOOP_MS = 2500;
-const MAX_CANDLES = 2600;
+const BASE_CANDLE_MS = 5 * 60 * 1000;
+const MAX_CANDLES = 5000;
 
 const cache = new Map();
 const tensorCandleHistory = {};
@@ -191,8 +192,31 @@ function normalizeNetwork(network) {
 
   if (raw.includes('arb')) return 'arbitrum';
   if (raw.includes('sol')) return 'sol';
-  if (raw.includes('tron') || raw.includes('trx')) return 'trx';
+  if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
   if (raw.includes('eth') || raw.includes('erc')) return 'eth';
+
+  return 'eth';
+}
+
+function inferUserUsdtNetwork(user) {
+  const candidates = [];
+
+  if (Array.isArray(user.assets)) candidates.push(...user.assets);
+  if (Array.isArray(user.publicWallets)) candidates.push(...user.publicWallets);
+  if (Array.isArray(user.wallets)) candidates.push(...user.wallets);
+  if (Array.isArray(user.balances)) candidates.push(...user.balances);
+
+  const usdtItem = candidates.find(item => {
+    const text = JSON.stringify(item || {}).toLowerCase();
+    return text.includes('usdt') || text.includes('tether');
+  });
+
+  const text = JSON.stringify(usdtItem || user || {}).toLowerCase();
+
+  if (text.includes('arbitrum') || text.includes('arb')) return 'arbitrum';
+  if (text.includes('solana') || text.includes('sol')) return 'sol';
+  if (text.includes('tron') || text.includes('trc') || text.includes('trx')) return 'trx';
+  if (text.includes('ethereum') || text.includes('erc') || text.includes('eth')) return 'eth';
 
   return 'eth';
 }
@@ -393,7 +417,6 @@ function ensureDb() {
   }
 
   const db = readDbRaw();
-
   migrateDb(db);
   writeDb(db);
 }
@@ -415,9 +438,21 @@ function migrateDb(db) {
   if (!db.users) db.users = {};
   if (!db.otps) db.otps = {};
   if (!Array.isArray(db.tensorRegistry)) db.tensorRegistry = [];
-  if (!db.treasury) db.treasury = { collectedFeesUsdt: 0, tradeDeposits: [] };
-  if (!Array.isArray(db.treasury.tradeDeposits)) db.treasury.tradeDeposits = [];
-  if (!db.publicTradeCards) db.publicTradeCards = {};
+
+  if (!db.treasury) {
+    db.treasury = {
+      collectedFeesUsdt: 0,
+      tradeDeposits: []
+    };
+  }
+
+  if (!Array.isArray(db.treasury.tradeDeposits)) {
+    db.treasury.tradeDeposits = [];
+  }
+
+  if (!db.publicTradeCards) {
+    db.publicTradeCards = {};
+  }
 
   if (db.tensorRegistry.length === 0) {
     db.tensorRegistry = defaultTensorAssets();
@@ -438,6 +473,8 @@ function migrateUser(user) {
 
   if (!Array.isArray(user.publicWallets)) user.publicWallets = [];
   if (!Array.isArray(user.assets)) user.assets = [];
+  if (!Array.isArray(user.wallets)) user.wallets = [];
+  if (!Array.isArray(user.balances)) user.balances = [];
 
   if (!user.tensorAddress && user.email) {
     user.tensorAddress = `T0x${sha(user.email).slice(0, 40)}`;
@@ -456,6 +493,8 @@ function migrateUser(user) {
 
   user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
 
+  user.usdtNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
+
   user.positions.forEach(pos => {
     if (!pos.id) pos.id = makeId('pos');
     if (!pos.marginMode) pos.marginMode = 'cross';
@@ -464,6 +503,7 @@ function migrateUser(user) {
     pos.leverage = safeNumber(pos.leverage, 1);
     pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
     pos.entryPrice = safeNumber(pos.entryPrice, 1);
+    pos.markPrice = safeNumber(pos.markPrice, pos.entryPrice);
     pos.side = pos.side === 'short' ? 'short' : 'long';
   });
 }
@@ -509,10 +549,13 @@ function createWalletRecord(email, role = 'user') {
     encryptedVault: null,
     publicWallets: [],
     assets: [],
+    wallets: [],
+    balances: [],
     tensorAddress: `T0x${hash.slice(0, 40)}`,
     tensorVault: null,
     tensorBalances: {},
     usdtBalance: role === 'staff' ? 1000000 : 15000,
+    usdtNetwork: 'eth',
     positions: [],
     orderHistory: [],
     tradeDeposits: [],
@@ -761,13 +804,13 @@ function initializeCandlesForToken(tokenId, startPrice) {
 
   const candles = [];
   let price = Math.max(0.000001, safeNumber(startPrice, 1));
-  let timeCursor = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  let timeCursor = Date.now() - 14 * 24 * 60 * 60 * 1000;
 
-  for (let i = 0; i < 2160; i++) {
+  for (let i = 0; i < 4032; i++) {
     const open = price;
-    const close = Math.max(0.000001, open * (1 + (Math.random() - 0.5) * 0.006));
-    const high = Math.max(open, close) * (1 + Math.random() * 0.0025);
-    const low = Math.max(0.000001, Math.min(open, close) * (1 - Math.random() * 0.0025));
+    const close = Math.max(0.000001, open * (1 + (Math.random() - 0.5) * 0.0035));
+    const high = Math.max(open, close) * (1 + Math.random() * 0.0018);
+    const low = Math.max(0.000001, Math.min(open, close) * (1 - Math.random() * 0.0018));
 
     candles.push({
       time: timeCursor,
@@ -778,7 +821,7 @@ function initializeCandlesForToken(tokenId, startPrice) {
     });
 
     price = close;
-    timeCursor += 60 * 60 * 1000;
+    timeCursor += BASE_CANDLE_MS;
   }
 
   tensorCandleHistory[tokenId] = candles;
@@ -797,16 +840,16 @@ function pushLiveCandle(token, oldPrice) {
 
   const history = tensorCandleHistory[token.id];
   const now = Date.now();
-  const hourBucket = Math.floor(now / (60 * 60 * 1000)) * 60 * 60 * 1000;
+  const fiveMinuteBucket = Math.floor(now / BASE_CANDLE_MS) * BASE_CANDLE_MS;
   const last = history[history.length - 1];
 
-  if (last && last.time === hourBucket) {
+  if (last && last.time === fiveMinuteBucket) {
     last.close = token.price;
     last.high = Math.max(last.high, token.price);
     last.low = Math.min(last.low, token.price);
   } else {
     history.push({
-      time: hourBucket,
+      time: fiveMinuteBucket,
       open: oldPrice,
       high: Math.max(oldPrice, token.price),
       low: Math.min(oldPrice, token.price),
@@ -855,7 +898,8 @@ function calculatePnl(pos, currentPrice) {
 }
 
 function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode, network }) {
-  const destination = getTreasuryDestination(network);
+  const selectedNetwork = normalizeNetwork(network || user.usdtNetwork || inferUserUsdtNetwork(user));
+  const destination = getTreasuryDestination(selectedNetwork);
   const id = makeId('deposit');
   const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
 
@@ -864,7 +908,7 @@ function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode,
     txHash,
     type: 'USDT_TRADE_MARGIN_DEPOSIT',
     status: 'recorded',
-    note: 'Demo ledger transfer recorded by Tensor Wallet. No on-chain broadcast is performed by this server without wallet signing infrastructure.',
+    note: 'Demo ledger transfer recorded by Tensor Wallet. No on-chain broadcast is performed without wallet signing infrastructure.',
     userEmail: user.email,
     userWalletId: user.id,
     amountUsdt: margin,
@@ -873,6 +917,7 @@ function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode,
     side,
     leverage,
     marginMode,
+    sourceUsdtNetwork: selectedNetwork,
     destinationNetworkKey: destination.key,
     destinationNetwork: destination.network,
     destinationSymbol: destination.symbol,
@@ -979,6 +1024,8 @@ async function runMarketLoop() {
           return;
         }
 
+        pos.markPrice = token.price;
+
         const currentPrice = token.price;
         const liqPrice = getLiquidationPrice(pos, user.usdtBalance);
 
@@ -997,6 +1044,7 @@ async function runMarketLoop() {
             pnl,
             roi,
             closedAt: Date.now(),
+            closedAtIso: nowIso(),
             closeReason: 'Liquidation'
           });
         } else {
@@ -1064,6 +1112,7 @@ function buildTradeCardPayload({ req, db, user, trade }) {
   };
 
   db.publicTradeCards[publicId] = payload;
+
   user.publicTradeCards.unshift({
     id: publicId,
     tradeId: trade.id,
@@ -1441,6 +1490,7 @@ app.get('/api/trading/state', requireAuthJson, (req, res) => {
 
   res.json({
     usdtBalance: safeNumber(user.usdtBalance, 0),
+    usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
     positions: user.positions || [],
     orderHistory: user.orderHistory || [],
     publicTradeCards: user.publicTradeCards || [],
@@ -1457,7 +1507,6 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
   const marginMode = String(req.body.marginMode || 'cross').toLowerCase() === 'isolated'
     ? 'isolated'
     : 'cross';
-  const network = normalizeNetwork(req.body.network || req.body.usdtNetwork || 'eth');
 
   if (!tokenId || !['long', 'short'].includes(side)) {
     return res.status(400).json({ error: 'Invalid trade side or asset.' });
@@ -1484,6 +1533,8 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     return res.status(400).json({ error: 'Insufficient USDT balance.' });
   }
 
+  const automaticNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
+
   const treasuryDeposit = buildTreasuryDeposit({
     user,
     token,
@@ -1491,9 +1542,10 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     leverage,
     side,
     marginMode,
-    network
+    network: automaticNetwork
   });
 
+  user.usdtNetwork = automaticNetwork;
   user.usdtBalance = safeNumber(user.usdtBalance, 0) - margin;
 
   const position = {
@@ -1530,6 +1582,7 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     ok: true,
     position,
     usdtBalance: user.usdtBalance,
+    usdtNetwork: automaticNetwork,
     treasuryDeposit,
     treasuryDestination: {
       network: treasuryDeposit.destinationNetwork,
@@ -1651,6 +1704,7 @@ app.get('/api/wallet', requireAuthJson, (req, res) => {
 
   res.json({
     ...user,
+    usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
     treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
@@ -1674,6 +1728,29 @@ app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
   writeDb(db);
 
   res.json({ ok: true });
+});
+
+app.post('/api/wallet/usdt-network', requireAuthJson, (req, res) => {
+  const network = normalizeNetwork(req.body.network || req.body.usdtNetwork || '');
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  user.usdtNetwork = network;
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  const destination = getTreasuryDestination(network);
+
+  res.json({
+    ok: true,
+    usdtNetwork: network,
+    treasuryDestination: destination
+  });
 });
 
 app.post('/api/wallet/send', requireAuthJson, (req, res) => {
@@ -1761,13 +1838,15 @@ app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
   initializeCandlesForToken(token.id, token.price);
 
   res.json({
-    timeframe: '1H',
+    baseTimeframe: '5m',
+    supportedTimeframes: ['5m', '15m', '30m', '1h'],
     candles: tensorCandleHistory[token.id] || [],
     stats: {
       high24h: token.high24h,
       low24h: token.low24h,
       lifetimeHigh: token.lifetimeHigh,
-      markPrice: token.price
+      markPrice: token.price,
+      changePercent24h: token.changePercent24h
     }
   });
 });
@@ -2103,6 +2182,8 @@ app.get('/health', (req, res) => {
       publicTrade: '/trade/:id',
       publicTradeImage: '/trade/:id/image.svg'
     },
+    candleBase: '5m',
+    supportedChartTimeframes: ['5m', '15m', '30m', '1h'],
     treasuryDestinations: TREASURY_USDT_ADDRESSES,
     dataDir: DATA_DIR,
     dbPath: DB_PATH,
@@ -2138,6 +2219,8 @@ app.listen(PORT, () => {
   console.log(`Startup page: /index.html -> views/index.ejs`);
   console.log(`Wallet page: /wallet -> views/wallet.ejs`);
   console.log(`Trading page: /trading -> views/trading.ejs`);
+  console.log(`Chart base candles: 5m`);
+  console.log(`Supported chart timeframes: 5m, 15m, 30m, 1h`);
   console.log(`Public trade page: /trade/:id`);
   console.log(`Public trade image: /trade/:id/image.svg`);
   console.log(`Data directory: ${DATA_DIR}`);
