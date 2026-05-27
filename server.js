@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 
+/* -------------------- Config -------------------- */
+
 const PORT = process.env.PORT || 3000;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'tensorwallet-secure-secret-key-change-this';
 
@@ -23,8 +25,8 @@ const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const BINANCE_BASE = 'https://api.binance.com';
 const BINANCE_FALLBACK = 'https://data-api.binance.vision';
 
-const TENSOR_LOOP_MS = 2500;
 const PRICE_SYNC_MS = 2000;
+const MARKET_LOOP_MS = 2500;
 const MAX_CANDLES = 2200;
 
 const cache = new Map();
@@ -49,6 +51,8 @@ const REAL_SYMBOL_MAP = {
   SUI: 'SUIUSDT',
   PEPE: 'PEPEUSDT'
 };
+
+/* -------------------- App Setup -------------------- */
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -79,6 +83,8 @@ app.use(session({
   }
 }));
 
+/* -------------------- Helpers -------------------- */
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -99,6 +105,21 @@ function safeNumber(value, fallback = 0) {
 function makeId(prefix = 'id') {
   return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
 }
+
+function safeJsonForEjs(obj) {
+  return JSON.stringify(obj)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+}
+
+function ensureDataFolderOnly() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+/* -------------------- Defaults -------------------- */
 
 function defaultTensorAssets() {
   return [
@@ -249,10 +270,27 @@ function defaultDb() {
   };
 }
 
-function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+/* -------------------- Database -------------------- */
+
+function readDbRaw() {
+  try {
+    const raw = fs.readFileSync(DB_PATH, 'utf8');
+    return JSON.parse(raw || '{}');
+  } catch {
+    return defaultDb();
   }
+}
+
+function writeDb(db) {
+  ensureDataFolderOnly();
+
+  const tempPath = `${DB_PATH}.tmp`;
+  fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
+  fs.renameSync(tempPath, DB_PATH);
+}
+
+function ensureDb() {
+  ensureDataFolderOnly();
 
   if (!fs.existsSync(DB_PATH)) {
     writeDb(defaultDb());
@@ -274,15 +312,6 @@ function ensureDb() {
   db.tensorRegistry.forEach(migrateToken);
 
   writeDb(db);
-}
-
-function readDbRaw() {
-  try {
-    const raw = fs.readFileSync(DB_PATH, 'utf8');
-    return JSON.parse(raw || '{}');
-  } catch {
-    return defaultDb();
-  }
 }
 
 function readDb() {
@@ -307,20 +336,6 @@ function readDb() {
   db.tensorRegistry.forEach(migrateToken);
 
   return db;
-}
-
-function ensureDataFolderOnly() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-}
-
-function writeDb(db) {
-  ensureDataFolderOnly();
-
-  const tempPath = `${DB_PATH}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
-  fs.renameSync(tempPath, DB_PATH);
 }
 
 function migrateUser(user) {
@@ -354,6 +369,7 @@ function migrateUser(user) {
   user.positions.forEach(pos => {
     if (!pos.id) pos.id = makeId('pos');
     if (!pos.marginMode) pos.marginMode = 'cross';
+
     pos.margin = safeNumber(pos.margin, 0);
     pos.leverage = safeNumber(pos.leverage, 1);
     pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
@@ -383,6 +399,8 @@ function migrateToken(token) {
   token.high24h = safeNumber(token.high24h, token.price);
   token.low24h = safeNumber(token.low24h, token.price);
 }
+
+/* -------------------- Users/Auth Helpers -------------------- */
 
 function createWalletRecord(email, role = 'user') {
   const hash = sha(email);
@@ -531,6 +549,8 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
+/* -------------------- Network / Price Helpers -------------------- */
+
 async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   if (typeof fetch !== 'function') {
     throw new Error('Global fetch is unavailable. Use Node 18+.');
@@ -579,7 +599,9 @@ async function cachedJson(key, ttlMs, fetcher) {
 
 async function syncRealCryptoPrices(force = false) {
   try {
-    if (!force && Date.now() - lastRealPriceSync < PRICE_SYNC_MS) return latestRealPrices;
+    if (!force && Date.now() - lastRealPriceSync < PRICE_SYNC_MS) {
+      return latestRealPrices;
+    }
 
     const symbols = Object.values(REAL_SYMBOL_MAP);
     const symbolsParam = encodeURIComponent(JSON.stringify(symbols));
@@ -600,7 +622,9 @@ async function syncRealCryptoPrices(force = false) {
       );
     }
 
-    if (!Array.isArray(data)) return latestRealPrices;
+    if (!Array.isArray(data)) {
+      return latestRealPrices;
+    }
 
     const nextPrices = { ...latestRealPrices };
 
@@ -631,8 +655,12 @@ async function syncRealCryptoPrices(force = false) {
   }
 }
 
+/* -------------------- Candle / Trading Engine -------------------- */
+
 function initializeCandlesForToken(tokenId, startPrice) {
-  if (tensorCandleHistory[tokenId] && tensorCandleHistory[tokenId].length) return;
+  if (tensorCandleHistory[tokenId] && tensorCandleHistory[tokenId].length) {
+    return;
+  }
 
   const candles = [];
   let price = Math.max(0.000001, safeNumber(startPrice, 1));
@@ -728,7 +756,7 @@ function calculatePnl(pos, currentPrice) {
   return (priceDiff / entry) * size;
 }
 
-async function runTensorMarketLoop() {
+async function runMarketLoop() {
   try {
     await syncRealCryptoPrices();
 
@@ -850,11 +878,11 @@ async function runTensorMarketLoop() {
 
     writeDb(db);
   } catch (err) {
-    console.error('Tensor market loop error:', err);
+    console.error('Market loop error:', err);
   }
 }
 
-/* -------------------- Views -------------------- */
+/* -------------------- Page Routes -------------------- */
 
 app.get('/', (req, res) => {
   if (req.session.user) {
@@ -881,23 +909,34 @@ app.get('/index.html', (req, res) => {
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
-  res.redirect('/trading');
-});
-
-app.get('/trading', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
 
   res.render('wallet', {
     email: req.session.user.email,
     role: req.session.user.role,
-    wallet: JSON.stringify(user)
-      .replace(/</g, '\\u003c')
-      .replace(/>/g, '\\u003e')
-      .replace(/&/g, '\\u0026')
+    wallet: safeJsonForEjs(user)
   });
 });
 
-/* -------------------- Auth -------------------- */
+app.get('/wallet.ejs', requireAuth, (req, res) => {
+  res.redirect('/wallet');
+});
+
+app.get('/trading', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.render('trading', {
+    email: req.session.user.email,
+    role: req.session.user.role,
+    wallet: safeJsonForEjs(user)
+  });
+});
+
+app.get('/trading.ejs', requireAuth, (req, res) => {
+  res.redirect('/trading');
+});
+
+/* -------------------- Auth Routes -------------------- */
 
 app.post('/send-otp', async (req, res) => {
   try {
@@ -1096,7 +1135,6 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   const pnl = calculatePnl(pos, currentPrice);
 
   user.usdtBalance = safeNumber(user.usdtBalance, 0) + safeNumber(pos.margin, 0) + pnl;
-
   user.positions.splice(posIdx, 1);
 
   const historyRecord = {
@@ -1384,6 +1422,7 @@ app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
 
   Object.values(db.users).forEach(user => {
     if (user.tensorBalances) delete user.tensorBalances[req.params.id];
+
     if (Array.isArray(user.positions)) {
       user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
     }
@@ -1554,6 +1593,12 @@ app.get('/health', (req, res) => {
   res.json({
     ok: true,
     uptime: process.uptime(),
+    main: '/trading',
+    pages: {
+      index: '/ or /index.html',
+      wallet: '/wallet',
+      trading: '/trading'
+    },
     dataDir: DATA_DIR,
     dbPath: DB_PATH,
     dbExists: fs.existsSync(DB_PATH),
@@ -1580,16 +1625,18 @@ ensureDb();
 hydrateAllCandles();
 
 syncRealCryptoPrices(true)
-  .then(() => runTensorMarketLoop())
-  .catch(() => runTensorMarketLoop());
+  .then(() => runMarketLoop())
+  .catch(() => runMarketLoop());
 
 setInterval(() => {
-  runTensorMarketLoop();
-}, TENSOR_LOOP_MS);
+  runMarketLoop();
+}, MARKET_LOOP_MS);
 
 app.listen(PORT, () => {
   console.log(`Tensor Wallet running on port ${PORT}`);
-  console.log(`Main page: /trading`);
+  console.log(`Index page: /`);
+  console.log(`Wallet page: /wallet -> views/wallet.ejs`);
+  console.log(`Trading page: /trading -> views/trading.ejs`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Database path: ${DB_PATH}`);
 });
