@@ -380,31 +380,6 @@ function defaultTensorAssets() {
   ];
 }
 
-function defaultCopyProfiles() {
-  return {
-    copy_default_alpha: {
-      id: 'copy_default_alpha',
-      publicId: 'copy_default_alpha',
-      ownerEmail: 'admin@tensorwallet.local',
-      ownerWalletId: 'system',
-      name: 'Tensor Alpha Copy',
-      tag: 'Public strategy',
-      description: 'Demo public copy trading profile. Admin can create new profiles from the trading page.',
-      roi: 14.85,
-      pnl: 2840.25,
-      followers: 128,
-      risk: 'Medium',
-      minCopyUsdt: 50,
-      status: 'active',
-      positions: [],
-      createdAt: Date.now(),
-      createdAtIso: nowIso(),
-      updatedAt: Date.now(),
-      updatedAtIso: nowIso()
-    }
-  };
-}
-
 function defaultDb() {
   return {
     users: {},
@@ -416,7 +391,7 @@ function defaultDb() {
       copyDeposits: []
     },
     publicTradeCards: {},
-    copyProfiles: defaultCopyProfiles()
+    copyProfiles: {}
   };
 }
 
@@ -483,13 +458,9 @@ function migrateDb(db) {
   if (db.treasury.collectedFeesUsdt === undefined) db.treasury.collectedFeesUsdt = 0;
 
   if (!db.publicTradeCards) db.publicTradeCards = {};
-  if (!db.copyProfiles || typeof db.copyProfiles !== 'object') {
-    db.copyProfiles = defaultCopyProfiles();
-  }
+  if (!db.copyProfiles || typeof db.copyProfiles !== 'object') db.copyProfiles = {};
 
-  if (db.tensorRegistry.length === 0) {
-    db.tensorRegistry = defaultTensorAssets();
-  }
+  if (db.tensorRegistry.length === 0) db.tensorRegistry = defaultTensorAssets();
 
   Object.values(db.users).forEach(migrateUser);
   db.tensorRegistry.forEach(migrateToken);
@@ -530,27 +501,55 @@ function migrateUser(user) {
   user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
   user.usdtNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
 
-  user.positions.forEach(pos => {
-    if (!pos.id) pos.id = makeId('pos');
-    if (!pos.marginMode) pos.marginMode = 'cross';
-
-    pos.margin = safeNumber(pos.margin, 0);
-    pos.leverage = safeNumber(pos.leverage, 1);
-    pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
-    pos.entryPrice = safeNumber(pos.entryPrice, 1);
-    pos.markPrice = safeNumber(pos.markPrice, pos.entryPrice);
-    pos.side = pos.side === 'short' ? 'short' : 'long';
-  });
+  user.positions.forEach(pos => migratePosition(pos));
 
   user.copyTrades.forEach(copy => {
     if (!copy.id) copy.id = makeId('copytrade');
     copy.amountUsdt = safeNumber(copy.amountUsdt, 0);
     copy.pnl = safeNumber(copy.pnl, 0);
     copy.roi = safeNumber(copy.roi, 0);
+    copy.markValueUsdt = safeNumber(copy.markValueUsdt, copy.amountUsdt + copy.pnl);
     copy.status = copy.status || 'active';
     copy.startedAt = safeNumber(copy.startedAt, Date.now());
     if (!copy.startedAtIso) copy.startedAtIso = nowIso();
+    if (!Array.isArray(copy.copiedPositions)) copy.copiedPositions = [];
+    if (copy.followsNewAdminTrades === undefined) copy.followsNewAdminTrades = true;
+    copy.copiedPositions.forEach(pos => migrateCopiedPosition(pos));
   });
+}
+
+function migratePosition(pos) {
+  if (!pos.id) pos.id = makeId('pos');
+  if (!pos.marginMode) pos.marginMode = 'cross';
+
+  pos.margin = safeNumber(pos.margin, 0);
+  pos.leverage = safeNumber(pos.leverage, 1);
+  pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
+  pos.entryPrice = safeNumber(pos.entryPrice, 1);
+  pos.markPrice = safeNumber(pos.markPrice, pos.entryPrice);
+  pos.side = pos.side === 'short' ? 'short' : 'long';
+
+  if (!pos.openedAt) pos.openedAt = Date.now();
+  if (!pos.openedAtIso) pos.openedAtIso = nowIso();
+}
+
+function migrateCopiedPosition(pos) {
+  if (!pos.id) pos.id = makeId('copypos');
+  if (!pos.adminPositionId) pos.adminPositionId = pos.sourcePositionId || '';
+  if (!pos.status) pos.status = 'open';
+  if (!pos.side) pos.side = 'long';
+
+  pos.side = pos.side === 'short' ? 'short' : 'long';
+  pos.margin = safeNumber(pos.margin, 0);
+  pos.leverage = safeNumber(pos.leverage, 1);
+  pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
+  pos.entryPrice = safeNumber(pos.entryPrice, 1);
+  pos.markPrice = safeNumber(pos.markPrice, pos.entryPrice);
+  pos.pnl = safeNumber(pos.pnl, 0);
+  pos.roi = safeNumber(pos.roi, 0);
+
+  if (!pos.openedAt) pos.openedAt = Date.now();
+  if (!pos.openedAtIso) pos.openedAtIso = nowIso();
 }
 
 function migrateToken(token) {
@@ -585,18 +584,26 @@ function migrateCopyProfile(profile) {
 
   if (!profile.id) profile.id = makePublicId('copy');
   if (!profile.publicId) profile.publicId = profile.id;
+  if (!profile.ownerEmail) profile.ownerEmail = 'admin@tensorwallet.local';
+  if (!profile.ownerWalletId) profile.ownerWalletId = 'system';
   if (!profile.name) profile.name = 'Copy Trading Profile';
-  if (!profile.tag) profile.tag = 'Public strategy';
+  if (!profile.tag) profile.tag = 'Admin live trading profile';
   if (!profile.description) profile.description = '';
 
   profile.roi = safeNumber(profile.roi ?? profile.currentRoi, 0);
   profile.pnl = safeNumber(profile.pnl ?? profile.currentPnl, 0);
+  profile.openPnl = safeNumber(profile.openPnl, 0);
+  profile.closedPnl = safeNumber(profile.closedPnl, 0);
+  profile.totalMargin = safeNumber(profile.totalMargin, 0);
   profile.followers = Math.max(0, Math.floor(safeNumber(profile.followers ?? profile.copiers, 0)));
   profile.risk = ['Low', 'Medium', 'High'].includes(profile.risk) ? profile.risk : 'Medium';
   profile.minCopyUsdt = Math.max(1, safeNumber(profile.minCopyUsdt, 50));
   profile.status = profile.status === 'paused' ? 'paused' : 'active';
+  profile.source = profile.source || 'admin_live_trading';
 
   if (!Array.isArray(profile.positions)) profile.positions = [];
+  if (!Array.isArray(profile.history)) profile.history = [];
+
   if (!profile.createdAt) profile.createdAt = Date.now();
   if (!profile.createdAtIso) profile.createdAtIso = nowIso();
 
@@ -646,9 +653,8 @@ function getOrCreateUser(email, role = 'user') {
 
     if (role === 'staff' && db.users[normEmail].role !== 'staff') {
       db.users[normEmail].role = 'staff';
+      writeDb(db);
     }
-
-    writeDb(db);
   }
 
   return db.users[normEmail];
@@ -969,6 +975,296 @@ function calculatePnl(pos, currentPrice) {
   return (priceDiff / entry) * size;
 }
 
+function calculateRoiFromPnl(pnl, margin) {
+  const m = safeNumber(margin, 0);
+  if (m <= 0) return 0;
+  return (safeNumber(pnl, 0) / m) * 100;
+}
+
+function findTokenById(db, tokenId) {
+  return db.tensorRegistry.find(t => String(t.id) === String(tokenId));
+}
+
+/* -------------------- Copy Trading Engine -------------------- */
+
+function getAdminOpenPositionsWithPnl(db, admin) {
+  migrateUser(admin);
+
+  return (admin.positions || []).map(pos => {
+    migratePosition(pos);
+
+    const token = findTokenById(db, pos.tokenId);
+    const markPrice = token ? token.price : safeNumber(pos.markPrice, pos.entryPrice);
+    const pnl = calculatePnl(pos, markPrice);
+    const roi = calculateRoiFromPnl(pnl, pos.margin);
+
+    return {
+      ...pos,
+      markPrice,
+      pnl,
+      roi,
+      adminPositionId: pos.id
+    };
+  });
+}
+
+function calculateAdminProfileStats(db, admin) {
+  migrateUser(admin);
+
+  const openPositions = getAdminOpenPositionsWithPnl(db, admin);
+
+  let openPnl = 0;
+  let openMargin = 0;
+  let closedPnl = 0;
+  let closedMargin = 0;
+
+  openPositions.forEach(pos => {
+    openPnl += safeNumber(pos.pnl, 0);
+    openMargin += safeNumber(pos.margin, 0);
+  });
+
+  (admin.orderHistory || []).forEach(trade => {
+    closedPnl += safeNumber(trade.pnl, 0);
+    closedMargin += safeNumber(trade.margin, 0);
+  });
+
+  const totalPnl = openPnl + closedPnl;
+  const totalMargin = openMargin + closedMargin;
+  const roi = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
+
+  return {
+    pnl: Number(totalPnl.toFixed(6)),
+    roi: Number(roi.toFixed(4)),
+    openPnl: Number(openPnl.toFixed(6)),
+    closedPnl: Number(closedPnl.toFixed(6)),
+    openMargin: Number(openMargin.toFixed(6)),
+    closedMargin: Number(closedMargin.toFixed(6)),
+    totalMargin: Number(totalMargin.toFixed(6)),
+    positions: openPositions,
+    history: (admin.orderHistory || []).slice(0, 50)
+  };
+}
+
+function syncCopyProfileFromAdmin(db, profile) {
+  migrateCopyProfile(profile);
+
+  const admin = db.users[normalizeEmail(profile.ownerEmail)];
+
+  if (!admin) {
+    profile.updatedAt = Date.now();
+    profile.updatedAtIso = nowIso();
+    return profile;
+  }
+
+  const stats = calculateAdminProfileStats(db, admin);
+
+  profile.pnl = stats.pnl;
+  profile.roi = stats.roi;
+  profile.openPnl = stats.openPnl;
+  profile.closedPnl = stats.closedPnl;
+  profile.totalMargin = stats.totalMargin;
+  profile.positions = stats.positions;
+  profile.history = stats.history;
+  profile.source = 'admin_live_trading';
+  profile.updatedAt = Date.now();
+  profile.updatedAtIso = nowIso();
+
+  return profile;
+}
+
+function syncAllCopyProfilesFromAdmins(db) {
+  Object.values(db.copyProfiles || {}).forEach(profile => {
+    syncCopyProfileFromAdmin(db, profile);
+  });
+}
+
+function getActiveFollowersForProfile(db, profileId) {
+  const followers = [];
+
+  Object.values(db.users || {}).forEach(user => {
+    migrateUser(user);
+
+    const activeCopies = (user.copyTrades || []).filter(copy => {
+      return copy.status === 'active'
+        && String(copy.profileId) === String(profileId)
+        && copy.followsNewAdminTrades !== false;
+    });
+
+    activeCopies.forEach(copy => {
+      followers.push({ user, copy });
+    });
+  });
+
+  return followers;
+}
+
+function buildCopiedPositionFromAdmin({ adminPosition, copyTrade, profile }) {
+  const amountUsdt = safeNumber(copyTrade.amountUsdt, 0);
+  const profileTotalMargin = Math.max(1, safeNumber(profile.totalMargin, 0));
+  const adminMargin = safeNumber(adminPosition.margin, 0);
+  const ratio = adminMargin > 0 ? adminMargin / profileTotalMargin : 0;
+  const copyMargin = Math.max(0.01, amountUsdt * ratio);
+  const leverage = safeNumber(adminPosition.leverage, 1);
+
+  return {
+    id: makeId('copypos'),
+    adminPositionId: adminPosition.id,
+    profileId: profile.id,
+    tokenId: adminPosition.tokenId,
+    symbol: adminPosition.symbol,
+    side: adminPosition.side === 'short' ? 'short' : 'long',
+    margin: Number(copyMargin.toFixed(6)),
+    leverage,
+    marginMode: adminPosition.marginMode || 'cross',
+    size: Number((copyMargin * leverage).toFixed(6)),
+    entryPrice: safeNumber(adminPosition.entryPrice, 1),
+    markPrice: safeNumber(adminPosition.markPrice, adminPosition.entryPrice),
+    pnl: 0,
+    roi: 0,
+    status: 'open',
+    copiedFromAdminEmail: profile.ownerEmail,
+    openedAt: Date.now(),
+    openedAtIso: nowIso()
+  };
+}
+
+function copyAdminOpenPositionsToCopyTrade(db, profile, copyTrade) {
+  syncCopyProfileFromAdmin(db, profile);
+
+  if (!Array.isArray(copyTrade.copiedPositions)) copyTrade.copiedPositions = [];
+
+  const adminPositions = profile.positions || [];
+
+  adminPositions.forEach(adminPos => {
+    const exists = copyTrade.copiedPositions.some(pos => {
+      return String(pos.adminPositionId) === String(adminPos.id) && pos.status === 'open';
+    });
+
+    if (!exists) {
+      copyTrade.copiedPositions.push(
+        buildCopiedPositionFromAdmin({
+          adminPosition: adminPos,
+          copyTrade,
+          profile
+        })
+      );
+    }
+  });
+
+  updateSingleCopyTradePerformance(db, copyTrade);
+}
+
+function copyAdminNewPositionToFollowers(db, adminUser, adminPosition) {
+  const profiles = Object.values(db.copyProfiles || {}).filter(profile => {
+    return normalizeEmail(profile.ownerEmail) === normalizeEmail(adminUser.email)
+      && profile.status === 'active';
+  });
+
+  profiles.forEach(profile => {
+    syncCopyProfileFromAdmin(db, profile);
+
+    const followers = getActiveFollowersForProfile(db, profile.id);
+
+    followers.forEach(({ copy }) => {
+      if (!Array.isArray(copy.copiedPositions)) copy.copiedPositions = [];
+
+      const exists = copy.copiedPositions.some(pos => {
+        return String(pos.adminPositionId) === String(adminPosition.id) && pos.status === 'open';
+      });
+
+      if (!exists) {
+        copy.copiedPositions.push(
+          buildCopiedPositionFromAdmin({
+            adminPosition,
+            copyTrade: copy,
+            profile
+          })
+        );
+      }
+
+      updateSingleCopyTradePerformance(db, copy);
+    });
+  });
+}
+
+function closeCopiedPositionsForAdminPosition(db, adminUser, closedAdminPosition, closePrice) {
+  const profiles = Object.values(db.copyProfiles || {}).filter(profile => {
+    return normalizeEmail(profile.ownerEmail) === normalizeEmail(adminUser.email);
+  });
+
+  profiles.forEach(profile => {
+    const followers = getActiveFollowersForProfile(db, profile.id);
+
+    followers.forEach(({ copy }) => {
+      if (!Array.isArray(copy.copiedPositions)) copy.copiedPositions = [];
+
+      copy.copiedPositions.forEach(pos => {
+        if (String(pos.adminPositionId) !== String(closedAdminPosition.id) || pos.status !== 'open') return;
+
+        const finalPrice = safeNumber(closePrice, pos.markPrice);
+        const pnl = calculatePnl(pos, finalPrice);
+        const roi = calculateRoiFromPnl(pnl, pos.margin);
+
+        pos.markPrice = finalPrice;
+        pos.closePrice = finalPrice;
+        pos.pnl = Number(pnl.toFixed(6));
+        pos.roi = Number(roi.toFixed(4));
+        pos.status = 'closed';
+        pos.closeReason = closedAdminPosition.closeReason || 'Admin Closed';
+        pos.closedAt = Date.now();
+        pos.closedAtIso = nowIso();
+      });
+
+      updateSingleCopyTradePerformance(db, copy);
+    });
+  });
+}
+
+function updateSingleCopyTradePerformance(db, copyTrade) {
+  if (!copyTrade || copyTrade.status !== 'active') return;
+
+  if (!Array.isArray(copyTrade.copiedPositions)) copyTrade.copiedPositions = [];
+
+  let totalPnl = 0;
+  let totalMargin = 0;
+
+  copyTrade.copiedPositions.forEach(pos => {
+    migrateCopiedPosition(pos);
+
+    if (pos.status === 'open') {
+      const token = findTokenById(db, pos.tokenId);
+      const currentPrice = token ? token.price : safeNumber(pos.markPrice, pos.entryPrice);
+      const pnl = calculatePnl(pos, currentPrice);
+      const roi = calculateRoiFromPnl(pnl, pos.margin);
+
+      pos.markPrice = currentPrice;
+      pos.pnl = Number(pnl.toFixed(6));
+      pos.roi = Number(roi.toFixed(4));
+      pos.updatedAt = Date.now();
+      pos.updatedAtIso = nowIso();
+    }
+
+    totalPnl += safeNumber(pos.pnl, 0);
+    totalMargin += safeNumber(pos.margin, 0);
+  });
+
+  copyTrade.pnl = Number(totalPnl.toFixed(6));
+  copyTrade.roi = Number(calculateRoiFromPnl(totalPnl, totalMargin || copyTrade.amountUsdt).toFixed(4));
+  copyTrade.markValueUsdt = Number((safeNumber(copyTrade.amountUsdt, 0) + totalPnl).toFixed(6));
+  copyTrade.updatedAt = Date.now();
+  copyTrade.updatedAtIso = nowIso();
+}
+
+function updateAllCopyTradesPerformance(db) {
+  Object.values(db.users || {}).forEach(user => {
+    migrateUser(user);
+
+    (user.copyTrades || []).forEach(copy => {
+      updateSingleCopyTradePerformance(db, copy);
+    });
+  });
+}
+
 function buildTreasuryDeposit({ user, token, margin, leverage, side, marginMode, network }) {
   const selectedNetwork = normalizeNetwork(network || user.usdtNetwork || inferUserUsdtNetwork(user));
   const destination = getTreasuryDestination(selectedNetwork);
@@ -1024,30 +1320,7 @@ function buildCopyDeposit({ user, profile, amountUsdt, network }) {
   };
 }
 
-function updateCopyTradePerformance(db, user) {
-  if (!Array.isArray(user.copyTrades) || user.copyTrades.length === 0) return;
-
-  user.copyTrades.forEach(copy => {
-    if (copy.status !== 'active') return;
-
-    const profile = db.copyProfiles[copy.profileId];
-    if (!profile) return;
-
-    const targetRoi = safeNumber(profile.roi, 0);
-    const startedAt = safeNumber(copy.startedAt, Date.now());
-    const ageHours = Math.max(0, (Date.now() - startedAt) / (1000 * 60 * 60));
-    const ramp = Math.min(1, ageHours / 24);
-    const drift = Math.sin((Date.now() / 60000) + safeNumber(copy.amountUsdt, 0)) * 0.18;
-    const roi = targetRoi * ramp + drift;
-    const pnl = safeNumber(copy.amountUsdt, 0) * (roi / 100);
-
-    copy.roi = Number(roi.toFixed(4));
-    copy.pnl = Number(pnl.toFixed(6));
-    copy.markValueUsdt = Number((safeNumber(copy.amountUsdt, 0) + pnl).toFixed(6));
-    copy.updatedAt = Date.now();
-    copy.updatedAtIso = nowIso();
-  });
-}
+/* -------------------- Market Loop -------------------- */
 
 async function runMarketLoop() {
   try {
@@ -1093,7 +1366,6 @@ async function runMarketLoop() {
         token.low24h = real.low || token.price;
         token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
         token.marketCap = token.price * token.supply;
-
         pushLiveCandle(token, oldPrice);
         return;
       }
@@ -1103,7 +1375,6 @@ async function runMarketLoop() {
       } else {
         const bullChance = clamp(token.bullChance, 0, 100);
         const direction = Math.random() * 100 <= bullChance ? 1 : -1;
-
         const minPct = Math.max(0, safeNumber(token.minPct, 0.0005));
         const maxPct = Math.max(minPct, safeNumber(token.maxPct, 0.004));
         const magnitude = minPct + Math.random() * (maxPct - minPct);
@@ -1133,7 +1404,6 @@ async function runMarketLoop() {
     Object.keys(db.users).forEach(email => {
       const user = db.users[email];
       migrateUser(user);
-      updateCopyTradePerformance(db, user);
 
       if (!Array.isArray(user.positions) || user.positions.length === 0) {
         user.updatedAt = nowIso();
@@ -1173,6 +1443,10 @@ async function runMarketLoop() {
             closedAtIso: nowIso(),
             closeReason: 'Liquidation'
           });
+
+          if (user.role === 'staff') {
+            closeCopiedPositionsForAdminPosition(db, user, { ...pos, closeReason: 'Admin Liquidation' }, currentPrice);
+          }
         } else {
           keptPositions.push(pos);
         }
@@ -1182,6 +1456,9 @@ async function runMarketLoop() {
       user.orderHistory = user.orderHistory.slice(0, 100);
       user.updatedAt = nowIso();
     });
+
+    syncAllCopyProfilesFromAdmins(db);
+    updateAllCopyTradesPerformance(db);
 
     writeDb(db);
   } catch (err) {
@@ -1296,61 +1573,41 @@ function renderTradeCardSvg(card) {
       <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
     </filter>
   </defs>
-
   <rect width="1200" height="675" fill="url(#bgGrad)"/>
-
   <g opacity="0.12">
     <path d="M0 520 C180 460 280 570 440 500 S720 370 900 430 S1070 580 1200 500" fill="none" stroke="${color}" stroke-width="4"/>
     <path d="M0 560 C220 480 310 625 520 530 S780 405 960 470 S1110 610 1200 555" fill="none" stroke="#8b5cf6" stroke-width="3"/>
   </g>
-
   <g opacity="0.16">${candles}</g>
-
   <rect x="55" y="45" width="1090" height="585" rx="34" fill="${panel}" opacity="0.94" filter="url(#softShadow)"/>
   <rect x="55" y="45" width="1090" height="585" rx="34" fill="none" stroke="${grid}" stroke-width="2"/>
-
   <rect x="55" y="45" width="1090" height="116" rx="34" fill="${panel2}"/>
   <rect x="55" y="127" width="1090" height="34" fill="${panel2}"/>
-
   <text x="92" y="103" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="900" fill="${white}">bluecrypto.ink</text>
   <text x="92" y="134" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="800" fill="${muted}">Verified by Tensor Wallet</text>
-
   <rect x="848" y="76" width="245" height="52" rx="18" fill="url(#accentGrad)"/>
   <text x="970" y="110" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#fff">${escapeHtml(card.style.resultText)}</text>
-
   <text x="92" y="230" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="950" fill="${white}">${escapeHtml(t.symbol)} / USDT</text>
   <text x="96" y="272" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="${color}">${escapeHtml(sideText)}</text>
-
   <text x="92" y="377" font-family="Inter, Arial, sans-serif" font-size="90" font-weight="950" fill="${color}">${escapeHtml(roiText)}</text>
   <text x="96" y="418" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="850" fill="${muted}">Return on Investment</text>
-
   <rect x="685" y="205" width="410" height="295" rx="26" fill="#0b1220" stroke="${grid}" stroke-width="2"/>
-
   <text x="725" y="262" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">PNL</text>
   <text x="1070" y="262" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="${color}">${escapeHtml(pnlText)}</text>
-
   <text x="725" y="322" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Margin</text>
   <text x="1070" y="322" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.margin, 2)}</text>
-
   <text x="725" y="382" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Position Size</text>
   <text x="1070" y="382" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.size, 2)}</text>
-
   <text x="725" y="442" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Mark Price</text>
   <text x="1070" y="442" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.markPrice)}</text>
-
   <rect x="92" y="488" width="1003" height="1" fill="${grid}"/>
-
   <text x="96" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Entry</text>
   <text x="96" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.entryPrice)}</text>
-
   <text x="335" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Close</text>
   <text x="335" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.closePrice)}</text>
-
   <text x="574" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Reason</text>
   <text x="574" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">${escapeHtml(t.closeReason)}</text>
-
   <text x="1095" y="598" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" fill="${muted}">Trade ID ${escapeHtml(String(t.id).slice(0, 18))}</text>
-
   <text x="600" y="648" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850" fill="${muted}">${escapeHtml(watermark)} • ${escapeHtml(card.verificationText)}</text>
 </svg>`;
 }
@@ -1399,17 +1656,14 @@ function renderTradePublicPage(card) {
       </div>
       <div style="font-weight:950;color:${color}">${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(t.leverage)}x</div>
     </div>
-
     <div class="card">
       <img src="${escapeHtml(card.links.image)}" alt="Verified trade card"/>
     </div>
-
     <div class="actions">
       <a class="primary" href="${escapeHtml(card.links.download)}">Download Trade Image</a>
       <a href="${escapeHtml(card.links.image)}" target="_blank">Open Image</a>
       <a href="/trading">Open Trading</a>
     </div>
-
     <section class="stats">
       <div class="stat"><div class="label">ROI</div><div class="value" style="color:${color}">${escapeHtml(roiText)}</div></div>
       <div class="stat"><div class="label">PNL</div><div class="value" style="color:${color}">${escapeHtml(pnlText)}</div></div>
@@ -1429,18 +1683,24 @@ function publicCopyProfileForResponse(req, profile) {
   return {
     id: profile.id,
     publicId: profile.publicId || profile.id,
+    ownerEmailHash: sha(profile.ownerEmail || '').slice(0, 16),
     name: profile.name,
     tag: profile.tag,
     description: profile.description,
     roi: safeNumber(profile.roi, 0),
     pnl: safeNumber(profile.pnl, 0),
+    openPnl: safeNumber(profile.openPnl, 0),
+    closedPnl: safeNumber(profile.closedPnl, 0),
+    totalMargin: safeNumber(profile.totalMargin, 0),
     followers: safeNumber(profile.followers, 0),
     risk: profile.risk,
     minCopyUsdt: safeNumber(profile.minCopyUsdt, 50),
     status: profile.status,
     positions: Array.isArray(profile.positions) ? profile.positions : [],
+    history: Array.isArray(profile.history) ? profile.history.slice(0, 20) : [],
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
+    source: profile.source || 'admin_live_trading',
     shareUrl: `${baseUrl}/copy/${profile.publicId || profile.id}`,
     joinUrl: `${baseUrl}/trading?copy=${encodeURIComponent(profile.publicId || profile.id)}`
   };
@@ -1453,7 +1713,15 @@ function renderCopyProfilePage(req, profile) {
   const roiText = `${p.roi >= 0 ? '+' : ''}${formatMoney(p.roi)}%`;
 
   const positions = (p.positions || []).slice(0, 8).map(pos => {
-    return `<div class="row"><span>${escapeHtml(pos.symbol || 'Asset')} ${escapeHtml(pos.side || '')}</span><b>${escapeHtml(pos.leverage || 1)}x</b></div>`;
+    const pnl = safeNumber(pos.pnl, 0);
+    const pnlColor = pnl >= 0 ? '#0ecb81' : '#f6465d';
+
+    return `
+      <div class="row">
+        <span>${escapeHtml(pos.symbol || 'Asset')} ${escapeHtml(pos.side || '')} ${escapeHtml(pos.leverage || 1)}x</span>
+        <b style="color:${pnlColor}">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</b>
+      </div>
+    `;
   }).join('') || '<div class="muted">No public active positions listed.</div>';
 
   return `<!DOCTYPE html>
@@ -1476,7 +1744,7 @@ function renderCopyProfilePage(req, profile) {
     .stat{background:#0b1220;border:1px solid #1f2937;border-radius:16px;padding:14px}
     .label{color:#94a3b8;font-size:.72rem;font-weight:850}
     .val{font-weight:950;font-size:1.08rem;margin-top:6px}
-    .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1f2937;color:#e5e7eb}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #1f2937;color:#e5e7eb}
     .muted{color:#94a3b8;font-weight:750}
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     a{color:white;text-decoration:none;padding:12px 14px;border-radius:12px;background:#1f2937;border:1px solid #334155;font-weight:950}
@@ -1490,21 +1758,17 @@ function renderCopyProfilePage(req, profile) {
       <div class="brand">bluecrypto.ink • Tensor Wallet</div>
       <h1 class="title">${escapeHtml(p.name)}</h1>
       <div class="tag">${escapeHtml(p.tag)} • ${escapeHtml(p.risk)} risk • ${escapeHtml(p.status)}</div>
-
       <div class="stats">
         <div class="stat"><div class="label">ROI</div><div class="val" style="color:${roiClass}">${escapeHtml(roiText)}</div></div>
         <div class="stat"><div class="label">PNL</div><div class="val" style="color:${roiClass}">${escapeHtml(pnlText)}</div></div>
-        <div class="stat"><div class="label">Followers</div><div class="val">${formatMoney(p.followers, 0)}</div></div>
+        <div class="stat"><div class="label">Running</div><div class="val">${p.positions.length}</div></div>
         <div class="stat"><div class="label">Min Copy</div><div class="val">$${formatMoney(p.minCopyUsdt, 0)}</div></div>
       </div>
-
       <div class="muted">${escapeHtml(p.description || 'Public copy trading profile.')}</div>
-
       <div style="margin-top:18px">
-        <b>Public positions</b>
+        <b>Admin running positions</b>
         ${positions}
       </div>
-
       <div class="actions">
         <a class="primary" href="${escapeHtml(p.joinUrl)}">Open & Copy</a>
         <a href="/trading">Open Trading</a>
@@ -1606,6 +1870,10 @@ app.get('/trade/:id/download', (req, res) => {
 
 app.get('/copy/:id', (req, res) => {
   const db = readDb();
+  syncAllCopyProfilesFromAdmins(db);
+  updateAllCopyTradesPerformance(db);
+  writeDb(db);
+
   const profile = Object.values(db.copyProfiles).find(p => {
     return String(p.publicId || p.id) === String(req.params.id);
   });
@@ -1722,6 +1990,10 @@ app.post('/logout', (req, res) => {
 app.get('/api/copy/profiles', requireAuthJson, (req, res) => {
   const db = readDb();
 
+  syncAllCopyProfilesFromAdmins(db);
+  updateAllCopyTradesPerformance(db);
+  writeDb(db);
+
   const profiles = Object.values(db.copyProfiles)
     .map(profile => publicCopyProfileForResponse(req, profile))
     .sort((a, b) => safeNumber(b.updatedAt, 0) - safeNumber(a.updatedAt, 0));
@@ -1734,6 +2006,10 @@ app.get('/api/copy/profiles', requireAuthJson, (req, res) => {
 
 app.get('/api/copy/profile/:id', requireAuthJson, (req, res) => {
   const db = readDb();
+
+  syncAllCopyProfilesFromAdmins(db);
+  updateAllCopyTradesPerformance(db);
+  writeDb(db);
 
   const profile = Object.values(db.copyProfiles).find(p => {
     return String(p.id) === String(req.params.id) || String(p.publicId) === String(req.params.id);
@@ -1754,10 +2030,8 @@ app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
   const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
 
   const name = String(req.body.name || '').trim().slice(0, 64);
-  const tag = String(req.body.tag || 'Admin public profile').trim().slice(0, 80);
-  const description = String(req.body.description || '').trim().slice(0, 500);
-  const roi = safeNumber(req.body.roi ?? req.body.currentRoi, 0);
-  const pnl = safeNumber(req.body.pnl ?? req.body.currentPnl, 0);
+  const tag = String(req.body.tag || 'Admin live trading profile').trim().slice(0, 80);
+  const description = String(req.body.description || 'This profile follows the admin trader live. ROI, PNL, and running positions are calculated from admin trades.').trim().slice(0, 500);
   const risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : 'Medium';
   const minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, 50));
   const status = req.body.status === 'paused' ? 'paused' : 'active';
@@ -1768,12 +2042,6 @@ app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
 
   const id = makePublicId('copy');
 
-  const positions = Array.isArray(req.body.positions)
-    ? req.body.positions.slice(0, 25)
-    : Array.isArray(user.positions)
-      ? user.positions.slice(0, 25)
-      : [];
-
   const profile = {
     id,
     publicId: id,
@@ -1782,13 +2050,18 @@ app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
     name,
     tag,
     description,
-    roi,
-    pnl,
     followers: 0,
     risk,
     minCopyUsdt,
     status,
-    positions,
+    source: 'admin_live_trading',
+    positions: [],
+    history: [],
+    pnl: 0,
+    roi: 0,
+    openPnl: 0,
+    closedPnl: 0,
+    totalMargin: 0,
     createdAt: Date.now(),
     createdAtIso: nowIso(),
     updatedAt: Date.now(),
@@ -1796,6 +2069,7 @@ app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
   };
 
   db.copyProfiles[id] = profile;
+  syncCopyProfileFromAdmin(db, profile);
 
   writeDb(db);
 
@@ -1816,20 +2090,20 @@ app.put('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
     return res.status(404).json({ error: 'Copy profile not found.' });
   }
 
+  if (normalizeEmail(profile.ownerEmail) !== normalizeEmail(req.session.user.email)) {
+    return res.status(403).json({ error: 'You can only update your own copy profile.' });
+  }
+
   if (req.body.name !== undefined) profile.name = String(req.body.name || profile.name).trim().slice(0, 64);
   if (req.body.tag !== undefined) profile.tag = String(req.body.tag || profile.tag).trim().slice(0, 80);
   if (req.body.description !== undefined) profile.description = String(req.body.description || '').trim().slice(0, 500);
-  if (req.body.roi !== undefined || req.body.currentRoi !== undefined) profile.roi = safeNumber(req.body.roi ?? req.body.currentRoi, profile.roi);
-  if (req.body.pnl !== undefined || req.body.currentPnl !== undefined) profile.pnl = safeNumber(req.body.pnl ?? req.body.currentPnl, profile.pnl);
   if (req.body.risk !== undefined) profile.risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : profile.risk;
   if (req.body.minCopyUsdt !== undefined) profile.minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, profile.minCopyUsdt));
   if (req.body.status !== undefined) profile.status = req.body.status === 'paused' ? 'paused' : 'active';
-  if (Array.isArray(req.body.positions)) profile.positions = req.body.positions.slice(0, 25);
 
-  profile.updatedAt = Date.now();
-  profile.updatedAtIso = nowIso();
+  syncCopyProfileFromAdmin(db, profile);
+  updateAllCopyTradesPerformance(db);
 
-  migrateCopyProfile(profile);
   writeDb(db);
 
   res.json({
@@ -1849,7 +2123,25 @@ app.delete('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
     return res.status(404).json({ error: 'Copy profile not found.' });
   }
 
+  const profile = db.copyProfiles[key];
+
+  if (normalizeEmail(profile.ownerEmail) !== normalizeEmail(req.session.user.email)) {
+    return res.status(403).json({ error: 'You can only delete your own copy profile.' });
+  }
+
   delete db.copyProfiles[key];
+
+  Object.values(db.users).forEach(user => {
+    migrateUser(user);
+    user.copyTrades.forEach(copy => {
+      if (String(copy.profileId) === String(profile.id) && copy.status === 'active') {
+        copy.status = 'profile_deleted';
+        copy.closedAt = Date.now();
+        copy.closedAtIso = nowIso();
+      }
+    });
+  });
+
   writeDb(db);
 
   res.json({ ok: true });
@@ -1878,8 +2170,14 @@ app.post('/api/copy/join', requireAuthJson, (req, res) => {
     return res.status(404).json({ error: 'Copy profile not found.' });
   }
 
+  syncCopyProfileFromAdmin(db, profile);
+
   if (profile.status !== 'active') {
     return res.status(400).json({ error: 'This copy profile is not active.' });
+  }
+
+  if (normalizeEmail(profile.ownerEmail) === normalizeEmail(user.email)) {
+    return res.status(400).json({ error: 'You cannot copy your own profile.' });
   }
 
   if (amountUsdt < safeNumber(profile.minCopyUsdt, 50)) {
@@ -1904,6 +2202,7 @@ app.post('/api/copy/join', requireAuthJson, (req, res) => {
     profileId: profile.id,
     profilePublicId: profile.publicId || profile.id,
     profileName: profile.name,
+    ownerEmailHash: sha(profile.ownerEmail || '').slice(0, 16),
     amountUsdt,
     pnl: 0,
     roi: 0,
@@ -1914,8 +2213,12 @@ app.post('/api/copy/join', requireAuthJson, (req, res) => {
     depositId: copyDeposit.id,
     treasuryTxHash: copyDeposit.txHash,
     treasuryNetwork: copyDeposit.destinationNetwork,
-    treasuryAddress: copyDeposit.destinationAddress
+    treasuryAddress: copyDeposit.destinationAddress,
+    followsNewAdminTrades: req.body.followNewTrades !== false,
+    copiedPositions: []
   };
+
+  copyAdminOpenPositionsToCopyTrade(db, profile, copyTrade);
 
   user.usdtNetwork = automaticNetwork;
   user.usdtBalance = safeNumber(user.usdtBalance, 0) - amountUsdt;
@@ -1931,6 +2234,7 @@ app.post('/api/copy/join', requireAuthJson, (req, res) => {
   db.treasury.copyDeposits.unshift(copyDeposit);
   db.treasury.copyDeposits = db.treasury.copyDeposits.slice(0, 1000);
 
+  updateSingleCopyTradePerformance(db, copyTrade);
   writeDb(db);
 
   res.json({
@@ -1960,7 +2264,7 @@ app.post('/api/copy/stop', requireAuthJson, (req, res) => {
     return res.status(401).json({ error: 'User not found.' });
   }
 
-  updateCopyTradePerformance(db, user);
+  updateAllCopyTradesPerformance(db);
 
   const idx = user.copyTrades.findIndex(c => {
     return String(c.id) === copyTradeId && c.status === 'active';
@@ -2029,7 +2333,8 @@ app.get('/api/trading/state', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
 
-  updateCopyTradePerformance(db, user);
+  syncAllCopyProfilesFromAdmins(db);
+  updateAllCopyTradesPerformance(db);
   writeDb(db);
 
   res.json({
@@ -2122,6 +2427,12 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
 
   user.updatedAt = nowIso();
 
+  if (user.role === 'staff') {
+    copyAdminNewPositionToFollowers(db, user, position);
+    syncAllCopyProfilesFromAdmins(db);
+    updateAllCopyTradesPerformance(db);
+  }
+
   writeDb(db);
 
   res.json({
@@ -2182,6 +2493,12 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   user.orderHistory = user.orderHistory.slice(0, 100);
   user.updatedAt = nowIso();
 
+  if (user.role === 'staff') {
+    closeCopiedPositionsForAdminPosition(db, user, historyRecord, currentPrice);
+    syncAllCopyProfilesFromAdmins(db);
+    updateAllCopyTradesPerformance(db);
+  }
+
   const publicCard = buildTradeCardPayload({
     req,
     db,
@@ -2232,7 +2549,6 @@ app.post('/api/trading/share', requireAuthJson, (req, res) => {
   });
 
   user.updatedAt = nowIso();
-
   writeDb(db);
 
   res.json({
@@ -2349,6 +2665,9 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
         token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
       }
     });
+
+    syncAllCopyProfilesFromAdmins(db);
+    updateAllCopyTradesPerformance(db);
 
     writeDb(db);
 
@@ -2554,6 +2873,14 @@ app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
     if (Array.isArray(user.positions)) {
       user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
     }
+
+    if (Array.isArray(user.copyTrades)) {
+      user.copyTrades.forEach(copy => {
+        if (Array.isArray(copy.copiedPositions)) {
+          copy.copiedPositions = copy.copiedPositions.filter(p => p.tokenId !== req.params.id);
+        }
+      });
+    }
   });
 
   writeDb(db);
@@ -2721,10 +3048,12 @@ app.get('/api/prices', requireAuthJson, async (req, res) => {
 app.get('/health', (req, res) => {
   const dbExists = fs.existsSync(DB_PATH);
   let copyProfileCount = 0;
+  let userCount = 0;
 
   try {
     const db = readDb();
     copyProfileCount = Object.keys(db.copyProfiles || {}).length;
+    userCount = Object.keys(db.users || {}).length;
   } catch {}
 
   res.json({
@@ -2739,15 +3068,23 @@ app.get('/health', (req, res) => {
       publicTradeImage: '/trade/:id/image.svg',
       publicCopyProfile: '/copy/:id'
     },
+    api: {
+      copyProfiles: '/api/copy/profiles',
+      copyJoin: '/api/copy/join',
+      copyStop: '/api/copy/stop',
+      adminCopyProfile: '/api/copy/admin/profile'
+    },
     candleBase: '5m',
     supportedChartTimeframes: ['5m', '15m', '30m', '1h'],
     treasuryDestinations: TREASURY_USDT_ADDRESSES,
     dataDir: DATA_DIR,
     dbPath: DB_PATH,
     dbExists,
+    userCount,
+    copyProfileCount,
     lastRealPriceSync,
     realPriceCount: Object.keys(latestRealPrices).length,
-    copyProfileCount
+    note: 'This server records demo ledger movements only. It does not broadcast real blockchain transactions.'
   });
 });
 
@@ -2782,6 +3119,7 @@ app.listen(PORT, () => {
   console.log(`Public trade page: /trade/:id`);
   console.log(`Public trade image: /trade/:id/image.svg`);
   console.log(`Public copy profile: /copy/:id`);
+  console.log(`Copy trading is simulated in the local ledger. No real on-chain broadcasts are performed.`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Database path: ${DB_PATH}`);
 });
