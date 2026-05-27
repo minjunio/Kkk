@@ -20,6 +20,7 @@ const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
 const STAFF_EMAIL = process.env.STAFF_EMAIL || 'staff@tensor.local';
 
 const IS_PROD = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+
 const DATA_DIR = process.env.DATA_DIR || (IS_PROD ? '/data' : path.join(__dirname, 'data'));
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
@@ -106,7 +107,7 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-/* -------------------- Helpers -------------------- */
+/* -------------------- Basic Helpers -------------------- */
 
 function nowIso() {
   return new Date().toISOString();
@@ -137,16 +138,18 @@ function safeJsonForEjs(obj) {
   return JSON.stringify(obj ?? null)
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
-    .replace(/&/g, '\\u0026');
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }
 
 function escapeHtml(value) {
   return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function ensureDataFolderOnly() {
@@ -187,47 +190,16 @@ function getSolanaDestination() {
   };
 }
 
-function getTokenByIdOrSymbol(db, tokenIdOrSymbol) {
-  const query = String(tokenIdOrSymbol || '').toUpperCase();
+function formatPrice(n) {
+  const num = safeNumber(n, 0);
 
-  return db.tensorRegistry.find(t => {
-    return String(t.id) === String(tokenIdOrSymbol) ||
-      String(t.symbol || '').toUpperCase() === query;
-  });
+  if (num >= 1000) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (num >= 1) return num.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+  return num.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
 }
 
-function publicWallet(user) {
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    createdAt: user.createdAt,
-    tensorAddress: user.tensorAddress,
-
-    usdtBalance: safeNumber(user.usdtBalance, 0),
-    ousdBalance: safeNumber(user.ousdBalance, 0),
-    usdtNetwork: user.usdtNetwork || 'eth',
-
-    assets: user.assets || [],
-    publicWallets: user.publicWallets || [],
-    wallets: user.wallets || [],
-    balances: user.balances || [],
-
-    positions: user.positions || [],
-    orderHistory: user.orderHistory || [],
-    publicTradeCards: user.publicTradeCards || [],
-    tradeDeposits: user.tradeDeposits || [],
-
-    copyState: {
-      isCopyTrader: !!user.copyState?.isCopyTrader,
-      copyingTarget: user.copyState?.copyingTarget || null,
-      copyBalance: safeNumber(user.copyState?.copyBalance, 0),
-      activeCopyTrades: user.copyState?.activeCopyTrades || []
-    }
-  };
-}
-
-/* -------------------- Default DB -------------------- */
+/* -------------------- Default Data -------------------- */
 
 function defaultTensorAssets() {
   return [
@@ -383,8 +355,7 @@ function defaultDb() {
       collectedFeesUsdt: 0,
       tradeDeposits: []
     },
-    publicTradeCards: {},
-    copyProfiles: {}
+    publicTradeCards: {}
   };
 }
 
@@ -442,7 +413,6 @@ function migrateDb(db) {
   if (!Array.isArray(db.treasury.tradeDeposits)) db.treasury.tradeDeposits = [];
 
   if (!db.publicTradeCards) db.publicTradeCards = {};
-  if (!db.copyProfiles) db.copyProfiles = {};
 
   db.tensorRegistry.forEach(migrateToken);
   Object.values(db.users).forEach(migrateUser);
@@ -496,8 +466,8 @@ function migrateUser(user) {
 
 function migratePosition(pos) {
   if (!pos.id) pos.id = makeId('pos');
-  if (!pos.tokenId) pos.tokenId = null;
 
+  pos.tokenId = pos.tokenId || null;
   pos.symbol = String(pos.symbol || 'BTC').toUpperCase();
   pos.side = pos.side === 'short' ? 'short' : 'long';
   pos.margin = safeNumber(pos.margin, 0);
@@ -540,7 +510,7 @@ function migrateToken(token) {
   );
 }
 
-/* -------------------- Auth Helpers -------------------- */
+/* -------------------- Users -------------------- */
 
 function createWalletRecord(email, role = 'user') {
   const hash = sha(email);
@@ -551,7 +521,6 @@ function createWalletRecord(email, role = 'user') {
     role,
     createdAt: nowIso(),
     updatedAt: nowIso(),
-    encryptedVault: null,
 
     assets: [],
     publicWallets: [],
@@ -590,7 +559,7 @@ function getOrCreateUser(email, role = 'user') {
   } else {
     migrateUser(db.users[normEmail]);
 
-    if (role === 'staff' && db.users[normEmail].role !== 'staff') {
+    if (role === 'staff') {
       db.users[normEmail].role = 'staff';
       db.users[normEmail].usdtBalance = Math.max(safeNumber(db.users[normEmail].usdtBalance, 0), 1000000);
       db.users[normEmail].ousdBalance = Math.max(safeNumber(db.users[normEmail].ousdBalance, 0), 500000);
@@ -600,6 +569,39 @@ function getOrCreateUser(email, role = 'user') {
 
   return db.users[normEmail];
 }
+
+function publicWallet(user) {
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    tensorAddress: user.tensorAddress,
+
+    usdtBalance: safeNumber(user.usdtBalance, 0),
+    ousdBalance: safeNumber(user.ousdBalance, 0),
+    usdtNetwork: user.usdtNetwork || 'eth',
+
+    assets: user.assets || [],
+    publicWallets: user.publicWallets || [],
+    wallets: user.wallets || [],
+    balances: user.balances || [],
+
+    positions: user.positions || [],
+    orderHistory: user.orderHistory || [],
+    publicTradeCards: user.publicTradeCards || [],
+    tradeDeposits: user.tradeDeposits || [],
+
+    copyState: {
+      isCopyTrader: !!user.copyState?.isCopyTrader,
+      copyingTarget: user.copyState?.copyingTarget || null,
+      copyBalance: safeNumber(user.copyState?.copyBalance, 0),
+      activeCopyTrades: user.copyState?.activeCopyTrades || []
+    }
+  };
+}
+
+/* -------------------- Auth Middleware -------------------- */
 
 function requireAuth(req, res, next) {
   if (!req.session.user || !req.session.user.email) {
@@ -617,13 +619,7 @@ function requireAuthJson(req, res, next) {
   next();
 }
 
-function requireStaffJson(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'staff') {
-    return res.status(403).json({ error: 'Staff access required.' });
-  }
-
-  next();
-}
+/* -------------------- OTP -------------------- */
 
 function generateOtp() {
   return String(crypto.randomInt(100000, 999999));
@@ -708,6 +704,134 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
+/* -------------------- Safe Render Helpers -------------------- */
+
+function fallbackIndexHtml(data = {}) {
+  const error = data.error ? `<div class="msg error">${escapeHtml(data.error)}</div>` : '';
+  const message = data.message ? `<div class="msg ok">${escapeHtml(data.message)}</div>` : '';
+  const email = escapeHtml(data.email || '');
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Tensor Login</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>
+        body{margin:0;background:#0b0e11;color:#eaecef;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:20px}
+        .box{width:100%;max-width:420px;background:#1e2329;border:1px solid #2b3139;border-radius:18px;padding:24px}
+        h1{margin:0 0 10px;font-size:28px}
+        p{color:#848e9c}
+        input{width:100%;box-sizing:border-box;margin:8px 0;padding:14px;border-radius:10px;border:1px solid #2b3139;background:#0b0e11;color:#fff}
+        button{width:100%;margin-top:8px;padding:14px;border-radius:10px;border:0;background:#8b5cf6;color:#fff;font-weight:900}
+        .msg{padding:12px;border-radius:10px;margin:10px 0;font-weight:800}
+        .error{background:rgba(246,70,93,.15);color:#f6465d}
+        .ok{background:rgba(14,203,129,.15);color:#0ecb81}
+        hr{border:0;border-top:1px solid #2b3139;margin:22px 0}
+      </style>
+    </head>
+    <body>
+      <div class="box">
+        <h1>Tensor Wallet</h1>
+        <p>Login with email code.</p>
+        ${error}
+        ${message}
+
+        <form method="POST" action="/auth/request-otp">
+          <input name="email" type="email" placeholder="Email" value="${email}" required>
+          <button type="submit">Send Code</button>
+        </form>
+
+        <form method="POST" action="/auth/verify">
+          <input name="email" type="email" placeholder="Email" value="${email}" required>
+          <input name="otp" type="text" placeholder="6-digit code" required>
+          <button type="submit">Verify</button>
+        </form>
+
+        <hr>
+
+        <form method="POST" action="/staff/login">
+          <input name="username" placeholder="Staff username">
+          <input name="password" type="password" placeholder="Staff password">
+          <button type="submit">Staff Login</button>
+        </form>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function renderIndex(req, res, extra = {}) {
+  const data = {
+    error: null,
+    message: null,
+    email: '',
+    user: req.session.user || null,
+    safeJsonForEjs,
+    escapeHtml,
+    ...extra
+  };
+
+  const indexPath = path.join(__dirname, 'views', 'index.ejs');
+
+  if (!fs.existsSync(indexPath)) {
+    return res.status(extra.statusCode || 200).send(fallbackIndexHtml(data));
+  }
+
+  return res.status(extra.statusCode || 200).render('index', data, (err, html) => {
+    if (err) {
+      console.error('INDEX EJS ERROR:', err);
+      return res.status(200).send(fallbackIndexHtml({
+        ...data,
+        error: IS_PROD ? 'Login page template error.' : `index.ejs error: ${err.message}`
+      }));
+    }
+
+    return res.send(html);
+  });
+}
+
+function renderTrading(req, res, user) {
+  const walletJson = safeJsonForEjs(publicWallet(user));
+  const treasuryJson = safeJsonForEjs(TREASURY_USDT_ADDRESSES);
+
+  return res.render('trading', {
+    wallet: walletJson,
+    treasury: treasuryJson,
+    user: publicWallet(user),
+    safeJsonForEjs,
+    escapeHtml,
+    formatPrice
+  }, (err, html) => {
+    if (err) {
+      console.error('TRADING EJS ERROR:', err);
+
+      return res.status(500).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Trading Template Error</title>
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <style>
+            body{background:#0b0e11;color:#eaecef;font-family:Arial,sans-serif;padding:20px}
+            pre{white-space:pre-wrap;background:#1e2329;border:1px solid #2b3139;border-radius:12px;padding:16px;color:#f6465d}
+            a{color:#8b5cf6}
+          </style>
+        </head>
+        <body>
+          <h1>trading.ejs error</h1>
+          <p>The server is working, but your <b>views/trading.ejs</b> has a template error.</p>
+          <pre>${escapeHtml(err.stack || err.message)}</pre>
+          <a href="/">Back to index</a>
+        </body>
+        </html>
+      `);
+    }
+
+    return res.send(html);
+  });
+}
+
 /* -------------------- Price Engine -------------------- */
 
 async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
@@ -784,6 +908,15 @@ async function syncRealCryptoPrices(force = false) {
   }
 }
 
+function getTokenByIdOrSymbol(db, tokenIdOrSymbol) {
+  const raw = String(tokenIdOrSymbol || '');
+  const query = raw.toUpperCase();
+
+  return db.tensorRegistry.find(t => {
+    return String(t.id) === raw || String(t.symbol || '').toUpperCase() === query;
+  });
+}
+
 function initializeCandlesForToken(tokenId, startPrice) {
   if (tensorCandleHistory[tokenId] && tensorCandleHistory[tokenId].length) return;
 
@@ -814,10 +947,9 @@ function initializeCandlesForToken(tokenId, startPrice) {
 }
 
 function appendCandle(token) {
-  const tokenId = token.id;
-  initializeCandlesForToken(tokenId, token.price);
+  initializeCandlesForToken(token.id, token.price);
 
-  const candles = tensorCandleHistory[tokenId];
+  const candles = tensorCandleHistory[token.id];
   const last = candles[candles.length - 1];
   const now = Date.now();
   const price = Math.max(0.000001, safeNumber(token.price, 1));
@@ -893,16 +1025,19 @@ function syncRegistryWithPrices(db) {
   });
 }
 
+function getMarketPrice(db, tokenIdOrSymbol) {
+  const token = getTokenByIdOrSymbol(db, tokenIdOrSymbol);
+  return Math.max(0.000001, safeNumber(token?.price, 1));
+}
+
 function calculatePosition(pos, markPrice) {
   const entry = Math.max(0.000001, safeNumber(pos.entryPrice, 1));
   const size = safeNumber(pos.size, 0);
   const margin = Math.max(0.000001, safeNumber(pos.margin, 0));
 
-  const side = pos.side === 'short' ? 'short' : 'long';
-
-  const priceMovePct = side === 'long'
-    ? (markPrice - entry) / entry
-    : (entry - markPrice) / entry;
+  const priceMovePct = pos.side === 'short'
+    ? (entry - markPrice) / entry
+    : (markPrice - entry) / entry;
 
   const pnl = size * priceMovePct;
   const roi = pnl / margin * 100;
@@ -910,15 +1045,8 @@ function calculatePosition(pos, markPrice) {
   return {
     markPrice,
     pnl,
-    roi,
-    value: size + pnl
+    roi
   };
-}
-
-function getMarketPrice(db, tokenIdOrSymbol) {
-  const token = getTokenByIdOrSymbol(db, tokenIdOrSymbol);
-  if (!token) return 1;
-  return Math.max(0.000001, safeNumber(token.price, 1));
 }
 
 function updateUserPositions(user, db) {
@@ -947,20 +1075,18 @@ function updateUserPositions(user, db) {
   });
 }
 
-function updateAllPositions(db) {
-  Object.values(db.users || {}).forEach(user => {
-    migrateUser(user);
-    updateUserPositions(user, db);
-  });
-}
-
 async function marketLoop() {
   try {
     await syncRealCryptoPrices(false);
 
     const db = readDb();
+
     syncRegistryWithPrices(db);
-    updateAllPositions(db);
+
+    Object.values(db.users || {}).forEach(user => {
+      migrateUser(user);
+      updateUserPositions(user, db);
+    });
 
     writeDb(db);
   } catch (err) {
@@ -968,7 +1094,7 @@ async function marketLoop() {
   }
 }
 
-/* -------------------- PNG Helper -------------------- */
+/* -------------------- PNG Generation -------------------- */
 
 function crc32(buf) {
   const table = crc32.table || (crc32.table = (() => {
@@ -1065,21 +1191,7 @@ function makeTradePng(card) {
   ]);
 }
 
-/* -------------------- Render Helpers -------------------- */
-
-function renderIndex(req, res, extra = {}) {
-  return res.render('index', {
-    error: null,
-    message: null,
-    email: '',
-    user: req.session.user || null,
-    safeJsonForEjs,
-    escapeHtml,
-    ...extra
-  });
-}
-
-/* -------------------- Page Routes -------------------- */
+/* -------------------- Pages -------------------- */
 
 app.get('/', (req, res) => {
   return renderIndex(req, res);
@@ -1095,7 +1207,8 @@ app.get('/index.html', (req, res) => {
 
 app.get('/trading', requireAuth, (req, res) => {
   const db = readDb();
-  const user = db.users[normalizeEmail(req.session.user.email)];
+  const email = normalizeEmail(req.session.user.email);
+  const user = db.users[email];
 
   if (!user) {
     req.session.destroy(() => {});
@@ -1103,14 +1216,9 @@ app.get('/trading', requireAuth, (req, res) => {
   }
 
   migrateUser(user);
+  updateUserPositions(user, db);
 
-  return res.render('trading', {
-    wallet: safeJsonForEjs(publicWallet(user)),
-    treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES),
-    user: publicWallet(user),
-    safeJsonForEjs,
-    escapeHtml
-  });
+  return renderTrading(req, res, user);
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
@@ -1118,6 +1226,12 @@ app.get('/wallet', requireAuth, (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+});
+
+app.get('/reset-session', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/');
   });
@@ -1202,7 +1316,14 @@ app.post('/staff/login', (req, res) => {
   return res.redirect('/trading');
 });
 
-/* -------------------- API Required By trading.ejs -------------------- */
+/* -------------------- API For trading.ejs -------------------- */
+
+app.get('/api/session', (req, res) => {
+  return res.json({
+    authenticated: !!req.session.user,
+    user: req.session.user || null
+  });
+});
 
 app.get('/api/tensor', requireAuthJson, async (req, res) => {
   await syncRealCryptoPrices(false);
@@ -1220,11 +1341,11 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
 
 app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
   const db = readDb();
-  const tokenId = req.query.tokenId;
-  const token = getTokenByIdOrSymbol(db, tokenId);
+  const token = getTokenByIdOrSymbol(db, req.query.tokenId);
 
   if (!token) {
     return res.status(404).json({
+      ok: false,
       error: 'Token not found.',
       candles: []
     });
@@ -1290,8 +1411,7 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     return res.status(404).json({ error: 'User not found.' });
   }
 
-  const tokenId = String(req.body.tokenId || '');
-  const token = getTokenByIdOrSymbol(db, tokenId);
+  const token = getTokenByIdOrSymbol(db, req.body.tokenId);
 
   if (!token) {
     return res.status(404).json({ error: 'Asset not found.' });
@@ -1420,7 +1540,7 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
     user.usdtBalance += returned;
   }
 
-  const publicTradeCard = createTradeCard(db, user, historyRecord, null);
+  const publicTradeCard = createTradeCard(db, user, historyRecord);
 
   user.publicTradeCards.unshift({
     id: publicTradeCard.id,
@@ -1445,44 +1565,9 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
   });
 });
 
-app.post('/api/trading/share', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[normalizeEmail(req.session.user.email)];
+/* -------------------- Trade Sharing -------------------- */
 
-  if (!user) {
-    return res.status(404).json({ error: 'User not found.' });
-  }
-
-  const historyId = String(req.body.historyId || '');
-  const trade = user.orderHistory.find(t => String(t.id) === historyId);
-
-  if (!trade) {
-    return res.status(404).json({ error: 'History trade not found.' });
-  }
-
-  const publicTradeCard = createTradeCard(db, user, trade, req);
-  const shareUrl = `${getBaseUrl(req)}/trade/${publicTradeCard.id}`;
-  const imageUrl = `${getBaseUrl(req)}/trade/${publicTradeCard.id}/download`;
-
-  user.publicTradeCards.unshift({
-    id: publicTradeCard.id,
-    tradeId: trade.id,
-    page: shareUrl,
-    image: imageUrl,
-    createdAt: Date.now()
-  });
-
-  writeDb(db);
-
-  return res.json({
-    ok: true,
-    publicTradeCard,
-    shareUrl,
-    imageUrl
-  });
-});
-
-function createTradeCard(db, user, trade, req) {
+function createTradeCard(db, user, trade) {
   const id = makePublicId('trade');
 
   const card = {
@@ -1509,6 +1594,43 @@ function createTradeCard(db, user, trade, req) {
   db.publicTradeCards[id] = card;
   return card;
 }
+
+app.post('/api/trading/share', requireAuthJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[normalizeEmail(req.session.user.email)];
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
+
+  const historyId = String(req.body.historyId || '');
+  const trade = user.orderHistory.find(t => String(t.id) === historyId);
+
+  if (!trade) {
+    return res.status(404).json({ error: 'History trade not found.' });
+  }
+
+  const publicTradeCard = createTradeCard(db, user, trade);
+  const shareUrl = `${getBaseUrl(req)}/trade/${publicTradeCard.id}`;
+  const imageUrl = `${getBaseUrl(req)}/trade/${publicTradeCard.id}/download`;
+
+  user.publicTradeCards.unshift({
+    id: publicTradeCard.id,
+    tradeId: trade.id,
+    page: shareUrl,
+    image: imageUrl,
+    createdAt: Date.now()
+  });
+
+  writeDb(db);
+
+  return res.json({
+    ok: true,
+    publicTradeCard,
+    shareUrl,
+    imageUrl
+  });
+});
 
 app.get('/trade/:id', (req, res) => {
   const db = readDb();
@@ -1541,8 +1663,8 @@ app.get('/trade/:id', (req, res) => {
         <h1>${escapeHtml(card.symbol)} / USDT</h1>
         <div class="pnl">${safeNumber(card.pnl,0) >= 0 ? '+' : ''}$${safeNumber(card.pnl,0).toFixed(2)}</div>
         <div style="color:#848E9C;font-weight:800;margin-bottom:18px">${safeNumber(card.roi,0) >= 0 ? '+' : ''}${safeNumber(card.roi,0).toFixed(2)}% ROI</div>
-        <div class="row"><span>Entry</span><b>$${safeNumber(card.entryPrice,0).toFixed(6)}</b></div>
-        <div class="row"><span>Close</span><b>$${safeNumber(card.closePrice,0).toFixed(6)}</b></div>
+        <div class="row"><span>Entry</span><b>$${formatPrice(card.entryPrice)}</b></div>
+        <div class="row"><span>Close</span><b>$${formatPrice(card.closePrice)}</b></div>
         <div class="row"><span>Margin</span><b>${safeNumber(card.margin,0).toFixed(2)} ${escapeHtml(card.currency)}</b></div>
         <div class="row"><span>Size</span><b>${safeNumber(card.size,0).toFixed(2)} ${escapeHtml(card.currency)}</b></div>
         <a href="/trade/${encodeURIComponent(card.id)}/download">Download PNG</a>
@@ -1567,7 +1689,7 @@ app.get('/trade/:id/download', (req, res) => {
   return res.send(png);
 });
 
-/* -------------------- Copy Trading API Required By trading.ejs -------------------- */
+/* -------------------- Copy Trading -------------------- */
 
 app.get('/api/trading/copy-profiles', requireAuthJson, (req, res) => {
   const db = readDb();
@@ -1578,14 +1700,12 @@ app.get('/api/trading/copy-profiles', requireAuthJson, (req, res) => {
       const totalPnl = [...(user.orderHistory || []), ...(user.positions || [])]
         .reduce((sum, p) => sum + safeNumber(p.pnl, 0), 0);
 
-      const profileId = user.id;
-
       return {
-        walletId: profileId,
+        walletId: user.id,
         traderName: user.role === 'staff' ? 'Tensor Master Trader' : `Trader ${String(user.id).slice(-6)}`,
         totalPnl,
-        followers: Object.values(db.users || {}).filter(u => u.copyState?.copyingTarget === profileId).length,
-        link: `/copy/${profileId}`
+        followers: Object.values(db.users || {}).filter(u => u.copyState?.copyingTarget === user.id).length,
+        link: `/copy/${user.id}`
       };
     });
 
@@ -1643,10 +1763,10 @@ app.get('/copy/:walletId', (req, res) => {
     </head>
     <body>
       <div class="card">
-        <h1>Tensor Master Trader</h1>
+        <h1>${user.role === 'staff' ? 'Tensor Master Trader' : 'Tensor Trader'}</h1>
         <p style="color:#848E9C">Public copy trading profile</p>
         <div class="pnl">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</div>
-        <p>Open the Tensor app and press Copy Trader to copy this profile.</p>
+        <p>Open Tensor and press Copy Trader to copy this profile.</p>
       </div>
     </body>
     </html>
@@ -1792,7 +1912,7 @@ app.post('/api/trading/copy/stop', requireAuthJson, (req, res) => {
   });
 });
 
-/* -------------------- Compatibility Routes -------------------- */
+/* -------------------- Compatibility APIs -------------------- */
 
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   await syncRealCryptoPrices(false);
@@ -1815,13 +1935,6 @@ app.get('/api/registry', requireAuthJson, (req, res) => {
   });
 });
 
-app.get('/api/session', (req, res) => {
-  return res.json({
-    authenticated: !!req.session.user,
-    user: req.session.user || null
-  });
-});
-
 /* -------------------- Error Handling -------------------- */
 
 app.use((req, res) => {
@@ -1832,14 +1945,25 @@ app.use((req, res) => {
     });
   }
 
-  return res.status(404).render('index', {
-    error: 'Page not found.',
-    message: null,
-    email: '',
-    user: req.session.user || null,
-    safeJsonForEjs,
-    escapeHtml
-  });
+  return res.status(404).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>404</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>
+        body{background:#0b0e11;color:#eaecef;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}
+        a{color:#8b5cf6}
+      </style>
+    </head>
+    <body>
+      <div>
+        <h1>Page not found</h1>
+        <a href="/">Go home</a>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
 app.use((err, req, res, next) => {
@@ -1852,14 +1976,26 @@ app.use((err, req, res, next) => {
     });
   }
 
-  return res.status(500).render('index', {
-    error: IS_PROD ? 'Server error.' : err.message,
-    message: null,
-    email: '',
-    user: req.session.user || null,
-    safeJsonForEjs,
-    escapeHtml
-  });
+  return res.status(500).send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Server Error</title>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>
+        body{background:#0b0e11;color:#eaecef;font-family:Arial,sans-serif;padding:20px}
+        pre{white-space:pre-wrap;background:#1e2329;border:1px solid #2b3139;border-radius:12px;padding:16px;color:#f6465d}
+        a{color:#8b5cf6}
+      </style>
+    </head>
+    <body>
+      <h1>Server Error</h1>
+      <p>The server caught the error instead of crashing.</p>
+      <pre>${escapeHtml(IS_PROD ? 'Server error.' : err.stack || err.message)}</pre>
+      <a href="/reset-session">Reset session</a>
+    </body>
+    </html>
+  `);
 });
 
 /* -------------------- Start -------------------- */
@@ -1873,6 +2009,6 @@ setInterval(marketLoop, MARKET_LOOP_MS);
 
 app.listen(PORT, () => {
   console.log(`Tensor server running on port ${PORT}`);
-  console.log(`Index page: views/index.ejs`);
-  console.log(`Trading page: views/trading.ejs`);
+  console.log(`Index: views/index.ejs or fallback HTML`);
+  console.log(`Trading: views/trading.ejs`);
 });
