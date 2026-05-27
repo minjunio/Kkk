@@ -443,7 +443,7 @@ function getOrCreateUser(email, role = 'user') {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/');
+  if (!req.session.user) return res.redirect('/index.html');
   next();
 }
 
@@ -884,11 +884,13 @@ async function runMarketLoop() {
 
 /* -------------------- Page Routes -------------------- */
 
-app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/trading');
-  }
+/*
+  Important:
+  / and /index.html ALWAYS show index.ejs first.
+  They do NOT auto-redirect to /trading even if the user has a session.
+*/
 
+app.get('/', (req, res) => {
   res.render('index', {
     error: null,
     success: null,
@@ -897,10 +899,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index.html', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/trading');
-  }
-
   res.render('index', {
     error: null,
     success: null,
@@ -1027,7 +1025,7 @@ app.post('/staff-login', (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('tensorwallet.sid');
-    res.redirect('/');
+    res.redirect('/index.html');
   });
 });
 
@@ -1593,7 +1591,7 @@ app.get('/health', (req, res) => {
   res.json({
     ok: true,
     uptime: process.uptime(),
-    main: '/trading',
+    startupPage: '/index.html',
     pages: {
       index: '/ or /index.html',
       wallet: '/wallet',
@@ -1612,11 +1610,7 @@ app.use((req, res) => {
     return res.status(404).json({ error: 'API route not found.' });
   }
 
-  if (req.session.user) {
-    return res.redirect('/trading');
-  }
-
-  return res.redirect('/');
+  return res.redirect('/index.html');
 });
 
 /* -------------------- Startup -------------------- */
@@ -1634,7 +1628,7 @@ setInterval(() => {
 
 app.listen(PORT, () => {
   console.log(`Tensor Wallet running on port ${PORT}`);
-  console.log(`Index page: /`);
+  console.log(`Startup page: /index.html -> views/index.ejs`);
   console.log(`Wallet page: /wallet -> views/wallet.ejs`);
   console.log(`Trading page: /trading -> views/trading.ejs`);
   console.log(`Data directory: ${DATA_DIR}`);
