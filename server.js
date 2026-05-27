@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+const SESSION_SECRET = process.env.SESSION_SECRET || 'tensorwallet-secure-secret-key-change-this';
 
 const STAFF_USERNAME = process.env.STAFF_USERNAME || 'admin';
 const STAFF_PASSWORD = process.env.STAFF_PASSWORD || 'monterysasd';
@@ -20,12 +20,35 @@ const DATA_DIR = process.env.DATA_DIR || (IS_PROD ? '/data' : path.join(__dirnam
 const DB_PATH = path.join(DATA_DIR, 'wallets.json');
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
+const BINANCE_BASE = 'https://api.binance.com';
+const BINANCE_FALLBACK = 'https://data-api.binance.vision';
 
-const TENSOR_LOOP_MS = 5000;
+const TENSOR_LOOP_MS = 2500;
+const PRICE_SYNC_MS = 2000;
 const MAX_CANDLES = 2200;
 
 const cache = new Map();
 const tensorCandleHistory = {};
+
+let latestRealPrices = {};
+let lastRealPriceSync = 0;
+
+const REAL_SYMBOL_MAP = {
+  BTC: 'BTCUSDT',
+  ETH: 'ETHUSDT',
+  SOL: 'SOLUSDT',
+  BNB: 'BNBUSDT',
+  XRP: 'XRPUSDT',
+  DOGE: 'DOGEUSDT',
+  ADA: 'ADAUSDT',
+  AVAX: 'AVAXUSDT',
+  LINK: 'LINKUSDT',
+  TRX: 'TRXUSDT',
+  LTC: 'LTCUSDT',
+  TON: 'TONUSDT',
+  SUI: 'SUIUSDT',
+  PEPE: 'PEPEUSDT'
+};
 
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
@@ -77,6 +100,144 @@ function makeId(prefix = 'id') {
   return `${prefix}_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
 }
 
+function defaultTensorAssets() {
+  return [
+    {
+      id: 'real_btc',
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      price: 68000,
+      startPrice: 68000,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.004,
+      icon: '₿',
+      supply: 21000000,
+      marketCap: 68000 * 21000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 68000,
+      low24h: 68000
+    },
+    {
+      id: 'real_eth',
+      name: 'Ethereum',
+      symbol: 'ETH',
+      price: 3800,
+      startPrice: 3800,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.004,
+      icon: 'Ξ',
+      supply: 120000000,
+      marketCap: 3800 * 120000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 3800,
+      low24h: 3800
+    },
+    {
+      id: 'real_sol',
+      name: 'Solana',
+      symbol: 'SOL',
+      price: 170,
+      startPrice: 170,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.006,
+      icon: '◎',
+      supply: 580000000,
+      marketCap: 170 * 580000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 170,
+      low24h: 170
+    },
+    {
+      id: 'real_bnb',
+      name: 'BNB',
+      symbol: 'BNB',
+      price: 600,
+      startPrice: 600,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.004,
+      icon: 'B',
+      supply: 150000000,
+      marketCap: 600 * 150000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 600,
+      low24h: 600
+    },
+    {
+      id: 'real_xrp',
+      name: 'XRP',
+      symbol: 'XRP',
+      price: 0.55,
+      startPrice: 0.55,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.006,
+      icon: 'X',
+      supply: 99980000000,
+      marketCap: 0.55 * 99980000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 0.55,
+      low24h: 0.55
+    },
+    {
+      id: 'real_doge',
+      name: 'Dogecoin',
+      symbol: 'DOGE',
+      price: 0.16,
+      startPrice: 0.16,
+      bias: 'real',
+      bullChance: 50,
+      minPct: 0.001,
+      maxPct: 0.008,
+      icon: 'D',
+      supply: 145000000000,
+      marketCap: 0.16 * 145000000000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 0.16,
+      low24h: 0.16
+    },
+    {
+      id: 'tensor_ai',
+      name: 'Tensor AI',
+      symbol: 'TAI',
+      price: 1.25,
+      startPrice: 1.25,
+      bias: 'balanced',
+      bullChance: 54,
+      minPct: 0.002,
+      maxPct: 0.012,
+      icon: 'T',
+      supply: 10000000,
+      marketCap: 12500000,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: 1.25,
+      low24h: 1.25
+    }
+  ];
+}
+
 function defaultDb() {
   return {
     users: {},
@@ -88,83 +249,13 @@ function defaultDb() {
   };
 }
 
-function defaultTensorAssets() {
-  return [
-    {
-      id: 'T0xbtc_tensor_demo',
-      name: 'Bitcoin Tensor',
-      symbol: 'BTC',
-      price: 68250,
-      startPrice: 68250,
-      bias: 'balanced',
-      bullChance: 52,
-      minPct: 0.0004,
-      maxPct: 0.003,
-      icon: '₿',
-      supply: 21000000,
-      marketCap: 68250 * 21000000,
-      volume: 0,
-      dominance: 0
-    },
-    {
-      id: 'T0xeth_tensor_demo',
-      name: 'Ethereum Tensor',
-      symbol: 'ETH',
-      price: 3760,
-      startPrice: 3760,
-      bias: 'balanced',
-      bullChance: 53,
-      minPct: 0.0006,
-      maxPct: 0.004,
-      icon: 'Ξ',
-      supply: 120000000,
-      marketCap: 3760 * 120000000,
-      volume: 0,
-      dominance: 0
-    },
-    {
-      id: 'T0xsol_tensor_demo',
-      name: 'Solana Tensor',
-      symbol: 'SOL',
-      price: 168,
-      startPrice: 168,
-      bias: 'balanced',
-      bullChance: 54,
-      minPct: 0.001,
-      maxPct: 0.007,
-      icon: '◎',
-      supply: 580000000,
-      marketCap: 168 * 580000000,
-      volume: 0,
-      dominance: 0
-    },
-    {
-      id: 'T0xusdt_tensor_demo',
-      name: 'Tether Tensor',
-      symbol: 'USDT',
-      price: 1,
-      startPrice: 1,
-      bias: 'pegged',
-      bullChance: 50,
-      minPct: 0,
-      maxPct: 0,
-      icon: '$',
-      supply: 100000000000,
-      marketCap: 100000000000,
-      volume: 0,
-      dominance: 0
-    }
-  ];
-}
-
 function ensureDb() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
   if (!fs.existsSync(DB_PATH)) {
-    const db = defaultDb();
-    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+    writeDb(defaultDb());
     return;
   }
 
@@ -195,7 +286,11 @@ function readDbRaw() {
 }
 
 function readDb() {
-  if (!fs.existsSync(DB_PATH)) ensureDb();
+  ensureDataFolderOnly();
+
+  if (!fs.existsSync(DB_PATH)) {
+    writeDb(defaultDb());
+  }
 
   const db = readDbRaw();
 
@@ -214,10 +309,14 @@ function readDb() {
   return db;
 }
 
-function writeDb(db) {
+function ensureDataFolderOnly() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
+}
+
+function writeDb(db) {
+  ensureDataFolderOnly();
 
   const tempPath = `${DB_PATH}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
@@ -227,6 +326,7 @@ function writeDb(db) {
 function migrateUser(user) {
   if (!user) return;
 
+  if (!user.email) user.email = '';
   if (!user.id && user.email) user.id = `wallet_${sha(user.email).slice(0, 20)}`;
   if (!user.role) user.role = 'user';
   if (!user.createdAt) user.createdAt = nowIso();
@@ -239,8 +339,15 @@ function migrateUser(user) {
     user.tensorAddress = `T0x${sha(user.email).slice(0, 40)}`;
   }
 
+  if (!user.tensorVault) user.tensorVault = null;
   if (!user.tensorBalances) user.tensorBalances = {};
-  if (user.usdtBalance === undefined) user.usdtBalance = 15000;
+
+  if (user.usdtBalance === undefined) {
+    user.usdtBalance = user.role === 'staff' ? 1000000 : 15000;
+  }
+
+  user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
+
   if (!Array.isArray(user.positions)) user.positions = [];
   if (!Array.isArray(user.orderHistory)) user.orderHistory = [];
 
@@ -251,6 +358,7 @@ function migrateUser(user) {
     pos.leverage = safeNumber(pos.leverage, 1);
     pos.size = safeNumber(pos.size, pos.margin * pos.leverage);
     pos.entryPrice = safeNumber(pos.entryPrice, 1);
+    pos.side = pos.side === 'short' ? 'short' : 'long';
   });
 }
 
@@ -258,8 +366,8 @@ function migrateToken(token) {
   if (!token.id) token.id = `T0x${crypto.randomBytes(20).toString('hex')}`;
   if (!token.name) token.name = token.symbol || 'Tensor Asset';
   if (!token.symbol) token.symbol = 'TENSOR';
-  token.symbol = String(token.symbol).toUpperCase();
 
+  token.symbol = String(token.symbol).toUpperCase();
   token.price = Math.max(0.000001, safeNumber(token.price, 1));
   token.startPrice = Math.max(0.000001, safeNumber(token.startPrice, token.price));
   token.bias = token.bias || 'balanced';
@@ -271,6 +379,9 @@ function migrateToken(token) {
   token.marketCap = token.price * token.supply;
   token.volume = safeNumber(token.volume, 0);
   token.dominance = safeNumber(token.dominance, 0);
+  token.changePercent24h = safeNumber(token.changePercent24h, 0);
+  token.high24h = safeNumber(token.high24h, token.price);
+  token.low24h = safeNumber(token.low24h, token.price);
 }
 
 function createWalletRecord(email, role = 'user') {
@@ -303,6 +414,7 @@ function getOrCreateUser(email, role = 'user') {
     writeDb(db);
   } else {
     migrateUser(db.users[normEmail]);
+
     if (role === 'staff' && db.users[normEmail].role !== 'staff') {
       db.users[normEmail].role = 'staff';
       writeDb(db);
@@ -419,6 +531,106 @@ async function sendOtpEmail(email, otp) {
   return true;
 }
 
+async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
+  if (typeof fetch !== 'function') {
+    throw new Error('Global fetch is unavailable. Use Node 18+.');
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'TensorWallet/1.0',
+        ...(options.headers || {})
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function cachedJson(key, ttlMs, fetcher) {
+  const hit = cache.get(key);
+
+  if (hit && Date.now() - hit.time < ttlMs) {
+    return hit.data;
+  }
+
+  const data = await fetcher();
+
+  cache.set(key, {
+    time: Date.now(),
+    data
+  });
+
+  return data;
+}
+
+async function syncRealCryptoPrices(force = false) {
+  try {
+    if (!force && Date.now() - lastRealPriceSync < PRICE_SYNC_MS) return latestRealPrices;
+
+    const symbols = Object.values(REAL_SYMBOL_MAP);
+    const symbolsParam = encodeURIComponent(JSON.stringify(symbols));
+
+    let data;
+
+    try {
+      data = await fetchJsonWithTimeout(
+        `${BINANCE_BASE}/api/v3/ticker/24hr?symbols=${symbolsParam}`,
+        {},
+        4500
+      );
+    } catch {
+      data = await fetchJsonWithTimeout(
+        `${BINANCE_FALLBACK}/api/v3/ticker/24hr?symbols=${symbolsParam}`,
+        {},
+        4500
+      );
+    }
+
+    if (!Array.isArray(data)) return latestRealPrices;
+
+    const nextPrices = { ...latestRealPrices };
+
+    data.forEach(item => {
+      if (!item || !item.symbol) return;
+
+      const price = Number(item.lastPrice);
+      if (!Number.isFinite(price) || price <= 0) return;
+
+      nextPrices[item.symbol] = {
+        symbol: item.symbol,
+        price,
+        changePercent: safeNumber(item.priceChangePercent, 0),
+        high: safeNumber(item.highPrice, price),
+        low: safeNumber(item.lowPrice, price),
+        volume: safeNumber(item.quoteVolume, 0),
+        syncedAt: Date.now()
+      };
+    });
+
+    latestRealPrices = nextPrices;
+    lastRealPriceSync = Date.now();
+
+    return latestRealPrices;
+  } catch (err) {
+    console.error('Real crypto price sync failed:', err.message);
+    return latestRealPrices;
+  }
+}
+
 function initializeCandlesForToken(tokenId, startPrice) {
   if (tensorCandleHistory[tokenId] && tensorCandleHistory[tokenId].length) return;
 
@@ -490,7 +702,10 @@ function getLiquidationPrice(pos, availableBalance = 0) {
 
   if (entry <= 0 || size <= 0 || margin <= 0) return 0;
 
-  const usableMargin = mode === 'cross' ? margin + Math.max(0, availableBalance) : margin;
+  const usableMargin = mode === 'cross'
+    ? margin + Math.max(0, safeNumber(availableBalance, 0))
+    : margin;
+
   const priceMove = (usableMargin / size) * entry;
 
   if (side === 'long') {
@@ -513,8 +728,10 @@ function calculatePnl(pos, currentPrice) {
   return (priceDiff / entry) * size;
 }
 
-function runTensorMarketLoop() {
+async function runTensorMarketLoop() {
   try {
+    await syncRealCryptoPrices();
+
     if (!fs.existsSync(DB_PATH)) return;
 
     const db = readDb();
@@ -536,13 +753,28 @@ function runTensorMarketLoop() {
     db.tensorRegistry.forEach(token => {
       token.dominance = totalMarketCap > 0 ? (token.marketCap / totalMarketCap) * 100 : 0;
 
-      if (token.dominance > 30 && token.bias !== 'pegged') {
+      if (token.dominance > 30 && token.bias !== 'pegged' && token.bias !== 'real') {
         alphaDrift += (Math.random() - 0.5) * 0.003 * (token.dominance / 100);
       }
     });
 
     db.tensorRegistry.forEach(token => {
       const oldPrice = token.price;
+      const mappedSymbol = REAL_SYMBOL_MAP[String(token.symbol || '').toUpperCase()];
+      const real = mappedSymbol ? latestRealPrices[mappedSymbol] : null;
+
+      if (real && real.price > 0) {
+        token.bias = 'real';
+        token.price = real.price;
+        token.volume = real.volume || token.volume || 0;
+        token.changePercent24h = real.changePercent || 0;
+        token.high24h = real.high || token.price;
+        token.low24h = real.low || token.price;
+        token.marketCap = token.price * token.supply;
+
+        pushLiveCandle(token, oldPrice);
+        return;
+      }
 
       if (token.bias === 'pegged') {
         token.price = token.startPrice || 1;
@@ -554,7 +786,10 @@ function runTensorMarketLoop() {
         const maxPct = Math.max(minPct, safeNumber(token.maxPct, 0.004));
         const magnitude = minPct + Math.random() * (maxPct - minPct);
 
-        const dominanceDampener = token.dominance > 35 ? 0.25 : Math.max(0.35, 1 - token.dominance / 100);
+        const dominanceDampener = token.dominance > 35
+          ? 0.25
+          : Math.max(0.35, 1 - token.dominance / 100);
+
         const randomMove = direction * magnitude * dominanceDampener;
         const totalMove = randomMove + alphaDrift;
 
@@ -563,6 +798,11 @@ function runTensorMarketLoop() {
 
       token.marketCap = token.price * token.supply;
       token.volume = safeNumber(token.volume, 0) * 0.96 + Math.abs(token.price - oldPrice) * token.supply * 0.04;
+      token.high24h = Math.max(safeNumber(token.high24h, token.price), token.price);
+      token.low24h = Math.min(safeNumber(token.low24h, token.price), token.price);
+      token.changePercent24h = token.startPrice > 0
+        ? ((token.price - token.startPrice) / token.startPrice) * 100
+        : 0;
 
       pushLiveCandle(token, oldPrice);
     });
@@ -577,6 +817,7 @@ function runTensorMarketLoop() {
 
       user.positions.forEach(pos => {
         const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
+
         if (!token) {
           keptPositions.push(pos);
           return;
@@ -613,56 +854,11 @@ function runTensorMarketLoop() {
   }
 }
 
-async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
-  if (typeof fetch !== 'function') {
-    throw new Error('Global fetch is unavailable. Use Node 18+.');
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      headers: {
-        accept: 'application/json',
-        ...(options.headers || {})
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    return await response.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function cachedJson(key, ttlMs, fetcher) {
-  const hit = cache.get(key);
-
-  if (hit && Date.now() - hit.time < ttlMs) {
-    return hit.data;
-  }
-
-  const data = await fetcher();
-
-  cache.set(key, {
-    time: Date.now(),
-    data
-  });
-
-  return data;
-}
-
 /* -------------------- Views -------------------- */
 
 app.get('/', (req, res) => {
   if (req.session.user) {
-    return res.redirect('/wallet');
+    return res.redirect('/trading');
   }
 
   res.render('index', {
@@ -674,7 +870,7 @@ app.get('/', (req, res) => {
 
 app.get('/index.html', (req, res) => {
   if (req.session.user) {
-    return res.redirect('/wallet');
+    return res.redirect('/trading');
   }
 
   res.render('index', {
@@ -685,6 +881,10 @@ app.get('/index.html', (req, res) => {
 });
 
 app.get('/wallet', requireAuth, (req, res) => {
+  res.redirect('/trading');
+});
+
+app.get('/trading', requireAuth, (req, res) => {
   const user = getOrCreateUser(req.session.user.email, req.session.user.role);
 
   res.render('wallet', {
@@ -695,10 +895,6 @@ app.get('/wallet', requireAuth, (req, res) => {
       .replace(/>/g, '\\u003e')
       .replace(/&/g, '\\u0026')
   });
-});
-
-app.get('/trading', requireAuth, (req, res) => {
-  res.redirect('/wallet');
 });
 
 /* -------------------- Auth -------------------- */
@@ -724,7 +920,7 @@ app.post('/send-otp', async (req, res) => {
       error: null,
       success: sent
         ? 'OTP sent. Check your inbox.'
-        : `DEV mode: OTP was printed in your Render/terminal logs.`,
+        : 'DEV mode: OTP was printed in your server logs.',
       otpEmail: email
     });
   } catch (err) {
@@ -761,7 +957,7 @@ app.post('/verify-otp', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save(() => res.redirect('/wallet'));
+  req.session.save(() => res.redirect('/trading'));
 });
 
 app.post('/staff-login', (req, res) => {
@@ -786,7 +982,7 @@ app.post('/staff-login', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save(() => res.redirect('/wallet'));
+  req.session.save(() => res.redirect('/trading'));
 });
 
 app.get('/logout', (req, res) => {
@@ -800,7 +996,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/logout');
 });
 
-/* -------------------- Trading APIs for wallet.ejs -------------------- */
+/* -------------------- Trading APIs -------------------- */
 
 app.get('/api/trading/state', requireAuthJson, (req, res) => {
   const db = readDb();
@@ -974,20 +1170,48 @@ app.post('/api/wallet/send', requireAuthJson, (req, res) => {
 
 /* -------------------- Tensor APIs -------------------- */
 
-app.get('/api/tensor', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
+app.get('/api/tensor', requireAuthJson, async (req, res) => {
+  try {
+    await syncRealCryptoPrices();
 
-  db.tensorRegistry.forEach(token => {
-    initializeCandlesForToken(token.id, token.price);
-  });
+    const db = readDb();
+    const user = db.users[req.session.user.email];
 
-  res.json({
-    registry: db.tensorRegistry,
-    address: user.tensorAddress,
-    balances: user.tensorBalances || {},
-    treasury: req.session.user.role === 'staff' ? db.treasury : undefined
-  });
+    db.tensorRegistry.forEach(token => {
+      const oldPrice = token.price;
+      const mappedSymbol = REAL_SYMBOL_MAP[String(token.symbol || '').toUpperCase()];
+      const real = mappedSymbol ? latestRealPrices[mappedSymbol] : null;
+
+      if (real && real.price > 0) {
+        token.bias = 'real';
+        token.price = real.price;
+        token.volume = real.volume || token.volume || 0;
+        token.changePercent24h = real.changePercent || 0;
+        token.high24h = real.high || token.price;
+        token.low24h = real.low || token.price;
+        token.marketCap = token.price * token.supply;
+        pushLiveCandle(token, oldPrice);
+      } else {
+        initializeCandlesForToken(token.id, token.price);
+      }
+    });
+
+    writeDb(db);
+
+    res.json({
+      registry: db.tensorRegistry,
+      address: user.tensorAddress,
+      balances: user.tensorBalances || {},
+      syncedAt: Date.now(),
+      treasury: req.session.user.role === 'staff' ? db.treasury : undefined
+    });
+  } catch (err) {
+    console.error('/api/tensor error:', err);
+
+    res.status(500).json({
+      error: 'Could not load tensor registry.'
+    });
+  }
 });
 
 app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
@@ -1009,6 +1233,23 @@ app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
   res.json({
     candles: tensorCandleHistory[token.id] || []
   });
+});
+
+app.get('/api/live-prices', requireAuthJson, async (req, res) => {
+  try {
+    await syncRealCryptoPrices(true);
+
+    res.json({
+      ok: true,
+      prices: latestRealPrices,
+      syncedAt: lastRealPriceSync
+    });
+  } catch {
+    res.status(500).json({
+      ok: false,
+      error: 'Could not load live prices.'
+    });
+  }
 });
 
 app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
@@ -1064,7 +1305,10 @@ app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
     supply,
     marketCap: price * supply,
     volume: 0,
-    dominance: 0
+    dominance: 0,
+    changePercent24h: 0,
+    high24h: price,
+    low24h: price
   };
 
   db.tensorRegistry.push(token);
@@ -1139,8 +1383,10 @@ app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
   delete tensorCandleHistory[req.params.id];
 
   Object.values(db.users).forEach(user => {
-    delete user.tensorBalances[req.params.id];
-    user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
+    if (user.tensorBalances) delete user.tensorBalances[req.params.id];
+    if (Array.isArray(user.positions)) {
+      user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
+    }
   });
 
   writeDb(db);
@@ -1204,7 +1450,7 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
 
   let priceImpact = 0;
 
-  if (token.bias !== 'pegged') {
+  if (token.bias !== 'pegged' && token.bias !== 'real') {
     const marketCap = Math.max(100, safeNumber(token.marketCap, token.price * token.supply));
     const impactMultiplier = netSpend / marketCap;
     priceImpact = Math.min(0.5, impactMultiplier * 0.8);
@@ -1217,7 +1463,7 @@ app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
   user.usdtBalance -= spend;
   user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + received;
 
-  if (token.bias !== 'pegged') {
+  if (token.bias !== 'pegged' && token.bias !== 'real') {
     token.price = Math.max(0.000001, originalPrice * (1 + priceImpact));
     token.marketCap = token.price * token.supply;
   }
@@ -1276,7 +1522,7 @@ app.post('/api/tensor/send', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-/* -------------------- Market APIs -------------------- */
+/* -------------------- Standard Market APIs -------------------- */
 
 app.get('/api/prices', requireAuthJson, async (req, res) => {
   try {
@@ -1309,7 +1555,10 @@ app.get('/health', (req, res) => {
     ok: true,
     uptime: process.uptime(),
     dataDir: DATA_DIR,
-    dbExists: fs.existsSync(DB_PATH)
+    dbPath: DB_PATH,
+    dbExists: fs.existsSync(DB_PATH),
+    lastRealPriceSync,
+    realPriceCount: Object.keys(latestRealPrices).length
   });
 });
 
@@ -1319,7 +1568,7 @@ app.use((req, res) => {
   }
 
   if (req.session.user) {
-    return res.redirect('/wallet');
+    return res.redirect('/trading');
   }
 
   return res.redirect('/');
@@ -1329,11 +1578,18 @@ app.use((req, res) => {
 
 ensureDb();
 hydrateAllCandles();
-runTensorMarketLoop();
-setInterval(runTensorMarketLoop, TENSOR_LOOP_MS);
+
+syncRealCryptoPrices(true)
+  .then(() => runTensorMarketLoop())
+  .catch(() => runTensorMarketLoop());
+
+setInterval(() => {
+  runTensorMarketLoop();
+}, TENSOR_LOOP_MS);
 
 app.listen(PORT, () => {
   console.log(`Tensor Wallet running on port ${PORT}`);
+  console.log(`Main page: /trading`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Database path: ${DB_PATH}`);
 });
