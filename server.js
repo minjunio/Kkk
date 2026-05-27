@@ -223,6 +223,7 @@ function inferUserUsdtNetwork(user) {
 
 function getTreasuryDestination(network) {
   const key = normalizeNetwork(network);
+
   return {
     key,
     ...TREASURY_USDT_ADDRESSES[key]
@@ -510,6 +511,7 @@ function migrateUser(user) {
   user.isCopyTrader = !!user.isCopyTrader;
   user.copyingTarget = user.copyingTarget || null;
   user.copyBalance = safeNumber(user.copyBalance, 0);
+
   if (!Array.isArray(user.activeCopyTrades)) user.activeCopyTrades = [];
 
   user.positions.forEach(pos => {
@@ -608,7 +610,10 @@ function getOrCreateUser(email, role = 'user') {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/');
+  if (!req.session.user || !req.session.user.email) {
+    return res.redirect('/');
+  }
+
   next();
 }
 
@@ -621,7 +626,7 @@ function requireStaff(req, res, next) {
 }
 
 function requireAuthJson(req, res, next) {
-  if (!req.session.user) {
+  if (!req.session.user || !req.session.user.email) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
 
@@ -681,6 +686,7 @@ function verifyOtp(email, otp) {
 
   delete db.otps[normEmail];
   writeDb(db);
+
   return { ok: true };
 }
 
@@ -695,7 +701,10 @@ async function sendOtpEmail(email, otp) {
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: gmailUser, pass: gmailPass }
+    auth: {
+      user: gmailUser,
+      pass: gmailPass
+    }
   });
 
   await transporter.sendMail({
@@ -1038,14 +1047,15 @@ function pngChunk(type, data) {
 function makeSimpleTradeHistoryPng(user) {
   const width = 1000;
   const height = 520;
-  const rowHeight = 34;
   const channels = 4;
   const raw = Buffer.alloc((width * channels + 1) * height, 255);
 
   function setPixel(x, y, r, g, b, a = 255) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
+
     const rowStart = y * (width * channels + 1);
     const idx = rowStart + 1 + x * channels;
+
     raw[idx] = r;
     raw[idx + 1] = g;
     raw[idx + 2] = b;
@@ -1065,6 +1075,7 @@ function makeSimpleTradeHistoryPng(user) {
     const dy = -Math.abs(y1 - y0);
     const sx = x0 < x1 ? 1 : -1;
     const sy = y0 < y1 ? 1 : -1;
+
     let err = dx + dy;
 
     while (true) {
@@ -1073,6 +1084,7 @@ function makeSimpleTradeHistoryPng(user) {
       if (x0 === x1 && y0 === y1) break;
 
       const e2 = 2 * err;
+
       if (e2 >= dy) {
         err += dy;
         x0 += sx;
@@ -1092,6 +1104,7 @@ function makeSimpleTradeHistoryPng(user) {
 
   const trades = [...(user.orderHistory || [])].slice(-40);
   const values = trades.map(t => safeNumber(t.pnl, 0));
+
   const min = Math.min(0, ...values);
   const max = Math.max(1, ...values);
   const span = Math.max(1, max - min);
@@ -1110,6 +1123,7 @@ function makeSimpleTradeHistoryPng(user) {
     const points = values.map((v, i) => {
       const x = chartX + Math.round(i * chartW / Math.max(1, values.length - 1));
       const y = chartY + chartH - Math.round((v - min) / span * chartH);
+
       return { x, y, v };
     });
 
@@ -1138,24 +1152,36 @@ function makeSimpleTradeHistoryPng(user) {
   ]);
 }
 
-/* -------------------- Page Routes -------------------- */
+/* -------------------- Page Rendering -------------------- */
 
-app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/trading');
-  }
-
+function renderIndex(req, res, extra = {}) {
   return res.render('index', {
     error: null,
     message: null,
     email: '',
+    user: req.session.user || null,
     safeJsonForEjs,
-    escapeHtml
+    escapeHtml,
+    formatMoney,
+    formatPrice,
+    ...extra
   });
+}
+
+/* -------------------- Page Routes -------------------- */
+
+/*
+  Important:
+  Opening your website loads views/index.ejs first.
+  It does NOT auto-redirect to /trading anymore.
+*/
+
+app.get('/', (req, res) => {
+  return renderIndex(req, res);
 });
 
 app.get('/index.ejs', (req, res) => {
-  return res.redirect('/');
+  return renderIndex(req, res);
 });
 
 app.get('/index.html', (req, res) => {
@@ -1164,7 +1190,8 @@ app.get('/index.html', (req, res) => {
 
 app.get('/trading', requireAuth, (req, res) => {
   const db = readDb();
-  const user = db.users[normalizeEmail(req.session.user.email)];
+  const email = normalizeEmail(req.session.user.email);
+  const user = db.users[email];
 
   if (!user) {
     req.session.destroy(() => {});
@@ -1175,10 +1202,10 @@ app.get('/trading', requireAuth, (req, res) => {
 
   return res.render('trading', {
     user: publicUser(user),
-    registry: db.tensorRegistry,
+    registry: db.tensorRegistry || [],
     treasuryAddresses: TREASURY_USDT_ADDRESSES,
-    copyProfiles: db.copyProfiles,
-    publicTradeCards: db.publicTradeCards,
+    copyProfiles: db.copyProfiles || {},
+    publicTradeCards: db.publicTradeCards || {},
     safeJsonForEjs,
     escapeHtml,
     formatMoney,
@@ -1193,10 +1220,10 @@ app.get('/staff', requireStaff, (req, res) => {
   return res.render('staff', {
     user: req.session.user,
     users,
-    registry: db.tensorRegistry,
-    treasury: db.treasury,
-    copyProfiles: db.copyProfiles,
-    publicTradeCards: db.publicTradeCards,
+    registry: db.tensorRegistry || [],
+    treasury: db.treasury || { collectedFeesUsdt: 0, tradeDeposits: [] },
+    copyProfiles: db.copyProfiles || {},
+    publicTradeCards: db.publicTradeCards || {},
     safeJsonForEjs,
     escapeHtml,
     formatMoney,
@@ -1209,18 +1236,12 @@ app.get('/copy/:publicId', (req, res) => {
   const profile = db.copyProfiles[req.params.publicId];
 
   if (!profile || profile.status === 'disabled') {
-    return res.status(404).render('index', {
-      error: 'Copy trading profile not found.',
-      message: null,
-      email: '',
-      safeJsonForEjs,
-      escapeHtml
-    });
+    return res.status(404).send('Copy trading profile not found.');
   }
 
   return res.render('copy-profile', {
     profile,
-    registry: db.tensorRegistry,
+    registry: db.tensorRegistry || [],
     safeJsonForEjs,
     escapeHtml,
     formatMoney,
@@ -1262,8 +1283,11 @@ app.post('/auth/request-otp', async (req, res) => {
         error: 'Enter a valid email.',
         message: null,
         email,
+        user: req.session.user || null,
         safeJsonForEjs,
-        escapeHtml
+        escapeHtml,
+        formatMoney,
+        formatPrice
       });
     }
 
@@ -1278,18 +1302,24 @@ app.post('/auth/request-otp', async (req, res) => {
         ? 'Verification code sent. Check your email.'
         : `Development mode: your verification code is ${otp}`,
       email,
+      user: req.session.user || null,
       safeJsonForEjs,
-      escapeHtml
+      escapeHtml,
+      formatMoney,
+      formatPrice
     });
   } catch (err) {
     console.error(err);
 
     return res.status(500).render('index', {
-      error: 'Could not send verification code.',
+      error: IS_PROD ? 'Could not send verification code.' : err.message,
       message: null,
       email: normalizeEmail(req.body.email),
+      user: req.session.user || null,
       safeJsonForEjs,
-      escapeHtml
+      escapeHtml,
+      formatMoney,
+      formatPrice
     });
   }
 });
@@ -1305,8 +1335,11 @@ app.post('/auth/verify', (req, res) => {
       error: result.reason,
       message: null,
       email,
+      user: req.session.user || null,
       safeJsonForEjs,
-      escapeHtml
+      escapeHtml,
+      formatMoney,
+      formatPrice
     });
   }
 
@@ -1330,8 +1363,11 @@ app.post('/staff/login', (req, res) => {
       error: 'Invalid staff login.',
       message: null,
       email: '',
+      user: req.session.user || null,
       safeJsonForEjs,
-      escapeHtml
+      escapeHtml,
+      formatMoney,
+      formatPrice
     });
   }
 
@@ -1399,7 +1435,7 @@ app.get('/api/prices', async (req, res) => {
   res.json({
     syncedAt: Date.now(),
     prices: latestRealPrices,
-    registry: db.tensorRegistry
+    registry: db.tensorRegistry || []
   });
 });
 
@@ -1407,16 +1443,21 @@ app.get('/api/registry', (req, res) => {
   const db = readDb();
 
   res.json({
-    registry: db.tensorRegistry
+    registry: db.tensorRegistry || []
   });
 });
 
 app.get('/api/candles/:symbol', (req, res) => {
   const symbol = String(req.params.symbol || '').toUpperCase();
   const db = readDb();
-  const token = db.tensorRegistry.find(t => String(t.symbol).toUpperCase() === symbol || String(t.id) === req.params.symbol);
 
-  if (!token) return res.status(404).json({ error: 'Asset not found.' });
+  const token = db.tensorRegistry.find(t => {
+    return String(t.symbol).toUpperCase() === symbol || String(t.id) === req.params.symbol;
+  });
+
+  if (!token) {
+    return res.status(404).json({ error: 'Asset not found.' });
+  }
 
   initializeCandlesForToken(token.id, token.price);
 
@@ -1489,13 +1530,16 @@ app.post('/api/admin/deposit/approve', requireAdminJson, (req, res) => {
 
   Object.values(db.users).forEach(user => {
     const deposit = (user.tradeDeposits || []).find(d => d.id === depositId);
+
     if (deposit) {
       found = deposit;
       owner = user;
     }
   });
 
-  if (!found || !owner) return res.status(404).json({ error: 'Deposit not found.' });
+  if (!found || !owner) {
+    return res.status(404).json({ error: 'Deposit not found.' });
+  }
 
   if (found.status !== 'approved') {
     found.status = 'approved';
@@ -1598,7 +1642,9 @@ app.post('/api/trade/close', requireAuthJson, (req, res) => {
 
   const pos = user.positions.find(p => p.id === positionId && p.status === 'open');
 
-  if (!pos) return res.status(404).json({ error: 'Open position not found.' });
+  if (!pos) {
+    return res.status(404).json({ error: 'Open position not found.' });
+  }
 
   const markPrice = getMarketPrice(pos.symbol, db.tensorRegistry);
   const calc = calculatePosition(pos, markPrice);
@@ -1673,7 +1719,9 @@ app.post('/api/trades/share', requireAuthJson, (req, res) => {
 
   const trade = [...(user.positions || []), ...(user.orderHistory || [])].find(t => t.id === positionId);
 
-  if (!trade) return res.status(404).json({ error: 'Trade not found.' });
+  if (!trade) {
+    return res.status(404).json({ error: 'Trade not found.' });
+  }
 
   const publicId = makePublicId('trade');
 
@@ -1743,7 +1791,6 @@ app.get('/api/copy-profiles', (req, res) => {
 
 app.post('/api/admin/copy-profiles/create', requireAdminJson, (req, res) => {
   const db = readDb();
-
   const publicId = makePublicId('copy');
 
   const profile = {
@@ -1776,7 +1823,9 @@ app.post('/api/admin/copy-profiles/update', requireAdminJson, (req, res) => {
   const db = readDb();
   const profile = db.copyProfiles[publicId];
 
-  if (!profile) return res.status(404).json({ error: 'Copy profile not found.' });
+  if (!profile) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
 
   if (req.body.name !== undefined) profile.name = String(req.body.name || '').trim();
   if (req.body.description !== undefined) profile.description = String(req.body.description || '').trim();
@@ -1803,7 +1852,9 @@ app.post('/api/admin/copy-profiles/add-position', requireAdminJson, (req, res) =
   const db = readDb();
   const profile = db.copyProfiles[publicId];
 
-  if (!profile) return res.status(404).json({ error: 'Copy profile not found.' });
+  if (!profile) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
 
   const entryPrice = getMarketPrice(symbol, db.tensorRegistry);
 
@@ -1846,9 +1897,13 @@ app.post('/api/copy/start', requireAuthJson, (req, res) => {
   const profile = db.copyProfiles[publicId];
 
   if (!user) return res.status(404).json({ error: 'User not found.' });
-  if (!profile || profile.status === 'disabled') return res.status(404).json({ error: 'Copy profile not found.' });
+  if (!profile || profile.status === 'disabled') {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
 
-  const balance = wallet === 'OUSD' ? safeNumber(user.ousdBalance, 0) : safeNumber(user.usdtBalance, 0);
+  const balance = wallet === 'OUSD'
+    ? safeNumber(user.ousdBalance, 0)
+    : safeNumber(user.usdtBalance, 0);
 
   if (amount > balance) {
     return res.status(400).json({ error: `Not enough ${wallet} balance.` });
@@ -1961,7 +2016,9 @@ app.post('/api/admin/user/balance', requireAdminJson, (req, res) => {
   const db = readDb();
   const user = db.users[email];
 
-  if (!user) return res.status(404).json({ error: 'User not found.' });
+  if (!user) {
+    return res.status(404).json({ error: 'User not found.' });
+  }
 
   if (usdtBalance !== null) user.usdtBalance = usdtBalance;
   if (ousdBalance !== null) user.ousdBalance = ousdBalance;
@@ -1978,10 +2035,11 @@ app.post('/api/admin/user/balance', requireAdminJson, (req, res) => {
 
 app.post('/api/admin/asset/create', requireAdminJson, (req, res) => {
   const db = readDb();
-
   const symbol = String(req.body.symbol || '').trim().toUpperCase();
 
-  if (!symbol) return res.status(400).json({ error: 'Symbol is required.' });
+  if (!symbol) {
+    return res.status(400).json({ error: 'Symbol is required.' });
+  }
 
   if (db.tensorRegistry.some(t => String(t.symbol).toUpperCase() === symbol)) {
     return res.status(400).json({ error: 'Asset already exists.' });
@@ -2028,7 +2086,9 @@ app.post('/api/admin/asset/update', requireAdminJson, (req, res) => {
   const db = readDb();
   const token = db.tensorRegistry.find(t => t.id === id || String(t.symbol).toUpperCase() === symbol);
 
-  if (!token) return res.status(404).json({ error: 'Asset not found.' });
+  if (!token) {
+    return res.status(404).json({ error: 'Asset not found.' });
+  }
 
   if (req.body.name !== undefined) token.name = String(req.body.name || token.name).trim();
   if (req.body.price !== undefined) token.price = Math.max(0.000001, safeNumber(req.body.price, token.price));
@@ -2060,24 +2120,33 @@ app.use((req, res) => {
     error: 'Page not found.',
     message: null,
     email: '',
+    user: req.session.user || null,
     safeJsonForEjs,
-    escapeHtml
+    escapeHtml,
+    formatMoney,
+    formatPrice
   });
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error('SERVER ERROR:', err);
 
   if (req.path.startsWith('/api')) {
-    return res.status(500).json({ error: 'Server error.' });
+    return res.status(500).json({
+      error: 'Server error.',
+      details: IS_PROD ? undefined : err.message
+    });
   }
 
   return res.status(500).render('index', {
-    error: 'Server error.',
+    error: IS_PROD ? 'Server error.' : err.message,
     message: null,
     email: '',
+    user: req.session.user || null,
     safeJsonForEjs,
-    escapeHtml
+    escapeHtml,
+    formatMoney,
+    formatPrice
   });
 });
 
@@ -2092,5 +2161,5 @@ setInterval(marketLoop, MARKET_LOOP_MS);
 
 app.listen(PORT, () => {
   console.log(`Tensor Wallet running on port ${PORT}`);
-  console.log(`Login page: views/index.ejs`);
+  console.log(`Main page renders: views/index.ejs`);
 });
