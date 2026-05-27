@@ -148,7 +148,7 @@
 </head>
 <body>
 
-  <!-- Server Data Injection: Guarantees Real USDT Balance Immediately -->
+  <!-- Ensure strictly real USDT balance is injected directly from server payload -->
   <script>
     const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
   </script>
@@ -194,6 +194,7 @@
           </div>
         </div>
 
+        <!-- The perfectly scaled dynamic graph -->
         <div class="chart-wrapper" id="apexChartContainer"></div>
       </div>
       
@@ -270,7 +271,7 @@
   </nav>
 
   <script>
-    // State
+    // System State
     let currentTheme = localStorage.getItem('blue_theme') || 'dark';
     let isPaper = false;
     let marginMode = 'cross'; 
@@ -278,9 +279,9 @@
     let activeToken = null;
     let prevPrices = {}; 
 
-    // Directly use Real USDT from Wallet
+    // Directly use Real USDT from Server injection, strictly 0 if undefined to prevent fake money
     let liveState = { 
-      usdtBalance: SERVER_WALLET ? Number(SERVER_WALLET.usdtBalance) : 0, 
+      usdtBalance: SERVER_WALLET && SERVER_WALLET.usdtBalance !== undefined ? Number(SERVER_WALLET.usdtBalance) : 0, 
       positions: SERVER_WALLET && SERVER_WALLET.positions ? SERVER_WALLET.positions : [], 
       orderHistory: SERVER_WALLET && SERVER_WALLET.orderHistory ? SERVER_WALLET.orderHistory : [] 
     };
@@ -296,6 +297,7 @@
     let currentChartStyle = 'candlestick';
     let rawChartData = [];
     let priceInterval = null;
+    let hasInitialZoomed = false; // Flags if the user just switched coins
 
     // --- UI Theme ---
     function toggleTheme() {
@@ -331,7 +333,7 @@
       localStorage.setItem('paper_history', JSON.stringify(paperState.orderHistory));
     }
 
-    // --- Core Data Sync & Live Ticker ---
+    // --- Core Data Sync ---
     async function fetchCoreData() {
       try {
         const tokenRes = await fetch(`/api/tensor?_t=${Date.now()}`);
@@ -356,47 +358,51 @@
       } catch(e) {}
     }
 
-    // High Frequency Local Ticker (Creates fast live Binance feel between server polls)
+    // High Frequency Local Ticker
     function startLiveTicker() {
       if(priceInterval) clearInterval(priceInterval);
       priceInterval = setInterval(() => {
         if(!activeToken || !chartInstance || !rawChartData.length) return;
         
-        // Slight random jitter around the actual price for visual effect
-        const jitter = activeToken.price * (1 + (Math.random() - 0.5) * 0.0005);
-        const isUp = jitter >= activeToken.price;
-        activeToken.price = jitter; // Temporarily mutate local price
+        // Jitter is strictly visual, it does NOT alter activeToken.price to avoid false liquidations
+        const visualJitter = activeToken.price * (1 + (Math.random() - 0.5) * 0.0002);
+        const isUp = visualJitter >= activeToken.price;
         
-        // Update Chart Last Candle
-        const lastCandle = rawChartData[rawChartData.length - 1];
-        lastCandle.close = jitter;
-        if(jitter > lastCandle.high) lastCandle.high = jitter;
-        if(jitter < lastCandle.low) lastCandle.low = jitter;
-        renderChart();
-
-        // Update UI
+        // Render UI with visual jitter
         const subEl = document.getElementById('chartSub');
-        subEl.innerText = `$${jitter.toFixed(4)}`;
+        subEl.innerText = `$${visualJitter.toFixed(4)}`;
         subEl.className = `chart-price ${isUp ? 'text-green' : 'text-red'}`;
         
         const stripPrice = document.getElementById(`price-${activeToken.id}`);
         if(stripPrice) {
-          stripPrice.innerText = `$${jitter.toFixed(4)}`;
+          stripPrice.innerText = `$${visualJitter.toFixed(4)}`;
           stripPrice.style.color = isUp ? 'var(--green)' : 'var(--red)';
         }
 
-        // Live Line on Y-Axis
+        // Send temporary visual candle to chart engine
+        const lastCandle = rawChartData[rawChartData.length - 1];
+        const tempCandle = { ...lastCandle, close: visualJitter };
+        if(visualJitter > tempCandle.high) tempCandle.high = visualJitter;
+        if(visualJitter < tempCandle.low) tempCandle.low = visualJitter;
+        renderChart(tempCandle);
+
+        // Flash Y-Axis indicator
         chartInstance.clearAnnotations();
         chartInstance.addYaxisAnnotation({
-          y: jitter, borderColor: isUp ? '#0ecb81' : '#f6465d',
-          label: { style: { color: '#fff', background: isUp ? '#0ecb81' : '#f6465d' }, text: jitter.toFixed(4) }
+          y: visualJitter, 
+          borderColor: isUp ? '#0ecb81' : '#f6465d',
+          label: { 
+            style: { color: '#fff', background: isUp ? '#0ecb81' : '#f6465d', fontSize: '11px', fontWeight: 'bold', padding: { left: 4, right: 4, top: 2, bottom: 2 } }, 
+            text: visualJitter.toFixed(4), position: 'right', offsetX: 0, offsetY: 0
+          }
         }, false);
         
-        renderActivePositionsOnly(); 
+        // PNL flashes visually
+        renderActivePositionsOnly(visualJitter); 
       }, 800); 
     }
 
-    // --- ApexCharts (Fixed Zoom/Pan) ---
+    // --- ApexCharts Setup (Fully Configured for Zoom and Crosshairs) ---
     function initApexChart() {
       const isDark = currentTheme === 'dark';
       const textCol = isDark ? '#848E9C' : '#848E9C';
@@ -408,17 +414,32 @@
           type: currentChartStyle,
           height: '100%',
           background: 'transparent',
-          animations: { enabled: false }, // Crucial for fast updates without lag
-          toolbar: { autoSelected: 'pan', tools: { download: false, selection: false, zoom: true, pan: true } },
-          zoom: { enabled: true, type: 'x' },
-          selection: { enabled: false }, // Disables the annoying drag-to-zoom box
+          animations: { enabled: false }, // Disables rendering lag during fast ticks
+          toolbar: { 
+            autoSelected: 'pan', // Default to Pan so user can drag easily
+            tools: { download: false, selection: false, zoom: true, pan: true } 
+          },
+          zoom: { enabled: true, type: 'x' }, // Enables Pinch-to-zoom and wheel zoom
+          selection: { enabled: false }, // Kills the annoying drag-box zoom
           fontFamily: 'Inter, sans-serif'
         },
         theme: { mode: isDark ? 'dark' : 'light' },
         plotOptions: { candlestick: { colors: { upward: '#0ecb81', downward: '#f6465d' }, wick: { useFillColor: true } } },
         stroke: { curve: 'straight', width: 2, colors: ['var(--tensor)'] },
-        xaxis: { type: 'datetime', labels: { style: { colors: textCol }, datetimeFormatter: { hour: 'HH:mm' } }, axisBorder: { show: false }, axisTicks: { show: false }, tooltip: { enabled: false } },
-        yaxis: { opposite: true, labels: { style: { colors: textCol }, formatter: (v) => v.toFixed(4) } },
+        xaxis: { 
+          type: 'datetime', 
+          labels: { style: { colors: textCol }, datetimeFormatter: { hour: 'HH:mm' }, datetimeUTC: false }, 
+          axisBorder: { show: false }, 
+          axisTicks: { show: false }, 
+          tooltip: { enabled: true, formatter: (val) => new Date(val).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) },
+          crosshairs: { show: true, position: 'back', stroke: { color: '#8b5cf6', width: 1, dashArray: 3 } }
+        },
+        yaxis: { 
+          opposite: true, // Binance style, scale on the right
+          labels: { style: { colors: textCol }, formatter: (v) => v.toFixed(4) },
+          tooltip: { enabled: true },
+          crosshairs: { show: true, stroke: { color: '#8b5cf6', width: 1, dashArray: 3 } }
+        },
         grid: { borderColor: gridCol, strokeDashArray: 0, padding: { top: 0, right: 0, bottom: 0, left: 10 } }
       };
       chartInstance = new ApexCharts(document.querySelector("#apexChartContainer"), options);
@@ -447,13 +468,18 @@
       currentTF = minutes;
       document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      hasInitialZoomed = false; // Reset zoom on TF change
       renderChart();
     }
 
-    function renderChart() {
+    function renderChart(visualLastCandle = null) {
       if(!chartInstance || !rawChartData.length) return;
+      
+      const dataToProcess = [...rawChartData];
+      if (visualLastCandle) { dataToProcess[dataToProcess.length - 1] = visualLastCandle; }
+
       let aggregated = []; let currentBucket = null; let msInterval = currentTF * 60 * 1000;
-      rawChartData.forEach(c => {
+      dataToProcess.forEach(c => {
           const bucketTime = Math.floor(c.time / msInterval) * msInterval;
           if (!currentBucket || currentBucket.originalTime !== bucketTime) {
               if (currentBucket) aggregated.push(currentBucket);
@@ -470,7 +496,16 @@
         if(currentChartStyle === 'candlestick') return { x: b.time, y: [b.open, b.high, b.low, b.close] };
         return { x: b.time, y: b.close };
       });
+      
       chartInstance.updateSeries([{ data: formattedData }]);
+
+      // Automatically lock zoom to the last 60 bars so it fits nicely
+      if(!hasInitialZoomed && formattedData.length > 20) {
+         const minX = formattedData[Math.max(0, formattedData.length - 60)].x;
+         const maxX = formattedData[formattedData.length - 1].x;
+         chartInstance.zoomX(minX, maxX);
+         hasInitialZoomed = true;
+      }
     }
 
     // --- UI Builders ---
@@ -492,6 +527,7 @@
     }
 
     function selectAsset(id) {
+      hasInitialZoomed = false; // Trigger re-zoom on new asset
       activeToken = tensorAssets.find(x => x.id === id);
       document.querySelectorAll('.market-card').forEach(c => c.classList.remove('active'));
       document.getElementById(`strip-${id}`).classList.add('active');
@@ -539,13 +575,12 @@
       }
     }
 
-    // Render Boxed Positions
+    // Position Rendering
     function renderBalancesAndPositions() {
       const state = isPaper ? paperState : liveState;
       document.getElementById('availUsdt').innerText = state.usdtBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
       renderActivePositionsOnly();
 
-      // Render History
       const hView = document.getElementById('historyPosView');
       if(state.orderHistory.length === 0) {
          hView.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:0.8rem; font-weight:700;">No history.</div>`;
@@ -557,7 +592,7 @@
             <div class="pos-card">
               <div class="pos-header" style="border:none; margin:0; padding:0;">
                 <div><span style="font-weight:900;">${p.symbol}</span> <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span></div>
-                <div class="${col} font-weight:900;">${sign}$${p.pnl.toFixed(2)}</div>
+                <div class="${col}" style="font-weight:900;">${sign}$${p.pnl.toFixed(2)}</div>
               </div>
               <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">Closed via ${p.closeReason || 'Market'} @ $${p.closePrice.toFixed(4)}</div>
             </div>`;
@@ -566,7 +601,7 @@
       updateMetrics();
     }
 
-    function renderActivePositionsOnly() {
+    function renderActivePositionsOnly(overrideVisualPrice = null) {
       const state = isPaper ? paperState : liveState;
       document.getElementById('posCount').innerText = state.positions.length;
       const container = document.getElementById('activePosView');
@@ -578,7 +613,10 @@
 
       container.innerHTML = state.positions.map(p => {
         const token = tensorAssets.find(t => t.id === p.tokenId);
-        const currentPrice = token ? token.price : p.entryPrice;
+        // Prioritize visual ticker price if it's the active token, otherwise true server price
+        const currentPrice = (overrideVisualPrice && token && token.id === activeToken.id) 
+            ? overrideVisualPrice 
+            : (token ? token.price : p.entryPrice);
         
         const pnlRaw = p.side === 'long' ? (currentPrice - p.entryPrice) : (p.entryPrice - currentPrice);
         const pnl = (pnlRaw / p.entryPrice) * p.size;
@@ -592,12 +630,12 @@
         <div class="pos-card">
           <div class="pos-header">
             <div>
-              <span style="font-weight:900; font-size:1rem; color:var(--text-main);">${p.symbol}</span> 
+              <span style="font-weight:900; font-size:1.1rem; color:var(--text-main);">${p.symbol}</span> 
               <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
             </div>
             <div style="text-align:right;">
-              <div class="${col}" style="font-weight:900; font-size:1rem;">${sign}$${pnl.toFixed(2)}</div>
-              <div class="${col}" style="font-size:0.75rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
+              <div class="${col}" style="font-weight:900; font-size:1.1rem;">${sign}$${pnl.toFixed(2)}</div>
+              <div class="${col}" style="font-size:0.8rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
             </div>
           </div>
           <div class="pos-grid">
@@ -662,7 +700,8 @@
         const idx = paperState.positions.findIndex(p => p.id === id);
         if(idx === -1) return;
         const pos = paperState.positions[idx];
-        const currentPrice = tensorAssets.find(t => t.id === pos.tokenId).price;
+        const token = tensorAssets.find(t => t.id === pos.tokenId);
+        const currentPrice = token ? token.price : pos.entryPrice;
         const pnl = (pos.side === 'long' ? (currentPrice - pos.entryPrice) : (pos.entryPrice - currentPrice)) / pos.entryPrice * pos.size;
         
         paperState.usdtBalance += (pos.margin + pnl);
@@ -681,6 +720,7 @@
       }
     }
 
+    // Engine ensures paper liquidation relies on SERVER true price, not the jitter UI price.
     function checkPaperLiquidations() {
       if(!isPaper || paperState.positions.length === 0) return;
       let changed = false;
@@ -704,12 +744,10 @@
       document.documentElement.setAttribute('data-theme', currentTheme);
       initApexChart();
       
-      // Inject instant balance UI
       document.getElementById('availUsdt').innerText = liveState.usdtBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
       
       fetchCoreData(); 
 
-      // Slower interval strictly for server sync to save bandwidth
       setInterval(async () => {
         await fetchCoreData();
         checkPaperLiquidations(); 
