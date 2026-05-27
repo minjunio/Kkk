@@ -158,14 +158,17 @@ function ensureDataFolderOnly() {
 
 function getBaseUrl(req) {
   const envBase = process.env.PUBLIC_BASE_URL || process.env.BASE_URL;
+
   if (envBase) {
     return envBase.replace(/\/+$/, '');
   }
+
   return `${req.protocol}://${req.get('host')}`;
 }
 
 function formatMoney(n, decimals = 2) {
   const num = safeNumber(n, 0);
+
   return num.toLocaleString('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals
@@ -174,8 +177,10 @@ function formatMoney(n, decimals = 2) {
 
 function formatPrice(n) {
   const num = safeNumber(n, 0);
+
   if (num >= 1000) return formatMoney(num, 2);
   if (num >= 1) return formatMoney(num, 4);
+
   return num.toLocaleString('en-US', {
     minimumFractionDigits: 6,
     maximumFractionDigits: 6
@@ -184,15 +189,18 @@ function formatPrice(n) {
 
 function normalizeNetwork(network) {
   const raw = String(network || '').trim().toLowerCase();
+
   if (raw.includes('arb')) return 'arbitrum';
   if (raw.includes('sol')) return 'sol';
   if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
   if (raw.includes('eth') || raw.includes('erc')) return 'eth';
+
   return 'eth';
 }
 
 function inferUserUsdtNetwork(user) {
   const candidates = [];
+
   if (Array.isArray(user.assets)) candidates.push(...user.assets);
   if (Array.isArray(user.publicWallets)) candidates.push(...user.publicWallets);
   if (Array.isArray(user.wallets)) candidates.push(...user.wallets);
@@ -204,6 +212,7 @@ function inferUserUsdtNetwork(user) {
   });
 
   const text = JSON.stringify(usdtItem || user || {}).toLowerCase();
+
   if (text.includes('arbitrum') || text.includes('arb')) return 'arbitrum';
   if (text.includes('solana') || text.includes('sol')) return 'sol';
   if (text.includes('tron') || text.includes('trc') || text.includes('trx')) return 'trx';
@@ -289,6 +298,7 @@ function readDbRaw() {
 
 function writeDb(db) {
   ensureDataFolderOnly();
+
   const tempPath = `${DB_PATH}.tmp`;
   fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
   fs.renameSync(tempPath, DB_PATH);
@@ -296,10 +306,12 @@ function writeDb(db) {
 
 function ensureDb() {
   ensureDataFolderOnly();
+
   if (!fs.existsSync(DB_PATH)) {
     writeDb(defaultDb());
     return;
   }
+
   const db = readDbRaw();
   migrateDb(db);
   writeDb(db);
@@ -307,11 +319,14 @@ function ensureDb() {
 
 function readDb() {
   ensureDataFolderOnly();
+
   if (!fs.existsSync(DB_PATH)) {
     writeDb(defaultDb());
   }
+
   const db = readDbRaw();
   migrateDb(db);
+
   return db;
 }
 
@@ -361,6 +376,7 @@ function migrateUser(user) {
   if (!Array.isArray(user.tradeDeposits)) user.tradeDeposits = [];
   if (!Array.isArray(user.publicTradeCards)) user.publicTradeCards = [];
 
+  // OUSD and Copy Trading Enhancements
   user.ousdBalance = safeNumber(user.ousdBalance, 0);
   user.usdtBalance = safeNumber(user.usdtBalance, user.role === 'staff' ? 1000000 : 15000);
   user.usdtNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
@@ -452,6 +468,7 @@ function getOrCreateUser(email, role = 'user') {
     writeDb(db);
   } else {
     migrateUser(db.users[normEmail]);
+
     if (role === 'staff' && db.users[normEmail].role !== 'staff') {
       db.users[normEmail].role = 'staff';
       writeDb(db);
@@ -462,7 +479,7 @@ function getOrCreateUser(email, role = 'user') {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/');
+  if (!req.session.user) return res.redirect('/index.html');
   next();
 }
 
@@ -470,6 +487,7 @@ function requireAuthJson(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not authenticated.' });
   }
+
   next();
 }
 
@@ -477,6 +495,7 @@ function requireAdminJson(req, res, next) {
   if (!req.session.user || req.session.user.role !== 'staff') {
     return res.status(403).json({ error: 'Admin access required.' });
   }
+
   next();
 }
 
@@ -582,6 +601,14 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
   }
 }
 
+async function cachedJson(key, ttlMs, fetcher) {
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.time < ttlMs) return hit.data;
+  const data = await fetcher();
+  cache.set(key, { time: Date.now(), data });
+  return data;
+}
+
 async function syncRealCryptoPrices(force = false) {
   try {
     if (!force && Date.now() - lastRealPriceSync < PRICE_SYNC_MS) return latestRealPrices;
@@ -640,422 +667,6 @@ function initializeCandlesForToken(tokenId, startPrice) {
     price = close;
     timeCursor += BASE_CANDLE_MS;
   }
-  
-  tensorCandleHistory[tokenId] = candles;
-}
+  tensor
 
-function updateCandles(tokenId, currentPrice) {
-  let candles = tensorCandleHistory[tokenId];
-  if (!candles) {
-    initializeCandlesForToken(tokenId, currentPrice);
-    candles = tensorCandleHistory[tokenId];
-  }
-  if (!candles || candles.length === 0) return;
 
-  const now = Date.now();
-  const lastCandle = candles[candles.length - 1];
-
-  if (now - lastCandle.time >= BASE_CANDLE_MS) {
-    candles.push({ time: now, open: currentPrice, high: currentPrice, low: currentPrice, close: currentPrice });
-    if (candles.length > MAX_CANDLES) candles.shift();
-  } else {
-    lastCandle.close = currentPrice;
-    lastCandle.high = Math.max(lastCandle.high, currentPrice);
-    lastCandle.low = Math.min(lastCandle.low, currentPrice);
-  }
-}
-
-async function runMarketLoop() {
-  await syncRealCryptoPrices();
-  const db = readDb();
-  let dbChanged = false;
-
-  db.tensorRegistry.forEach(token => {
-    if (token.bias === 'real') {
-      const symbolMap = REAL_SYMBOL_MAP[token.symbol];
-      if (symbolMap && latestRealPrices[symbolMap]) {
-        const rp = latestRealPrices[symbolMap];
-        token.price = rp.price;
-        token.changePercent24h = rp.changePercent;
-        token.high24h = rp.high;
-        token.low24h = rp.low;
-      }
-    } else {
-      const isBull = Math.random() * 100 < token.bullChance;
-      const change = (Math.random() * (token.maxPct - token.minPct) + token.minPct);
-      token.price = Math.max(0.000001, token.price * (1 + (isBull ? change : -change)));
-    }
-    
-    token.lifetimeHigh = Math.max(token.lifetimeHigh || 0, token.price, token.high24h || 0);
-    updateCandles(token.id, token.price);
-    dbChanged = true;
-  });
-
-  if (dbChanged) writeDb(db);
-  setTimeout(runMarketLoop, MARKET_LOOP_MS);
-}
-
-// Start Engine
-ensureDb();
-const initialDb = readDb();
-initialDb.tensorRegistry.forEach(t => initializeCandlesForToken(t.id, t.price));
-runMarketLoop();
-
-/* -------------------- Express Routes -------------------- */
-
-// Auth Routes
-app.post('/api/auth/request-otp', async (req, res) => {
-  const { email } = req.body;
-  if (!email || !email.includes('@')) return res.status(400).json({ error: 'Valid email required' });
-  
-  const otp = generateOtp();
-  saveOtp(email, otp);
-  const emailed = await sendOtpEmail(email, otp);
-  
-  res.json({ ok: true, message: emailed ? 'OTP sent via email' : 'OTP generated (Check console in dev)' });
-});
-
-app.post('/api/auth/verify-otp', (req, res) => {
-  const { email, otp, adminOverride } = req.body;
-  
-  if (adminOverride === STAFF_PASSWORD && email === STAFF_USERNAME) {
-    const user = getOrCreateUser(email, 'staff');
-    req.session.user = user;
-    return res.json({ ok: true });
-  }
-
-  const result = verifyOtp(email, otp);
-  if (!result.ok) return res.status(400).json({ error: result.reason });
-
-  const user = getOrCreateUser(email, 'user');
-  req.session.user = user;
-  res.json({ ok: true });
-});
-
-app.post('/api/auth/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ ok: true });
-});
-
-// View Routes
-app.get('/', (req, res) => {
-  // If the user is logged in, redirect straight to the dashboard
-  if (req.session.user) return res.redirect('/trading');
-  
-  // If not logged in, cleanly serve your own index.html from the public directory
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/trading', requireAuth, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  res.render('trading', { 
-    wallet: safeJsonForEjs(user),
-    treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES)
-  });
-});
-
-app.get('/wallet', requireAuth, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  const profiles = Object.values(db.copyProfiles).filter(p => p.active);
-  const copyProfiles = profiles.map(p => ({
-    traderName: p.traderName || 'Pro Trader',
-    roi: p.roi || 0,
-    winRate: p.winRate || 0,
-    copierCount: p.copierCount || 0,
-    strategyDesc: p.strategyDesc || 'Algorithmic Trading'
-  }));
-
-  res.render('wallet', { 
-    user,
-    copyProfiles,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance
-  });
-});
-
-// API Routes
-app.get('/api/tensor', (req, res) => {
-  const db = readDb();
-  res.json({
-    registry: db.tensorRegistry,
-    treasuryDestinations: TREASURY_USDT_ADDRESSES
-  });
-});
-
-app.get('/api/tensor/chart', (req, res) => {
-  const { tokenId } = req.query;
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-  const candles = tensorCandleHistory[tokenId] || [];
-  
-  res.json({
-    candles,
-    stats: token ? {
-      high24h: token.high24h,
-      low24h: token.low24h,
-      lifetimeHigh: token.lifetimeHigh,
-      changePercent24h: token.changePercent24h
-    } : null
-  });
-});
-
-app.get('/api/trading/state', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  res.json({
-    role: user.role,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance,
-    usdtNetwork: user.usdtNetwork,
-    positions: user.positions,
-    orderHistory: user.orderHistory,
-    tradeDeposits: user.tradeDeposits,
-    publicTradeCards: user.publicTradeCards,
-    copyState: {
-      isCopyTrader: user.isCopyTrader,
-      copyingTarget: user.copyingTarget,
-      copyBalance: user.copyBalance,
-      activeCopyTrades: user.activeCopyTrades
-    },
-    treasuryDestinations: TREASURY_USDT_ADDRESSES
-  });
-});
-
-app.post('/api/trading/execute', requireAuthJson, (req, res) => {
-  const { tokenId, side, margin, leverage, marginMode, currency } = req.body;
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-
-  if (!token) return res.status(404).json({ error: 'Asset not found' });
-  if (!margin || margin <= 0) return res.status(400).json({ error: 'Invalid margin' });
-  
-  const mgn = Number(margin);
-  const lev = Number(leverage || 1);
-  const size = mgn * lev;
-  const curr = currency === 'OUSD' ? 'OUSD' : 'USDT';
-
-  if (curr === 'OUSD' && user.ousdBalance < mgn) return res.status(400).json({ error: 'Insufficient OUSD balance' });
-  if (curr === 'USDT' && user.usdtBalance < mgn) return res.status(400).json({ error: 'Insufficient USDT balance' });
-
-  if (curr === 'OUSD') {
-    user.ousdBalance -= mgn;
-  } else {
-    user.usdtBalance -= mgn;
-  }
-
-  const dest = getTreasuryDestination(user.usdtNetwork);
-  const depositRecord = {
-    id: makeId('dep'),
-    amount: mgn,
-    currency: curr,
-    network: dest.network,
-    destinationAddress: dest.address,
-    status: 'routed',
-    createdAt: nowIso()
-  };
-  
-  user.tradeDeposits.unshift(depositRecord);
-  db.treasury.tradeDeposits.push({ userEmail: user.email, ...depositRecord });
-  db.treasury.collectedFeesUsdt += (mgn * 0.001);
-
-  const position = {
-    id: makeId('pos'),
-    tokenId: token.id,
-    symbol: token.symbol,
-    side,
-    margin: mgn,
-    leverage: lev,
-    size,
-    entryPrice: token.price,
-    markPrice: token.price,
-    marginMode: marginMode || 'cross',
-    currency: curr,
-    treasuryNetwork: dest.network,
-    treasuryAddress: dest.address,
-    openedAt: nowIso()
-  };
-
-  user.positions.unshift(position);
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    position,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance,
-    usdtNetwork: dest.key,
-    treasuryDeposit: depositRecord
-  });
-});
-
-app.post('/api/trading/close', requireAuthJson, (req, res) => {
-  const { positionId } = req.body;
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  const posIndex = user.positions.findIndex(p => p.id === positionId);
-  if (posIndex === -1) return res.status(404).json({ error: 'Position not found' });
-  
-  const pos = user.positions[posIndex];
-  const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
-  const currentPrice = token ? token.price : pos.entryPrice;
-  
-  const pnlRaw = pos.side === 'long' ? currentPrice - pos.entryPrice : pos.entryPrice - currentPrice;
-  const pnl = (pnlRaw / pos.entryPrice) * pos.size;
-  const roi = (pnl / pos.margin) * 100;
-  
-  const returnAmt = Math.max(0, pos.margin + pnl);
-
-  if (pos.currency === 'OUSD') {
-    user.ousdBalance += returnAmt;
-  } else if (pos.currency === 'COPY') {
-    user.copyBalance += returnAmt;
-  } else {
-    user.usdtBalance += returnAmt;
-  }
-
-  user.positions.splice(posIndex, 1);
-  
-  const historyRecord = {
-    ...pos,
-    closePrice: currentPrice,
-    markPrice: currentPrice,
-    pnl,
-    roi,
-    closeReason: 'Market Close',
-    closedAt: nowIso()
-  };
-  
-  user.orderHistory.unshift(historyRecord);
-  writeDb(db);
-  
-  res.json({
-    ok: true,
-    historyRecord,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance
-  });
-});
-
-app.post('/api/trading/share', requireAuthJson, (req, res) => {
-  const { historyId } = req.body;
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  const history = user.orderHistory.find(h => h.id === historyId);
-  if (!history) return res.status(404).json({ error: 'Trade not found' });
-
-  const shareId = makePublicId();
-  const shareRecord = {
-    id: shareId,
-    tradeId: history.id,
-    page: `${getBaseUrl(req)}/t/${shareId}`,
-    image: `${getBaseUrl(req)}/api/og/${shareId}`,
-    createdAt: Date.now()
-  };
-
-  user.publicTradeCards.unshift(shareRecord);
-  db.publicTradeCards[shareId] = { ...shareRecord, data: history, userEmail: user.email };
-  writeDb(db);
-
-  res.json({ ok: true, ...shareRecord });
-});
-
-// Copy Trading Routes
-app.get('/api/trading/copy-profiles', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const profiles = Object.values(db.copyProfiles).filter(p => p.active).map(p => ({
-    walletId: p.walletId,
-    traderName: p.traderName,
-    followers: p.copierCount,
-    totalPnl: p.roi * 100,
-    link: `/u/${p.walletId}`
-  }));
-  res.json({ ok: true, profiles });
-});
-
-app.post('/api/trading/copy-profile/toggle', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  
-  user.isCopyTrader = !user.isCopyTrader;
-  
-  if (user.isCopyTrader) {
-    db.copyProfiles[user.id] = {
-      walletId: user.id,
-      traderName: 'Admin Master Profile',
-      roi: 142.50,
-      winRate: 71.2,
-      copierCount: 1204,
-      strategyDesc: "Momentum & Volatility Arbitrage",
-      active: true
-    };
-  } else {
-    if (db.copyProfiles[user.id]) db.copyProfiles[user.id].active = false;
-  }
-  
-  writeDb(db);
-  res.json({ ok: true, isCopyTrader: user.isCopyTrader });
-});
-
-app.post('/api/trading/copy/start', requireAuthJson, (req, res) => {
-  const { targetWalletId, amount, currency } = req.body;
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-
-  if (user.copyingTarget) return res.status(400).json({ error: 'Already copying a trader' });
-  if (amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
-
-  const curr = currency === 'OUSD' ? 'OUSD' : 'USDT';
-  if (curr === 'OUSD' && user.ousdBalance < amount) return res.status(400).json({ error: 'Insufficient OUSD' });
-  if (curr === 'USDT' && user.usdtBalance < amount) return res.status(400).json({ error: 'Insufficient USDT' });
-
-  if (curr === 'OUSD') user.ousdBalance -= amount;
-  else user.usdtBalance -= amount;
-
-  user.copyingTarget = targetWalletId;
-  user.copyBalance = amount;
-  user.activeCopyTrades = [];
-
-  if (db.copyProfiles[targetWalletId]) {
-    db.copyProfiles[targetWalletId].copierCount += 1;
-  }
-
-  writeDb(db);
-  res.json({ ok: true, copyBalance: user.copyBalance });
-});
-
-app.post('/api/trading/copy/stop', requireAuthJson, (req, res) => {
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-
-  if (!user.copyingTarget) return res.status(400).json({ error: 'Not currently copying' });
-
-  if (db.copyProfiles[user.copyingTarget]) {
-    db.copyProfiles[user.copyingTarget].copierCount = Math.max(0, db.copyProfiles[user.copyingTarget].copierCount - 1);
-  }
-
-  user.usdtBalance += user.copyBalance;
-  user.copyBalance = 0;
-  user.copyingTarget = null;
-  user.activeCopyTrades = [];
-
-  writeDb(db);
-  res.json({ ok: true, usdtBalance: user.usdtBalance });
-});
-
-/* -------------------- Boot -------------------- */
-
-app.use((req, res) => {
-  res.status(404).send('404: Route not found');
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Tensor Engine running on port ${PORT}`);
-  console.log(`📂 Data directory: ${DATA_DIR}`);
-});
