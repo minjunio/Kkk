@@ -19,14 +19,12 @@
       --text-main: #EAECEF;
       --text-muted: #848E9C;
       --border: #2b3139;
-
       --green: #0ecb81;
       --green-glow: rgba(14, 203, 129, 0.15);
       --red: #f6465d;
       --red-glow: rgba(246, 70, 93, 0.15);
       --tensor: #8b5cf6;
-      --bluebrand: #38bdf8;
-
+      --blue: #38bdf8;
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
@@ -51,7 +49,7 @@
     html,
     body {
       width: 100%;
-      min-height: 100%;
+      height: 100%;
       background: var(--bg-base);
       color: var(--text-main);
       font-variant-numeric: tabular-nums;
@@ -140,7 +138,7 @@
 
     .market-card {
       flex: 0 0 auto;
-      min-width: 132px;
+      min-width: 130px;
       scroll-snap-align: start;
       padding: 8px 12px;
       border-radius: 6px;
@@ -164,7 +162,7 @@
 
     @media (min-width: 1024px) {
       .shell {
-        grid-template-columns: 1fr 330px;
+        grid-template-columns: 1fr 320px;
         align-items: start;
         max-width: 1600px;
         margin: 0 auto;
@@ -205,7 +203,7 @@
     .chart-wrapper {
       width: 100%;
       height: 48vh;
-      min-height: 340px;
+      min-height: 330px;
       max-height: 560px;
       background: var(--bg-base);
       border-radius: 6px;
@@ -213,15 +211,14 @@
       overflow: hidden;
       position: relative;
       transition: box-shadow 0.25s ease;
-      touch-action: pan-y;
     }
 
     .chart-wrapper.pump {
-      box-shadow: inset 0 0 42px rgba(14,203,129,0.12), 0 0 20px rgba(14,203,129,0.08);
+      box-shadow: inset 0 0 42px rgba(14,203,129,0.12);
     }
 
     .chart-wrapper.dump {
-      box-shadow: inset 0 0 42px rgba(246,70,93,0.12), 0 0 20px rgba(246,70,93,0.08);
+      box-shadow: inset 0 0 42px rgba(246,70,93,0.12);
     }
 
     .chart-stats-bar {
@@ -229,13 +226,13 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 44px;
+      min-height: 42px;
       z-index: 20;
       display: flex;
       align-items: center;
-      gap: 13px;
+      gap: 12px;
       padding: 6px 10px;
-      background: linear-gradient(to bottom, rgba(11,14,17,0.94), rgba(11,14,17,0.62));
+      background: linear-gradient(to bottom, rgba(11,14,17,0.94), rgba(11,14,17,0.58));
       border-bottom: 1px solid var(--border);
       pointer-events: none;
       overflow-x: auto;
@@ -247,7 +244,7 @@
     }
 
     [data-theme="light"] .chart-stats-bar {
-      background: linear-gradient(to bottom, rgba(255,255,255,0.94), rgba(255,255,255,0.65));
+      background: linear-gradient(to bottom, rgba(255,255,255,0.94), rgba(255,255,255,0.68));
     }
 
     .chart-stat {
@@ -272,25 +269,6 @@
     .chart-live-mark {
       font-size: 0.86rem;
       font-weight: 950;
-    }
-
-    .chart-help {
-      position: absolute;
-      left: 10px;
-      bottom: 8px;
-      z-index: 15;
-      padding: 5px 8px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-muted);
-      background: rgba(11,14,17,0.72);
-      font-size: 0.66rem;
-      font-weight: 800;
-      pointer-events: none;
-    }
-
-    [data-theme="light"] .chart-help {
-      background: rgba(255,255,255,0.72);
     }
 
     .pill-toggle {
@@ -319,10 +297,6 @@
 
     .text-red {
       color: var(--red);
-    }
-
-    .text-blue {
-      color: var(--bluebrand);
     }
 
     .order-header {
@@ -385,8 +359,7 @@
       color: var(--text-muted);
       font-size: 0.75rem;
       font-weight: 600;
-      width: 64px;
-      flex: 0 0 auto;
+      width: 58px;
     }
 
     .input-box input,
@@ -395,21 +368,21 @@
       height: 100%;
       color: var(--text-main);
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-align: right;
       padding: 0 8px;
       width: 100%;
+      background: transparent;
     }
 
     .select-box select {
-      appearance: none;
-      text-align-last: right;
-      cursor: pointer;
+      text-align: right;
+      color: var(--text-main);
     }
 
     .select-box option {
-      background: var(--bg-panel);
-      color: var(--text-main);
+      background: #111827;
+      color: #fff;
     }
 
     .input-suffix {
@@ -418,12 +391,20 @@
       font-weight: 700;
     }
 
-    .treasury-hint {
-      margin: -5px 0 12px;
-      color: var(--text-muted);
+    .treasury-note {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px;
+      margin-bottom: 12px;
       font-size: 0.68rem;
       line-height: 1.35;
+      color: var(--text-muted);
       word-break: break-all;
+    }
+
+    .treasury-note strong {
+      color: var(--text-main);
     }
 
     .leverage-bar {
@@ -485,7 +466,7 @@
     .metrics-row {
       display: flex;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
     }
 
     .metrics-val {
@@ -557,7 +538,6 @@
       margin-bottom: 10px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
-      gap: 10px;
     }
 
     .type-badge {
@@ -603,15 +583,21 @@
       text-align: right;
     }
 
-    .close-btn {
+    .close-btn,
+    .share-btn,
+    .download-btn,
+    .copy-btn {
       width: 100%;
       background: var(--bg-hover);
       color: var(--text-main);
       padding: 8px;
       border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 800;
+      font-size: 0.78rem;
+      font-weight: 850;
       margin-top: 10px;
+      text-align: center;
+      text-decoration: none;
+      display: block;
     }
 
     .close-btn:hover {
@@ -619,55 +605,39 @@
       color: var(--red);
     }
 
-    .share-grid {
+    .share-btn {
+      background: rgba(56,189,248,0.12);
+      color: var(--blue);
+    }
+
+    .download-btn {
+      background: rgba(139,92,246,0.14);
+      color: #c4b5fd;
+    }
+
+    .copy-btn {
+      background: rgba(14,203,129,0.12);
+      color: var(--green);
+    }
+
+    .history-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 10px;
     }
 
-    .share-btn,
-    .download-btn {
-      background: var(--bg-hover);
-      color: var(--text-main);
-      padding: 8px;
-      border-radius: 4px;
-      font-size: 0.76rem;
-      font-weight: 900;
-      text-align: center;
-      text-decoration: none;
-      border: 1px solid transparent;
+    .history-actions .share-btn,
+    .history-actions .download-btn {
+      margin-top: 0;
     }
 
-    .share-btn:hover {
-      border-color: var(--tensor);
-      color: var(--tensor);
-    }
-
-    .download-btn:hover {
-      border-color: var(--bluebrand);
-      color: var(--bluebrand);
-    }
-
-    .share-output {
+    .public-card-link {
       margin-top: 8px;
-      padding: 8px;
-      border-radius: 4px;
-      background: rgba(56,189,248,0.08);
-      border: 1px solid rgba(56,189,248,0.22);
-      color: var(--text-main);
-      font-size: 0.7rem;
-      font-weight: 750;
-      word-break: break-all;
-      display: none;
-    }
-
-    .deposit-line {
-      margin-top: 8px;
-      color: var(--text-muted);
       font-size: 0.68rem;
-      line-height: 1.35;
+      color: var(--text-muted);
       word-break: break-all;
+      line-height: 1.35;
     }
 
     .bottom-nav {
@@ -717,15 +687,15 @@
     }
   </style>
 </head>
-
 <body>
+
   <script>
     const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
-    const TREASURY_DESTINATIONS = <%- typeof treasury !== 'undefined' ? treasury : '{}' %>;
+    const SERVER_TREASURY = <%- typeof treasury !== 'undefined' ? treasury : '{}' %>;
   </script>
 
   <header class="topbar">
-    <a href="/index.html" class="brand">
+    <a href="/" class="brand">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--tensor)" stroke-width="2.5" stroke-linecap="round">
         <path d="M3 3v18h18"/>
         <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
@@ -801,8 +771,6 @@
           </div>
 
           <div id="apexChartContainer" style="width:100%; height:100%;"></div>
-
-          <div class="chart-help">Drag or scroll horizontally to view historical 1H candles</div>
         </div>
       </div>
 
@@ -843,6 +811,21 @@
         <button id="addFundsBtn" style="display:none; background:var(--bg-hover); padding:2px 6px; border-radius:3px; font-size:0.65rem;" onclick="addPaperFunds()">+ Add</button>
       </div>
 
+      <div class="select-box">
+        <span class="input-label">USDT</span>
+        <select id="usdtNetwork" onchange="updateTreasuryNote()">
+          <option value="eth">Ethereum</option>
+          <option value="arbitrum">Arbitrum</option>
+          <option value="sol">Solana</option>
+          <option value="trx">TRON</option>
+        </select>
+      </div>
+
+      <div class="treasury-note" id="treasuryNote">
+        <strong>Margin route:</strong> Ethereum<br>
+        0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a
+      </div>
+
       <div class="input-box">
         <span class="input-label">Price</span>
         <input type="text" value="Market" readonly style="color:var(--text-muted);">
@@ -852,20 +835,6 @@
         <span class="input-label">Margin</span>
         <input type="number" id="tradeAmt" step="any" placeholder="0.00" oninput="updateMetrics()">
         <span class="input-suffix">USDT</span>
-      </div>
-
-      <div class="select-box">
-        <span class="input-label">USDT Net</span>
-        <select id="usdtNetwork" onchange="updateTreasuryHint()">
-          <option value="eth">Ethereum</option>
-          <option value="arbitrum">Arbitrum</option>
-          <option value="sol">Solana</option>
-          <option value="trx">TRON</option>
-        </select>
-      </div>
-
-      <div class="treasury-hint" id="treasuryHint">
-        Margin deposits are recorded to Tensor Wallet treasury.
       </div>
 
       <div class="leverage-bar">
@@ -899,11 +868,6 @@
           <span>Est. Short Liq. Price</span>
           <span class="metrics-val" style="color:#f59e0b;" id="liqShort">0.00</span>
         </div>
-
-        <div class="metrics-row">
-          <span>Treasury</span>
-          <span class="metrics-val" id="treasuryNetMini">ETH</span>
-        </div>
       </div>
 
       <div class="trade-grid">
@@ -935,18 +899,15 @@
     let currentTheme = localStorage.getItem('blue_theme') || 'dark';
     let isPaper = false;
     let marginMode = 'cross';
-
     let tensorAssets = [];
     let activeToken = null;
+    let prevPrices = {};
 
     let lastDisplayedPrice = 0;
     let lastServerPrice = 0;
     let localVisualPrice = 0;
     let visualTrendPower = 0;
-
     let latestFormattedChartData = [];
-    let chartWindowMin = null;
-    let chartWindowMax = null;
 
     let liveState = {
       usdtBalance: SERVER_WALLET && SERVER_WALLET.usdtBalance !== undefined ? Number(SERVER_WALLET.usdtBalance) : 0,
@@ -992,32 +953,20 @@
       });
     }
 
-    function formatMoney(num) {
-      return (Number(num) || 0).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
+    function updateTreasuryNote() {
+      const network = document.getElementById('usdtNetwork')?.value || 'eth';
+      const info = SERVER_TREASURY[network] || SERVER_TREASURY.eth || {
+        network: 'Ethereum',
+        address: '0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a'
+      };
 
-    function getTreasuryConfig() {
-      const key = document.getElementById('usdtNetwork')?.value || 'eth';
-      return TREASURY_DESTINATIONS[key] || TREASURY_DESTINATIONS.eth || {};
-    }
+      const box = document.getElementById('treasuryNote');
+      if (!box) return;
 
-    function updateTreasuryHint() {
-      const key = document.getElementById('usdtNetwork')?.value || 'eth';
-      const cfg = getTreasuryConfig();
-
-      const hint = document.getElementById('treasuryHint');
-      const mini = document.getElementById('treasuryNetMini');
-
-      if (hint) {
-        hint.innerText = `${cfg.network || key}: ${cfg.address || 'Treasury address unavailable'}`;
-      }
-
-      if (mini) {
-        mini.innerText = cfg.symbol || key.toUpperCase();
-      }
+      box.innerHTML = `
+        <strong>Margin route:</strong> ${info.network || network}<br>
+        ${info.address || ''}
+      `;
     }
 
     function toggleTheme() {
@@ -1064,6 +1013,7 @@
 
     function setGraphMood(isUp) {
       const chartWrap = document.getElementById('chartWrap');
+
       if (!chartWrap) return;
 
       chartWrap.classList.remove('pump', 'dump');
@@ -1110,8 +1060,8 @@
       const prev = Number(previousPrice) || p;
       const isUp = p >= prev;
 
-      const refPrice = Number(activeToken.startPrice || prev || p);
-      const movePct = refPrice > 0 ? ((p - refPrice) / refPrice) * 100 : 0;
+      const sessionOpen = Number(activeToken.startPrice || prev || p);
+      const movePct = sessionOpen > 0 ? ((p - sessionOpen) / sessionOpen) * 100 : 0;
 
       const colorClass = isUp ? 'text-green' : 'text-red';
       const sessionColorClass = movePct >= 0 ? 'text-green' : 'text-red';
@@ -1150,7 +1100,8 @@
       }
 
       if (lifetimeHighVal) {
-        lifetimeHighVal.innerText = `$${formatPriceSmart(getLifetimeHigh(p))}`;
+        const lifetimeHigh = getLifetimeHigh(p);
+        lifetimeHighVal.innerText = `$${formatPriceSmart(lifetimeHigh)}`;
       }
 
       const stripPrice = document.getElementById(`price-${activeToken.id}`);
@@ -1182,19 +1133,19 @@
         label: {
           borderColor: labelColor,
           position: 'right',
-          offsetX: -6,
-          offsetY: 0,
-          text: `MARK ${activeToken.symbol} $${formatPriceSmart(p)}`,
+          offsetX: -8,
+          offsetY: 48,
+          text: `${activeToken.symbol} $${formatPriceSmart(p)}`,
           style: {
             color: '#fff',
             background: labelColor,
             fontSize: '11px',
             fontWeight: 900,
             padding: {
-              left: 7,
-              right: 7,
-              top: 4,
-              bottom: 4
+              left: 6,
+              right: 6,
+              top: 3,
+              bottom: 3
             }
           }
         }
@@ -1219,10 +1170,10 @@
       const dramaticNoise = (Math.random() - 0.5) * 0.00045;
       const dramaticMove = visualTrendPower + dramaticNoise;
 
-      localVisualPrice = localVisualPrice + (truePrice - localVisualPrice) * 0.38;
+      localVisualPrice = localVisualPrice + (truePrice - localVisualPrice) * 0.28;
       localVisualPrice = localVisualPrice * (1 + dramaticMove);
 
-      const maxDistance = truePrice * 0.0035;
+      const maxDistance = truePrice * 0.003;
 
       if (Math.abs(localVisualPrice - truePrice) > maxDistance) {
         localVisualPrice = truePrice + Math.sign(localVisualPrice - truePrice) * maxDistance;
@@ -1286,7 +1237,7 @@
 
         rawChartData = data.candles || [];
 
-        if (data.stats) {
+        if (data.stats && activeToken) {
           activeToken.high24h = data.stats.high24h || activeToken.high24h;
           activeToken.low24h = data.stats.low24h || activeToken.low24h;
           activeToken.lifetimeHigh = data.stats.lifetimeHigh || activeToken.lifetimeHigh;
@@ -1319,7 +1270,7 @@
           low: Math.min(lastCandle.low, visualPrice)
         };
 
-        renderChart(tempCandle, true);
+        renderChart(tempCandle);
         updateChartPriceLabel(visualPrice, previousPrice);
         renderActivePositionsOnly(visualPrice);
 
@@ -1341,10 +1292,10 @@
           animations: {
             enabled: true,
             easing: 'easeout',
-            speed: 160,
+            speed: 220,
             dynamicAnimation: {
               enabled: true,
-              speed: 160
+              speed: 220
             }
           },
           toolbar: {
@@ -1360,17 +1311,36 @@
           },
           fontFamily: 'Inter, sans-serif',
           events: {
-            zoomed: function(ctx, payload) {
-              if (payload && payload.xaxis) {
-                chartWindowMin = payload.xaxis.min;
-                chartWindowMax = payload.xaxis.max;
-              }
-            },
-            scrolled: function(ctx, payload) {
-              if (payload && payload.xaxis) {
-                chartWindowMin = payload.xaxis.min;
-                chartWindowMax = payload.xaxis.max;
-              }
+            mounted: function(chartContext) {
+              chartContext.el.addEventListener('wheel', function(e) {
+                e.preventDefault();
+
+                const minX = chartContext.w.globals.minX;
+                const maxX = chartContext.w.globals.maxX;
+
+                if (minX === undefined || maxX === undefined || !latestFormattedChartData.length) return;
+
+                const allMin = latestFormattedChartData[0].x;
+                const allMax = latestFormattedChartData[latestFormattedChartData.length - 1].x;
+                const range = maxX - minX;
+                const direction = e.deltaY > 0 ? 1 : -1;
+                const shift = range * 0.13 * direction;
+
+                let nextMin = minX + shift;
+                let nextMax = maxX + shift;
+
+                if (nextMin < allMin) {
+                  nextMin = allMin;
+                  nextMax = allMin + range;
+                }
+
+                if (nextMax > allMax) {
+                  nextMax = allMax;
+                  nextMin = allMax - range;
+                }
+
+                chartContext.zoomX(nextMin, nextMax);
+              }, { passive: false });
             }
           }
         },
@@ -1390,14 +1360,17 @@
         },
         stroke: {
           curve: 'straight',
-          width: currentChartStyle === 'line' ? 2 : 1.4,
+          width: currentChartStyle === 'line' ? 2.5 : 1.2,
           colors: ['#8b5cf6']
         },
         xaxis: {
           type: 'datetime',
           labels: {
             style: { colors: textCol },
-            datetimeFormatter: { day: 'dd MMM', hour: 'HH:mm' },
+            datetimeFormatter: {
+              hour: 'HH:mm',
+              day: 'dd MMM'
+            },
             datetimeUTC: false
           },
           axisBorder: { show: false },
@@ -1424,9 +1397,9 @@
         yaxis: {
           opposite: true,
           labels: {
+            offsetY: 12,
             style: { colors: textCol },
-            formatter: v => formatPriceSmart(v),
-            offsetX: -2
+            formatter: v => formatPriceSmart(v)
           },
           tooltip: { enabled: true },
           crosshairs: {
@@ -1443,9 +1416,6 @@
           theme: isDark ? 'dark' : 'light',
           x: {
             format: 'dd MMM HH:mm'
-          },
-          y: {
-            formatter: v => `$${formatPriceSmart(v)}`
           }
         },
         grid: {
@@ -1453,7 +1423,7 @@
           strokeDashArray: 0,
           padding: {
             top: 48,
-            right: 90,
+            right: 18,
             bottom: 0,
             left: 10
           }
@@ -1461,104 +1431,7 @@
       };
 
       chartInstance = new ApexCharts(document.querySelector('#apexChartContainer'), options);
-      chartInstance.render().then(() => {
-        attachChartHistoryControls();
-      });
-    }
-
-    function attachChartHistoryControls() {
-      const wrap = document.getElementById('chartWrap');
-      if (!wrap) return;
-
-      wrap.addEventListener('wheel', function(e) {
-        if (!latestFormattedChartData.length || !chartInstance) return;
-
-        e.preventDefault();
-
-        const minData = latestFormattedChartData[0].x;
-        const maxData = latestFormattedChartData[latestFormattedChartData.length - 1].x;
-
-        const currentMin = chartWindowMin || latestFormattedChartData[Math.max(0, latestFormattedChartData.length - 80)].x;
-        const currentMax = chartWindowMax || maxData;
-        const range = currentMax - currentMin;
-
-        const direction = e.deltaY > 0 ? 1 : -1;
-        let shift = range * 0.16 * direction;
-
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          shift = range * 0.16 * (e.deltaX > 0 ? 1 : -1);
-        }
-
-        let nextMin = currentMin + shift;
-        let nextMax = currentMax + shift;
-
-        if (nextMin < minData) {
-          nextMin = minData;
-          nextMax = minData + range;
-        }
-
-        if (nextMax > maxData) {
-          nextMax = maxData;
-          nextMin = maxData - range;
-        }
-
-        chartWindowMin = nextMin;
-        chartWindowMax = nextMax;
-        chartInstance.zoomX(nextMin, nextMax);
-      }, { passive: false });
-
-      let isDragging = false;
-      let startX = 0;
-      let dragMin = null;
-      let dragMax = null;
-
-      wrap.addEventListener('pointerdown', e => {
-        if (!latestFormattedChartData.length) return;
-
-        isDragging = true;
-        startX = e.clientX;
-        dragMin = chartWindowMin;
-        dragMax = chartWindowMax;
-        wrap.setPointerCapture(e.pointerId);
-      });
-
-      wrap.addEventListener('pointermove', e => {
-        if (!isDragging || !chartInstance || !dragMin || !dragMax) return;
-
-        const dx = e.clientX - startX;
-        const width = wrap.clientWidth || 1;
-        const range = dragMax - dragMin;
-        const shift = -(dx / width) * range;
-
-        const minData = latestFormattedChartData[0].x;
-        const maxData = latestFormattedChartData[latestFormattedChartData.length - 1].x;
-
-        let nextMin = dragMin + shift;
-        let nextMax = dragMax + shift;
-
-        if (nextMin < minData) {
-          nextMin = minData;
-          nextMax = minData + range;
-        }
-
-        if (nextMax > maxData) {
-          nextMax = maxData;
-          nextMin = maxData - range;
-        }
-
-        chartWindowMin = nextMin;
-        chartWindowMax = nextMax;
-        chartInstance.zoomX(nextMin, nextMax);
-      });
-
-      wrap.addEventListener('pointerup', e => {
-        isDragging = false;
-        try { wrap.releasePointerCapture(e.pointerId); } catch {}
-      });
-
-      wrap.addEventListener('pointercancel', () => {
-        isDragging = false;
-      });
+      chartInstance.render();
     }
 
     function updateChartTheme() {
@@ -1597,8 +1470,7 @@
         chartInstance.updateOptions({
           chart: { type: style },
           stroke: {
-            curve: 'straight',
-            width: style === 'line' ? 2 : 1.4,
+            width: style === 'line' ? 2.5 : 1.2,
             colors: ['#8b5cf6']
           }
         });
@@ -1613,7 +1485,7 @@
       renderChart();
     }
 
-    function renderChart(visualLastCandle = null, preserveZoom = false) {
+    function renderChart(visualLastCandle = null) {
       if (!chartInstance || !rawChartData.length) return;
 
       const dataToProcess = [...rawChartData];
@@ -1622,7 +1494,34 @@
         dataToProcess[dataToProcess.length - 1] = visualLastCandle;
       }
 
-      const formattedData = dataToProcess.map(b => {
+      let aggregated = [];
+      let currentBucket = null;
+      let msInterval = currentTF * 60 * 1000;
+
+      dataToProcess.forEach(c => {
+        const bucketTime = Math.floor(c.time / msInterval) * msInterval;
+
+        if (!currentBucket || currentBucket.originalTime !== bucketTime) {
+          if (currentBucket) aggregated.push(currentBucket);
+
+          currentBucket = {
+            time: bucketTime,
+            originalTime: bucketTime,
+            open: Number(c.open),
+            high: Number(c.high),
+            low: Number(c.low),
+            close: Number(c.close)
+          };
+        } else {
+          currentBucket.high = Math.max(currentBucket.high, Number(c.high));
+          currentBucket.low = Math.min(currentBucket.low, Number(c.low));
+          currentBucket.close = Number(c.close);
+        }
+      });
+
+      if (currentBucket) aggregated.push(currentBucket);
+
+      const formattedData = aggregated.map(b => {
         if (currentChartStyle === 'candlestick') {
           return {
             x: b.time,
@@ -1640,24 +1539,19 @@
 
       chartInstance.updateSeries([{ data: formattedData }], false);
 
-      const latest = dataToProcess[dataToProcess.length - 1];
+      const latest = aggregated[aggregated.length - 1];
 
       if (latest) {
         const prev = lastDisplayedPrice || latest.open;
         updateChartPriceLabel(latest.close, prev);
       }
 
-      if (!preserveZoom && !hasInitialZoomed && formattedData.length > 20) {
+      if (!hasInitialZoomed && formattedData.length > 20) {
         const minX = formattedData[Math.max(0, formattedData.length - 80)].x;
         const maxX = formattedData[formattedData.length - 1].x;
 
-        chartWindowMin = minX;
-        chartWindowMax = maxX;
-
         chartInstance.zoomX(minX, maxX);
         hasInitialZoomed = true;
-      } else if (preserveZoom && chartWindowMin && chartWindowMax) {
-        chartInstance.zoomX(chartWindowMin, chartWindowMax);
       }
     }
 
@@ -1665,7 +1559,9 @@
       const strip = document.getElementById('assetStrip');
 
       strip.innerHTML = tensorAssets.map(t => {
-        const chg = Number(t.changePercent24h !== undefined ? t.changePercent24h : ((t.price - (t.startPrice || t.price)) / (t.startPrice || t.price)) * 100);
+        const chg = Number(t.changePercent24h ?? (
+          t.startPrice > 0 ? ((t.price - t.startPrice) / t.startPrice) * 100 : 0
+        ));
         const colClass = chg >= 0 ? 'text-green' : 'text-red';
 
         return `
@@ -1684,8 +1580,6 @@
 
     function selectAsset(id) {
       hasInitialZoomed = false;
-      chartWindowMin = null;
-      chartWindowMax = null;
 
       activeToken = tensorAssets.find(x => x.id === id);
       if (!activeToken) return;
@@ -1732,12 +1626,15 @@
     function updateMetrics() {
       const margin = Number(document.getElementById('tradeAmt').value) || 0;
       const lev = Number(document.getElementById('levSlider').value) || 1;
-      const price = activeToken ? activeToken.price : 1;
+      const price = activeToken ? Number(activeToken.price) : 1;
       const state = isPaper ? paperState : liveState;
 
       const posSize = margin * lev;
 
-      document.getElementById('posSize').innerText = `${formatMoney(posSize)} USDT`;
+      document.getElementById('posSize').innerText = `${posSize.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} USDT`;
 
       if (margin > 0 && price > 0) {
         const liqL = getLiqPrice(price, posSize, margin, 'long', marginMode, state.usdtBalance);
@@ -1754,7 +1651,7 @@
     function renderBalancesAndPositions() {
       const state = isPaper ? paperState : liveState;
 
-      document.getElementById('availUsdt').innerText = state.usdtBalance.toLocaleString(undefined, {
+      document.getElementById('availUsdt').innerText = Number(state.usdtBalance || 0).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       });
@@ -1770,82 +1667,59 @@
           </div>
         `;
       } else {
-        hView.innerHTML = state.orderHistory.slice(0, 25).map(p => renderHistoryCard(p)).join('');
+        hView.innerHTML = state.orderHistory.slice(0, 20).map(p => {
+          const pnl = Number(p.pnl || 0);
+          const roi = Number(p.roi !== undefined ? p.roi : (p.margin > 0 ? (pnl / p.margin) * 100 : 0));
+          const col = pnl >= 0 ? 'text-green' : 'text-red';
+          const sign = pnl >= 0 ? '+' : '';
+          const existingCard = findPublicCardForTrade(p.id);
+
+          return `
+            <div class="pos-card" id="history-${p.id}">
+              <div class="pos-header" style="border:none; margin:0; padding:0;">
+                <div>
+                  <span style="font-weight:900;">${p.symbol}</span>
+                  <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
+                </div>
+                <div style="text-align:right;">
+                  <div class="${col}" style="font-weight:900;">${sign}$${Math.abs(pnl).toFixed(2)}</div>
+                  <div class="${col}" style="font-size:0.78rem; font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
+                </div>
+              </div>
+
+              <div class="pos-grid" style="margin-top:10px;">
+                <div class="pos-item"><span class="pos-label">Entry</span><span class="pos-val">$${formatPriceSmart(p.entryPrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Close</span><span class="pos-val">$${formatPriceSmart(p.closePrice || p.markPrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Mark</span><span class="pos-val">$${formatPriceSmart(p.markPrice || p.closePrice || 0)}</span></div>
+                <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${Number(p.size || 0).toLocaleString(undefined, {maximumFractionDigits:2})}</span></div>
+              </div>
+
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
+                Closed via ${p.closeReason || 'Market'} • Verified trade card by bluecrypto.ink
+              </div>
+
+              <div class="history-actions">
+                <button class="share-btn" onclick="generateTradeShare('${p.id}')">
+                  ${existingCard ? 'Refresh Link' : 'Generate Link'}
+                </button>
+                <button class="download-btn" onclick="downloadTradeImage('${p.id}')">
+                  Download Image
+                </button>
+              </div>
+
+              <button class="copy-btn" onclick="copyTradeLink('${p.id}')">
+                Copy Share Link
+              </button>
+
+              <div class="public-card-link" id="shareLink-${p.id}">
+                ${existingCard ? existingCard.page || existingCard.image || '' : 'No public link generated yet.'}
+              </div>
+            </div>
+          `;
+        }).join('');
       }
 
       updateMetrics();
-    }
-
-    function renderHistoryCard(p) {
-      const pnl = Number(p.pnl || 0);
-      const roi = Number(p.roi !== undefined ? p.roi : (p.margin > 0 ? (pnl / p.margin) * 100 : 0));
-      const col = pnl >= 0 ? 'text-green' : 'text-red';
-      const sign = pnl >= 0 ? '+' : '';
-
-      const publicCard = findPublicCardForTrade(p.id);
-      const shareUrl = publicCard?.page;
-      const imageUrl = publicCard?.image;
-      const downloadUrl = publicCard?.download;
-
-      return `
-        <div class="pos-card" id="history-${p.id}">
-          <div class="pos-header" style="border:none; margin:0; padding:0;">
-            <div>
-              <span style="font-weight:900;">${p.symbol}</span>
-              <span class="type-badge ${p.side}">${p.side} ${p.leverage}x</span>
-            </div>
-
-            <div style="text-align:right;">
-              <div class="${col}" style="font-weight:900;">${sign}$${Math.abs(pnl).toFixed(2)}</div>
-              <div class="${col}" style="font-size:0.78rem; font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% ROI</div>
-            </div>
-          </div>
-
-          <div class="pos-grid" style="margin-top:10px;">
-            <div class="pos-item">
-              <span class="pos-label">Entry</span>
-              <span class="pos-val">$${formatPriceSmart(p.entryPrice)}</span>
-            </div>
-
-            <div class="pos-item">
-              <span class="pos-label">Mark</span>
-              <span class="pos-val">$${formatPriceSmart(p.markPrice || p.closePrice)}</span>
-            </div>
-
-            <div class="pos-item">
-              <span class="pos-label">Size</span>
-              <span class="pos-val">$${formatMoney(p.size)}</span>
-            </div>
-
-            <div class="pos-item">
-              <span class="pos-label">Margin</span>
-              <span class="pos-val">$${formatMoney(p.margin)}</span>
-            </div>
-          </div>
-
-          <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
-            Closed via ${p.closeReason || 'Market'} @ $${formatPriceSmart(p.closePrice || p.markPrice || 0)}
-          </div>
-
-          <div class="share-grid">
-            <button class="share-btn" onclick="shareTrade('${p.id}')">Generate/View Link</button>
-            <button class="download-btn" onclick="downloadTradeImage('${p.id}')">Download Image</button>
-          </div>
-
-          <div class="share-output" id="share-output-${p.id}" style="${shareUrl ? 'display:block;' : ''}">
-            ${shareUrl ? `
-              Link: <a href="${shareUrl}" target="_blank" style="color:var(--bluebrand);">${shareUrl}</a><br>
-              Image: <a href="${imageUrl}" target="_blank" style="color:var(--bluebrand);">Open image</a>
-              ${downloadUrl ? `<br><a href="${downloadUrl}" target="_blank" style="color:var(--bluebrand);">Download SVG</a>` : ''}
-            ` : ''}
-          </div>
-        </div>
-      `;
-    }
-
-    function findPublicCardForTrade(tradeId) {
-      const cards = liveState.publicTradeCards || [];
-      return cards.find(c => String(c.tradeId) === String(tradeId)) || null;
     }
 
     function renderActivePositionsOnly(overrideVisualPrice = null) {
@@ -1890,46 +1764,24 @@
               </div>
 
               <div style="text-align:right;">
-                <div class="${col}" style="font-weight:900; font-size:1.1rem;">${sign}$${Math.abs(pnl).toFixed(2)}</div>
+                <div class="${col}" style="font-weight:900; font-size:1.1rem;">${sign}$${pnl.toFixed(2)}</div>
                 <div class="${col}" style="font-size:0.8rem; font-weight:800;">${sign}${roi.toFixed(2)}% ROI</div>
               </div>
             </div>
 
             <div class="pos-grid">
-              <div class="pos-item">
-                <span class="pos-label">Size</span>
-                <span class="pos-val">$${formatMoney(p.size)}</span>
-              </div>
-
-              <div class="pos-item">
-                <span class="pos-label">Margin</span>
-                <span class="pos-val">$${formatMoney(p.margin)}</span>
-              </div>
-
-              <div class="pos-item">
-                <span class="pos-label">Entry Price</span>
-                <span class="pos-val">$${formatPriceSmart(p.entryPrice)}</span>
-              </div>
-
-              <div class="pos-item">
-                <span class="pos-label">Mark Price</span>
-                <span class="pos-val">$${formatPriceSmart(currentPrice)}</span>
-              </div>
-
-              <div class="pos-item">
-                <span class="pos-label">Liq. Price</span>
-                <span class="pos-val" style="color:#f59e0b;">$${formatPriceSmart(Math.max(0, liq))}</span>
-              </div>
-
-              <div class="pos-item">
-                <span class="pos-label">Mode</span>
-                <span class="pos-val" style="text-transform:capitalize;">${p.marginMode || 'Cross'}</span>
-              </div>
+              <div class="pos-item"><span class="pos-label">Size</span><span class="pos-val">$${p.size.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+              <div class="pos-item"><span class="pos-label">Margin</span><span class="pos-val">$${p.margin.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+              <div class="pos-item"><span class="pos-label">Entry Price</span><span class="pos-val">$${formatPriceSmart(p.entryPrice)}</span></div>
+              <div class="pos-item"><span class="pos-label">Mark Price</span><span class="pos-val">$${formatPriceSmart(currentPrice)}</span></div>
+              <div class="pos-item"><span class="pos-label">Liq. Price</span><span class="pos-val" style="color:#f59e0b;">$${formatPriceSmart(Math.max(0, liq))}</span></div>
+              <div class="pos-item"><span class="pos-label">Mode</span><span class="pos-val" style="text-transform:capitalize;">${p.marginMode || 'Cross'}</span></div>
             </div>
 
             ${p.treasuryAddress ? `
-              <div class="deposit-line">
-                Treasury ${p.treasuryNetwork || ''}: ${p.treasuryAddress}
+              <div class="treasury-note" style="margin-top:10px; margin-bottom:0;">
+                <strong>USDT margin route:</strong> ${p.treasuryNetwork || 'Ethereum'}<br>
+                ${p.treasuryAddress}
               </div>
             ` : ''}
 
@@ -1937,6 +1789,95 @@
           </div>
         `;
       }).join('');
+    }
+
+    function findPublicCardForTrade(tradeId) {
+      const cards = liveState.publicTradeCards || [];
+      return cards.find(c => String(c.tradeId) === String(tradeId));
+    }
+
+    async function generateTradeShare(tradeId) {
+      try {
+        const res = await fetch('/api/trading/share', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            historyId: tradeId
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Could not generate share link.');
+          return null;
+        }
+
+        if (!liveState.publicTradeCards) liveState.publicTradeCards = [];
+
+        liveState.publicTradeCards.unshift({
+          id: data.publicTradeCard.id,
+          tradeId,
+          page: data.shareUrl,
+          image: data.imageUrl,
+          createdAt: Date.now()
+        });
+
+        const linkBox = document.getElementById(`shareLink-${tradeId}`);
+        if (linkBox) {
+          linkBox.innerText = data.shareUrl;
+        }
+
+        return data;
+      } catch (e) {
+        alert('Network error generating share link.');
+        return null;
+      }
+    }
+
+    async function ensureTradeShare(tradeId) {
+      const existing = findPublicCardForTrade(tradeId);
+
+      if (existing && (existing.page || existing.image)) {
+        return {
+          shareUrl: existing.page,
+          imageUrl: existing.image,
+          downloadUrl: existing.page ? `${existing.page}/download` : null
+        };
+      }
+
+      return await generateTradeShare(tradeId);
+    }
+
+    async function downloadTradeImage(tradeId) {
+      const data = await ensureTradeShare(tradeId);
+
+      if (!data) return;
+
+      const url = data.downloadUrl || (data.publicTradeCard && data.publicTradeCard.links && data.publicTradeCard.links.download);
+
+      if (url) {
+        window.open(url, '_blank');
+      }
+    }
+
+    async function copyTradeLink(tradeId) {
+      const data = await ensureTradeShare(tradeId);
+
+      if (!data) return;
+
+      const url = data.shareUrl || (data.publicTradeCard && data.publicTradeCard.links && data.publicTradeCard.links.page);
+
+      if (!url) return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Share link copied.');
+      } catch {
+        prompt('Copy this link:', url);
+      }
     }
 
     function switchTab(tab, el) {
@@ -1950,7 +1891,7 @@
     async function executeTrade(side) {
       const margin = Number(document.getElementById('tradeAmt').value);
       const lev = Number(document.getElementById('levSlider').value);
-      const network = document.getElementById('usdtNetwork').value || 'eth';
+      const network = document.getElementById('usdtNetwork')?.value || 'eth';
 
       if (!margin || margin <= 0) return alert('Enter margin amount');
       if (!activeToken) return alert('No asset selected');
@@ -2009,15 +1950,17 @@
           liveState.usdtBalance = data.usdtBalance;
           liveState.positions.unshift(data.position);
 
-          if (data.treasuryDeposit) {
-            liveState.tradeDeposits = liveState.tradeDeposits || [];
-            liveState.tradeDeposits.unshift(data.treasuryDeposit);
-          }
+          if (!liveState.tradeDeposits) liveState.tradeDeposits = [];
+          if (data.treasuryDeposit) liveState.tradeDeposits.unshift(data.treasuryDeposit);
 
           document.getElementById('tradeAmt').value = '';
 
           renderBalancesAndPositions();
           switchTab('active', document.querySelector('.tab:first-child'));
+
+          if (data.treasuryDestination) {
+            console.log('USDT margin route:', data.treasuryDestination);
+          }
         } else {
           alert(data.error || 'Trade failed');
         }
@@ -2042,8 +1985,6 @@
             : pos.entryPrice - currentPrice
         ) / pos.entryPrice * pos.size;
 
-        const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
-
         paperState.usdtBalance += pos.margin + pnl;
         paperState.positions.splice(idx, 1);
         paperState.orderHistory.unshift({
@@ -2051,7 +1992,7 @@
           closePrice: currentPrice,
           markPrice: currentPrice,
           pnl,
-          roi,
+          roi: pos.margin > 0 ? (pnl / pos.margin) * 100 : 0,
           closeReason: 'Market Close'
         });
 
@@ -2075,34 +2016,85 @@
         const data = await res.json();
 
         if (res.ok) {
-          liveState.usdtBalance = data.usdtBalance;
-
-          if (data.historyRecord) {
-            liveState.orderHistory = liveState.orderHistory || [];
-            liveState.orderHistory.unshift(data.historyRecord);
-          }
-
-          if (data.publicTradeCard) {
-            liveState.publicTradeCards = liveState.publicTradeCards || [];
-            liveState.publicTradeCards.unshift({
-              id: data.publicTradeCard.id,
-              tradeId: data.historyRecord.id,
-              page: data.shareUrl,
-              image: data.imageUrl,
-              download: data.downloadUrl,
-              createdAt: Date.now()
-            });
-          }
-
           await fetchCoreData();
 
-          setTimeout(() => {
-            switchTab('history', document.querySelectorAll('.tab')[1]);
-            if (data.shareUrl) {
-              const out = document.getElementById(`share-output-${data.historyRecord.id}`);
-              if (out) {
-                out.style.display = 'block';
-                out.innerHTML = `
-                  Link: <a href="${data.shareUrl}" target="_blank" style="color:var(--bluebrand);">${data.shareUrl}</a><br>
-                  Image: <a href="${data.imageUrl}" target="_blank" style="color:var(--bluebrand);">Open image</a><br>
-                  <a href="${data.downloadUrl}" target="_
+          if (data.shareUrl) {
+            setTimeout(() => {
+              switchTab('history', document.querySelectorAll('.tab')[1]);
+            }, 50);
+          }
+        } else {
+          alert(data.error || 'Failed to close position.');
+        }
+      } catch (e) {
+        console.error('closePosition error:', e);
+      }
+    }
+
+    function checkPaperLiquidations() {
+      if (!isPaper || paperState.positions.length === 0) return;
+
+      let changed = false;
+
+      paperState.positions = paperState.positions.filter(pos => {
+        const token = tensorAssets.find(t => t.id === pos.tokenId);
+
+        if (!token) return true;
+
+        const liqPrice = getLiqPrice(
+          pos.entryPrice,
+          pos.size,
+          pos.margin,
+          pos.side,
+          pos.marginMode || 'cross',
+          paperState.usdtBalance
+        );
+
+        const isLiq = pos.side === 'long'
+          ? token.price <= liqPrice
+          : token.price >= liqPrice;
+
+        if (isLiq) {
+          paperState.orderHistory.unshift({
+            ...pos,
+            closePrice: token.price,
+            markPrice: token.price,
+            pnl: -pos.margin,
+            roi: -100,
+            closeReason: 'LIQUIDATION'
+          });
+
+          changed = true;
+          return false;
+        }
+
+        return true;
+      });
+
+      if (changed) {
+        savePaperState();
+        renderBalancesAndPositions();
+      }
+    }
+
+    window.onload = () => {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+
+      initApexChart();
+      updateTreasuryNote();
+
+      document.getElementById('availUsdt').innerText = liveState.usdtBalance.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      fetchCoreData();
+
+      setInterval(async () => {
+        await fetchCoreData();
+        checkPaperLiquidations();
+      }, 1800);
+    };
+  </script>
+</body>
+</html>
