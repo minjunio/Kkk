@@ -1330,4 +1330,1458 @@ function renderTradeCardSvg(card) {
   <text x="1070" y="262" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="950" fill="${color}">${escapeHtml(pnlText)}</text>
 
   <text x="725" y="322" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Margin</text>
-  <text x="1070" y="322" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900"
+  <text x="1070" y="322" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.margin, 2)}</text>
+
+  <text x="725" y="382" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Position Size</text>
+  <text x="1070" y="382" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatMoney(t.size, 2)}</text>
+
+  <text x="725" y="442" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="850" fill="${muted}">Mark Price</text>
+  <text x="1070" y="442" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.markPrice)}</text>
+
+  <rect x="92" y="488" width="1003" height="1" fill="${grid}"/>
+
+  <text x="96" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Entry</text>
+  <text x="96" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.entryPrice)}</text>
+
+  <text x="335" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Close</text>
+  <text x="335" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">$${formatPrice(t.closePrice)}</text>
+
+  <text x="574" y="535" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="800" fill="${muted}">Reason</text>
+  <text x="574" y="566" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="900" fill="${white}">${escapeHtml(t.closeReason)}</text>
+
+  <text x="1095" y="598" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" fill="${muted}">Trade ID ${escapeHtml(String(t.id).slice(0, 18))}</text>
+
+  <text x="600" y="648" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850" fill="${muted}">${escapeHtml(watermark)} • ${escapeHtml(card.verificationText)}</text>
+</svg>`;
+}
+
+function renderTradePublicPage(card) {
+  const t = card.trade;
+  const color = card.style.color;
+  const pnlText = `${t.pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(t.pnl), 2)}`;
+  const roiText = `${t.roi >= 0 ? '+' : ''}${formatMoney(t.roi, 2)}%`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(roiText)} | bluecrypto.ink</title>
+  <meta property="og:title" content="${escapeHtml(t.symbol)} Trade ${escapeHtml(roiText)} ROI"/>
+  <meta property="og:description" content="Verified by Tensor Wallet on bluecrypto.ink"/>
+  <meta property="og:image" content="${escapeHtml(card.links.image)}"/>
+  <meta property="og:type" content="website"/>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#070a0f;color:#f8fafc;font-family:Inter,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:18px}
+    .wrap{width:min(980px,100%)}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px}
+    .brand{font-weight:950;font-size:1.25rem}
+    .verified{color:#94a3b8;font-weight:850;font-size:.86rem}
+    .card{border:1px solid #1f2937;background:#111827;border-radius:24px;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+    img{width:100%;display:block;background:#070a0f}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    a{color:white;text-decoration:none;background:#1f2937;border:1px solid #334155;border-radius:12px;padding:12px 14px;font-weight:900}
+    a.primary{background:${color};border-color:${color}}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+    .stat{background:#0b1220;border:1px solid #1f2937;border-radius:16px;padding:14px}
+    .label{color:#94a3b8;font-size:.75rem;font-weight:850}
+    .value{font-size:1.05rem;font-weight:950;margin-top:6px}
+    @media(max-width:720px){.stats{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div>
+        <div class="brand">bluecrypto.ink</div>
+        <div class="verified">Verified by Tensor Wallet</div>
+      </div>
+      <div style="font-weight:950;color:${color}">${escapeHtml(t.symbol)} ${escapeHtml(t.side)} ${escapeHtml(t.leverage)}x</div>
+    </div>
+
+    <div class="card">
+      <img src="${escapeHtml(card.links.image)}" alt="Verified trade card"/>
+    </div>
+
+    <div class="actions">
+      <a class="primary" href="${escapeHtml(card.links.download)}">Download Trade Image</a>
+      <a href="${escapeHtml(card.links.image)}" target="_blank">Open Image</a>
+      <a href="/trading">Open Trading</a>
+    </div>
+
+    <section class="stats">
+      <div class="stat"><div class="label">ROI</div><div class="value" style="color:${color}">${escapeHtml(roiText)}</div></div>
+      <div class="stat"><div class="label">PNL</div><div class="value" style="color:${color}">${escapeHtml(pnlText)}</div></div>
+      <div class="stat"><div class="label">Mark Price</div><div class="value">$${formatPrice(t.markPrice)}</div></div>
+      <div class="stat"><div class="label">Position Size</div><div class="value">$${formatMoney(t.size, 2)}</div></div>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+/* -------------------- Copy Profile Pages -------------------- */
+
+function publicCopyProfileForResponse(req, profile) {
+  const baseUrl = getBaseUrl(req);
+
+  return {
+    id: profile.id,
+    publicId: profile.publicId || profile.id,
+    name: profile.name,
+    tag: profile.tag,
+    description: profile.description,
+    roi: safeNumber(profile.roi, 0),
+    pnl: safeNumber(profile.pnl, 0),
+    followers: safeNumber(profile.followers, 0),
+    risk: profile.risk,
+    minCopyUsdt: safeNumber(profile.minCopyUsdt, 50),
+    status: profile.status,
+    positions: Array.isArray(profile.positions) ? profile.positions : [],
+    createdAt: profile.createdAt,
+    updatedAt: profile.updatedAt,
+    shareUrl: `${baseUrl}/copy/${profile.publicId || profile.id}`,
+    joinUrl: `${baseUrl}/trading?copy=${encodeURIComponent(profile.publicId || profile.id)}`
+  };
+}
+
+function renderCopyProfilePage(req, profile) {
+  const p = publicCopyProfileForResponse(req, profile);
+  const roiClass = p.roi >= 0 ? '#0ecb81' : '#f6465d';
+  const pnlText = `${p.pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(p.pnl))}`;
+  const roiText = `${p.roi >= 0 ? '+' : ''}${formatMoney(p.roi)}%`;
+
+  const positions = (p.positions || []).slice(0, 8).map(pos => {
+    return `<div class="row"><span>${escapeHtml(pos.symbol || 'Asset')} ${escapeHtml(pos.side || '')}</span><b>${escapeHtml(pos.leverage || 1)}x</b></div>`;
+  }).join('') || '<div class="muted">No public active positions listed.</div>';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(p.name)} | Copy Trading</title>
+  <meta property="og:title" content="${escapeHtml(p.name)} Copy Trading">
+  <meta property="og:description" content="${escapeHtml(roiText)} ROI • ${escapeHtml(pnlText)} PNL">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#070a0f;color:#f8fafc;font-family:Inter,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:18px}
+    .wrap{width:min(760px,100%)}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:26px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.42)}
+    .brand{font-weight:950;color:#94a3b8;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+    .title{font-size:2rem;font-weight:950;margin:10px 0 4px}
+    .tag{color:#94a3b8;font-weight:800}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+    .stat{background:#0b1220;border:1px solid #1f2937;border-radius:16px;padding:14px}
+    .label{color:#94a3b8;font-size:.72rem;font-weight:850}
+    .val{font-weight:950;font-size:1.08rem;margin-top:6px}
+    .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1f2937;color:#e5e7eb}
+    .muted{color:#94a3b8;font-weight:750}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    a{color:white;text-decoration:none;padding:12px 14px;border-radius:12px;background:#1f2937;border:1px solid #334155;font-weight:950}
+    .primary{background:#8b5cf6;border-color:#8b5cf6}
+    @media(max-width:680px){.stats{grid-template-columns:1fr 1fr}.title{font-size:1.45rem}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="brand">bluecrypto.ink • Tensor Wallet</div>
+      <h1 class="title">${escapeHtml(p.name)}</h1>
+      <div class="tag">${escapeHtml(p.tag)} • ${escapeHtml(p.risk)} risk • ${escapeHtml(p.status)}</div>
+
+      <div class="stats">
+        <div class="stat"><div class="label">ROI</div><div class="val" style="color:${roiClass}">${escapeHtml(roiText)}</div></div>
+        <div class="stat"><div class="label">PNL</div><div class="val" style="color:${roiClass}">${escapeHtml(pnlText)}</div></div>
+        <div class="stat"><div class="label">Followers</div><div class="val">${formatMoney(p.followers, 0)}</div></div>
+        <div class="stat"><div class="label">Min Copy</div><div class="val">$${formatMoney(p.minCopyUsdt, 0)}</div></div>
+      </div>
+
+      <div class="muted">${escapeHtml(p.description || 'Public copy trading profile.')}</div>
+
+      <div style="margin-top:18px">
+        <b>Public positions</b>
+        ${positions}
+      </div>
+
+      <div class="actions">
+        <a class="primary" href="${escapeHtml(p.joinUrl)}">Open & Copy</a>
+        <a href="/trading">Open Trading</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
+/* -------------------- Page Routes -------------------- */
+
+app.get('/', (req, res) => {
+  res.render('index', {
+    error: null,
+    success: null,
+    otpEmail: null
+  });
+});
+
+app.get('/index.html', (req, res) => {
+  res.render('index', {
+    error: null,
+    success: null,
+    otpEmail: null
+  });
+});
+
+app.get('/wallet', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.render('wallet', {
+    email: req.session.user.email,
+    role: req.session.user.role,
+    wallet: safeJsonForEjs(user)
+  });
+});
+
+app.get('/wallet.ejs', requireAuth, (req, res) => {
+  res.redirect('/wallet');
+});
+
+app.get('/trading', requireAuth, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.render('trading', {
+    email: req.session.user.email,
+    role: req.session.user.role,
+    wallet: safeJsonForEjs(user),
+    treasury: safeJsonForEjs(TREASURY_USDT_ADDRESSES)
+  });
+});
+
+app.get('/trading.ejs', requireAuth, (req, res) => {
+  res.redirect('/trading');
+});
+
+/* -------------------- Public Share Routes -------------------- */
+
+app.get('/trade/:id', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade card not found.');
+  }
+
+  res.set('Cache-Control', 'public, max-age=60');
+  res.send(renderTradePublicPage(card));
+});
+
+app.get('/trade/:id/image.svg', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade image not found.');
+  }
+
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.send(renderTradeCardSvg(card));
+});
+
+app.get('/trade/:id/download', (req, res) => {
+  const db = readDb();
+  const card = db.publicTradeCards[req.params.id];
+
+  if (!card) {
+    return res.status(404).send('Trade image not found.');
+  }
+
+  const filename = `bluecrypto-${card.trade.symbol}-${card.trade.side}-${card.id}.svg`;
+
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(renderTradeCardSvg(card));
+});
+
+app.get('/copy/:id', (req, res) => {
+  const db = readDb();
+  const profile = Object.values(db.copyProfiles).find(p => {
+    return String(p.publicId || p.id) === String(req.params.id);
+  });
+
+  if (!profile) {
+    return res.status(404).send('Copy profile not found.');
+  }
+
+  res.set('Cache-Control', 'public, max-age=60');
+  res.send(renderCopyProfilePage(req, profile));
+});
+
+/* -------------------- Auth Routes -------------------- */
+
+app.post('/send-otp', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+
+    if (!email || !email.includes('@')) {
+      return res.render('index', {
+        error: 'Enter a valid email.',
+        success: null,
+        otpEmail: null
+      });
+    }
+
+    const otp = generateOtp();
+    saveOtp(email, otp);
+
+    const sent = await sendOtpEmail(email, otp);
+
+    res.render('index', {
+      error: null,
+      success: sent
+        ? 'OTP sent. Check your inbox.'
+        : 'DEV mode: OTP was printed in your server logs.',
+      otpEmail: email
+    });
+  } catch (err) {
+    console.error('send-otp error:', err);
+
+    res.render('index', {
+      error: 'Could not send OTP. Check server email settings.',
+      success: null,
+      otpEmail: normalizeEmail(req.body.email)
+    });
+  }
+});
+
+app.post('/verify-otp', (req, res) => {
+  const email = normalizeEmail(req.body.email);
+  const otp = String(req.body.otp || '').trim();
+
+  const result = verifyOtp(email, otp);
+
+  if (!result.ok) {
+    return res.render('index', {
+      error: result.reason,
+      success: null,
+      otpEmail: email
+    });
+  }
+
+  const user = getOrCreateUser(email, 'user');
+
+  req.session.user = {
+    email,
+    username: email.split('@')[0],
+    role: user.role,
+    walletId: user.id
+  };
+
+  req.session.save(() => res.redirect('/trading'));
+});
+
+app.post('/staff-login', (req, res) => {
+  const username = String(req.body.username || '').trim();
+  const password = String(req.body.password || '');
+
+  if (username !== STAFF_USERNAME || password !== STAFF_PASSWORD) {
+    return res.render('index', {
+      error: 'Invalid staff login.',
+      success: null,
+      otpEmail: null
+    });
+  }
+
+  const adminEmail = 'admin@tensorwallet.local';
+  const user = getOrCreateUser(adminEmail, 'staff');
+
+  req.session.user = {
+    email: adminEmail,
+    username: 'admin',
+    role: 'staff',
+    walletId: user.id
+  };
+
+  req.session.save(() => res.redirect('/trading'));
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('tensorwallet.sid');
+    res.redirect('/index.html');
+  });
+});
+
+app.post('/logout', (req, res) => {
+  res.redirect('/logout');
+});
+
+/* -------------------- Copy Trading APIs -------------------- */
+
+app.get('/api/copy/profiles', requireAuthJson, (req, res) => {
+  const db = readDb();
+
+  const profiles = Object.values(db.copyProfiles)
+    .map(profile => publicCopyProfileForResponse(req, profile))
+    .sort((a, b) => safeNumber(b.updatedAt, 0) - safeNumber(a.updatedAt, 0));
+
+  res.json({
+    ok: true,
+    profiles
+  });
+});
+
+app.get('/api/copy/profile/:id', requireAuthJson, (req, res) => {
+  const db = readDb();
+
+  const profile = Object.values(db.copyProfiles).find(p => {
+    return String(p.id) === String(req.params.id) || String(p.publicId) === String(req.params.id);
+  });
+
+  if (!profile) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
+
+  res.json({
+    ok: true,
+    profile: publicCopyProfileForResponse(req, profile)
+  });
+});
+
+app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  const name = String(req.body.name || '').trim().slice(0, 64);
+  const tag = String(req.body.tag || 'Admin public profile').trim().slice(0, 80);
+  const description = String(req.body.description || '').trim().slice(0, 500);
+  const roi = safeNumber(req.body.roi ?? req.body.currentRoi, 0);
+  const pnl = safeNumber(req.body.pnl ?? req.body.currentPnl, 0);
+  const risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : 'Medium';
+  const minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, 50));
+  const status = req.body.status === 'paused' ? 'paused' : 'active';
+
+  if (!name) {
+    return res.status(400).json({ error: 'Profile name is required.' });
+  }
+
+  const id = makePublicId('copy');
+
+  const positions = Array.isArray(req.body.positions)
+    ? req.body.positions.slice(0, 25)
+    : Array.isArray(user.positions)
+      ? user.positions.slice(0, 25)
+      : [];
+
+  const profile = {
+    id,
+    publicId: id,
+    ownerEmail: user.email,
+    ownerWalletId: user.id,
+    name,
+    tag,
+    description,
+    roi,
+    pnl,
+    followers: 0,
+    risk,
+    minCopyUsdt,
+    status,
+    positions,
+    createdAt: Date.now(),
+    createdAtIso: nowIso(),
+    updatedAt: Date.now(),
+    updatedAtIso: nowIso()
+  };
+
+  db.copyProfiles[id] = profile;
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    profile: publicCopyProfileForResponse(req, profile)
+  });
+});
+
+app.put('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
+  const db = readDb();
+
+  const profile = db.copyProfiles[req.params.id] || Object.values(db.copyProfiles).find(p => {
+    return String(p.publicId) === String(req.params.id);
+  });
+
+  if (!profile) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
+
+  if (req.body.name !== undefined) profile.name = String(req.body.name || profile.name).trim().slice(0, 64);
+  if (req.body.tag !== undefined) profile.tag = String(req.body.tag || profile.tag).trim().slice(0, 80);
+  if (req.body.description !== undefined) profile.description = String(req.body.description || '').trim().slice(0, 500);
+  if (req.body.roi !== undefined || req.body.currentRoi !== undefined) profile.roi = safeNumber(req.body.roi ?? req.body.currentRoi, profile.roi);
+  if (req.body.pnl !== undefined || req.body.currentPnl !== undefined) profile.pnl = safeNumber(req.body.pnl ?? req.body.currentPnl, profile.pnl);
+  if (req.body.risk !== undefined) profile.risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : profile.risk;
+  if (req.body.minCopyUsdt !== undefined) profile.minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, profile.minCopyUsdt));
+  if (req.body.status !== undefined) profile.status = req.body.status === 'paused' ? 'paused' : 'active';
+  if (Array.isArray(req.body.positions)) profile.positions = req.body.positions.slice(0, 25);
+
+  profile.updatedAt = Date.now();
+  profile.updatedAtIso = nowIso();
+
+  migrateCopyProfile(profile);
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    profile: publicCopyProfileForResponse(req, profile)
+  });
+});
+
+app.delete('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
+  const db = readDb();
+
+  const key = db.copyProfiles[req.params.id]
+    ? req.params.id
+    : Object.keys(db.copyProfiles).find(k => String(db.copyProfiles[k].publicId) === String(req.params.id));
+
+  if (!key) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
+
+  delete db.copyProfiles[key];
+  writeDb(db);
+
+  res.json({ ok: true });
+});
+
+app.post('/api/copy/join', requireAuthJson, (req, res) => {
+  const profileId = String(req.body.profileId || '').trim();
+  const amountUsdt = safeNumber(req.body.amountUsdt, 0);
+
+  if (!profileId) {
+    return res.status(400).json({ error: 'Missing copy profile ID.' });
+  }
+
+  if (amountUsdt <= 0) {
+    return res.status(400).json({ error: 'Enter a valid USDT amount.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  const profile = db.copyProfiles[profileId] || Object.values(db.copyProfiles).find(p => {
+    return String(p.publicId) === profileId;
+  });
+
+  if (!profile) {
+    return res.status(404).json({ error: 'Copy profile not found.' });
+  }
+
+  if (profile.status !== 'active') {
+    return res.status(400).json({ error: 'This copy profile is not active.' });
+  }
+
+  if (amountUsdt < safeNumber(profile.minCopyUsdt, 50)) {
+    return res.status(400).json({ error: `Minimum copy amount is ${profile.minCopyUsdt} USDT.` });
+  }
+
+  if (safeNumber(user.usdtBalance, 0) < amountUsdt) {
+    return res.status(400).json({ error: 'Insufficient USDT balance.' });
+  }
+
+  const automaticNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
+
+  const copyDeposit = buildCopyDeposit({
+    user,
+    profile,
+    amountUsdt,
+    network: automaticNetwork
+  });
+
+  const copyTrade = {
+    id: makeId('copytrade'),
+    profileId: profile.id,
+    profilePublicId: profile.publicId || profile.id,
+    profileName: profile.name,
+    amountUsdt,
+    pnl: 0,
+    roi: 0,
+    markValueUsdt: amountUsdt,
+    status: 'active',
+    startedAt: Date.now(),
+    startedAtIso: nowIso(),
+    depositId: copyDeposit.id,
+    treasuryTxHash: copyDeposit.txHash,
+    treasuryNetwork: copyDeposit.destinationNetwork,
+    treasuryAddress: copyDeposit.destinationAddress
+  };
+
+  user.usdtNetwork = automaticNetwork;
+  user.usdtBalance = safeNumber(user.usdtBalance, 0) - amountUsdt;
+  user.copyTrades.unshift(copyTrade);
+  user.copyDeposits.unshift(copyDeposit);
+  user.copyDeposits = user.copyDeposits.slice(0, 200);
+  user.updatedAt = nowIso();
+
+  profile.followers = Math.max(0, safeNumber(profile.followers, 0)) + 1;
+  profile.updatedAt = Date.now();
+  profile.updatedAtIso = nowIso();
+
+  db.treasury.copyDeposits.unshift(copyDeposit);
+  db.treasury.copyDeposits = db.treasury.copyDeposits.slice(0, 1000);
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    usdtBalance: user.usdtBalance,
+    copyTrade,
+    copyDeposit,
+    treasuryDestination: {
+      network: copyDeposit.destinationNetwork,
+      address: copyDeposit.destinationAddress,
+      symbol: copyDeposit.destinationSymbol
+    }
+  });
+});
+
+app.post('/api/copy/stop', requireAuthJson, (req, res) => {
+  const copyTradeId = String(req.body.copyTradeId || '').trim();
+
+  if (!copyTradeId) {
+    return res.status(400).json({ error: 'Missing copy trade ID.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  updateCopyTradePerformance(db, user);
+
+  const idx = user.copyTrades.findIndex(c => {
+    return String(c.id) === copyTradeId && c.status === 'active';
+  });
+
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Active copy trade not found.' });
+  }
+
+  const copy = user.copyTrades[idx];
+  const returnAmount = Math.max(0, safeNumber(copy.amountUsdt, 0) + safeNumber(copy.pnl, 0));
+
+  user.usdtBalance = safeNumber(user.usdtBalance, 0) + returnAmount;
+
+  const closed = {
+    ...copy,
+    status: 'closed',
+    closedAt: Date.now(),
+    closedAtIso: nowIso(),
+    returnedUsdt: returnAmount
+  };
+
+  user.copyTrades.splice(idx, 1);
+
+  user.orderHistory.unshift({
+    id: closed.id,
+    symbol: 'COPY',
+    side: 'long',
+    leverage: 1,
+    margin: closed.amountUsdt,
+    size: closed.amountUsdt,
+    entryPrice: 1,
+    closePrice: 1,
+    markPrice: 1,
+    pnl: closed.pnl,
+    roi: closed.roi,
+    closeReason: `Stopped Copy: ${closed.profileName}`,
+    openedAt: closed.startedAt,
+    openedAtIso: closed.startedAtIso,
+    closedAt: closed.closedAt,
+    closedAtIso: closed.closedAtIso
+  });
+
+  const profile = db.copyProfiles[copy.profileId];
+
+  if (profile) {
+    profile.followers = Math.max(0, safeNumber(profile.followers, 0) - 1);
+    profile.updatedAt = Date.now();
+    profile.updatedAtIso = nowIso();
+  }
+
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    usdtBalance: user.usdtBalance,
+    closedCopyTrade: closed
+  });
+});
+
+/* -------------------- Trading APIs -------------------- */
+
+app.get('/api/trading/state', requireAuthJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  updateCopyTradePerformance(db, user);
+  writeDb(db);
+
+  res.json({
+    usdtBalance: safeNumber(user.usdtBalance, 0),
+    usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
+    positions: user.positions || [],
+    orderHistory: user.orderHistory || [],
+    publicTradeCards: user.publicTradeCards || [],
+    tradeDeposits: user.tradeDeposits || [],
+    copyTrades: user.copyTrades || [],
+    copyDeposits: user.copyDeposits || [],
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
+  });
+});
+
+app.post('/api/trading/execute', requireAuthJson, (req, res) => {
+  const tokenId = String(req.body.tokenId || '');
+  const side = String(req.body.side || '').toLowerCase();
+  const margin = safeNumber(req.body.margin, 0);
+  const leverage = safeNumber(req.body.leverage, 1);
+  const marginMode = String(req.body.marginMode || 'cross').toLowerCase() === 'isolated'
+    ? 'isolated'
+    : 'cross';
+
+  if (!tokenId || !['long', 'short'].includes(side)) {
+    return res.status(400).json({ error: 'Invalid trade side or asset.' });
+  }
+
+  if (margin <= 0 || leverage < 1 || leverage > 150) {
+    return res.status(400).json({ error: 'Invalid margin or leverage.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+
+  if (!token) {
+    return res.status(404).json({ error: 'Asset not found.' });
+  }
+
+  if (safeNumber(user.usdtBalance, 0) < margin) {
+    return res.status(400).json({ error: 'Insufficient USDT balance.' });
+  }
+
+  const automaticNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
+
+  const treasuryDeposit = buildTreasuryDeposit({
+    user,
+    token,
+    margin,
+    leverage,
+    side,
+    marginMode,
+    network: automaticNetwork
+  });
+
+  user.usdtNetwork = automaticNetwork;
+  user.usdtBalance = safeNumber(user.usdtBalance, 0) - margin;
+
+  const position = {
+    id: makeId('pos'),
+    tokenId: token.id,
+    symbol: token.symbol,
+    side,
+    margin,
+    leverage,
+    marginMode,
+    size: margin * leverage,
+    entryPrice: token.price,
+    markPrice: token.price,
+    openedAt: Date.now(),
+    openedAtIso: nowIso(),
+    treasuryDepositId: treasuryDeposit.id,
+    treasuryTxHash: treasuryDeposit.txHash,
+    treasuryNetwork: treasuryDeposit.destinationNetwork,
+    treasuryAddress: treasuryDeposit.destinationAddress
+  };
+
+  user.positions.unshift(position);
+  user.tradeDeposits.unshift(treasuryDeposit);
+  user.tradeDeposits = user.tradeDeposits.slice(0, 200);
+
+  db.treasury.tradeDeposits.unshift(treasuryDeposit);
+  db.treasury.tradeDeposits = db.treasury.tradeDeposits.slice(0, 1000);
+
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    position,
+    usdtBalance: user.usdtBalance,
+    usdtNetwork: automaticNetwork,
+    treasuryDeposit,
+    treasuryDestination: {
+      network: treasuryDeposit.destinationNetwork,
+      address: treasuryDeposit.destinationAddress,
+      symbol: treasuryDeposit.destinationSymbol
+    }
+  });
+});
+
+app.post('/api/trading/close', requireAuthJson, (req, res) => {
+  const positionId = String(req.body.positionId || '');
+
+  if (!positionId) {
+    return res.status(400).json({ error: 'Missing position ID.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  const posIdx = user.positions.findIndex(p => String(p.id) === positionId);
+
+  if (posIdx === -1) {
+    return res.status(404).json({ error: 'Position not found.' });
+  }
+
+  const pos = user.positions[posIdx];
+  const token = db.tensorRegistry.find(t => t.id === pos.tokenId);
+  const currentPrice = token ? token.price : pos.entryPrice;
+  const pnl = calculatePnl(pos, currentPrice);
+  const roi = pos.margin > 0 ? (pnl / pos.margin) * 100 : 0;
+
+  user.usdtBalance = safeNumber(user.usdtBalance, 0) + safeNumber(pos.margin, 0) + pnl;
+  user.positions.splice(posIdx, 1);
+
+  const historyRecord = {
+    ...pos,
+    closePrice: currentPrice,
+    markPrice: currentPrice,
+    pnl,
+    roi,
+    closedAt: Date.now(),
+    closedAtIso: nowIso(),
+    closeReason: 'Market Close'
+  };
+
+  user.orderHistory.unshift(historyRecord);
+  user.orderHistory = user.orderHistory.slice(0, 100);
+  user.updatedAt = nowIso();
+
+  const publicCard = buildTradeCardPayload({
+    req,
+    db,
+    user,
+    trade: historyRecord
+  });
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    usdtBalance: user.usdtBalance,
+    pnl,
+    roi,
+    historyRecord,
+    publicTradeCard: publicCard,
+    shareUrl: publicCard.links.page,
+    imageUrl: publicCard.links.image,
+    downloadUrl: publicCard.links.download
+  });
+});
+
+app.post('/api/trading/share', requireAuthJson, (req, res) => {
+  const historyId = String(req.body.historyId || req.body.tradeId || '');
+
+  if (!historyId) {
+    return res.status(400).json({ error: 'Missing history trade ID.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  const trade = user.orderHistory.find(t => String(t.id) === historyId);
+
+  if (!trade) {
+    return res.status(404).json({ error: 'Trade history not found.' });
+  }
+
+  const publicCard = buildTradeCardPayload({
+    req,
+    db,
+    user,
+    trade
+  });
+
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    publicTradeCard: publicCard,
+    shareUrl: publicCard.links.page,
+    imageUrl: publicCard.links.image,
+    downloadUrl: publicCard.links.download
+  });
+});
+
+/* -------------------- Wallet APIs -------------------- */
+
+app.get('/api/wallet', requireAuthJson, (req, res) => {
+  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+
+  res.json({
+    ...user,
+    usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
+    treasuryDestinations: TREASURY_USDT_ADDRESSES
+  });
+});
+
+app.post('/api/wallet/vault', requireAuthJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  if (!req.body.encryptedVault) {
+    return res.status(400).json({ error: 'No vault data provided.' });
+  }
+
+  user.encryptedVault = req.body.encryptedVault;
+  user.publicWallets = Array.isArray(req.body.publicWallets) ? req.body.publicWallets : [];
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({ ok: true });
+});
+
+app.post('/api/wallet/usdt-network', requireAuthJson, (req, res) => {
+  const network = normalizeNetwork(req.body.network || req.body.usdtNetwork || '');
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  user.usdtNetwork = network;
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  const destination = getTreasuryDestination(network);
+
+  res.json({
+    ok: true,
+    usdtNetwork: network,
+    treasuryDestination: destination
+  });
+});
+
+app.post('/api/wallet/send', requireAuthJson, (req, res) => {
+  const network = String(req.body.network || '').trim();
+  const asset = String(req.body.asset || '').trim();
+  const amount = safeNumber(req.body.amount, 0);
+  const toAddress = String(req.body.toAddress || '').trim();
+
+  if (!network || !asset || amount <= 0 || !toAddress) {
+    return res.status(400).json({ error: 'Invalid request.' });
+  }
+
+  const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
+
+  res.json({
+    ok: true,
+    txHash,
+    status: 'demo-sent'
+  });
+});
+
+/* -------------------- Tensor APIs -------------------- */
+
+app.get('/api/tensor', requireAuthJson, async (req, res) => {
+  try {
+    await syncRealCryptoPrices();
+
+    const db = readDb();
+    const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
+
+    db.tensorRegistry.forEach(token => {
+      const oldPrice = token.price;
+      const mappedSymbol = REAL_SYMBOL_MAP[String(token.symbol || '').toUpperCase()];
+      const real = mappedSymbol ? latestRealPrices[mappedSymbol] : null;
+
+      if (real && real.price > 0) {
+        token.bias = 'real';
+        token.price = real.price;
+        token.volume = real.volume || token.volume || 0;
+        token.changePercent24h = real.changePercent || 0;
+        token.high24h = real.high || token.price;
+        token.low24h = real.low || token.price;
+        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price, token.high24h);
+        token.marketCap = token.price * token.supply;
+
+        pushLiveCandle(token, oldPrice);
+      } else {
+        initializeCandlesForToken(token.id, token.price);
+        token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
+      }
+    });
+
+    writeDb(db);
+
+    res.json({
+      registry: db.tensorRegistry,
+      address: user.tensorAddress,
+      balances: user.tensorBalances || {},
+      syncedAt: Date.now(),
+      treasury: req.session.user.role === 'staff' ? db.treasury : undefined,
+      treasuryDestinations: TREASURY_USDT_ADDRESSES
+    });
+  } catch (err) {
+    console.error('/api/tensor error:', err);
+
+    res.status(500).json({
+      error: 'Could not load tensor registry.'
+    });
+  }
+});
+
+app.get('/api/tensor/chart', requireAuthJson, (req, res) => {
+  const tokenId = String(req.query.tokenId || '');
+
+  if (!tokenId) {
+    return res.json({ candles: [] });
+  }
+
+  const db = readDb();
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+
+  if (!token) {
+    return res.json({ candles: [] });
+  }
+
+  initializeCandlesForToken(token.id, token.price);
+
+  res.json({
+    baseTimeframe: '5m',
+    supportedTimeframes: ['5m', '15m', '30m', '1h'],
+    candles: (tensorCandleHistory[token.id] || []).slice(-900),
+    stats: {
+      high24h: token.high24h,
+      low24h: token.low24h,
+      lifetimeHigh: token.lifetimeHigh,
+      markPrice: token.price,
+      changePercent24h: token.changePercent24h
+    }
+  });
+});
+
+app.get('/api/live-prices', requireAuthJson, async (req, res) => {
+  try {
+    await syncRealCryptoPrices(true);
+
+    res.json({
+      ok: true,
+      prices: latestRealPrices,
+      syncedAt: lastRealPriceSync
+    });
+  } catch {
+    res.status(500).json({
+      ok: false,
+      error: 'Could not load live prices.'
+    });
+  }
+});
+
+app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+
+  if (!user) {
+    return res.status(401).json({ error: 'User not found.' });
+  }
+
+  if (!req.body.tensorVault) {
+    return res.status(400).json({ error: 'No Tensor vault data provided.' });
+  }
+
+  user.tensorVault = req.body.tensorVault;
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({ ok: true });
+});
+
+app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const symbol = String(req.body.symbol || '').trim().toUpperCase();
+  const price = safeNumber(req.body.price, 0);
+  const bias = String(req.body.bias || 'balanced').trim();
+  const bullChance = safeNumber(req.body.bullChance, 50);
+  const minPct = safeNumber(req.body.minPct, 0.1) / 100;
+  const maxPct = safeNumber(req.body.maxPct, 0.5) / 100;
+  const icon = String(req.body.icon || symbol.slice(0, 1) || 'T').trim();
+  const supply = safeNumber(req.body.supply, 10000000);
+
+  if (!name || !symbol || price <= 0 || supply <= 0) {
+    return res.status(400).json({ error: 'Missing or invalid token parameters.' });
+  }
+
+  const db = readDb();
+
+  const id = `T0x${crypto.randomBytes(20).toString('hex')}`;
+
+  const token = {
+    id,
+    name,
+    symbol,
+    price,
+    startPrice: price,
+    bias,
+    bullChance: clamp(bullChance, 0, 100),
+    minPct: Math.max(0, minPct),
+    maxPct: Math.max(minPct, maxPct),
+    icon,
+    supply,
+    marketCap: price * supply,
+    volume: 0,
+    dominance: 0,
+    changePercent24h: 0,
+    high24h: price,
+    low24h: price,
+    lifetimeHigh: price
+  };
+
+  db.tensorRegistry.push(token);
+  writeDb(db);
+
+  initializeCandlesForToken(id, price);
+
+  res.json({
+    ok: true,
+    id,
+    token
+  });
+});
+
+app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
+  const db = readDb();
+  const token = db.tensorRegistry.find(t => t.id === req.params.id);
+
+  if (!token) {
+    return res.status(404).json({ error: 'Token not found.' });
+  }
+
+  if (req.body.name !== undefined) token.name = String(req.body.name || token.name);
+  if (req.body.symbol !== undefined) token.symbol = String(req.body.symbol || token.symbol).toUpperCase();
+  if (req.body.icon !== undefined) token.icon = String(req.body.icon || token.icon);
+  if (req.body.bias !== undefined) token.bias = String(req.body.bias || token.bias);
+
+  if (req.body.price !== undefined) {
+    token.price = Math.max(0.000001, safeNumber(req.body.price, token.price));
+  }
+
+  if (req.body.startPrice !== undefined) {
+    token.startPrice = Math.max(0.000001, safeNumber(req.body.startPrice, token.startPrice));
+  }
+
+  if (req.body.bullChance !== undefined) {
+    token.bullChance = clamp(req.body.bullChance, 0, 100);
+  }
+
+  if (req.body.minPct !== undefined) {
+    token.minPct = Math.max(0, safeNumber(req.body.minPct, token.minPct * 100) / 100);
+  }
+
+  if (req.body.maxPct !== undefined) {
+    token.maxPct = Math.max(token.minPct, safeNumber(req.body.maxPct, token.maxPct * 100) / 100);
+  }
+
+  if (req.body.supply !== undefined) {
+    token.supply = Math.max(1, safeNumber(req.body.supply, token.supply));
+  }
+
+  token.marketCap = token.price * token.supply;
+  token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
+
+  writeDb(db);
+  initializeCandlesForToken(token.id, token.price);
+
+  res.json({
+    ok: true,
+    token
+  });
+});
+
+app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
+  const db = readDb();
+  const index = db.tensorRegistry.findIndex(t => t.id === req.params.id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: 'Token not found.' });
+  }
+
+  db.tensorRegistry.splice(index, 1);
+  delete tensorCandleHistory[req.params.id];
+
+  Object.values(db.users).forEach(user => {
+    if (user.tensorBalances) delete user.tensorBalances[req.params.id];
+
+    if (Array.isArray(user.positions)) {
+      user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
+    }
+  });
+
+  writeDb(db);
+
+  res.json({ ok: true });
+});
+
+app.post('/api/tensor/admin-mint', requireAdminJson, (req, res) => {
+  const tokenId = String(req.body.tokenId || '');
+  const amount = safeNumber(req.body.amount, 0);
+
+  if (!tokenId || amount <= 0) {
+    return res.status(400).json({ error: 'Invalid parameters.' });
+  }
+
+  const db = readDb();
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+
+  if (!token) {
+    return res.status(404).json({ error: 'Token not found.' });
+  }
+
+  const user = db.users[req.session.user.email];
+
+  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + amount;
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    newBalance: user.tensorBalances[tokenId]
+  });
+});
+
+app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
+  const tokenId = String(req.body.tokenId || '');
+  const spend = safeNumber(req.body.usdtAmount, 0);
+
+  if (!tokenId || spend <= 0) {
+    return res.status(400).json({ error: 'Invalid payload.' });
+  }
+
+  const db = readDb();
+  const user = db.users[req.session.user.email];
+  const token = db.tensorRegistry.find(t => t.id === tokenId);
+
+  if (!token) {
+    return res.status(404).json({ error: 'Token missing.' });
+  }
+
+  if (safeNumber(user.usdtBalance, 0) < spend) {
+    return res.status(400).json({ error: 'Insufficient USDT balance.' });
+  }
+
+  const feeRate = 0.000001;
+  const feeAmount = spend * feeRate;
+  const netSpend = spend - feeAmount;
+
+  db.treasury.collectedFeesUsdt = safeNumber(db.treasury.collectedFeesUsdt, 0) + feeAmount;
+
+  let priceImpact = 0;
+
+  if (token.bias !== 'pegged' && token.bias !== 'real') {
+    const marketCap = Math.max(100, safeNumber(token.marketCap, token.price * token.supply));
+    const impactMultiplier = netSpend / marketCap;
+    priceImpact = Math.min(0.5, impactMultiplier * 0.8);
+  }
+
+  const originalPrice = token.price;
+  const executionPrice = originalPrice * (1 + priceImpact / 2);
+  const received = netSpend / executionPrice;
+
+  user.usdtBalance -= spend;
+  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + received;
+
+  if (token.bias !== 'pegged' && token.bias !== 'real') {
+    token.price = Math.max(0.000001, originalPrice * (1 + priceImpact));
+    token.marketCap = token.price * token.supply;
+    token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
+  }
+
+  token.volume = safeNumber(token.volume, 0) + spend;
+
+  pushLiveCandle(token, originalPrice);
+
+  user.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({
+    ok: true,
+    received,
+    impactPercent: Number((priceImpact * 100).toFixed(4)),
+    feePaid: feeAmount,
+    usdtBalance: user.usdtBalance
+  });
+});
+
+app.post('/api/tensor/send', requireAuthJson, (req, res) => {
+  const tokenId = String(req.body.tokenId || '');
+  const amount = safeNumber(req.body.amount, 0);
+  const toAddress = String(req.body.toAddress || '').trim();
+
+  if (!tokenId || amount <= 0 || !toAddress) {
+    return res.status(400).json({ error: 'Invalid parameters.' });
+  }
+
+  const db = readDb();
+  const sender = db.users[req.session.user.email];
+
+  if (safeNumber(sender.tensorBalances[tokenId], 0) < amount) {
+    return res.status(400).json({ error: 'Insufficient balance.' });
+  }
+
+  const recipientEmail = Object.keys(db.users).find(email => {
+    return db.users[email].tensorAddress === toAddress;
+  });
+
+  if (!recipientEmail) {
+    return res.status(404).json({ error: 'Recipient not found.' });
+  }
+
+  const recipient = db.users[recipientEmail];
+
+  sender.tensorBalances[tokenId] -= amount;
+  recipient.tensorBalances[tokenId] = safeNumber(recipient.tensorBalances[tokenId], 0) + amount;
+
+  sender.updatedAt = nowIso();
+  recipient.updatedAt = nowIso();
+
+  writeDb(db);
+
+  res.json({ ok: true });
+});
+
+/* -------------------- Standard Market APIs -------------------- */
+
+app.get('/api/prices', requireAuthJson, async (req, res) => {
+  try {
+    const ids = String(req.query.ids || '')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    if (!ids.length) {
+      return res.json({});
+    }
+
+    const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(ids.join(','))}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`;
+
+    const data = await cachedJson(`cg-prices:${ids.join(',')}`, 5000, () => {
+      return fetchJsonWithTimeout(url, {}, 8000);
+    });
+
+    res.json(data);
+  } catch (err) {
+    console.error('/api/prices error:', err.message);
+    res.json({});
+  }
+});
+
+/* -------------------- Health / Fallback -------------------- */
+
+app.get('/health', (req, res) => {
+  const dbExists = fs.existsSync(DB_PATH);
+  let copyProfileCount = 0;
+
+  try {
+    const db = readDb();
+    copyProfileCount = Object.keys(db.copyProfiles || {}).length;
+  } catch {}
+
+  res.json({
+    ok: true,
+    uptime: process.uptime(),
+    startupPage: '/index.html',
+    pages: {
+      index: '/ or /index.html',
+      wallet: '/wallet',
+      trading: '/trading',
+      publicTrade: '/trade/:id',
+      publicTradeImage: '/trade/:id/image.svg',
+      publicCopyProfile: '/copy/:id'
+    },
+    candleBase: '5m',
+    supportedChartTimeframes: ['5m', '15m', '30m', '1h'],
+    treasuryDestinations: TREASURY_USDT_ADDRESSES,
+    dataDir: DATA_DIR,
+    dbPath: DB_PATH,
+    dbExists,
+    lastRealPriceSync,
+    realPriceCount: Object.keys(latestRealPrices).length,
+    copyProfileCount
+  });
+});
+
+app.use((req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API route not found.' });
+  }
+
+  return res.redirect('/index.html');
+});
+
+/* -------------------- Startup -------------------- */
+
+ensureDb();
+hydrateAllCandles();
+
+syncRealCryptoPrices(true)
+  .then(() => runMarketLoop())
+  .catch(() => runMarketLoop());
+
+setInterval(() => {
+  runMarketLoop();
+}, MARKET_LOOP_MS);
+
+app.listen(PORT, () => {
+  console.log(`Tensor Wallet running on port ${PORT}`);
+  console.log(`Startup page: /index.html -> views/index.ejs`);
+  console.log(`Wallet page: /wallet -> views/wallet.ejs`);
+  console.log(`Trading page: /trading -> views/trading.ejs`);
+  console.log(`Chart base candles: 5m`);
+  console.log(`Supported chart timeframes: 5m, 15m, 30m, 1h`);
+  console.log(`Public trade page: /trade/:id`);
+  console.log(`Public trade image: /trade/:id/image.svg`);
+  console.log(`Public copy profile: /copy/:id`);
+  console.log(`Data directory: ${DATA_DIR}`);
+  console.log(`Database path: ${DB_PATH}`);
+});
