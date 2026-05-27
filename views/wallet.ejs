@@ -1,1047 +1,2076 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tensor Wallet | Ecosystem</title>
+  <title>Tensor Wallet | Wallet</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
   <style>
     :root {
-      color-scheme: light;
-      --bg1: #e9f8ff; --bg2: #f8fcff; --bg3: #d7f0ff;
-      --glass: rgba(255,255,255,0.85); --glass2: rgba(255,255,255,0.7);
-      --solid: #ffffff; --soft: #f0f7ff; --soft-hover: #e0f0ff;
-      --text: #0f172a; --muted: #64748b; --muted2: #94a3b8;
-      --blue: #0284c7; --blue2: #2563eb; --cyan: #38bdf8;
-      --pink: #e11d48; --orange: #d97706; --green: #10b981;
-      --tensor: #8b5cf6; --tensor2: #d946ef; 
-      --border: rgba(2,132,199,0.12); --border2: rgba(2,132,199,0.35);
-      --shadow: 0 24px 64px rgba(37,99,235,0.12); --shadow2: 0 12px 32px rgba(2,132,199,0.08);
-      --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+      --bg-base: #070a0f;
+      --bg-base-2: #0b0f17;
+      --bg-panel: rgba(17, 24, 39, 0.86);
+      --bg-panel-solid: #111827;
+      --bg-card: rgba(15, 23, 42, 0.72);
+      --bg-hover: rgba(45, 55, 72, 0.9);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.24);
+
+      --green: #0ecb81;
+      --green-glow: rgba(14, 203, 129, 0.18);
+      --red: #f6465d;
+      --red-glow: rgba(246, 70, 93, 0.18);
+      --tensor: #8b5cf6;
+      --tensor-2: #3b82f6;
+      --tensor-soft: rgba(139, 92, 246, 0.18);
+      --yellow: #f59e0b;
+
+      --shadow: 0 22px 70px rgba(0,0,0,0.38);
+      --radius: 18px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
     }
 
-    [data-theme="dark"] {
-      color-scheme: dark;
-      --bg1: #06111f; --bg2: #050816; --bg3: #0a2942;
-      --glass: rgba(13,22,40,0.88); --glass2: rgba(17,29,51,0.72);
-      --solid: #0d1628; --soft: #111d33; --soft-hover: #1e293b;
-      --text: #f8fafc; --muted: #94a3b8; --muted2: #64748b;
-      --blue: #38bdf8; --tensor: #a78bfa; --tensor2: #e879f9;
-      --border: rgba(125,211,252,0.16); --border2: rgba(56,189,248,0.36);
-      --shadow: 0 28px 86px rgba(0,0,0,0.5); --shadow2: 0 14px 38px rgba(0,0,0,0.3);
+    [data-theme="light"] {
+      --bg-base: #f6f8fb;
+      --bg-base-2: #eef2f8;
+      --bg-panel: rgba(255,255,255,0.90);
+      --bg-panel-solid: #ffffff;
+      --bg-card: rgba(255,255,255,0.84);
+      --bg-hover: rgba(226, 232, 240, 0.9);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: rgba(15, 23, 42, 0.10);
+      --border-strong: rgba(15, 23, 42, 0.18);
+      --shadow: 0 18px 55px rgba(15,23,42,0.10);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; min-height: 100vh; overflow-x: hidden; scroll-behavior: smooth; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
     body {
-      color: var(--text);
-      background: radial-gradient(circle at 10% 0%, rgba(56,189,248,0.25), transparent 35%), radial-gradient(circle at 90% 15%, rgba(37,99,235,0.15), transparent 30%), radial-gradient(circle at 50% 100%, rgba(14,165,233,0.2), transparent 40%), linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-      background-attachment: fixed; padding-bottom: calc(92px + var(--safe-bottom)); -webkit-font-smoothing: antialiased;
+      width: 100%;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(139, 92, 246, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-base), var(--bg-base-2));
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+      overflow-x: hidden;
     }
-    button, input, select, textarea { font: inherit; outline: none; border: none; background: transparent; }
-    button { cursor: pointer; transition: transform 0.1s ease, filter 0.1s ease; }
-    button:active { transform: scale(0.97); filter: brightness(0.95); }
 
-    .topbar { position: sticky; top: 0; z-index: 50; padding: calc(10px + var(--safe-top)) 12px 10px; background: rgba(248,251,255,0.7); border-bottom: 1px solid var(--border); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-    [data-theme="dark"] .topbar { background: rgba(5,8,22,0.8); }
-    .topbar-inner { width: min(980px, 100%); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-    .logo { width: 46px; height: 46px; border-radius: 18px; display: grid; place-items: center; color: white; font-weight: 900; font-size: 1.2rem; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); box-shadow: 0 12px 28px rgba(139,92,246,0.25); }
-    .brand-title { font-weight: 900; letter-spacing: -0.04em; font-size: 1.1rem; }
-    .brand-sub { color: var(--muted); font-size: 0.75rem; font-weight: 700; margin-top: 2px; }
-    .top-actions { display: flex; gap: 8px; }
-    .icon-btn { width: 44px; height: 44px; border-radius: 16px; background: var(--glass); border: 1px solid var(--border); color: var(--text); box-shadow: var(--shadow2); backdrop-filter: blur(16px); font-weight: 900; display: grid; place-items: center; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 70%);
+      z-index: 0;
+    }
 
-    .shell { width: min(980px, 100%); margin: 0 auto; padding: 12px; }
-    .hero { position: relative; overflow: hidden; border-radius: 32px; padding: 32px 24px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(32px); text-align: center; }
-    
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 99px; color: var(--tensor); background: rgba(139,92,246,0.1); border: 1px solid var(--tensor); font-size: 0.75rem; font-weight: 800; margin-bottom: 16px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tensor); animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(139,92,246,0.5); } 70% { box-shadow: 0 0 0 8px rgba(139,92,246,0); } 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); } }
-    
-    .portfolio-overview { margin-bottom: 24px; }
-    .balance { font-size: clamp(3rem, 12vw, 5.5rem); font-weight: 900; line-height: 1; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      outline: none;
+      border: none;
+      background: transparent;
+      color: inherit;
+    }
 
-    .pnl-line { margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 99px; background: var(--glass2); border: 1px solid var(--border); color: var(--muted); font-weight: 800; font-size: 0.9rem; }
-    .pnl-line.up { color: var(--green); background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.2); }
-    .pnl-line.down { color: var(--pink); background: rgba(225,29,72,0.08); border-color: rgba(225,29,72,0.2); }
-    
-    .flash-up { color: var(--green) !important; text-shadow: 0 0 8px rgba(16,185,129,0.4); transition: 0.1s; }
-    .flash-down { color: var(--pink) !important; text-shadow: 0 0 8px rgba(225,29,72,0.4); transition: 0.1s; }
+    button {
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
 
-    .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 24px; }
-    .quick-btn { min-height: 76px; border-radius: 24px; padding: 12px; text-align: center; color: var(--text); background: var(--solid); border: 1px solid var(--border); box-shadow: var(--shadow2); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .quick-btn.primary { color: white; background: linear-gradient(135deg, var(--blue2), var(--cyan)); border: none; box-shadow: 0 16px 32px rgba(37,99,235,0.25); }
-    .quick-btn.tensor-btn { color: white; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); border: none; box-shadow: 0 16px 32px rgba(139,92,246,0.25); }
-    .quick-btn strong { font-size: 0.95rem; font-weight: 900; margin-bottom: 4px; }
-    .quick-btn span { color: var(--muted); font-size: 0.7rem; font-weight: 700; }
-    .quick-btn.primary span, .quick-btn.tensor-btn span { color: rgba(255,255,255,0.9); }
+    button:active {
+      transform: scale(0.98);
+    }
 
-    .panel { margin-top: 14px; border-radius: 28px; padding: 20px; background: var(--glass); border: 1px solid var(--border); box-shadow: var(--shadow2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-    .panel.tensor-panel { border-color: rgba(139,92,246,0.3); background: linear-gradient(180deg, rgba(139,92,246,0.05), var(--glass)); }
-    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .title { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.03em; }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
 
-    .asset-scroll { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 6px; }
-    .asset-scroll::-webkit-scrollbar { display: none; }
-    
-    .asset-card { flex: 0 0 190px; scroll-snap-align: start; border-radius: 24px; padding: 16px; background: var(--glass2); border: 1px solid var(--border); color: var(--text); text-align: left; box-shadow: var(--shadow2); transition: 0.15s ease; position: relative; cursor: pointer; }
-    .asset-card:hover { border-color: var(--cyan); }
-    .asset-card:active { transform: scale(0.97); }
-    .asset-card.tensor { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.05); }
-    .asset-card.tensor:hover { border-color: var(--tensor); }
-    .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(255,255,255,0.3)); }
-    [data-theme="dark"] .asset-card.watch { background: linear-gradient(180deg, var(--glass2), rgba(17,29,51,0.4)); }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-    .asset-top { display: flex; align-items: center; gap: 12px; }
-    .coin { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--solid); border: 1px solid var(--border); color: var(--blue); font-weight: 900; font-size: 0.75rem; flex-shrink: 0; padding: 4px; overflow: hidden; }
-    .coin.tensor-coin { border: none; background: transparent; padding: 0; }
-    .coin.tensor-coin svg { width: 44px; height: 44px; }
-    .coin img { width: 100%; height: 100%; object-fit: contain; }
+    .app {
+      position: relative;
+      z-index: 1;
+    }
 
-    .name { font-weight: 900; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tiny { color: var(--muted); font-size: 0.75rem; font-weight: 700; margin-top: 2px; }
-    .asset-value { margin-top: 14px; font-size: 1.25rem; font-weight: 900; font-variant-numeric: tabular-nums; }
-    .asset-sub { margin-top: 6px; color: var(--muted); font-size: 0.75rem; font-weight: 700; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      background: rgba(7, 10, 15, 0.78);
+      backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-    .small-btn { height: 38px; padding: 0 14px; font-size: 0.85rem; border-radius: 16px; font-weight: 800; background: var(--solid); border: 1px solid var(--border); color: var(--text); }
-    .primary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: white; background: linear-gradient(135deg, var(--blue2), var(--cyan)); box-shadow: 0 12px 24px rgba(37,99,235,0.25); }
-    .tensor-primary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 900; color: white; background: linear-gradient(135deg, var(--tensor), var(--tensor2)); box-shadow: 0 12px 24px rgba(139,92,246,0.25); }
-    .secondary-btn { width: 100%; height: 52px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; background: var(--solid); border: 1px solid var(--border); color: var(--text); }
+    [data-theme="light"] .topbar {
+      background: rgba(255,255,255,0.78);
+    }
 
-    .form { display: grid; gap: 12px; }
-    .field { display: grid; gap: 8px; }
-    label { color: var(--muted); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 950;
+      font-size: 1.08rem;
+      color: var(--text-main);
+    }
 
-    .input, .select { width: 100%; height: 54px; padding: 0 16px; border-radius: 18px; background: var(--soft); border: 1px solid var(--border); color: var(--text); font-weight: 800; font-size: 0.95rem; transition: border-color 0.2s; }
-    .input:focus, .select:focus { border-color: var(--cyan); }
-    .select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px; padding-right: 48px; }
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 22%),
+        linear-gradient(135deg, var(--tensor), var(--tensor-2));
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.35);
+    }
 
-    .box { padding: 18px; border-radius: 24px; background: var(--glass2); border: 1px solid var(--border); }
-    .box.tensor { background: rgba(139,92,246,0.05); border-color: rgba(139,92,246,0.2); }
-    .box.bad { color: var(--pink); background: rgba(225,29,72,0.06); border-color: rgba(225,29,72,0.15); }
+    .brand-logo svg {
+      width: 19px;
+      height: 19px;
+      stroke: white;
+    }
 
-    /* Modern Swap Input */
-    .defi-input-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--soft); border-radius: 20px; padding: 12px 16px; border: 1px solid var(--border); transition: 0.2s; }
-    .defi-input-wrap:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: var(--solid); }
-    .defi-input-wrap.tensor-focus:focus-within { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
-    .defi-amount { flex: 1; font-size: 1.8rem; font-weight: 900; background: transparent; color: var(--text); padding: 0; outline: none; border: none; font-variant-numeric: tabular-nums; width: 100%; }
-    .defi-amount::placeholder { color: var(--muted2); }
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
 
-    .icon-picker-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 8px; max-height: 200px; overflow-y: auto; padding-right: 4px; }
-    .icon-option { height: 48px; border-radius: 14px; border: 1px solid var(--border); background: var(--solid); display: grid; place-items: center; color: var(--muted); transition: 0.2s; }
-    .icon-option.selected { border-color: var(--tensor); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); background: rgba(139,92,246,0.05); }
-    .icon-option svg { width: 28px; height: 28px; }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
 
-    /* Pill Toggles */
-    .pill-toggle { display: flex; background: var(--soft); border-radius: 99px; padding: 4px; border: 1px solid var(--border); margin-bottom: 12px; }
-    .pill-toggle button { flex: 1; height: 38px; border-radius: 99px; font-size: 0.9rem; font-weight: 800; color: var(--muted); transition: 0.2s; }
-    .pill-toggle button.active { background: var(--solid); color: var(--text); box-shadow: var(--shadow2); border: 1px solid var(--border); }
+    .admin-badge {
+      display: none;
+      padding: 7px 10px;
+      border: 1px solid rgba(139,92,246,0.42);
+      background: rgba(139,92,246,0.16);
+      color: #c4b5fd;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 950;
+      white-space: nowrap;
+    }
 
-    .modal-overlay, .drawer-overlay { position: fixed; inset: 0; z-index: 100; display: none; background: rgba(15,23,42,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 16px; overflow-y: auto; }
-    .modal-overlay.active, .drawer-overlay.active { display: block; }
-    .modal-card { width: min(520px, 100%); margin: calc(12px + var(--safe-top)) auto 20px auto; padding: 24px; border-radius: 36px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); box-shadow: 0 32px 80px rgba(0,0,0,0.1); backdrop-filter: blur(40px); animation: pop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
-    [data-theme="dark"] .modal-card { background: rgba(13,22,40,0.95); box-shadow: 0 32px 80px rgba(0,0,0,0.4); }
-    
-    .drawer { position: absolute; top: 0; right: 0; width: min(440px, 100%); height: 100%; overflow-y: auto; padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); background: var(--solid); border-left: 1px solid var(--border); box-shadow: -20px 0 80px rgba(0,0,0,0.2); animation: slide 0.25s ease both; }
+    .admin-badge.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-    @keyframes pop { from { transform: translateY(20px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-    @keyframes slide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .page {
+      width: min(1640px, 100%);
+      margin: 0 auto;
+      padding: 12px 12px calc(84px + var(--safe-bottom));
+      display: grid;
+      gap: 14px;
+    }
 
-    .modal-head, .drawer-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-    .modal-title, .drawer-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.04em; }
-    .close { width: 44px; height: 44px; border-radius: 18px; background: var(--soft); border: 1px solid var(--border); font-size: 1.4rem; font-weight: 900; color: var(--text); display:grid; place-items:center; }
+    @media (min-width: 1100px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr) 380px;
+        align-items: start;
+        padding-bottom: 18px;
+      }
+    }
 
-    .toast { position: fixed; left: 50%; bottom: calc(100px + var(--safe-bottom)); transform: translateX(-50%) translateY(20px); z-index: 150; padding: 14px 24px; border-radius: 20px; background: rgba(15,23,42,0.95); color: white; font-weight: 800; font-size: 0.9rem; box-shadow: 0 16px 32px rgba(0,0,0,0.3); opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); white-space:nowrap; }
-    .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .main-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
 
-    .bottom-nav { position: fixed; left: 50%; bottom: calc(12px + var(--safe-bottom)); transform: translateX(-50%); z-index: 70; width: min(440px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px; border-radius: 28px; background: rgba(255,255,255,0.92); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-    [data-theme="dark"] .bottom-nav { background: rgba(13,22,40,0.95); }
-    .bottom-nav button { min-height: 58px; border-radius: 20px; color: var(--muted); background: transparent; font-size: 0.75rem; font-weight: 800; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
-    .bottom-nav button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; transition:0.2s; }
-    .bottom-nav button.active { color: var(--blue); background: var(--soft); box-shadow: inset 0 0 0 1px var(--border); }
-    .bottom-nav button.active svg { stroke: var(--blue); }
+    .panel {
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
 
-    @media (max-width: 580px) {
-      .hero { padding: 24px 20px; border-radius: 28px; }
-      .balance { font-size: 3.2rem; }
-      .quick { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-      .quick-btn { min-height: 72px; padding: 10px 4px; border-radius: 20px; }
-      .quick-btn strong { font-size: 0.8rem; }
-      .panel { padding: 16px; border-radius: 24px; }
-      .asset-card { flex-basis: 170px; }
-      .modal-card { width: 100%; border-radius: 36px 36px 0 0; margin: auto auto 0 auto; max-height: 92vh; }
-      .drawer { width: 100%; }
-      .defi-amount { font-size: 1.6rem; }
-      .icon-picker-grid { grid-template-columns: repeat(5, 1fr); }
+    .hero {
+      padding: 16px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(139,92,246,0.30), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(14,203,129,0.12), transparent 24%),
+        var(--bg-panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(18px);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -150px;
+      right: -120px;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(139,92,246,0.22), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wallet-label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .wallet-balance {
+      margin-top: 5px;
+      font-size: clamp(2rem, 7vw, 4.2rem);
+      font-weight: 950;
+      letter-spacing: -0.075em;
+      line-height: 1;
+    }
+
+    .wallet-sub {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.4;
+      max-width: 720px;
+    }
+
+    .network-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(139,92,246,0.34);
+      background: rgba(139,92,246,0.14);
+      color: #c4b5fd;
+      font-size: 0.74rem;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .primary-btn,
+    .mini-btn,
+    .danger-btn,
+    .green-btn {
+      min-height: 40px;
+      border-radius: 13px;
+      padding: 9px 12px;
+      font-size: 0.78rem;
+      font-weight: 950;
+      border: 1px solid transparent;
+      text-align: center;
+    }
+
+    .primary-btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--tensor), var(--tensor-2));
+      box-shadow: 0 14px 30px rgba(59,130,246,0.18);
+    }
+
+    .green-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #0ecb81, #10b981);
+      box-shadow: 0 14px 30px rgba(14,203,129,0.14);
+    }
+
+    .mini-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .danger-btn {
+      background: var(--red-glow);
+      color: var(--red);
+      border-color: rgba(246,70,93,0.24);
+    }
+
+    .stats-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card {
+      background: rgba(7,10,15,0.42);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 11px;
+      min-width: 0;
+    }
+
+    [data-theme="light"] .stat-card {
+      background: rgba(255,255,255,0.72);
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      margin-top: 5px;
+      font-weight: 950;
+      font-size: 0.92rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1rem;
+      font-weight: 950;
+    }
+
+    .section-title-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--tensor-soft);
+      color: #c4b5fd;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 760;
+      line-height: 1.42;
+      margin-top: 3px;
+    }
+
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 760px) {
+      .asset-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .asset-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: rgba(7, 10, 15, 0.48);
+      border: 1px solid var(--border);
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    [data-theme="light"] .asset-card {
+      background: rgba(255,255,255,0.82);
+    }
+
+    .asset-card:hover,
+    .asset-card.active {
+      border-color: rgba(139,92,246,0.52);
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.14);
+    }
+
+    .asset-card.active::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--tensor), transparent);
+    }
+
+    .asset-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .coin {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .coin-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(139,92,246,0.88), rgba(59,130,246,0.82));
+      color: white;
+      font-weight: 950;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .coin-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .coin-name {
+      min-width: 0;
+    }
+
+    .coin-symbol {
+      font-weight: 950;
+      font-size: 0.94rem;
+      line-height: 1.1;
+    }
+
+    .coin-full {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 820;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .asset-price {
+      margin-top: 12px;
+      font-weight: 950;
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .asset-row {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 850;
+    }
+
+    .text-green {
+      color: var(--green);
+    }
+
+    .text-red {
+      color: var(--red);
+    }
+
+    .side-panel {
+      position: sticky;
+      top: 68px;
+      height: fit-content;
+      display: grid;
+      gap: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 7px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab {
+      padding: 8px 10px;
+      font-weight: 900;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: var(--text-main);
+      border-bottom-color: var(--tensor);
+    }
+
+    .qr-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .qr-box {
+      width: 178px;
+      height: 178px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 18px;
+      padding: 12px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.20);
+    }
+
+    #qrCanvas {
+      width: 154px !important;
+      height: 154px !important;
+      display: block;
+    }
+
+    .address-box {
+      padding: 11px;
+      border-radius: 14px;
+      background: rgba(7,10,15,0.48);
+      border: 1px solid var(--border);
+      word-break: break-all;
+      font-size: 0.76rem;
+      color: var(--text-main);
+      font-weight: 850;
+      line-height: 1.44;
+      text-align: center;
+    }
+
+    [data-theme="light"] .address-box {
+      background: rgba(248,250,252,0.90);
+    }
+
+    .network-select {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .network-btn {
+      min-height: 36px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 950;
+    }
+
+    .network-btn.active {
+      background: rgba(139,92,246,0.16);
+      color: #c4b5fd;
+      border-color: rgba(139,92,246,0.38);
+    }
+
+    .form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--text-muted);
+      font-size: 0.67rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      min-height: 42px;
+      background: rgba(7,10,15,0.58);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 9px 11px;
+      font-size: 0.84rem;
+      font-weight: 850;
+      width: 100%;
+    }
+
+    [data-theme="light"] .field input,
+    [data-theme="light"] .field select,
+    [data-theme="light"] .field textarea {
+      background: rgba(248,250,252,0.92);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: rgba(139,92,246,0.72);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.10);
+    }
+
+    .mini-note {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 760;
+      line-height: 1.44;
+    }
+
+    .wallet-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .wallet-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: rgba(7,10,15,0.42);
+    }
+
+    [data-theme="light"] .wallet-row {
+      background: rgba(255,255,255,0.78);
+    }
+
+    .wallet-row-title {
+      font-size: 0.8rem;
+      font-weight: 950;
+    }
+
+    .wallet-row-sub {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      word-break: break-all;
+    }
+
+    .tx-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .tx-card {
+      padding: 11px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: rgba(7,10,15,0.42);
+    }
+
+    [data-theme="light"] .tx-card {
+      background: rgba(255,255,255,0.78);
+    }
+
+    .tx-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .tx-title {
+      font-weight: 950;
+      font-size: 0.82rem;
+    }
+
+    .tx-date {
+      color: var(--text-muted);
+      font-size: 0.66rem;
+      font-weight: 800;
+    }
+
+    .tx-detail {
+      margin-top: 7px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 760;
+      line-height: 1.44;
+      word-break: break-all;
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px;
+      background: rgba(7,10,15,0.22);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(74px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      min-width: 220px;
+      max-width: calc(100% - 28px);
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(15,23,42,0.94);
+      border: 1px solid var(--border-strong);
+      color: white;
+      font-weight: 900;
+      font-size: 0.78rem;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.18s ease;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: calc(60px + var(--safe-bottom));
+      background: rgba(7,10,15,0.86);
+      backdrop-filter: blur(22px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding-bottom: var(--safe-bottom);
+      z-index: 60;
+    }
+
+    [data-theme="light"] .bottom-nav {
+      background: rgba(255,255,255,0.86);
+    }
+
+    @media (min-width: 1024px) {
+      .bottom-nav {
+        display: none;
+      }
+    }
+
+    .bottom-nav button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 800;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+    }
+
+    .bottom-nav button svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .bottom-nav button.active {
+      color: var(--text-main);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.66);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(580px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--bg-panel-solid);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.50);
+    }
+
+    .modal-title {
+      font-size: 1.08rem;
+      font-weight: 950;
+    }
+
+    .modal-desc {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 780;
+      line-height: 1.44;
+      margin-top: 6px;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    @media (max-width: 720px) {
+      .brand span:last-child {
+        display: none;
+      }
+
+      .admin-badge {
+        display: none !important;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .asset-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .network-select {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-head {
+        flex-direction: column;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="/" class="brand">
-        <div class="logo">T</div>
-        <div>
-          <div class="brand-title">Tensor Wallet</div>
-          <div class="brand-sub" id="statusText">Connecting...</div>
-        </div>
+  <div class="app">
+    <script>
+      const SERVER_EMAIL = <%- JSON.stringify(typeof email !== 'undefined' ? email : '') %>;
+      const SERVER_ROLE = <%- JSON.stringify(typeof role !== 'undefined' ? role : '') %>;
+      const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
+    </script>
+
+    <header class="topbar">
+      <a href="/wallet" class="brand">
+        <span class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5v-11Z"/>
+            <path d="M18 12h.01"/>
+            <path d="M3 8h18"/>
+          </svg>
+        </span>
+        <span>Tensor Wallet</span>
       </a>
+
       <div class="top-actions">
-        <button class="icon-btn" onclick="openSettings()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div id="adminDetectedBadge" class="admin-badge">● Admin</div>
+
+        <button class="icon-btn" onclick="refreshWallet()" aria-label="Refresh wallet">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 12a9 9 0 0 1-15.5 6.2"/>
+            <path d="M3 12A9 9 0 0 1 18.5 5.8"/>
+            <path d="M18 2v4h4"/>
+            <path d="M6 22v-4H2"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <button class="icon-btn" onclick="window.location.href='/logout'" aria-label="Logout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <path d="M16 17l5-5-5-5"/>
+            <path d="M21 12H9"/>
+          </svg>
         </button>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="shell">
-    <section class="hero" id="homeSection">
-      <div class="badge"><span class="dot"></span><span id="walletStatusBadge">Connecting...</span></div>
-      
-      <div class="portfolio-overview">
-        <div class="balance" id="totalUsd">$0.00</div>
-        <div class="pnl-line up" id="pnlLine">Updating Portfolio...</div>
-      </div>
-      
-      <div class="quick">
-        <button class="quick-btn tensor-btn" onclick="openModal('tensorSwapModal')"><strong>Tensor</strong><span>AI Swap</span></button>
-        <button class="quick-btn primary" onclick="openModal('receiveModal')"><strong>Receive</strong><span>Scan QR</span></button>
-        <button class="quick-btn" onclick="openModal('sendModal')"><strong>Send</strong><span>Transfer</span></button>
-        <button class="quick-btn" onclick="openModal('swapModal')"><strong>DEX</strong><span>Trade</span></button>
-      </div>
-    </section>
+    <main class="page">
+      <div class="main-column">
+        <section class="hero">
+          <div class="hero-head">
+            <div>
+              <div class="wallet-label">Total Wallet Balance</div>
+              <div class="wallet-balance">$<span id="totalBalance">0.00</span></div>
+              <div class="wallet-sub">
+                This wallet balance is the same USDT used for live trading, copy trading, and Tensor swaps. Trading and copying deduct directly from this synced wallet balance.
+              </div>
+            </div>
 
-    <section class="panel" id="assetsSection">
-      <div class="panel-head"><h2 class="title">Crypto Assets</h2><button class="small-btn" onclick="refreshAllBalances(true)">Sync</button></div>
-      <div class="asset-scroll" id="assetCards"></div>
-    </section>
-
-    <section class="panel tensor-panel" id="tensorAssetsSection">
-      <div class="panel-head"><h2 class="title" style="color:var(--tensor);">Tensor Assets (AI)</h2><button class="small-btn" style="color:var(--tensor); border-color:var(--tensor);" onclick="openModal('tensorSendModal')">Transfer</button></div>
-      <div class="asset-scroll" id="tensorCards"></div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button id="navHome" class="active" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); navSetActive('navHome');"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
-    <button id="navTrading" onclick="window.location.href='trading'"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>Trading</button>
-    <button id="navSettings" onclick="openSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
-  </nav>
-
-  <div class="modal-overlay" id="sendModal" onclick="overlayClose(event,'sendModal')">
-    <div class="modal-card">
-      <div class="modal-head"><div><div class="modal-title">Send Crypto</div><div class="modal-sub">Fast & secure transfers.</div></div><button class="close" onclick="closeModal('sendModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
-      <div class="form">
-        <div class="field">
-          <label>Select Asset</label>
-          <select class="select" id="sendAssetSelect" onchange="updateSendMaxBalance()"></select>
-        </div>
-        
-        <div class="box">
-          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-            <label>Amount</label>
-            <div class="tiny" id="sendBalanceText">0.00 available</div>
+            <div class="network-pill" id="selectedNetworkPill">USDT • Ethereum</div>
           </div>
-          <div class="defi-input-wrap">
-            <input class="defi-amount" id="sendAmountInput" type="number" step="any" placeholder="0" />
-            <button class="small-btn" style="height:32px; padding:0 12px; font-size:0.8rem; border-color:var(--blue); color:var(--blue);" onclick="setMaxSend()">MAX</button>
+
+          <div class="hero-actions">
+            <button class="primary-btn" onclick="window.location.href='/trading'">Open Trading</button>
+            <button class="green-btn" onclick="openReceiveModal()">Receive</button>
+            <button class="mini-btn" onclick="focusSendForm()">Send</button>
+            <button class="mini-btn" onclick="copyCurrentAddress()">Copy Address</button>
           </div>
-        </div>
-        
-        <div class="field">
-          <label>Recipient Address</label>
-          <input class="input" id="sendToInput" placeholder="0x... or Address" autocomplete="off" />
-        </div>
-        
-        <button class="primary-btn" onclick="executeCryptoSend()" style="height:56px;">Confirm Send</button>
-      </div>
-    </div>
-  </div>
 
-  <div class="modal-overlay" id="tensorSendModal" onclick="overlayClose(event,'tensorSendModal')">
-    <div class="modal-card" style="border-color:var(--tensor);">
-      <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Send AI Token</div><div class="modal-sub">Transfer via T0x network.</div></div><button class="close" onclick="closeModal('tensorSendModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
-      <div class="form">
-        <div class="field"><label>Asset</label><select class="select" id="tenSendSelect" onchange="updateTenSendBal()"></select></div>
-        <div class="box tensor">
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <label>Amount</label>
-            <div class="tiny" id="tenSendBalTxt" style="color:var(--tensor);">0.00 available</div>
-          </div>
-          <div class="defi-input-wrap tensor-focus">
-            <input class="defi-amount" id="tenSendAmt" type="number" step="any" placeholder="0" />
-            <button class="small-btn" style="height:32px; padding:0 12px; font-size:0.8rem; border-color:var(--tensor); color:var(--tensor);" onclick="maxTenSend()">MAX</button>
-          </div>
-        </div>
-        <div class="field"><label>Recipient Address (T0x...)</label><input class="input" id="tenSendTo" placeholder="T0x..." /></div>
-        <button class="tensor-primary-btn" style="height:56px;" onclick="executeTensorSend()">Send AI Token</button>
-      </div>
-    </div>
-  </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">USDT Balance</div>
+              <div class="stat-value">$<span id="usdtBalance">0.00</span></div>
+            </div>
 
-  <div class="modal-overlay" id="receiveModal" onclick="overlayClose(event,'receiveModal')">
-    <div class="modal-card">
-      <div class="modal-head"><div><div class="modal-title">Receive</div><div class="modal-sub">Select network and asset.</div></div><button class="close" onclick="closeModal('receiveModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
-      <div class="form">
-        <div class="pill-toggle" style="margin-bottom:16px;">
-          <button id="btnRecCrypto" class="active" onclick="switchRecMode('crypto')">Standard Crypto</button>
-          <button id="btnRecTensor" onclick="switchRecMode('tensor')">Tensor (AI) Network</button>
-        </div>
-        <input type="hidden" id="receiveGroupSelect" value="crypto" />
+            <div class="stat-card">
+              <div class="stat-label">Tensor Address</div>
+              <div class="stat-value" id="tensorAddressShort">—</div>
+            </div>
 
-        <div class="field" id="recNetWrap"><label>Network Chain</label><select class="select" id="receiveNetworkSelect" onchange="renderReceiveAssets()"></select></div>
-        
-        <div class="box" style="text-align:center; padding:32px 24px;">
-          <div style="background:white; display:inline-block; padding:12px; border-radius:24px; margin-bottom:20px; box-shadow:var(--shadow2);"><div id="qrBox"></div></div>
-          <div style="display:flex; align-items:center; background:var(--solid); border:1px solid var(--border); border-radius:18px; padding:6px 6px 6px 16px;">
-             <input id="receiveAddressInput" readonly onclick="this.select(); copyReceiveAddress();" style="flex:1; font-size:0.95rem; font-family:monospace; color:var(--text); background:transparent; border:none; outline:none;" />
-             <button class="icon-btn" style="width:40px; height:40px; background:var(--blue); color:white; border:none; border-radius:14px; flex-shrink:0;" id="copyAddrBtn" onclick="copyReceiveAddress()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Trades</div>
+              <div class="stat-value" id="activeTradesCount">0</div>
+            </div>
 
-  <div class="modal-overlay" id="tensorSwapModal" onclick="overlayClose(event,'tensorSwapModal')">
-    <div class="modal-card" style="border-color:var(--tensor);">
-      <div class="modal-head"><div><div class="modal-title" style="color:var(--tensor);">Tensor Swap</div><div class="modal-sub">Acquire AI tokens via USDT.</div></div><button class="close" onclick="closeModal('tensorSwapModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
-      <div class="form">
-        <div class="box tensor">
-          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-            <label>You Pay</label><div class="tiny" id="tenSwapUsdtBal">0.00 available</div>
-          </div>
-          <div class="defi-input-wrap tensor-focus">
-            <input class="defi-amount" id="tenSwapAmountIn" type="number" step="any" placeholder="0" oninput="calcTensorOutput()" />
-            <div style="background:var(--solid); border:1px solid var(--border); border-radius:99px; padding:8px 14px; font-weight:800; font-size:0.95rem; display:flex; align-items:center; gap:8px;">USDT</div>
-          </div>
-        </div>
-        
-        <div class="box tensor" style="background:rgba(139,92,246,0.03);">
-          <label style="margin-bottom:12px; display:block;">You Receive</label>
-          <div class="defi-input-wrap tensor-focus" style="background:transparent; border-color:transparent; padding:0;">
-             <input class="defi-amount" id="tenSwapReceiveTxt" type="text" readonly placeholder="0" style="color:var(--tensor);" />
-             <select class="select" id="tenSwapSelectOut" onchange="calcTensorOutput()" style="width:auto; height:48px; padding:0 36px 0 16px; border-radius:99px; background-color:var(--solid); box-shadow:var(--shadow2);"></select>
-          </div>
-        </div>
-        <button class="tensor-primary-btn" style="height:60px; font-size:1.1rem;" onclick="executeTensorSwap()">Execute Swap</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="tensorChartModal" onclick="overlayClose(event,'tensorChartModal')">
-    <div class="modal-card" style="width:min(760px, 100%); border-color:var(--tensor); max-height: 95vh; display: flex; flex-direction: column;">
-      <div class="modal-head" style="margin-bottom: 16px;">
-        <div>
-          <div class="modal-title" id="chartModalTitle" style="color:var(--tensor);">AI Token Dynamics</div>
-          <div class="modal-sub" id="chartModalStats">Cap: $0.00 | Dominance: 0.00%</div>
-        </div>
-        <button class="close" onclick="closeModal('tensorChartModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-      </div>
-      
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <div class="pill-toggle" style="margin:0;">
-          <button id="chartTypeCandle" class="active" onclick="setChartType('candle')">Candle</button>
-          <button id="chartTypeLine" onclick="setChartType('line')">Line</button>
-        </div>
-        <div class="pill-toggle" style="margin:0;">
-          <button class="active tf-btn" onclick="setChartTF(1, this)">1m</button>
-          <button class="tf-btn" onclick="setChartTF(5, this)">5m</button>
-          <button class="tf-btn" onclick="setChartTF(15, this)">15m</button>
-          <button class="tf-btn" onclick="setChartTF(60, this)">1H</button>
-          <button class="tf-btn" onclick="setChartTF(1440, this)">1D</button>
-        </div>
-      </div>
-
-      <div id="chartContainer" style="width:100%; height:360px; background:var(--solid); border-radius:20px; border:1px solid var(--border); overflow:hidden; position:relative; box-shadow: inset 0 2px 12px rgba(0,0,0,0.02);"></div>
-      
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:16px; text-align:center;">
-         <div class="box" style="padding:12px; border-radius:18px;"><div class="tiny">Circulating Supply</div><strong id="chartMetricSupply" style="font-size:0.95rem;">0</strong></div>
-         <div class="box" style="padding:12px; border-radius:18px;"><div class="tiny">24h Vol (Sim)</div><strong id="chartMetricVolume" style="font-size:0.95rem;">$0.00</strong></div>
-         <div class="box tensor" style="padding:12px; border-radius:18px;"><div class="tiny" style="color:var(--tensor);">Dominance</div><strong id="chartMetricDominance" style="font-size:0.95rem; color:var(--tensor);">0.00%</strong></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="tensorManageModal" onclick="overlayClose(event,'tensorManageModal')">
-    <div class="modal-card" style="border-color:var(--tensor);">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title" style="color:var(--tensor);">Manage AI Asset</div>
-          <div class="modal-sub" id="manageTokenName">Update token mechanics.</div>
-        </div>
-        <button class="close" onclick="closeModal('tensorManageModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-      </div>
-      <div class="form">
-        <input type="hidden" id="editTokenId" />
-        <div class="field">
-          <label>Algorithm Bias</label>
-          <select class="select" id="editBias">
-            <option value="bull">Bullish Bias</option>
-            <option value="bear">Bearish Bias</option>
-            <option value="random">Random Walk</option>
-            <option value="pegged">True Stablecoin</option>
-          </select>
-        </div>
-        <div class="field"><label>Bull Probability (%)</label><input class="input" id="editBullChance" type="number" step="1" max="100" min="0" placeholder="60" /></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div class="field"><label>Min Interval Drop/Raise (%)</label><input class="input" id="editMinPct" type="number" step="0.1" /></div>
-          <div class="field"><label>Max Interval Drop/Raise (%)</label><input class="input" id="editMaxPct" type="number" step="0.1" /></div>
-        </div>
-        <div class="field"><label>Circulating Supply</label><input class="input" id="editSupply" type="number" step="1" /></div>
-        
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
-          <button class="secondary-btn" style="color:var(--pink); border-color:var(--pink);" onclick="deleteTensorToken()">Delete Asset</button>
-          <button class="tensor-primary-btn" onclick="updateTensorToken()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="drawer-overlay" id="settingsOverlay" onclick="overlayClose(event,'settingsOverlay')">
-    <aside class="drawer">
-      <div class="drawer-head"><div><div class="drawer-title">Settings</div><div class="drawer-sub">Preferences and security.</div></div><button class="close" onclick="closeSettings()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>
-      <div class="form">
-        <div class="box"><div class="name">Web3 Address</div><div class="tiny" id="settingsAddress" style="font-family:monospace; margin-top:6px; font-size:0.85rem; word-break:break-all;">Loading...</div></div>
-        <div class="box tensor"><div class="name" style="color:var(--tensor);">Tensor Address (T0x)</div><div class="tiny" id="settingsTensorAddress" style="font-family:monospace; margin-top:6px; font-size:0.85rem; word-break:break-all;">Loading...</div></div>
-        
-        <div id="adminSettingsControls" style="display:none; margin-top:16px;">
-           <div class="box tensor" style="margin-top:12px;">
-             <div class="name" style="color:var(--tensor);">Admin: Mint Tensor Token</div>
-             <div style="display:flex; gap:8px; margin-top:12px;">
-               <select class="select" id="adMintSelect" style="flex:1;"></select>
-               <input class="input" id="adMintAmount" type="number" placeholder="Amt" style="width:90px;" />
-             </div>
-             <button class="tensor-primary-btn" style="margin-top:12px; height:44px;" onclick="adminMintTensor()">Mint to Myself</button>
-           </div>
-
-           <div class="box bad" style="border-color:var(--cyan); background:rgba(6,182,212,0.05); margin-top:12px;">
-             <div class="name" style="color:var(--cyan);">Admin: Demo Balances</div>
-             <div class="field" style="margin-top:12px;"><label>ETH Balance</label><input class="input" id="adBalETH" type="number" step="any" /></div>
-             <div class="field"><label>USDT Balance</label><input class="input" id="adBalUSDT" type="number" step="any" /></div>
-             <div class="field"><label>BTC Balance</label><input class="input" id="adBalBTC" type="number" step="any" /></div>
-             <button class="primary-btn" style="margin-top:12px; height:44px;" onclick="saveAdminBalances()">Save Crypto Balances</button>
-           </div>
-           
-           <div class="box tensor" style="margin-top:12px;">
-             <div class="name" style="color:var(--tensor);">Admin: Tensor Factory</div>
-             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-               <div class="field"><label>Name</label><input class="input" id="adTenName" placeholder="Neural" /></div>
-               <div class="field"><label>Symbol</label><input class="input" id="adTenSym" placeholder="NRL" /></div>
-             </div>
-             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-               <div class="field"><label>Price ($)</label><input class="input" id="adTenPrice" type="number" step="any" placeholder="1.00" /></div>
-               <div class="field">
-                 <label>Algorithm Bias</label>
-                 <select class="select" id="adTenBias">
-                   <option value="bull">Bullish</option>
-                   <option value="bear">Bearish</option>
-                   <option value="random">Random Walk</option>
-                   <option value="pegged">True Stablecoin</option>
-                 </select>
-               </div>
-             </div>
-             <div class="field" style="margin-top:12px;"><label>Bull Probability (%)</label><input class="input" id="adTenBullChance" type="number" value="60" step="1" max="100" min="0" /></div>
-             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-               <div class="field"><label>Drop/Raise Min %</label><input class="input" id="adTenMinPct" type="number" value="1" step="0.1" /></div>
-               <div class="field"><label>Drop/Raise Max %</label><input class="input" id="adTenMaxPct" type="number" value="5" step="0.1" /></div>
-             </div>
-             <div class="field" style="margin-top:12px;"><label>Total Circulating Supply</label><input class="input" id="adTenSupply" type="number" value="10000000" /></div>
-             <div class="field" style="margin-top:12px;"><label>Icon Setup</label><div class="icon-picker-grid" id="adTenIconPicker"></div></div>
-             <button class="tensor-primary-btn" style="margin-top:16px; height:48px;" onclick="deployTensorToken()">Deploy AI Token</button>
-           </div>
-        </div>
-
-        <div class="field" style="margin-top:16px;"><label>Display currency</label><select class="select" id="currencySelect" onchange="setDisplayCurrency(this.value)"><option value="USD">USD</option><option value="AED">AED</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option></select></div>
-        <div class="field"><label>Theme</label><div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"><button class="secondary-btn" style="height:48px;" onclick="setTheme('light')">Light</button><button class="secondary-btn" style="height:48px;" onclick="setTheme('dark')">Dark</button></div></div>
-        
-        <form action="/logout" method="POST" style="margin-top:24px;"><button class="secondary-btn" style="height:48px; border-color:var(--pink); color:var(--pink);" type="submit">Secure Logout</button></form>
-      </div>
-    </aside>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-
-  <script>
-    const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
-    const CURRENT_EMAIL = "<%= typeof email !== 'undefined' ? email : '' %>";
-    const USER_ROLE = "<%= typeof role !== 'undefined' ? role : 'user' %>";
-    const IS_ADMIN = USER_ROLE === 'staff';
-
-    const DISPLAY_RATES = { USD:{symbol:'$',rate:1}, AED:{symbol:'AED ',rate:3.6725}, EUR:{symbol:'€',rate:.92}, GBP:{symbol:'£',rate:.79}, SAR:{symbol:'SAR ',rate:3.75} };
-    
-    const NETWORKS = { 
-      ethereum:{name:'Ethereum',chainId:1,symbol:'ETH'}, 
-      bsc:{name:'BNB Chain',chainId:56,symbol:'BNB'}, 
-      polygon:{name:'Polygon',chainId:137,symbol:'MATIC'},
-      bitcoin:{name:'Bitcoin Native',chainId:null,symbol:'BTC'},
-      solana:{name:'Solana Native',chainId:null,symbol:'SOL'}
-    };
-
-    // 30 Sharp SVGs for the Tensor AI Token Icon Picker
-    const TENSOR_ICONS = [
-      `<svg viewBox="0 0 24 24" fill="url(#grad1)"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ec4899" /><stop offset="100%" stop-color="#8b5cf6" /></linearGradient></defs><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#0ea5e9"><circle cx="12" cy="12" r="10"/><path fill="#ffffff" d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path stroke="#ffffff" stroke-width="2" d="M12 8v4l3 3"/></svg>`,
-      `<svg viewBox="0 0 24 24" stroke="#f59e0b" stroke-width="2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#8b5cf6"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line stroke="#ffffff" stroke-width="2" x1="8" y1="21" x2="16" y2="21"/><line stroke="#ffffff" stroke-width="2" x1="12" y1="17" x2="12" y2="21"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#84cc16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#6366f1"><path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#eab308"><path d="M12 2L15 8l6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#14b8a6"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#f97316"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-4a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#d946ef"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm4 2h4v4h-4V8z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#3b82f6"><circle cx="8" cy="8" r="4"/><circle cx="16" cy="16" r="4"/><line stroke="#3b82f6" stroke-width="2" x1="10" y1="10" x2="14" y2="14"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#a855f7"><path d="M12 2a10 10 0 0 0-7.07 17.07l1.41-1.41A8 8 0 1 1 12 4v-2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M20 12l-8 8-8-8 1.41-1.41L11 16.17V4h2v12.17l5.58-5.59L20 12z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#f43f5e"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#64748b"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#0ea5e9"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0 1 10 10h-2a8 8 0 0 0-8-8V2zm0 20a10 10 0 0 1-10-10h2a8 8 0 0 0 8 8v2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#ec4899"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#14b8a6"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#eab308"><path d="M11 2v4h2V2h-2zm-6.22 3.36l1.41 1.41 2.83-2.83-1.41-1.41-2.83 2.83zm14.44 0l-2.83-2.83-1.41 1.41 2.83 2.83 1.41-1.41zM2 11h4v2H2v-2zm16 0h4v2h-4v-2zM4.78 18.64l2.83-2.83-1.41-1.41-2.83 2.83 1.41 1.41zm14.44 0l1.41-1.41-2.83-2.83-1.41 1.41 2.83 2.83zM11 20v4h2v-4h-2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#3b82f6"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm4-4H7v-2h9v2zm0-4H7V7h9v2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#ef4444"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#a855f7"><path d="M21 3H3v18h18V3zm-2 16H5V5h14v14zM11 7h2v4h4v2h-4v4h-2v-4H7v-2h4V7z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#f97316"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
-      `<svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>`
-    ];
-
-    let displayCurrency = localStorage.getItem('blue_display_currency') || 'USD';
-    let activeSigner = null, allBalances = [], combinedAssets = [], ownedPositions = [];
-    let tensorAddress = "", baseTensorData = [], tensorBalances = {};
-    let prices = {};
-    let toastTimer;
-
-    // CHART ENGINE variables
-    let chartingIntervalObject = null;
-    let activeChartTokenId = null;
-    let tvChart = null, lineSeries = null, candleSeries = null;
-    let currentChartType = 'candle';
-    let currentTF = 1;
-    let rawCandleData = [];
-
-    // Tensor Global Integration
-    async function initTensor() {
-      tensorAddress = SERVER_WALLET?.tensorAddress || "T0x...Loading";
-      
-      if (IS_ADMIN) {
-        document.getElementById('adminSettingsControls').style.display = 'block';
-        document.getElementById('adTenIconPicker').innerHTML = TENSOR_ICONS.map((svg, i) => `<button class="icon-option ${i===0?'selected':''}" onclick="selAdTenIcon(this, ${i})">${svg}</button>`).join('');
-        window.selectedTenIcon = 0;
-        
-        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
-        document.getElementById('adBalETH').value = saved.eth;
-        document.getElementById('adBalUSDT').value = saved.usdt;
-        document.getElementById('adBalBTC').value = saved.btc;
-      }
-      
-      await fetchTensorData();
-      setInterval(fetchTensorData, 4000); // Polling globally without cache
-    }
-
-    async function fetchTensorData() {
-       try {
-         const res = await fetch(`/api/tensor?_t=${Date.now()}`); // Force skip cache
-         if(res.ok) {
-            const data = await res.json();
-            baseTensorData = data.registry || [];
-            tensorAddress = data.address || tensorAddress;
-            tensorBalances = data.balances || {};
-            renderTensorCards();
-            
-            if (IS_ADMIN) {
-               const mintSel = document.getElementById('adMintSelect');
-               if(mintSel && mintSel.options.length !== baseTensorData.length) {
-                   mintSel.innerHTML = baseTensorData.map(t => `<option value="${t.id}">${t.symbol}</option>`).join('');
-               }
-            }
-         }
-       } catch(e) { console.error('Tensor fetch failed', e); }
-    }
-
-    function renderTensorCards() {
-      const box = document.getElementById('tensorCards');
-      if(!baseTensorData.length) { box.innerHTML = `<div class="asset-card tensor"><div class="name">No Tensor Assets</div><div class="tiny">Admin must deploy tokens.</div></div>`; return; }
-      
-      let totTenUsd = 0;
-      box.innerHTML = baseTensorData.map(t => {
-        const bal = tensorBalances[t.id] || 0; 
-        const val = bal * t.price; 
-        totTenUsd += val;
-        const diff = t.startPrice ? (((t.price - t.startPrice)/t.startPrice)*100) : 0;
-        const adminBtn = IS_ADMIN ? `<button class="small-btn" style="position:absolute; top:12px; right:12px; height:24px; padding:0 8px; font-size:0.65rem;" onclick="event.stopPropagation(); openTensorManage('${t.id}')">Manage</button>` : '';
-
-        return `<div class="asset-card tensor" onclick="openTensorAnalytics('${t.id}')">
-          ${adminBtn}
-          <div class="asset-top">
-            <div class="coin tensor-coin">${t.icon}</div>
-            <div style="width:calc(100% - 56px); overflow:hidden;">
-              <div class="name">${t.symbol}</div>
+            <div class="stat-card">
+              <div class="stat-label">Copy Trades</div>
+              <div class="stat-value" id="copyTradesCount">0</div>
             </div>
           </div>
-          <div class="asset-value">${money(t.price)}</div>
-          <div class="asset-sub">
-            <span class="${diff>=0?'pnl-line up':'pnl-line down'}" style="padding:2px 8px; font-size:0.7rem; margin:0; border:none; background:transparent;">${diff>=0?'+':''}${diff.toFixed(2)}%</span>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/>
+                    <path d="M12 6v12"/>
+                  </svg>
+                </span>
+                Assets
+              </div>
+              <div class="section-sub">Fast wallet asset view. Select an asset to receive or send.</div>
+            </div>
+
+            <button class="mini-btn" onclick="refreshPrices()">Refresh Prices</button>
           </div>
-          <div class="tiny" style="margin-top:8px; opacity:0.8; font-size:0.7rem;">Holds: ${fmt(bal,2)} ${t.symbol}</div>
-        </div>`;
-      }).join('');
-      
-      renderTotals(totTenUsd);
-    }
 
-    // --- Admin Functions ---
-    function selAdTenIcon(btn, i) { document.querySelectorAll('.icon-option').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); window.selectedTenIcon = i; }
-    
-    function saveAdminBalances() {
-      const eth = Number(document.getElementById('adBalETH').value);
-      const usdt = Number(document.getElementById('adBalUSDT').value);
-      const btc = Number(document.getElementById('adBalBTC').value);
-      localStorage.setItem('blue_admin_balances', JSON.stringify({eth, usdt, btc}));
-      toast('Demo crypto balances saved!');
-      refreshAllBalances(true);
-    }
+          <div class="asset-grid" id="assetGrid"></div>
+        </section>
 
-    async function adminMintTensor() {
-       const tId = document.getElementById('adMintSelect').value;
-       const amt = Number(document.getElementById('adMintAmount').value);
-       if(!tId || amt <= 0) return toast('Invalid mint amount');
-       
-       try {
-         const res = await fetch('/api/tensor/admin-mint', {
-           method: 'POST', headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ tokenId: tId, amount: amt })
-         });
-         
-         if(res.ok) {
-           toast(`Minted ${amt} to Admin Wallet!`);
-           fetchTensorData();
-         } else { toast('Failed to mint.'); }
-       } catch (e) { toast('Network error.'); }
-    }
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 3v18h18"/>
+                    <path d="M7 15l4-4 3 3 5-6"/>
+                  </svg>
+                </span>
+                Trading / Copy Activity
+              </div>
+              <div class="section-sub">Live trades, copy allocations, and recent deposits are synced from the server.</div>
+            </div>
+          </div>
 
-    async function deployTensorToken() {
-      const name = document.getElementById('adTenName').value; 
-      const symbol = document.getElementById('adTenSym').value.toUpperCase();
-      const price = Number(document.getElementById('adTenPrice').value); 
-      const bias = document.getElementById('adTenBias').value;
-      const bullChance = Number(document.getElementById('adTenBullChance').value) || 60;
-      const supply = Number(document.getElementById('adTenSupply').value);
-      const minPct = Number(document.getElementById('adTenMinPct').value);
-      const maxPct = Number(document.getElementById('adTenMaxPct').value);
+          <div class="tabs">
+            <div class="tab active" onclick="switchActivityTab('positions', this)">Positions</div>
+            <div class="tab" onclick="switchActivityTab('copy', this)">Copy Trades</div>
+            <div class="tab" onclick="switchActivityTab('deposits', this)">Deposits</div>
+            <div class="tab" onclick="switchActivityTab('history', this)">History</div>
+          </div>
 
-      if(!name || !symbol || price <= 0 || supply <= 0 || minPct < 0 || maxPct < 0) return toast('Invalid details');
-      
-      try {
-        const res = await fetch('/api/tensor/deploy', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, symbol, price, bias, bullChance, minPct, maxPct, icon: TENSOR_ICONS[window.selectedTenIcon], supply })
-        });
-        if(res.ok) { toast(`${symbol} deployed!`); fetchTensorData(); closeSettings(); } 
-        else throw new Error('Failed');
-      } catch (e) { toast('Deployment failed.'); }
-    }
+          <div id="positionsView" class="tx-list"></div>
+          <div id="copyView" class="tx-list" style="display:none;"></div>
+          <div id="depositsView" class="tx-list" style="display:none;"></div>
+          <div id="historyView" class="tx-list" style="display:none;"></div>
+        </section>
+      </div>
 
-    function openTensorManage(id) {
-      const t = baseTensorData.find(x => x.id === id);
-      if(!t) return;
-      document.getElementById('editTokenId').value = id;
-      document.getElementById('manageTokenName').textContent = `Editing ${t.symbol}`;
-      document.getElementById('editBias').value = t.bias || 'random';
-      document.getElementById('editBullChance').value = t.bullChance || 60;
-      document.getElementById('editMinPct').value = (t.minPct || 0.01) * 100;
-      document.getElementById('editMaxPct').value = (t.maxPct || 0.05) * 100;
-      document.getElementById('editSupply').value = t.supply || 10000000;
-      openModal('tensorManageModal');
-    }
+      <aside class="side-panel">
+        <section class="panel qr-card">
+          <div class="section-head" style="margin-bottom:0;">
+            <div>
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                </span>
+                Receive
+              </div>
+              <div class="section-sub">Select network. QR stays visible in dark mode.</div>
+            </div>
+          </div>
 
-    async function updateTensorToken() {
-      const id = document.getElementById('editTokenId').value;
-      const bias = document.getElementById('editBias').value;
-      const bullChance = document.getElementById('editBullChance').value;
-      const minPct = document.getElementById('editMinPct').value;
-      const maxPct = document.getElementById('editMaxPct').value;
-      const supply = document.getElementById('editSupply').value;
+          <div class="network-select" id="networkSelect"></div>
 
-      try {
-        const res = await fetch(`/api/tensor/update/${id}`, {
-          method: 'PUT', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ bias, bullChance, minPct, maxPct, supply })
-        });
-        if(res.ok) { toast('Token mechanics updated.'); closeModal('tensorManageModal'); fetchTensorData(); }
-      } catch(e) { toast('Update failed.'); }
-    }
+          <div class="qr-box">
+            <canvas id="qrCanvas"></canvas>
+          </div>
 
-    async function deleteTensorToken() {
-      const id = document.getElementById('editTokenId').value;
-      try {
-        const res = await fetch(`/api/tensor/delete/${id}`, { method: 'DELETE' });
-        if(res.ok) { toast('Token deleted.'); closeModal('tensorManageModal'); fetchTensorData(); }
-      } catch(e) { toast('Deletion failed.'); }
-    }
+          <div class="address-box" id="receiveAddress">Loading address...</div>
 
+          <button class="primary-btn" onclick="copyCurrentAddress()">Copy Receive Address</button>
+        </section>
 
-    // --- CHARTING ENGINE (Lightweight Charts) ---
-    function initChart() {
-        if(tvChart) return;
-        const container = document.getElementById('chartContainer');
-        tvChart = LightweightCharts.createChart(container, {
-            layout: { background: { type: 'solid', color: 'transparent' }, textColor: '#64748b' },
-            grid: { vertLines: { color: 'rgba(2, 132, 199, 0.05)' }, horzLines: { color: 'rgba(2, 132, 199, 0.05)' } },
-            rightPriceScale: { borderVisible: false },
-            timeScale: { borderVisible: false, timeVisible: true, fixLeftEdge: true },
-            crosshair: { mode: 0, vertLine: { color: '#38bdf8', labelBackgroundColor: '#0284c7' }, horzLine: { color: '#38bdf8', labelBackgroundColor: '#0284c7' } }
-        });
-        
-        candleSeries = tvChart.addCandlestickSeries({ upColor: '#10b981', downColor: '#e11d48', borderVisible: false, wickUpColor: '#10b981', wickDownColor: '#e11d48' });
-        lineSeries = tvChart.addLineSeries({ color: '#38bdf8', lineWidth: 2 });
-        lineSeries.applyOptions({ visible: false });
-        
-        new ResizeObserver(entries => {
-            if (entries.length === 0 || entries[0].target !== container) { return; }
-            const newRect = entries[0].contentRect;
-            tvChart.applyOptions({ height: newRect.height, width: newRect.width });
-        }).observe(container);
-    }
+        <section class="panel" id="sendPanel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 2L11 13"/>
+                    <path d="M22 2l-7 20-4-9-9-4 20-7Z"/>
+                  </svg>
+                </span>
+                Send
+              </div>
+              <div class="section-sub">Demo send endpoint. It records a simulated transaction hash.</div>
+            </div>
+          </div>
 
-    function setChartType(type) {
-        currentChartType = type;
-        document.getElementById('chartTypeCandle').className = type === 'candle' ? 'active' : '';
-        document.getElementById('chartTypeLine').className = type === 'line' ? 'active' : '';
-        if (type === 'candle') { candleSeries.applyOptions({visible:true}); lineSeries.applyOptions({visible:false}); } 
-        else { candleSeries.applyOptions({visible:false}); lineSeries.applyOptions({visible:true}); }
-    }
+          <div class="form">
+            <div class="field">
+              <label>Asset</label>
+              <select id="sendAsset"></select>
+            </div>
 
-    function setChartTF(minutes, btn) {
-        currentTF = minutes;
-        document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        processAndRenderChartData();
-    }
+            <div class="field">
+              <label>Network</label>
+              <select id="sendNetwork"></select>
+            </div>
 
-    async function openTensorAnalytics(tokenId) {
-      activeChartTokenId = tokenId;
-      openModal('tensorChartModal');
-      setTimeout(() => {
-          initChart();
-          fetchAndDrawChart();
-      }, 100); 
-      
-      clearInterval(chartingIntervalObject);
-      chartingIntervalObject = setInterval(fetchAndDrawChart, 5000);
-    }
+            <div class="field">
+              <label>Amount</label>
+              <input id="sendAmount" type="number" step="any" placeholder="0.00">
+            </div>
 
-    async function fetchAndDrawChart() {
-      if (!activeChartTokenId || !document.getElementById('tensorChartModal').classList.contains('active')) {
-        clearInterval(chartingIntervalObject); return;
+            <div class="field">
+              <label>To Address</label>
+              <textarea id="sendTo" rows="3" placeholder="Paste recipient address"></textarea>
+            </div>
+
+            <button class="green-btn" onclick="sendAsset()">Send Asset</button>
+
+            <div class="mini-note">
+              For this demo, send returns a generated tx hash. Real on-chain transfers require wallet signing infrastructure.
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                <span class="section-title-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                </span>
+                Vault
+              </div>
+              <div class="section-sub">Encrypted vault storage hook for your frontend wallet data.</div>
+            </div>
+          </div>
+
+          <div class="form">
+            <div class="field">
+              <label>Encrypted Vault JSON</label>
+              <textarea id="vaultInput" rows="4" placeholder="Encrypted wallet payload"></textarea>
+            </div>
+
+            <button class="mini-btn" onclick="saveVault()">Save Vault</button>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="active" onclick="window.location.href='/wallet'">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Wallet
+      </button>
+
+      <button onclick="window.location.href='/trading'">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 3v18h18"/>
+          <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+        </svg>
+        Trading
+      </button>
+    </nav>
+
+    <div class="modal-backdrop" id="receiveModal">
+      <div class="modal">
+        <div class="modal-title">Receive <span id="receiveModalAsset">USDT</span></div>
+        <div class="modal-desc">Use the selected network and address below.</div>
+
+        <div style="margin:14px auto 12px;" class="qr-box">
+          <canvas id="modalQrCanvas"></canvas>
+        </div>
+
+        <div class="address-box" id="modalReceiveAddress">Loading...</div>
+
+        <div class="modal-actions">
+          <button class="mini-btn" onclick="closeReceiveModal()">Close</button>
+          <button class="primary-btn" onclick="copyCurrentAddress()">Copy Address</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Copied</div>
+  </div>
+
+  <script>
+    let currentTheme = localStorage.getItem('blue_theme') || 'dark';
+    let walletState = SERVER_WALLET || {};
+    let tensorRegistry = [];
+    let selectedAsset = 'USDT';
+    let selectedNetwork = normalizeNetwork(walletState.usdtNetwork || 'eth');
+    let prices = {};
+    let refreshInterval = null;
+
+    const networkMap = {
+      eth: {
+        key: 'eth',
+        network: 'Ethereum',
+        short: 'ERC20',
+        symbol: 'ETH',
+        address: '0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a'
+      },
+      arbitrum: {
+        key: 'arbitrum',
+        network: 'Arbitrum',
+        short: 'ARB',
+        symbol: 'ARB',
+        address: '0x0ab846457e6f9c7e9720a8e8782c9d1f8a260e5a'
+      },
+      sol: {
+        key: 'sol',
+        network: 'Solana',
+        short: 'SOL',
+        symbol: 'SOL',
+        address: '9prrQtQxzdt5Kt7nPHUxwWAVQLZATrj2bjU27k5Xkt5i'
+      },
+      trx: {
+        key: 'trx',
+        network: 'TRON',
+        short: 'TRC20',
+        symbol: 'TRX',
+        address: 'TPwY7YfXuufmgfCLF7ie9E2nyo6KhT4fn2'
       }
-      
-      const token = baseTensorData.find(t => t.id === activeChartTokenId);
-      if (!token) return;
+    };
 
-      document.getElementById('chartModalTitle').textContent = `${token.name} (${token.symbol})`;
-      document.getElementById('chartModalStats').textContent = `Cap: $${Number(token.marketCap || 0).toLocaleString(undefined, {maximumFractionDigits:0})} | Share: ${fmt(token.dominance || 0, 2)}%`;
-      document.getElementById('chartMetricSupply').textContent = Number(token.supply || 0).toLocaleString();
-      document.getElementById('chartMetricVolume').textContent = money(token.volume || 0);
-      document.getElementById('chartMetricDominance').textContent = `${fmt(token.dominance || 0, 2)}%`;
-
-      try {
-        const response = await fetch(`/api/tensor/chart?tokenId=${activeChartTokenId}&_t=${Date.now()}`);
-        const data = await response.json();
-        if (data && data.candles) {
-            rawCandleData = data.candles;
-            processAndRenderChartData();
-        }
-      } catch (e) { }
-    }
-
-    function processAndRenderChartData() {
-        if(!rawCandleData || rawCandleData.length === 0 || !tvChart) return;
-        
-        let aggregated = [];
-        let currentBucket = null;
-        let msInterval = currentTF * 60 * 1000;
-
-        rawCandleData.forEach(c => {
-            const bucketTime = Math.floor(c.time / msInterval) * msInterval;
-            if (!currentBucket || currentBucket.originalTime !== bucketTime) {
-                if (currentBucket) aggregated.push(currentBucket);
-                currentBucket = { time: Math.floor(bucketTime / 1000), originalTime: bucketTime, open: c.open, high: c.high, low: c.low, close: c.close, value: c.close };
-            } else {
-                currentBucket.high = Math.max(currentBucket.high, c.high);
-                currentBucket.low = Math.min(currentBucket.low, c.low);
-                currentBucket.close = c.close;
-                currentBucket.value = c.close;
-            }
-        });
-        if(currentBucket) aggregated.push(currentBucket);
-
-        const unique = Array.from(new Map(aggregated.map(item => [item.time, item])).values());
-        candleSeries.setData(unique);
-        lineSeries.setData(unique);
-    }
-    // --- END CHARTING ---
-
-
-    // --- SWAP / SEND TENSOR ---
-    function openTensorSwap() {
-      const s = document.getElementById('tenSwapSelectOut');
-      s.innerHTML = baseTensorData.map(t => `<option value="${t.id}">${t.symbol}</option>`).join('');
-      document.getElementById('tenSwapUsdtBal').textContent = `${fmt(getUsdtBalanceTotal())} available`;
-      document.getElementById('tenSwapAmountIn').value = ''; document.getElementById('tenSwapReceiveTxt').value = '';
-    }
-
-    function calcTensorOutput() {
-      const amt = Number(document.getElementById('tenSwapAmountIn').value||0);
-      const tId = document.getElementById('tenSwapSelectOut').value;
-      const t = baseTensorData.find(x=>x.id===tId);
-      if(!t || amt<=0) { document.getElementById('tenSwapReceiveTxt').value = ''; return; }
-      const feeAmount = amt * 0.000001;
-      const netAmount = amt - feeAmount;
-      document.getElementById('tenSwapReceiveTxt').value = fmt(netAmount / t.price, 4);
-    }
-
-    async function executeTensorSwap() {
-      const amt = Number(document.getElementById('tenSwapAmountIn').value||0);
-      const tId = document.getElementById('tenSwapSelectOut').value;
-      if(amt<=0) return toast('Invalid swap amount');
-      
-      toast('Processing Swap...');
-      try {
-        const res = await fetch('/api/tensor/swap', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tokenId: tId, usdtAmount: amt })
-        });
-        if(res.ok) { fetchTensorData(); closeModal('tensorSwapModal'); return toast(`Swap successful!`); }
-      } catch(e) { toast('Network error'); }
-    }
-
-    function updateTenSendBal() {
-      const tId = document.getElementById('tenSendSelect').value;
-      document.getElementById('tenSendBalTxt').textContent = `${fmt(tensorBalances[tId] || 0)} available`;
-    }
-    
-    function maxTenSend() { document.getElementById('tenSendAmt').value = tensorBalances[document.getElementById('tenSendSelect').value] || 0; }
-    
-    async function executeTensorSend() {
-      const tId = document.getElementById('tenSendSelect').value; const amt = Number(document.getElementById('tenSendAmt').value);
-      const to = document.getElementById('tenSendTo').value.trim();
-      if(!to.startsWith('T0x') || amt<=0 || (tensorBalances[tId]||0) < amt) return toast('Invalid details or insufficient balance');
-      
-      toast('Processing T0x Tx...');
-      try {
-         const res = await fetch('/api/tensor/send', {
-             method: 'POST', headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ tokenId: tId, amount: amt, toAddress: to })
-         });
-         if(res.ok) { fetchTensorData(); closeModal('tensorSendModal'); return toast('AI Token Sent Successfully'); }
-      } catch(e) { toast('Transfer failed.'); }
-    }
-
-    // --- STANDARD CRYPTO SWAP/SEND ---
-    function populateSendAssets() {
-        const select = document.getElementById('sendAssetSelect');
-        select.innerHTML = ownedPositions.map(p => `<option value="${p.symbol}">${p.symbol} (${p.networkKey})</option>`).join('');
-        if(ownedPositions.length === 0) select.innerHTML = '<option value="">No Assets Available</option>';
-        updateSendMaxBalance();
-    }
-
-    function updateSendMaxBalance() {
-        const sym = document.getElementById('sendAssetSelect').value;
-        const pos = ownedPositions.find(p => p.symbol === sym);
-        document.getElementById('sendBalanceText').textContent = pos ? `${fmt(pos.balance)} available` : '0.00 available';
-    }
-
-    function setMaxSend() {
-        const sym = document.getElementById('sendAssetSelect').value;
-        const pos = ownedPositions.find(p => p.symbol === sym);
-        if(pos) document.getElementById('sendAmountInput').value = pos.balance;
-    }
-
-    async function executeCryptoSend() {
-        const sym = document.getElementById('sendAssetSelect').value;
-        const amt = Number(document.getElementById('sendAmountInput').value);
-        const to = document.getElementById('sendToInput').value.trim();
-        const pos = ownedPositions.find(p => p.symbol === sym);
-
-        if(!pos || amt <= 0 || amt > pos.balance || !to) return toast('Invalid transfer details');
-
-        toast('Broadcasting Transaction...');
-        try {
-            const res = await fetch('/api/wallet/send', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ asset: sym, network: pos.networkKey, amount: amt, toAddress: to })
-            });
-            if(res.ok) { 
-                refreshAllBalances(true); 
-                closeModal('sendModal'); 
-                document.getElementById('sendAmountInput').value = '';
-                document.getElementById('sendToInput').value = '';
-                return toast(`Sent ${amt} ${sym} Successfully`); 
-            }
-        } catch(e) { toast('Transfer failed.'); }
-    }
-
-    function getUsdtBalanceTotal() {
-        return ownedPositions.filter(p => p.symbol === 'USDT').reduce((acc, p) => acc + Number(p.balance), 0);
-    }
-
-    function switchRecMode(mode) {
-        document.getElementById('btnRecCrypto').className = mode === 'crypto' ? 'active' : '';
-        document.getElementById('btnRecTensor').className = mode === 'tensor' ? 'active' : '';
-        document.getElementById('receiveGroupSelect').value = mode;
-        renderReceiveAssets();
-    }
-
-    function renderReceiveAssets() {
-      const g = document.getElementById('receiveGroupSelect').value;
-      const nw = document.getElementById('recNetWrap');
-      
-      if(g === 'tensor') {
-        nw.style.display = 'none'; 
-        document.getElementById('receiveAddressInput').value = tensorAddress; renderQr(tensorAddress);
-      } else {
-        nw.style.display = 'block'; 
-        const netKey = document.getElementById('receiveNetworkSelect').value || 'ethereum';
-        
-        let addr = IS_ADMIN ? '0xAdminDemoWallet...' : (activeSigner?.address || 'No wallet connected');
-        if (netKey === 'bitcoin') addr = 'bc1q' + Array.from(crypto.getRandomValues(new Uint8Array(18))).map(b=>b.toString(16).padStart(2,'0')).join('');
-        if (netKey === 'solana') addr = Array.from(crypto.getRandomValues(new Uint8Array(22))).map(b=>b.toString(36)).join('');
-        
-        document.getElementById('receiveAddressInput').value = addr; renderQr(addr);
+    const assetMeta = {
+      USDT: {
+        name: 'Tether USD',
+        symbol: 'USDT',
+        icon: '₮',
+        stable: true,
+        networks: ['eth', 'arbitrum', 'sol', 'trx']
+      },
+      OUSD: {
+        name: 'Origin Dollar',
+        symbol: 'OUSD',
+        icon: 'O',
+        stable: true,
+        networks: ['eth', 'arbitrum', 'sol']
+      },
+      BTC: {
+        name: 'Bitcoin',
+        symbol: 'BTC',
+        icon: '₿',
+        priceId: 'bitcoin',
+        networks: ['eth', 'arbitrum', 'sol']
+      },
+      ETH: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        icon: 'Ξ',
+        priceId: 'ethereum',
+        networks: ['eth', 'arbitrum']
+      },
+      SOL: {
+        name: 'Solana',
+        symbol: 'SOL',
+        icon: '◎',
+        priceId: 'solana',
+        networks: ['sol']
+      },
+      BNB: {
+        name: 'BNB',
+        symbol: 'BNB',
+        icon: 'B',
+        priceId: 'binancecoin',
+        networks: ['eth', 'arbitrum']
+      },
+      XRP: {
+        name: 'XRP',
+        symbol: 'XRP',
+        icon: 'X',
+        priceId: 'ripple',
+        networks: ['eth']
+      },
+      DOGE: {
+        name: 'Dogecoin',
+        symbol: 'DOGE',
+        icon: 'D',
+        priceId: 'dogecoin',
+        networks: ['eth']
       }
+    };
+
+    function isAdmin() {
+      const role = String(SERVER_ROLE || '').toLowerCase();
+      const email = String(SERVER_EMAIL || '').toLowerCase();
+      const walletRole = String(walletState?.role || '').toLowerCase();
+
+      return role === 'staff'
+        || role === 'admin'
+        || walletRole === 'staff'
+        || walletRole === 'admin'
+        || email === 'admin@tensorwallet.local';
     }
 
-    // HELPER FUNCTIONS
-    function toast(msg) { const el = document.getElementById('toast'); el.textContent = msg; el.classList.add('active'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('active'), 2500); }
-    function money(val) { const cfg = DISPLAY_RATES[displayCurrency] || DISPLAY_RATES.USD; return `${cfg.symbol}${(Number(val||0) * cfg.rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
-    function fmt(val, dec=6) { return Number(val||0).toLocaleString(undefined,{maximumFractionDigits:dec}); }
-    function icon(sym) { return `<div class="coin"><img src="https://assets.coincap.io/assets/icons/${String(sym).toLowerCase()}@2x.png" onerror="this.remove();this.parentNode.textContent='${String(sym).slice(0,4)}'" /></div>`; }
-
-    function openModal(id) { 
-        document.getElementById(id).classList.add('active'); 
-        if(id==='tensorSwapModal') openTensorSwap(); 
-        if(id==='tensorSendModal') { document.getElementById('tenSendSelect').innerHTML = baseTensorData.map(t=>`<option value="${t.id}">${t.symbol}</option>`).join(''); updateTenSendBal(); } 
-        if(id==='receiveModal') renderReceiveAssets(); 
-        if(id==='sendModal') populateSendAssets();
+    function updateAdminDetectionUI() {
+      const badge = document.getElementById('adminDetectedBadge');
+      if (badge) badge.classList.toggle('show', isAdmin());
     }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); if (id === 'tensorChartModal') clearInterval(chartingIntervalObject); }
-    function overlayClose(e,id) { if(e.target.id === id) closeModal(id); }
-    function navSetActive(id) { document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active')); document.getElementById(id)?.classList.add('active'); }
-    
-    function openSettings() { document.getElementById('settingsOverlay').classList.add('active'); document.getElementById('settingsAddress').textContent = IS_ADMIN ? "0xAdminDemo..." : (activeSigner ? activeSigner.address : "Loading..."); document.getElementById('settingsTensorAddress').textContent = tensorAddress; navSetActive('navSettings'); }
-    function closeSettings() { document.getElementById('settingsOverlay').classList.remove('active'); navSetActive('navHome'); }
-    function setTheme(t) { document.documentElement.setAttribute('data-theme',t); localStorage.setItem('blue_theme',t); }
-    function setDisplayCurrency(c) { displayCurrency = c; localStorage.setItem('blue_display_currency',c); document.getElementById('currencySelect').value = c; refreshAllBalances(false); }
-    function priceFor(sym) { return prices[sym.toLowerCase()]?.usd || 0; }
 
-    function combineAssets() {
-      const map = new Map(); 
-      allBalances.forEach(a => {
-        const sym = a.symbol; const usd = Number(a.balance||0)*priceFor(a.gecko);
-        if(!map.has(sym)) map.set(sym, {symbol:sym, name:a.name, gecko:a.gecko, amount:0, usd:0, positions:[]});
-        const item = map.get(sym); item.amount += Number(a.balance||0); item.usd += usd;
-        if(Number(a.balance||0)>0) { item.positions.push({...a,usd}); }
+    function normalizeNetwork(network) {
+      const raw = String(network || '').trim().toLowerCase();
+
+      if (raw.includes('arb')) return 'arbitrum';
+      if (raw.includes('sol')) return 'sol';
+      if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
+      if (raw.includes('eth') || raw.includes('erc')) return 'eth';
+
+      return 'eth';
+    }
+
+    function formatMoney(n, decimals = 2) {
+      return (Number(n) || 0).toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
       });
-      combinedAssets = [...map.values()].sort((a,b) => b.usd - a.usd);
-      ownedPositions = allBalances.filter(x=>Number(x.balance||0)>0);
     }
 
-    function renderTotals(tensorUsd = 0) {
-      let cryptoUsd = 0; 
-      combinedAssets.forEach(a => { cryptoUsd += a.usd; });
-      let tot = cryptoUsd + tensorUsd;
-      document.getElementById('totalUsd').textContent = money(tot);
+    function formatPriceSmart(price) {
+      price = Number(price) || 0;
+
+      if (price >= 1000) return price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (price >= 1) return price.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+
+      return price.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 });
     }
 
-    function renderAssetCards() {
-      document.getElementById('assetCards').innerHTML = combinedAssets.map(a => {
-        return `<div class="asset-card">
-          <div class="asset-top">${icon(a.symbol)}<div><div class="name">${a.symbol}</div><div class="tiny">${a.positions.length} network(s)</div></div></div>
-          <div class="asset-value">${money(a.usd)}</div>
-          <div class="tiny" style="margin-top:8px; opacity:0.8;">${fmt(a.amount)} ${a.symbol}</div>
-        </div>`;
-      }).join('');
-      renderTensorCards();
+    function shortAddress(address) {
+      const a = String(address || '');
+      if (a.length <= 16) return a;
+      return `${a.slice(0, 7)}...${a.slice(-6)}`;
     }
 
-    async function refreshAllBalances(force = false) {
-      if(force) { document.getElementById('statusText').textContent = 'Updating...'; }
-      
-      if(IS_ADMIN) { 
-        const saved = JSON.parse(localStorage.getItem('blue_admin_balances')) || {eth: 5.4, usdt: 25000, btc: 0.38};
-        allBalances = [
-          {networkKey:'ethereum', type:'native', symbol:'ETH', name:'Ethereum', balance: saved.eth, decimals:18, gecko:'ethereum'},
-          {networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: saved.usdt, decimals:6, gecko:'tether'},
-          {networkKey:'bitcoin', type:'native', symbol:'BTC', name:'Bitcoin', balance: saved.btc, decimals:8, gecko:'bitcoin'}
-        ]; 
-        await fetchPricesForAll(); combineAssets(); renderAssetCards(); 
-        document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
-        return; 
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function showToast(message = 'Done') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('blue_theme', currentTheme);
+      drawQrCodes();
+    }
+
+    function getUsdtBalance() {
+      return Number(walletState.usdtBalance || 0);
+    }
+
+    function getTensorBalance(tokenId) {
+      return Number(walletState.tensorBalances?.[tokenId] || 0);
+    }
+
+    function getCurrentAddress() {
+      if (selectedAsset === 'USDT' || selectedAsset === 'OUSD') {
+        return networkMap[selectedNetwork]?.address || networkMap.eth.address;
       }
-      
-      try {
-        await fetchPricesForAll();
-        allBalances = [{networkKey:'ethereum', type:'erc20', symbol:'USDT', name:'Tether', balance: 150.0, decimals:6, gecko:'tether'}];
-        combineAssets(); renderAssetCards();
-        document.getElementById('statusText').textContent = 'Connected'; document.getElementById('walletStatusBadge').textContent = 'Secured Wallet';
-      } catch(e) {}
-    }
-    
-    async function fetchPricesForAll() {
-      try {
-        const ids = ['bitcoin', 'ethereum', 'solana', 'tether', 'usd-coin'];
-        const fetchPromise = fetch(`/api/prices?ids=${ids.join(',')}&_t=${Date.now()}`); // Force bypass browser cache
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000));
-        const res = await Promise.race([fetchPromise, timeoutPromise]);
-        
-        if(res.ok) { prices = await res.json() || {}; } 
-      } catch(e) { console.warn("Using fallback mock prices for demo continuity"); }
+
+      const custom = findPublicWalletAddress(selectedAsset, selectedNetwork);
+      if (custom) return custom;
+
+      if (selectedNetwork === 'sol') return networkMap.sol.address;
+      if (selectedNetwork === 'trx') return networkMap.trx.address;
+
+      return walletState.tensorAddress || networkMap.eth.address;
     }
 
-    function renderQr(val) { const box = document.getElementById('qrBox'); box.innerHTML = ''; if(val && window.QRCode) QRCode.toCanvas(val, {width:220, margin:1, color:{dark:'#0f172a',light:'#ffffff'}}, (err,cvs) => { if(!err) box.appendChild(cvs); }); }
-    function copyReceiveAddress() { const a = document.getElementById('receiveAddressInput').value; navigator.clipboard?.writeText(a); toast('Address copied'); }
+    function findPublicWalletAddress(asset, network) {
+      const candidates = [];
 
-    async function init() {
-      setTheme(localStorage.getItem('blue_theme')||'light'); setDisplayCurrency(displayCurrency); initTensor();
-      const s = document.getElementById('receiveNetworkSelect'); if(s) s.innerHTML = Object.entries(NETWORKS).map(([k,n])=>`<option value="${k}">${n.name}</option>`).join('');
-      
-      if (IS_ADMIN) { 
-          await refreshAllBalances(true); 
-          setInterval(() => refreshAllBalances(false), 15000);
-          return; 
-      }
-      
-      try {
-        let savedVault = SERVER_WALLET?.encryptedVault;
-        if(savedVault) {
-           const parsedVault = JSON.parse(atob(savedVault));
-           activeSigner = { address: new ethers.Wallet(parsedVault.pk).address };
+      if (Array.isArray(walletState.publicWallets)) candidates.push(...walletState.publicWallets);
+      if (Array.isArray(walletState.assets)) candidates.push(...walletState.assets);
+      if (Array.isArray(walletState.wallets)) candidates.push(...walletState.wallets);
+      if (Array.isArray(walletState.balances)) candidates.push(...walletState.balances);
+
+      const item = candidates.find(x => {
+        const text = JSON.stringify(x || {}).toLowerCase();
+        return text.includes(String(asset).toLowerCase()) && text.includes(String(network).toLowerCase());
+      });
+
+      if (!item) return '';
+
+      return item.address || item.publicAddress || item.walletAddress || item.depositAddress || '';
+    }
+
+    function buildAssetList() {
+      const baseAssets = Object.values(assetMeta).map(meta => {
+        let balance = 0;
+        let usdValue = 0;
+        let price = 1;
+        let change = 0;
+
+        if (meta.symbol === 'USDT') {
+          balance = getUsdtBalance();
+          price = 1;
+          usdValue = balance;
+        } else if (meta.symbol === 'OUSD') {
+          balance = Number(walletState.ousdBalance || walletState.OUSD || walletState.ousd || 0);
+          price = 1;
+          usdValue = balance;
+        } else {
+          const cg = prices[meta.priceId] || {};
+          price = Number(cg.usd || 0);
+          change = Number(cg.usd_24h_change || 0);
+          balance = Number(walletState[`${meta.symbol.toLowerCase()}Balance`] || 0);
+          usdValue = balance * price;
         }
-        document.getElementById('walletStatusBadge').textContent = 'Secured Wallet'; 
-        
-        await refreshAllBalances(true);
-        setInterval(() => refreshAllBalances(false), 15000); 
-      } catch (err) {}
+
+        return {
+          ...meta,
+          balance,
+          price,
+          usdValue,
+          change,
+          tokenId: null,
+          type: 'standard'
+        };
+      });
+
+      const tensorAssets = tensorRegistry.map(t => {
+        const balance = getTensorBalance(t.id);
+        const price = Number(t.price || 0);
+
+        return {
+          name: t.name || t.symbol,
+          symbol: t.symbol,
+          icon: t.icon || String(t.symbol || 'T').slice(0, 1),
+          balance,
+          price,
+          usdValue: balance * price,
+          change: Number(t.changePercent24h || 0),
+          tokenId: t.id,
+          type: 'tensor',
+          networks: ['eth', 'arbitrum', 'sol']
+        };
+      });
+
+      return [...baseAssets, ...tensorAssets];
     }
-    
-    window.addEventListener('keydown', e => { if(e.key==='Escape') { closeSettings(); document.querySelectorAll('.modal-overlay').forEach(x=>x.classList.remove('active')); clearInterval(chartingIntervalObject); }});
-    window.onload = init;
+
+    function calculateTotalBalance() {
+      const assets = buildAssetList();
+      const assetTotal = assets.reduce((sum, asset) => sum + Number(asset.usdValue || 0), 0);
+      return assetTotal;
+    }
+
+    function renderHero() {
+      const total = calculateTotalBalance();
+      const usdt = getUsdtBalance();
+      const activeTrades = Array.isArray(walletState.positions) ? walletState.positions.length : 0;
+      const copyTrades = Array.isArray(walletState.copyTrades) ? walletState.copyTrades.length : 0;
+
+      document.getElementById('totalBalance').textContent = formatMoney(total);
+      document.getElementById('usdtBalance').textContent = formatMoney(usdt);
+      document.getElementById('activeTradesCount').textContent = activeTrades;
+      document.getElementById('copyTradesCount').textContent = copyTrades;
+
+      const tensorAddress = walletState.tensorAddress || '—';
+      document.getElementById('tensorAddressShort').textContent = shortAddress(tensorAddress);
+
+      const network = networkMap[selectedNetwork] || networkMap.eth;
+      document.getElementById('selectedNetworkPill').textContent = `${selectedAsset} • ${network.network}`;
+    }
+
+    function renderNetworkSelect() {
+      const asset = assetMeta[selectedAsset] || { networks: ['eth', 'arbitrum', 'sol', 'trx'] };
+      const networks = asset.networks || ['eth', 'arbitrum', 'sol', 'trx'];
+
+      if (!networks.includes(selectedNetwork)) {
+        selectedNetwork = networks[0] || 'eth';
+      }
+
+      document.getElementById('networkSelect').innerHTML = networks.map(key => {
+        const n = networkMap[key] || networkMap.eth;
+
+        return `
+          <button class="network-btn ${selectedNetwork === key ? 'active' : ''}" onclick="setNetwork('${key}')">
+            ${escapeHtml(n.short)}
+          </button>
+        `;
+      }).join('');
+
+      const sendNetwork = document.getElementById('sendNetwork');
+
+      if (sendNetwork) {
+        sendNetwork.innerHTML = networks.map(key => {
+          const n = networkMap[key] || networkMap.eth;
+          return `<option value="${key}" ${selectedNetwork === key ? 'selected' : ''}>${escapeHtml(n.network)} ${escapeHtml(n.short)}</option>`;
+        }).join('');
+      }
+    }
+
+    function renderAssets() {
+      const assets = buildAssetList();
+      const grid = document.getElementById('assetGrid');
+
+      grid.innerHTML = assets.map(asset => {
+        const change = Number(asset.change || 0);
+        const changeClass = change >= 0 ? 'text-green' : 'text-red';
+        const selected = selectedAsset === asset.symbol && (!asset.tokenId || asset.tokenId === window.selectedTensorTokenId);
+
+        return `
+          <div class="asset-card ${selected ? 'active' : ''}" onclick="selectAsset('${escapeHtml(asset.symbol)}', '${escapeHtml(asset.tokenId || '')}')">
+            <div class="asset-top">
+              <div class="coin">
+                <div class="coin-icon">${escapeHtml(asset.icon || asset.symbol.slice(0, 1))}</div>
+                <div class="coin-name">
+                  <div class="coin-symbol">${escapeHtml(asset.symbol)}</div>
+                  <div class="coin-full">${escapeHtml(asset.name)}</div>
+                </div>
+              </div>
+              <div class="${changeClass}" style="font-size:.72rem;font-weight:950;">
+                ${asset.stable ? 'Stable' : `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`}
+              </div>
+            </div>
+
+            <div class="asset-price">$${formatMoney(asset.usdValue || 0)}</div>
+
+            <div class="asset-row">
+              <span>Balance</span>
+              <span>${formatPriceSmart(asset.balance || 0)} ${escapeHtml(asset.symbol)}</span>
+            </div>
+
+            <div class="asset-row">
+              <span>Price</span>
+              <span>$${formatPriceSmart(asset.price || 0)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      renderSendAssetOptions(assets);
+    }
+
+    function renderSendAssetOptions(assets = buildAssetList()) {
+      const sendAsset = document.getElementById('sendAsset');
+      if (!sendAsset) return;
+
+      sendAsset.innerHTML = assets.map(asset => {
+        return `<option value="${escapeHtml(asset.symbol)}" ${selectedAsset === asset.symbol ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)}</option>`;
+      }).join('');
+    }
+
+    function renderAddress() {
+      const address = getCurrentAddress();
+      const network = networkMap[selectedNetwork] || networkMap.eth;
+
+      document.getElementById('receiveAddress').textContent = address;
+      document.getElementById('selectedNetworkPill').textContent = `${selectedAsset} • ${network.network}`;
+
+      const modalAddress = document.getElementById('modalReceiveAddress');
+      if (modalAddress) modalAddress.textContent = address;
+
+      const modalAsset = document.getElementById('receiveModalAsset');
+      if (modalAsset) modalAsset.textContent = selectedAsset;
+
+      drawQrCodes();
+    }
+
+    function drawQrCodes() {
+      const address = getCurrentAddress();
+      const payload = `${selectedAsset}:${address}?network=${selectedNetwork}`;
+      const qrCanvas = document.getElementById('qrCanvas');
+      const modalQrCanvas = document.getElementById('modalQrCanvas');
+
+      if (window.QRCode && qrCanvas) {
+        QRCode.toCanvas(qrCanvas, payload, {
+          width: 154,
+          margin: 1,
+          color: {
+            dark: '#000000',
+            light: '#ffffff'
+          }
+        });
+      }
+
+      if (window.QRCode && modalQrCanvas) {
+        QRCode.toCanvas(modalQrCanvas, payload, {
+          width: 154,
+          margin: 1,
+          color: {
+            dark: '#000000',
+            light: '#ffffff'
+          }
+        });
+      }
+    }
+
+    function renderActivity() {
+      renderPositions();
+      renderCopyTrades();
+      renderDeposits();
+      renderHistory();
+    }
+
+    function renderPositions() {
+      const positions = walletState.positions || [];
+      const view = document.getElementById('positionsView');
+
+      if (!positions.length) {
+        view.innerHTML = `<div class="empty">No active trading positions.</div>`;
+        return;
+      }
+
+      view.innerHTML = positions.map(p => {
+        const pnl = calculatePositionPnl(p);
+        const roi = Number(p.margin || 0) > 0 ? (pnl / Number(p.margin)) * 100 : 0;
+        const color = pnl >= 0 ? 'text-green' : 'text-red';
+
+        return `
+          <div class="tx-card">
+            <div class="tx-top">
+              <div>
+                <div class="tx-title">${escapeHtml(p.symbol)} ${escapeHtml(p.side)} ${Number(p.leverage || 1)}x</div>
+                <div class="tx-date">${p.openedAt ? new Date(p.openedAt).toLocaleString() : 'Open position'}</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="${color}" style="font-weight:950;">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
+                <div class="${color}" style="font-size:.7rem;font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
+              </div>
+            </div>
+            <div class="tx-detail">
+              Margin $${formatMoney(p.margin)} • Size $${formatMoney(p.size)} • Entry $${formatPriceSmart(p.entryPrice)} • Mark $${formatPriceSmart(p.markPrice)}
+              ${p.treasuryAddress ? `<br>Deposit: ${escapeHtml(shortAddress(p.treasuryAddress))}` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function calculatePositionPnl(p) {
+      const entry = Number(p.entryPrice || 0);
+      const mark = Number(p.markPrice || p.entryPrice || 0);
+      const size = Number(p.size || 0);
+
+      if (!entry || !size) return 0;
+
+      const diff = p.side === 'short' ? entry - mark : mark - entry;
+      return (diff / entry) * size;
+    }
+
+    function renderCopyTrades() {
+      const trades = walletState.copyTrades || [];
+      const view = document.getElementById('copyView');
+
+      if (!trades.length) {
+        view.innerHTML = `<div class="empty">No active copy trades.</div>`;
+        return;
+      }
+
+      view.innerHTML = trades.map(c => {
+        const pnl = Number(c.pnl || 0);
+        const roi = Number(c.roi || 0);
+        const color = pnl >= 0 ? 'text-green' : 'text-red';
+
+        return `
+          <div class="tx-card">
+            <div class="tx-top">
+              <div>
+                <div class="tx-title">${escapeHtml(c.profileName || 'Copy Portfolio')}</div>
+                <div class="tx-date">${c.startedAt ? new Date(c.startedAt).toLocaleString() : 'Started'}</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="${color}" style="font-weight:950;">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
+                <div class="${color}" style="font-size:.7rem;font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
+              </div>
+            </div>
+            <div class="tx-detail">
+              Allocated: $${formatMoney(c.amountUsdt)} USDT • Current value: $${formatMoney(c.markValueUsdt || Number(c.amountUsdt || 0) + pnl)}
+              <br>Mirrored positions: ${(c.mirroredPositions || c.copiedPositions || []).length}
+              ${c.treasuryAddress ? `<br>Deposit: ${escapeHtml(shortAddress(c.treasuryAddress))}` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDeposits() {
+      const deposits = [
+        ...(walletState.tradeDeposits || []),
+        ...(walletState.copyDeposits || [])
+      ];
+
+      const view = document.getElementById('depositsView');
+
+      if (!deposits.length) {
+        view.innerHTML = `<div class="empty">No recorded deposits yet.</div>`;
+        return;
+      }
+
+      view.innerHTML = deposits.slice(0, 40).map(d => {
+        return `
+          <div class="tx-card">
+            <div class="tx-top">
+              <div>
+                <div class="tx-title">${escapeHtml(d.type || 'Deposit')}</div>
+                <div class="tx-date">${d.createdAt ? new Date(d.createdAt).toLocaleString() : ''}</div>
+              </div>
+              <div style="font-weight:950;">$${formatMoney(d.amountUsdt || 0)}</div>
+            </div>
+            <div class="tx-detail">
+              Network: ${escapeHtml(d.destinationNetwork || d.sourceUsdtNetwork || 'Auto')}
+              <br>Address: ${escapeHtml(d.destinationAddress || '')}
+              <br>TX: ${escapeHtml(d.txHash || '')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderHistory() {
+      const history = walletState.orderHistory || [];
+      const view = document.getElementById('historyView');
+
+      if (!history.length) {
+        view.innerHTML = `<div class="empty">No closed trade history.</div>`;
+        return;
+      }
+
+      view.innerHTML = history.slice(0, 40).map(h => {
+        const pnl = Number(h.pnl || 0);
+        const roi = Number(h.roi || 0);
+        const color = pnl >= 0 ? 'text-green' : 'text-red';
+
+        return `
+          <div class="tx-card">
+            <div class="tx-top">
+              <div>
+                <div class="tx-title">${escapeHtml(h.symbol || 'TRADE')} ${escapeHtml(h.side || '')} ${Number(h.leverage || 1)}x</div>
+                <div class="tx-date">${h.closedAt ? new Date(h.closedAt).toLocaleString() : ''}</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="${color}" style="font-weight:950;">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div>
+                <div class="${color}" style="font-size:.7rem;font-weight:900;">${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%</div>
+              </div>
+            </div>
+            <div class="tx-detail">
+              ${escapeHtml(h.closeReason || 'Closed')} • Entry $${formatPriceSmart(h.entryPrice || 0)} • Close $${formatPriceSmart(h.closePrice || 0)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function switchActivityTab(tab, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById('positionsView').style.display = tab === 'positions' ? 'grid' : 'none';
+      document.getElementById('copyView').style.display = tab === 'copy' ? 'grid' : 'none';
+      document.getElementById('depositsView').style.display = tab === 'deposits' ? 'grid' : 'none';
+      document.getElementById('historyView').style.display = tab === 'history' ? 'grid' : 'none';
+    }
+
+    function selectAsset(symbol, tokenId = '') {
+      selectedAsset = symbol;
+      window.selectedTensorTokenId = tokenId || '';
+
+      const meta = assetMeta[selectedAsset];
+      if (meta && meta.networks && !meta.networks.includes(selectedNetwork)) {
+        selectedNetwork = meta.networks[0];
+      }
+
+      renderNetworkSelect();
+      renderAssets();
+      renderAddress();
+      renderHero();
+
+      const sendAsset = document.getElementById('sendAsset');
+      if (sendAsset) sendAsset.value = selectedAsset;
+    }
+
+    async function setNetwork(key) {
+      selectedNetwork = normalizeNetwork(key);
+
+      renderNetworkSelect();
+      renderAddress();
+      renderHero();
+
+      try {
+        const res = await fetch('/api/wallet/usdt-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ network: selectedNetwork })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          walletState.usdtNetwork = data.usdtNetwork || selectedNetwork;
+        }
+      } catch {}
+    }
+
+    async function copyCurrentAddress() {
+      const address = getCurrentAddress();
+
+      try {
+        await navigator.clipboard.writeText(address);
+        showToast('Address copied');
+      } catch {
+        prompt('Copy address:', address);
+      }
+    }
+
+    function openReceiveModal() {
+      renderAddress();
+      document.getElementById('receiveModal').classList.add('show');
+    }
+
+    function closeReceiveModal() {
+      document.getElementById('receiveModal').classList.remove('show');
+    }
+
+    function focusSendForm() {
+      document.getElementById('sendPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => document.getElementById('sendAmount').focus(), 350);
+    }
+
+    async function sendAsset() {
+      const asset = document.getElementById('sendAsset').value;
+      const network = document.getElementById('sendNetwork').value;
+      const amount = Number(document.getElementById('sendAmount').value || 0);
+      const toAddress = document.getElementById('sendTo').value.trim();
+
+      if (!asset || !network || !amount || amount <= 0 || !toAddress) {
+        showToast('Fill send details');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/wallet/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            asset,
+            network,
+            amount,
+            toAddress
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Send failed');
+          return;
+        }
+
+        document.getElementById('sendAmount').value = '';
+        document.getElementById('sendTo').value = '';
+
+        showToast(`Sent: ${shortAddress(data.txHash || '')}`);
+      } catch {
+        showToast('Network error');
+      }
+    }
+
+    async function saveVault() {
+      const encryptedVault = document.getElementById('vaultInput').value.trim();
+
+      if (!encryptedVault) {
+        showToast('Vault is empty');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/wallet/vault', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            encryptedVault,
+            publicWallets: walletState.publicWallets || []
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Vault save failed');
+          return;
+        }
+
+        walletState.encryptedVault = encryptedVault;
+        showToast('Vault saved');
+      } catch {
+        showToast('Network error');
+      }
+    }
+
+    async function refreshWallet() {
+      try {
+        const res = await fetch(`/api/wallet?_t=${Date.now()}`);
+
+        if (res.ok) {
+          walletState = await res.json();
+
+          if (walletState.treasuryDestinations) {
+            Object.keys(walletState.treasuryDestinations).forEach(key => {
+              networkMap[key] = {
+                ...(networkMap[key] || {}),
+                key,
+                ...walletState.treasuryDestinations[key],
+                short: networkMap[key]?.short || key.toUpperCase()
+              };
+            });
+          }
+
+          selectedNetwork = normalizeNetwork(walletState.usdtNetwork || selectedNetwork);
+        }
+
+        const stateRes = await fetch(`/api/trading/state?_t=${Date.now()}`);
+
+        if (stateRes.ok) {
+          const state = await stateRes.json();
+
+          walletState.usdtBalance = Number(state.usdtBalance || 0);
+          walletState.usdtNetwork = state.usdtNetwork || walletState.usdtNetwork || selectedNetwork;
+          walletState.positions = state.positions || [];
+          walletState.orderHistory = state.orderHistory || [];
+          walletState.tradeDeposits = state.tradeDeposits || [];
+          walletState.copyTrades = state.copyTrades || [];
+          walletState.copyDeposits = state.copyDeposits || [];
+
+          selectedNetwork = normalizeNetwork(walletState.usdtNetwork || selectedNetwork);
+        }
+
+        await refreshTensor();
+        await refreshPrices();
+
+        renderAll();
+      } catch (e) {
+        console.error('refreshWallet error:', e);
+        showToast('Could not refresh wallet');
+      }
+    }
+
+    async function refreshTensor() {
+      try {
+        const res = await fetch(`/api/tensor?_t=${Date.now()}`);
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        tensorRegistry = data.registry || [];
+        walletState.tensorAddress = data.address || walletState.tensorAddress;
+        walletState.tensorBalances = data.balances || walletState.tensorBalances || {};
+      } catch {}
+    }
+
+    async function refreshPrices() {
+      const ids = Object.values(assetMeta)
+        .map(a => a.priceId)
+        .filter(Boolean)
+        .join(',');
+
+      if (!ids) return;
+
+      try {
+        const res = await fetch(`/api/prices?ids=${encodeURIComponent(ids)}&_t=${Date.now()}`);
+        if (res.ok) prices = await res.json();
+      } catch {}
+
+      renderHero();
+      renderAssets();
+    }
+
+    function renderSendSelectors() {
+      const assets = buildAssetList();
+      renderSendAssetOptions(assets);
+      renderNetworkSelect();
+
+      const sendAsset = document.getElementById('sendAsset');
+      const sendNetwork = document.getElementById('sendNetwork');
+
+      sendAsset.onchange = function() {
+        selectAsset(this.value, '');
+      };
+
+      sendNetwork.onchange = function() {
+        setNetwork(this.value);
+      };
+    }
+
+    function renderAll() {
+      updateAdminDetectionUI();
+      renderHero();
+      renderSendSelectors();
+      renderAssets();
+      renderNetworkSelect();
+      renderAddress();
+      renderActivity();
+
+      const vault = document.getElementById('vaultInput');
+      if (vault && walletState.encryptedVault && !vault.value) {
+        vault.value = walletState.encryptedVault;
+      }
+    }
+
+    async function bootWallet() {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+
+      selectedNetwork = normalizeNetwork(walletState.usdtNetwork || selectedNetwork);
+
+      renderAll();
+
+      await refreshWallet();
+
+      if (refreshInterval) clearInterval(refreshInterval);
+
+      refreshInterval = setInterval(async () => {
+        await refreshWallet();
+      }, 5000);
+    }
+
+    window.addEventListener('load', bootWallet);
   </script>
 </body>
 </html>
