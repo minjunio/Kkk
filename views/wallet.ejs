@@ -15,10 +15,10 @@
     :root {
       --bg-base: #070a0f;
       --bg-base-2: #0b0f17;
-      --bg-panel: rgba(17, 24, 39, 0.88);
+      --bg-panel: rgba(17, 24, 39, 0.86);
       --bg-panel-solid: #111827;
-      --bg-card: rgba(15, 23, 42, 0.76);
-      --bg-hover: rgba(45, 55, 72, 0.92);
+      --bg-card: rgba(15, 23, 42, 0.72);
+      --bg-hover: rgba(45, 55, 72, 0.9);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border: rgba(148, 163, 184, 0.14);
@@ -32,7 +32,6 @@
       --tensor-2: #3b82f6;
       --tensor-soft: rgba(139, 92, 246, 0.18);
       --yellow: #f59e0b;
-      --yellow-soft: rgba(245,158,11,0.14);
 
       --shadow: 0 22px 70px rgba(0,0,0,0.38);
       --radius: 18px;
@@ -43,10 +42,10 @@
     [data-theme="light"] {
       --bg-base: #f6f8fb;
       --bg-base-2: #eef2f8;
-      --bg-panel: rgba(255,255,255,0.92);
+      --bg-panel: rgba(255,255,255,0.90);
       --bg-panel-solid: #ffffff;
-      --bg-card: rgba(255,255,255,0.86);
-      --bg-hover: rgba(226, 232, 240, 0.92);
+      --bg-card: rgba(255,255,255,0.84);
+      --bg-hover: rgba(226, 232, 240, 0.9);
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border: rgba(15, 23, 42, 0.10);
@@ -210,9 +209,9 @@
       gap: 14px;
     }
 
-    @media (min-width: 1120px) {
+    @media (min-width: 1100px) {
       .page {
-        grid-template-columns: minmax(0, 1fr) 390px;
+        grid-template-columns: minmax(0, 1fr) 380px;
         align-items: start;
         padding-bottom: 18px;
       }
@@ -290,7 +289,7 @@
       font-size: 0.78rem;
       font-weight: 800;
       line-height: 1.4;
-      max-width: 760px;
+      max-width: 720px;
     }
 
     .network-pill {
@@ -343,9 +342,9 @@
     }
 
     .yellow-btn {
-      background: var(--yellow-soft);
       color: var(--yellow);
-      border-color: rgba(245,158,11,0.30);
+      background: rgba(245,158,11,0.14);
+      border-color: rgba(245,158,11,0.26);
     }
 
     .mini-btn {
@@ -422,7 +421,6 @@
       place-items: center;
       background: var(--tensor-soft);
       color: #c4b5fd;
-      flex: 0 0 auto;
     }
 
     .section-sub {
@@ -454,7 +452,6 @@
       padding: 12px;
       cursor: pointer;
       transition: 0.16s ease;
-      min-height: 150px;
     }
 
     [data-theme="light"] .asset-card {
@@ -491,9 +488,9 @@
     }
 
     .coin-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
       display: grid;
       place-items: center;
       background: linear-gradient(135deg, rgba(139,92,246,0.88), rgba(59,130,246,0.82));
@@ -501,12 +498,11 @@
       font-weight: 950;
       overflow: hidden;
       flex: 0 0 auto;
-      box-shadow: 0 10px 22px rgba(0,0,0,0.16);
     }
 
     .coin-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       display: block;
     }
 
@@ -548,10 +544,10 @@
     }
 
     .asset-actions {
-      margin-top: 10px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 7px;
+      margin-top: 10px;
     }
 
     .asset-actions button {
@@ -564,10 +560,10 @@
       color: var(--text-main);
     }
 
-    .asset-actions button.danger-small {
+    .asset-actions button.remove {
       color: var(--red);
       background: var(--red-glow);
-      border-color: rgba(246,70,93,0.23);
+      border-color: rgba(246,70,93,0.24);
     }
 
     .text-green {
@@ -656,13 +652,16 @@
     .seed-box {
       text-align: left;
       user-select: text;
-      color: #e5e7eb;
+      filter: blur(4px);
+    }
+
+    .seed-box.revealed {
+      filter: none;
     }
 
     [data-theme="light"] .address-box,
     [data-theme="light"] .seed-box {
       background: rgba(248,250,252,0.90);
-      color: #0f172a;
     }
 
     .network-select {
@@ -694,7 +693,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
@@ -746,39 +745,6 @@
       font-size: 0.7rem;
       font-weight: 760;
       line-height: 1.44;
-    }
-
-    .wallet-list {
-      display: grid;
-      gap: 9px;
-    }
-
-    .wallet-row {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 15px;
-      border: 1px solid var(--border);
-      background: rgba(7,10,15,0.42);
-    }
-
-    [data-theme="light"] .wallet-row {
-      background: rgba(255,255,255,0.78);
-    }
-
-    .wallet-row-title {
-      font-size: 0.8rem;
-      font-weight: 950;
-    }
-
-    .wallet-row-sub {
-      margin-top: 3px;
-      color: var(--text-muted);
-      font-size: 0.68rem;
-      font-weight: 800;
-      word-break: break-all;
     }
 
     .tx-list {
@@ -833,41 +799,6 @@
       border: 1px dashed var(--border-strong);
       border-radius: 16px;
       background: rgba(7,10,15,0.22);
-    }
-
-    .security-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .security-card {
-      border: 1px solid var(--border);
-      background: rgba(7,10,15,0.38);
-      border-radius: 16px;
-      padding: 12px;
-      display: grid;
-      gap: 9px;
-    }
-
-    [data-theme="light"] .security-card {
-      background: rgba(255,255,255,0.78);
-    }
-
-    .security-title {
-      font-size: 0.82rem;
-      font-weight: 950;
-    }
-
-    .security-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 7px;
-    }
-
-    .masked {
-      filter: blur(4px);
-      opacity: 0.86;
     }
 
     .admin-panel {
@@ -1003,7 +934,7 @@
       margin-top: 13px;
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 720px) {
       .brand span:last-child {
         display: none;
       }
@@ -1012,9 +943,7 @@
         display: none !important;
       }
 
-      .stats-grid,
-      .security-grid,
-      .form-grid {
+      .stats-grid {
         grid-template-columns: 1fr 1fr;
       }
 
@@ -1034,11 +963,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
       }
-    }
 
-    @media (max-width: 520px) {
-      .stats-grid,
-      .security-grid,
       .form-grid {
         grid-template-columns: 1fr;
       }
@@ -1099,10 +1024,10 @@
         <section class="hero">
           <div class="hero-head">
             <div>
-              <div class="wallet-label">Total Portfolio Balance</div>
+              <div class="wallet-label">Total Wallet Balance</div>
               <div class="wallet-balance">$<span id="totalBalance">0.00</span></div>
               <div class="wallet-sub">
-                Portfolio is separated into normal crypto assets and Tensor tokens. USDT and OUSD are synced with trading and copy trading.
+                This wallet balance is synced with trading and copy trading. Normal crypto and Tensor tokens are separated below.
               </div>
             </div>
 
@@ -1113,17 +1038,17 @@
             <button class="primary-btn" onclick="window.location.href='/trading'">Open Trading</button>
             <button class="green-btn" onclick="openReceiveModal()">Receive</button>
             <button class="mini-btn" onclick="focusSendForm()">Send</button>
-            <button class="yellow-btn" onclick="toggleSeeds()">Show Seeds</button>
+            <button class="yellow-btn" onclick="toggleSeedPanel()">Show Seeds</button>
           </div>
 
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-label">USDT</div>
+              <div class="stat-label">USDT Balance</div>
               <div class="stat-value">$<span id="usdtBalance">0.00</span></div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">OUSD</div>
+              <div class="stat-label">OUSD Balance</div>
               <div class="stat-value">$<span id="ousdBalance">0.00</span></div>
             </div>
 
@@ -1133,8 +1058,8 @@
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">Selected</div>
-              <div class="stat-value" id="selectedAssetStat">USDT</div>
+              <div class="stat-label">Selected Asset</div>
+              <div class="stat-value" id="selectedAssetText">USDT</div>
             </div>
           </div>
         </section>
@@ -1150,12 +1075,12 @@
                     <path d="M12 6v12"/>
                   </svg>
                 </span>
-                Normal Crypto Wallet
+                Normal Crypto
               </div>
-              <div class="section-sub">USDT, OUSD and major crypto balances. These are separate from Tensor tokens.</div>
+              <div class="section-sub">USDT, OUSD, BTC, ETH, SOL and other normal wallet assets.</div>
             </div>
 
-            <button class="mini-btn" onclick="refreshPrices()">Refresh</button>
+            <button class="mini-btn" onclick="refreshWallet()">Refresh Prices</button>
           </div>
 
           <div class="asset-grid" id="normalAssetGrid"></div>
@@ -1171,18 +1096,18 @@
                     <path d="M9 12l2 2 4-5"/>
                   </svg>
                 </span>
-                Tensor Token Wallet
+                Tensor Tokens
               </div>
-              <div class="section-sub">Custom Tensor tokens deployed by admin. Admin can add, mint, edit, and remove tokens.</div>
+              <div class="section-sub">Custom Tensor token currencies are separate from normal crypto.</div>
             </div>
 
-            <button class="primary-btn admin-panel" id="openAdminTokenBtn" onclick="openAdminTokenModal()">Add Token</button>
+            <button class="primary-btn admin-panel" id="adminAddTokenBtn" onclick="openTokenModal()">Add Token</button>
           </div>
 
           <div class="asset-grid" id="tensorAssetGrid"></div>
         </section>
 
-        <section class="panel admin-panel" id="adminQuickPanel">
+        <section class="panel admin-panel" id="adminTokenPanel">
           <div class="section-head">
             <div>
               <div class="section-title">
@@ -1192,36 +1117,36 @@
                     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/>
                   </svg>
                 </span>
-                Admin Tensor Controls
+                Admin Token Creator
               </div>
-              <div class="section-sub">Manage Tensor token currencies without changing the wallet settings.</div>
+              <div class="section-sub">Add new Tensor currencies without changing the wallet layout.</div>
             </div>
           </div>
 
           <div class="form-grid">
             <div class="field">
               <label>Name</label>
-              <input id="adminTokenName" placeholder="Tensor Gold">
+              <input id="quickTokenName" placeholder="Tensor AI">
             </div>
 
             <div class="field">
               <label>Symbol</label>
-              <input id="adminTokenSymbol" placeholder="TGLD" maxlength="12">
+              <input id="quickTokenSymbol" placeholder="TAI" maxlength="12">
             </div>
 
             <div class="field">
-              <label>Start Price</label>
-              <input id="adminTokenPrice" type="number" step="any" placeholder="1.00">
+              <label>Price</label>
+              <input id="quickTokenPrice" type="number" step="any" placeholder="1.25">
             </div>
 
             <div class="field">
               <label>Supply</label>
-              <input id="adminTokenSupply" type="number" step="any" placeholder="10000000">
+              <input id="quickTokenSupply" type="number" step="any" placeholder="10000000">
             </div>
 
             <div class="field">
               <label>Bias</label>
-              <select id="adminTokenBias">
+              <select id="quickTokenBias">
                 <option value="balanced">Balanced</option>
                 <option value="bullish">Bullish</option>
                 <option value="bearish">Bearish</option>
@@ -1231,21 +1156,21 @@
 
             <div class="field">
               <label>Bull Chance %</label>
-              <input id="adminTokenBullChance" type="number" step="1" value="54">
+              <input id="quickTokenBullChance" type="number" step="1" value="54">
             </div>
 
             <div class="field">
               <label>Min Move %</label>
-              <input id="adminTokenMinPct" type="number" step="any" value="0.2">
+              <input id="quickTokenMinPct" type="number" step="any" value="0.2">
             </div>
 
             <div class="field">
               <label>Max Move %</label>
-              <input id="adminTokenMaxPct" type="number" step="any" value="1.2">
+              <input id="quickTokenMaxPct" type="number" step="any" value="1.2">
             </div>
 
             <div class="field full">
-              <button class="primary-btn" onclick="deployTensorToken()">Deploy Tensor Token</button>
+              <button class="primary-btn" onclick="deployQuickToken()">Deploy Tensor Token</button>
             </div>
           </div>
         </section>
@@ -1263,27 +1188,25 @@
                 </span>
                 Wallet Seeds
               </div>
-              <div class="section-sub">Demo seed display for this wallet UI. Keep real seed phrases private and never expose them in production.</div>
+              <div class="section-sub">Demo seed display. Never expose real seed phrases in production.</div>
             </div>
           </div>
 
-          <div class="security-grid">
-            <div class="security-card">
-              <div class="security-title">Normal Crypto Wallet Seed</div>
-              <div class="seed-box masked" id="normalSeedBox"></div>
-              <div class="security-actions">
-                <button class="mini-btn" onclick="toggleSeedMask('normalSeedBox')">Reveal</button>
-                <button class="mini-btn" onclick="copySeed('normal')">Copy</button>
-              </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Normal Crypto Wallet Seed</label>
+              <div class="seed-box" id="normalSeedBox">—</div>
+              <button class="mini-btn" onclick="toggleSeedBlur('normalSeedBox')">Reveal / Hide</button>
             </div>
 
-            <div class="security-card">
-              <div class="security-title">Tensor Wallet Seed</div>
-              <div class="seed-box masked" id="tensorSeedBox"></div>
-              <div class="security-actions">
-                <button class="mini-btn" onclick="toggleSeedMask('tensorSeedBox')">Reveal</button>
-                <button class="mini-btn" onclick="copySeed('tensor')">Copy</button>
-              </div>
+            <div class="field">
+              <label>Tensor Wallet Seed</label>
+              <div class="seed-box" id="tensorSeedBox">—</div>
+              <button class="mini-btn" onclick="toggleSeedBlur('tensorSeedBox')">Reveal / Hide</button>
+            </div>
+
+            <div class="field full">
+              <button class="mini-btn" onclick="copyBothSeeds()">Copy Seeds</button>
             </div>
           </div>
         </section>
@@ -1298,15 +1221,15 @@
                     <path d="M7 15l4-4 3 3 5-6"/>
                   </svg>
                 </span>
-                Wallet Activity
+                Trading / Wallet Activity
               </div>
-              <div class="section-sub">Live trades, copy allocations, deposits, sends, and closed history.</div>
+              <div class="section-sub">Live trades, copy allocations, wallet sends, deposits, and history.</div>
             </div>
           </div>
 
           <div class="tabs">
             <div class="tab active" onclick="switchActivityTab('positions', this)">Positions</div>
-            <div class="tab" onclick="switchActivityTab('copy', this)">Copy</div>
+            <div class="tab" onclick="switchActivityTab('copy', this)">Copy Trades</div>
             <div class="tab" onclick="switchActivityTab('deposits', this)">Deposits</div>
             <div class="tab" onclick="switchActivityTab('sends', this)">Sends</div>
             <div class="tab" onclick="switchActivityTab('history', this)">History</div>
@@ -1335,13 +1258,13 @@
                 </span>
                 Receive
               </div>
-              <div class="section-sub">Select an asset and network. QR remains clear in dark mode.</div>
+              <div class="section-sub">Choose asset and network. QR works in dark mode.</div>
             </div>
           </div>
 
           <div class="field">
-            <label>Receive Asset</label>
-            <select id="receiveAssetSelect"></select>
+            <label>Asset</label>
+            <select id="receiveAsset"></select>
           </div>
 
           <div class="network-select" id="networkSelect"></div>
@@ -1367,7 +1290,7 @@
                 </span>
                 Send
               </div>
-              <div class="section-sub">Send normal assets or Tensor tokens. Demo endpoint records a tx hash.</div>
+              <div class="section-sub">Send normal crypto or Tensor tokens from the selected wallet.</div>
             </div>
           </div>
 
@@ -1392,10 +1315,10 @@
               <textarea id="sendTo" rows="3" placeholder="Paste recipient address"></textarea>
             </div>
 
-            <button class="green-btn" onclick="sendAsset()">Send Asset</button>
+            <button class="green-btn" onclick="sendSelectedAsset()">Send Asset</button>
 
             <div class="mini-note">
-              For this demo, send returns a generated tx hash. Real on-chain transfers require wallet signing infrastructure.
+              This uses your existing server endpoint and records a demo transaction hash. Real on-chain transfers require wallet signing.
             </div>
           </div>
         </section>
@@ -1412,7 +1335,7 @@
                 </span>
                 Vault
               </div>
-              <div class="section-sub">Encrypted vault storage hook for frontend wallet data.</div>
+              <div class="section-sub">Encrypted vault storage hook for your frontend wallet data.</div>
             </div>
           </div>
 
@@ -1464,32 +1387,32 @@
       </div>
     </div>
 
-    <div class="modal-backdrop" id="adminTokenModal">
+    <div class="modal-backdrop" id="tokenModal">
       <div class="modal">
-        <div class="modal-title" id="adminTokenModalTitle">Add Tensor Token</div>
-        <div class="modal-desc">Create or edit Tensor token currencies. These appear in the Tensor Token Wallet section.</div>
+        <div class="modal-title" id="tokenModalTitle">Edit Tensor Token</div>
+        <div class="modal-desc">Admin can edit the selected Tensor token currency.</div>
+
+        <input id="modalTokenId" type="hidden">
 
         <div class="form-grid" style="margin-top:14px;">
-          <input id="editTokenId" type="hidden">
-
           <div class="field">
             <label>Name</label>
-            <input id="modalTokenName" placeholder="Tensor AI">
+            <input id="modalTokenName">
           </div>
 
           <div class="field">
             <label>Symbol</label>
-            <input id="modalTokenSymbol" placeholder="TAI" maxlength="12">
+            <input id="modalTokenSymbol" maxlength="12">
           </div>
 
           <div class="field">
             <label>Price</label>
-            <input id="modalTokenPrice" type="number" step="any" placeholder="1.25">
+            <input id="modalTokenPrice" type="number" step="any">
           </div>
 
           <div class="field">
             <label>Supply</label>
-            <input id="modalTokenSupply" type="number" step="any" placeholder="10000000">
+            <input id="modalTokenSupply" type="number" step="any">
           </div>
 
           <div class="field">
@@ -1504,23 +1427,23 @@
 
           <div class="field">
             <label>Bull Chance %</label>
-            <input id="modalTokenBullChance" type="number" step="1" value="54">
+            <input id="modalTokenBullChance" type="number" step="1">
           </div>
 
           <div class="field">
             <label>Min Move %</label>
-            <input id="modalTokenMinPct" type="number" step="any" value="0.2">
+            <input id="modalTokenMinPct" type="number" step="any">
           </div>
 
           <div class="field">
             <label>Max Move %</label>
-            <input id="modalTokenMaxPct" type="number" step="any" value="1.2">
+            <input id="modalTokenMaxPct" type="number" step="any">
           </div>
         </div>
 
         <div class="modal-actions">
-          <button class="mini-btn" onclick="closeAdminTokenModal()">Cancel</button>
-          <button class="primary-btn" onclick="saveTensorTokenFromModal()">Save Token</button>
+          <button class="mini-btn" onclick="closeTokenModal()">Cancel</button>
+          <button class="primary-btn" onclick="saveTokenFromModal()">Save Token</button>
         </div>
       </div>
     </div>
@@ -1533,18 +1456,11 @@
     let walletState = SERVER_WALLET || {};
     let tensorRegistry = [];
     let selectedAsset = 'USDT';
-    let selectedTokenId = '';
-    let selectedAssetType = 'standard';
     let selectedNetwork = normalizeNetwork(walletState.usdtNetwork || 'eth');
+    let selectedAssetType = 'standard';
+    let selectedTensorTokenId = '';
     let prices = {};
     let refreshInterval = null;
-    let seedsVisible = false;
-
-    const seedWords = [
-      'alpha','orbit','matrix','tensor','vault','river','signal','quantum','neural','forest','silver','phoenix',
-      'rocket','cipher','galaxy','anchor','velvet','dragon','ember','crystal','shadow','summit','pixel','vector',
-      'ocean','kernel','nova','bridge','solar','radar','marble','logic','future','atlas','cobalt','prism'
-    ];
 
     const networkMap = {
       eth: {
@@ -1578,15 +1494,20 @@
     };
 
     const assetMeta = {
-      USDT: { name: 'Tether USD', symbol: 'USDT', stable: true, networks: ['eth', 'arbitrum', 'sol', 'trx'] },
-      OUSD: { name: 'Origin Dollar', symbol: 'OUSD', stable: true, networks: ['eth', 'arbitrum', 'sol'] },
-      BTC: { name: 'Bitcoin', symbol: 'BTC', priceId: 'bitcoin', networks: ['eth', 'arbitrum', 'sol'] },
-      ETH: { name: 'Ethereum', symbol: 'ETH', priceId: 'ethereum', networks: ['eth', 'arbitrum'] },
-      SOL: { name: 'Solana', symbol: 'SOL', priceId: 'solana', networks: ['sol'] },
-      BNB: { name: 'BNB', symbol: 'BNB', priceId: 'binancecoin', networks: ['eth', 'arbitrum'] },
-      XRP: { name: 'XRP', symbol: 'XRP', priceId: 'ripple', networks: ['eth'] },
-      DOGE: { name: 'Dogecoin', symbol: 'DOGE', priceId: 'dogecoin', networks: ['eth'] }
+      USDT: { name: 'Tether USD', symbol: 'USDT', icon: '₮', stable: true, price: 1, networks: ['eth', 'arbitrum', 'sol', 'trx'] },
+      OUSD: { name: 'Origin Dollar', symbol: 'OUSD', icon: 'O', stable: true, price: 1, networks: ['eth', 'arbitrum', 'sol'] },
+      BTC: { name: 'Bitcoin', symbol: 'BTC', icon: '₿', binance: 'BTCUSDT', priceId: 'bitcoin', networks: ['eth', 'arbitrum', 'sol'] },
+      ETH: { name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', binance: 'ETHUSDT', priceId: 'ethereum', networks: ['eth', 'arbitrum'] },
+      SOL: { name: 'Solana', symbol: 'SOL', icon: '◎', binance: 'SOLUSDT', priceId: 'solana', networks: ['sol'] },
+      BNB: { name: 'BNB', symbol: 'BNB', icon: 'B', binance: 'BNBUSDT', priceId: 'binancecoin', networks: ['eth', 'arbitrum'] },
+      XRP: { name: 'XRP', symbol: 'XRP', icon: 'X', binance: 'XRPUSDT', priceId: 'ripple', networks: ['eth'] },
+      DOGE: { name: 'Dogecoin', symbol: 'DOGE', icon: 'D', binance: 'DOGEUSDT', priceId: 'dogecoin', networks: ['eth'] }
     };
+
+    const seedWords = [
+      'alpha','orbit','matrix','tensor','vault','river','signal','quantum','neural','forest','silver','phoenix',
+      'rocket','cipher','galaxy','anchor','velvet','dragon','ember','crystal','shadow','summit','pixel','vector'
+    ];
 
     function isAdmin() {
       const role = String(SERVER_ROLE || '').toLowerCase();
@@ -1647,6 +1568,57 @@
         .replaceAll("'", '&#039;');
     }
 
+    function showToast(message = 'Done') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('blue_theme', currentTheme);
+      drawQrCodes();
+    }
+
+    function coinSvg(symbol, type = 'standard') {
+      const s = String(symbol || 'T').toUpperCase().slice(0, 5);
+      const text = s === 'USDT' ? '₮' : s === 'BTC' ? '₿' : s === 'ETH' ? 'Ξ' : s === 'SOL' ? '◎' : s.slice(0, 1);
+
+      const normalColors = {
+        USDT: ['#26a17b', '#50af95'],
+        OUSD: ['#f59e0b', '#f97316'],
+        BTC: ['#f7931a', '#fbbf24'],
+        ETH: ['#627eea', '#8b5cf6'],
+        SOL: ['#14f195', '#9945ff'],
+        BNB: ['#f3ba2f', '#f59e0b'],
+        XRP: ['#334155', '#64748b'],
+        DOGE: ['#c2a633', '#facc15']
+      };
+
+      const c = type === 'tensor'
+        ? ['#8b5cf6', '#3b82f6']
+        : normalColors[s] || ['#8b5cf6', '#3b82f6'];
+
+      return `
+        <svg viewBox="0 0 48 48">
+          <defs>
+            <linearGradient id="g${type}${s}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="${c[0]}"/>
+              <stop offset="100%" stop-color="${c[1]}"/>
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="24" r="23" fill="url(#g${type}${s})"/>
+          <circle cx="24" cy="24" r="17" fill="rgba(255,255,255,0.10)"/>
+          ${type === 'tensor' ? '<path d="M15 14h18M24 14v20M18 34h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>' : ''}
+          <text x="24" y="${type === 'tensor' ? '29' : '31'}" text-anchor="middle" font-family="Inter,Arial" font-size="${text.length > 1 ? 13 : 20}" font-weight="900" fill="#fff">${escapeHtml(text)}</text>
+        </svg>
+      `;
+    }
+
     function simpleHash(str) {
       let h = 2166136261;
       for (let i = 0; i < String(str).length; i++) {
@@ -1669,73 +1641,6 @@
       return words.join(' ');
     }
 
-    function showToast(message = 'Done') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
-    }
-
-    function toggleTheme() {
-      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      localStorage.setItem('blue_theme', currentTheme);
-      drawQrCodes();
-    }
-
-    function normalLogo(symbol) {
-      const s = String(symbol || '').toUpperCase();
-
-      const colors = {
-        USDT: ['#26a17b', '#50af95'],
-        OUSD: ['#f59e0b', '#f97316'],
-        BTC: ['#f7931a', '#ffb347'],
-        ETH: ['#627eea', '#8b5cf6'],
-        SOL: ['#14f195', '#9945ff'],
-        BNB: ['#f3ba2f', '#f59e0b'],
-        XRP: ['#23292f', '#64748b'],
-        DOGE: ['#c2a633', '#f5d76e']
-      };
-
-      const c = colors[s] || ['#8b5cf6', '#3b82f6'];
-      const text = s === 'USDT' ? '₮' : s === 'BTC' ? '₿' : s === 'ETH' ? 'Ξ' : s.slice(0, 1);
-
-      return `
-        <svg viewBox="0 0 48 48" aria-hidden="true">
-          <defs>
-            <linearGradient id="g${s}" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="${c[0]}"/>
-              <stop offset="100%" stop-color="${c[1]}"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="23" fill="url(#g${s})"/>
-          <circle cx="24" cy="24" r="18" fill="rgba(255,255,255,0.10)"/>
-          <text x="24" y="30" text-anchor="middle" font-family="Inter,Arial" font-size="${text.length > 1 ? 13 : 20}" font-weight="900" fill="#fff">${text}</text>
-        </svg>
-      `;
-    }
-
-    function tensorLogo(symbol) {
-      const s = String(symbol || 'T').toUpperCase().slice(0, 4);
-
-      return `
-        <svg viewBox="0 0 48 48" aria-hidden="true">
-          <defs>
-            <linearGradient id="tg${s}" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#8b5cf6"/>
-              <stop offset="55%" stop-color="#3b82f6"/>
-              <stop offset="100%" stop-color="#0ecb81"/>
-            </linearGradient>
-          </defs>
-          <rect x="2" y="2" width="44" height="44" rx="16" fill="url(#tg${s})"/>
-          <path d="M14 14h20M24 14v20M17 34h14" stroke="white" stroke-width="3" stroke-linecap="round"/>
-          <text x="24" y="28" text-anchor="middle" font-family="Inter,Arial" font-size="${s.length > 2 ? 9 : 12}" font-weight="900" fill="#fff">${s}</text>
-        </svg>
-      `;
-    }
-
     function getUsdtBalance() {
       return Number(walletState.usdtBalance || 0);
     }
@@ -1748,21 +1653,15 @@
       return Number(walletState.tensorBalances?.[tokenId] || 0);
     }
 
-    function getCurrentAssetObject() {
-      if (selectedAssetType === 'tensor') {
-        return tensorRegistry.find(t => String(t.id) === String(selectedTokenId)) || null;
-      }
-      return assetMeta[selectedAsset] || assetMeta.USDT;
+    function getNormalAssetBalance(symbol) {
+      if (symbol === 'USDT') return getUsdtBalance();
+      if (symbol === 'OUSD') return getOusdBalance();
+      return Number(walletState[`${String(symbol).toLowerCase()}Balance`] || 0);
     }
 
-    function getAssetNetworks() {
-      const current = getCurrentAssetObject();
-
-      if (selectedAssetType === 'tensor') {
-        return ['eth', 'arbitrum', 'sol'];
-      }
-
-      return current.networks || ['eth', 'arbitrum', 'sol', 'trx'];
+    function getCurrentAssetNetworks() {
+      if (selectedAssetType === 'tensor') return ['eth', 'arbitrum', 'sol'];
+      return assetMeta[selectedAsset]?.networks || ['eth', 'arbitrum', 'sol', 'trx'];
     }
 
     function getCurrentAddress() {
@@ -1771,7 +1670,9 @@
       }
 
       if (selectedAsset === 'USDT' || selectedAsset === 'OUSD') {
-        return networkMap[selectedNetwork]?.address || networkMap.eth.address;
+        return walletState.receiveAddresses?.[selectedAsset]?.[selectedNetwork]
+          || networkMap[selectedNetwork]?.address
+          || networkMap.eth.address;
       }
 
       const custom = findPublicWalletAddress(selectedAsset, selectedNetwork);
@@ -1800,37 +1701,48 @@
       return item.address || item.publicAddress || item.walletAddress || item.depositAddress || '';
     }
 
+    function getNormalAssetPrice(meta) {
+      if (meta.stable) return 1;
+
+      if (meta.binance && prices.live && prices.live[meta.binance]) {
+        return Number(prices.live[meta.binance].price || 0);
+      }
+
+      if (meta.priceId && prices.cg && prices.cg[meta.priceId]) {
+        return Number(prices.cg[meta.priceId].usd || 0);
+      }
+
+      return 0;
+    }
+
+    function getNormalAssetChange(meta) {
+      if (meta.stable) return 0;
+
+      if (meta.binance && prices.live && prices.live[meta.binance]) {
+        return Number(prices.live[meta.binance].changePercent || 0);
+      }
+
+      if (meta.priceId && prices.cg && prices.cg[meta.priceId]) {
+        return Number(prices.cg[meta.priceId].usd_24h_change || 0);
+      }
+
+      return 0;
+    }
+
     function buildNormalAssets() {
       return Object.values(assetMeta).map(meta => {
-        let balance = 0;
-        let usdValue = 0;
-        let price = 1;
-        let change = 0;
-
-        if (meta.symbol === 'USDT') {
-          balance = getUsdtBalance();
-          price = 1;
-          usdValue = balance;
-        } else if (meta.symbol === 'OUSD') {
-          balance = getOusdBalance();
-          price = 1;
-          usdValue = balance;
-        } else {
-          const cg = prices[meta.priceId] || {};
-          price = Number(cg.usd || 0);
-          change = Number(cg.usd_24h_change || 0);
-          balance = Number(walletState[`${meta.symbol.toLowerCase()}Balance`] || 0);
-          usdValue = balance * price;
-        }
+        const balance = getNormalAssetBalance(meta.symbol);
+        const price = getNormalAssetPrice(meta);
+        const change = getNormalAssetChange(meta);
 
         return {
           ...meta,
           balance,
           price,
-          usdValue,
           change,
-          tokenId: '',
-          type: 'standard'
+          usdValue: balance * price,
+          type: 'standard',
+          tokenId: ''
         };
       });
     }
@@ -1843,69 +1755,33 @@
         return {
           name: t.name || t.symbol,
           symbol: t.symbol,
-          icon: t.icon || String(t.symbol || 'T').slice(0, 1),
           balance,
           price,
-          usdValue: balance * price,
           change: Number(t.changePercent24h || 0),
-          tokenId: t.id,
+          usdValue: balance * price,
           type: 'tensor',
+          tokenId: t.id,
           raw: t
         };
       });
     }
 
-    function buildAllAssets() {
-      return [...buildNormalAssets(), ...buildTensorAssets()];
-    }
-
     function calculateTotalBalance() {
-      return buildAllAssets().reduce((sum, asset) => sum + Number(asset.usdValue || 0), 0);
+      const normalTotal = buildNormalAssets().reduce((sum, a) => sum + Number(a.usdValue || 0), 0);
+      const tensorTotal = buildTensorAssets().reduce((sum, a) => sum + Number(a.usdValue || 0), 0);
+      return normalTotal + tensorTotal;
     }
 
     function renderHero() {
-      const total = calculateTotalBalance();
-      const activeTrades = Array.isArray(walletState.positions) ? walletState.positions.length : 0;
-      const copyTrades = Array.isArray(walletState.copyTrades) ? walletState.copyTrades.length : 0;
-
-      document.getElementById('totalBalance').textContent = formatMoney(total);
+      document.getElementById('totalBalance').textContent = formatMoney(calculateTotalBalance());
       document.getElementById('usdtBalance').textContent = formatMoney(getUsdtBalance());
       document.getElementById('ousdBalance').textContent = formatMoney(getOusdBalance());
-      document.getElementById('selectedAssetStat').textContent = selectedAsset;
-
-      const tensorAddress = walletState.tensorAddress || '—';
-      document.getElementById('tensorAddressShort').textContent = shortAddress(tensorAddress);
+      document.getElementById('tensorAddressShort').textContent = shortAddress(walletState.tensorAddress || '—');
+      document.getElementById('selectedAssetText').textContent = selectedAsset;
 
       const network = networkMap[selectedNetwork] || networkMap.eth;
-      const typeLabel = selectedAssetType === 'tensor' ? 'Tensor Network' : network.network;
-      document.getElementById('selectedNetworkPill').textContent = `${selectedAsset} • ${typeLabel}`;
-    }
-
-    function renderNetworkSelect() {
-      const networks = getAssetNetworks();
-
-      if (!networks.includes(selectedNetwork)) {
-        selectedNetwork = networks[0] || 'eth';
-      }
-
-      document.getElementById('networkSelect').innerHTML = networks.map(key => {
-        const n = networkMap[key] || networkMap.eth;
-
-        return `
-          <button class="network-btn ${selectedNetwork === key ? 'active' : ''}" onclick="setNetwork('${key}')">
-            ${escapeHtml(n.short)}
-          </button>
-        `;
-      }).join('');
-
-      const sendNetwork = document.getElementById('sendNetwork');
-
-      if (sendNetwork) {
-        sendNetwork.innerHTML = networks.map(key => {
-          const n = networkMap[key] || networkMap.eth;
-          return `<option value="${key}" ${selectedNetwork === key ? 'selected' : ''}>${escapeHtml(n.network)} ${escapeHtml(n.short)}</option>`;
-        }).join('');
-      }
+      const label = selectedAssetType === 'tensor' ? 'Tensor Wallet' : network.network;
+      document.getElementById('selectedNetworkPill').textContent = `${selectedAsset} • ${label}`;
     }
 
     function renderNormalAssets() {
@@ -1915,13 +1791,13 @@
       grid.innerHTML = assets.map(asset => {
         const change = Number(asset.change || 0);
         const changeClass = change >= 0 ? 'text-green' : 'text-red';
-        const selected = selectedAssetType === 'standard' && selectedAsset === asset.symbol;
+        const active = selectedAssetType === 'standard' && selectedAsset === asset.symbol;
 
         return `
-          <div class="asset-card ${selected ? 'active' : ''}" onclick="selectAsset('${escapeHtml(asset.symbol)}', '', 'standard')">
+          <div class="asset-card ${active ? 'active' : ''}" onclick="selectAsset('${escapeHtml(asset.symbol)}', '', 'standard')">
             <div class="asset-top">
               <div class="coin">
-                <div class="coin-icon">${normalLogo(asset.symbol)}</div>
+                <div class="coin-icon">${coinSvg(asset.symbol, 'standard')}</div>
                 <div class="coin-name">
                   <div class="coin-symbol">${escapeHtml(asset.symbol)}</div>
                   <div class="coin-full">${escapeHtml(asset.name)}</div>
@@ -1941,7 +1817,7 @@
 
             <div class="asset-row">
               <span>Price</span>
-              <span>$${formatPriceSmart(asset.price || 0)}</span>
+              <span>${asset.price > 0 ? `$${formatPriceSmart(asset.price)}` : 'Loading...'}</span>
             </div>
 
             <div class="asset-actions">
@@ -1958,21 +1834,21 @@
       const grid = document.getElementById('tensorAssetGrid');
 
       if (!assets.length) {
-        grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No Tensor tokens deployed yet.</div>`;
+        grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">No Tensor tokens found.</div>`;
         return;
       }
 
       grid.innerHTML = assets.map(asset => {
         const change = Number(asset.change || 0);
         const changeClass = change >= 0 ? 'text-green' : 'text-red';
-        const selected = selectedAssetType === 'tensor' && selectedTokenId === asset.tokenId;
+        const active = selectedAssetType === 'tensor' && selectedTensorTokenId === asset.tokenId;
         const token = asset.raw || {};
 
         return `
-          <div class="asset-card ${selected ? 'active' : ''}" onclick="selectAsset('${escapeHtml(asset.symbol)}', '${escapeHtml(asset.tokenId)}', 'tensor')">
+          <div class="asset-card ${active ? 'active' : ''}" onclick="selectAsset('${escapeHtml(asset.symbol)}', '${escapeHtml(asset.tokenId)}', 'tensor')">
             <div class="asset-top">
               <div class="coin">
-                <div class="coin-icon">${tensorLogo(asset.symbol)}</div>
+                <div class="coin-icon">${coinSvg(asset.symbol, 'tensor')}</div>
                 <div class="coin-name">
                   <div class="coin-symbol">${escapeHtml(asset.symbol)}</div>
                   <div class="coin-full">${escapeHtml(asset.name)}</div>
@@ -2004,9 +1880,9 @@
               <button onclick="event.stopPropagation(); selectAsset('${escapeHtml(asset.symbol)}', '${escapeHtml(asset.tokenId)}', 'tensor'); openReceiveModal();">Receive</button>
               <button onclick="event.stopPropagation(); selectAsset('${escapeHtml(asset.symbol)}', '${escapeHtml(asset.tokenId)}', 'tensor'); focusSendForm();">Send</button>
               ${isAdmin() ? `
-                <button onclick="event.stopPropagation(); openEditTokenModal('${escapeHtml(asset.tokenId)}');">Edit</button>
+                <button onclick="event.stopPropagation(); editTensorToken('${escapeHtml(asset.tokenId)}');">Edit</button>
                 <button onclick="event.stopPropagation(); mintTensorToken('${escapeHtml(asset.tokenId)}');">Mint</button>
-                <button class="danger-small" onclick="event.stopPropagation(); deleteTensorToken('${escapeHtml(asset.tokenId)}');">Remove</button>
+                <button class="remove" onclick="event.stopPropagation(); removeTensorToken('${escapeHtml(asset.tokenId)}');">Remove</button>
               ` : ''}
             </div>
           </div>
@@ -2017,47 +1893,102 @@
     function renderAssets() {
       renderNormalAssets();
       renderTensorAssets();
-      renderSendAssetOptions();
-      renderReceiveAssetOptions();
+      renderAssetSelects();
     }
 
-    function renderSendAssetOptions() {
-      const sendAsset = document.getElementById('sendAsset');
-      if (!sendAsset) return;
-
-      const normal = buildNormalAssets().map(asset => {
-        return `<option value="standard:${escapeHtml(asset.symbol)}" ${selectedAssetType === 'standard' && selectedAsset === asset.symbol ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)}</option>`;
+    function renderAssetSelects() {
+      const normalOptions = buildNormalAssets().map(asset => {
+        const val = `standard:${asset.symbol}`;
+        const selected = selectedAssetType === 'standard' && selectedAsset === asset.symbol;
+        return `<option value="${escapeHtml(val)}" ${selected ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)}</option>`;
       }).join('');
 
-      const tensor = buildTensorAssets().map(asset => {
-        return `<option value="tensor:${escapeHtml(asset.tokenId)}" ${selectedAssetType === 'tensor' && selectedTokenId === asset.tokenId ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)} [Tensor]</option>`;
+      const tensorOptions = buildTensorAssets().map(asset => {
+        const val = `tensor:${asset.tokenId}`;
+        const selected = selectedAssetType === 'tensor' && selectedTensorTokenId === asset.tokenId;
+        return `<option value="${escapeHtml(val)}" ${selected ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)} [Tensor]</option>`;
       }).join('');
 
-      sendAsset.innerHTML = `<optgroup label="Normal Crypto">${normal}</optgroup><optgroup label="Tensor Tokens">${tensor}</optgroup>`;
+      const html = `
+        <optgroup label="Normal Crypto">${normalOptions}</optgroup>
+        <optgroup label="Tensor Tokens">${tensorOptions}</optgroup>
+      `;
+
+      document.getElementById('sendAsset').innerHTML = html;
+      document.getElementById('receiveAsset').innerHTML = html;
     }
 
-    function renderReceiveAssetOptions() {
-      const receiveAsset = document.getElementById('receiveAssetSelect');
-      if (!receiveAsset) return;
+    function parseAssetValue(value) {
+      const parts = String(value || '').split(':');
+      const type = parts[0] || 'standard';
+      const id = parts[1] || 'USDT';
 
-      const normal = buildNormalAssets().map(asset => {
-        return `<option value="standard:${escapeHtml(asset.symbol)}" ${selectedAssetType === 'standard' && selectedAsset === asset.symbol ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)}</option>`;
-      }).join('');
-
-      const tensor = buildTensorAssets().map(asset => {
-        return `<option value="tensor:${escapeHtml(asset.tokenId)}" ${selectedAssetType === 'tensor' && selectedTokenId === asset.tokenId ? 'selected' : ''}>${escapeHtml(asset.symbol)} - ${escapeHtml(asset.name)} [Tensor]</option>`;
-      }).join('');
-
-      receiveAsset.innerHTML = `<optgroup label="Normal Crypto">${normal}</optgroup><optgroup label="Tensor Tokens">${tensor}</optgroup>`;
-    }
-
-    function parseAssetSelectValue(value) {
-      const [type, id] = String(value || '').split(':');
       if (type === 'tensor') {
         const token = tensorRegistry.find(t => String(t.id) === String(id));
-        if (token) return { type: 'tensor', symbol: token.symbol, tokenId: token.id };
+        if (token) {
+          return { type: 'tensor', symbol: token.symbol, tokenId: token.id };
+        }
       }
-      return { type: 'standard', symbol: id || 'USDT', tokenId: '' };
+
+      return { type: 'standard', symbol: id, tokenId: '' };
+    }
+
+    function selectAsset(symbol, tokenId = '', type = 'standard') {
+      selectedAsset = symbol;
+      selectedTensorTokenId = tokenId || '';
+      selectedAssetType = type || 'standard';
+
+      const networks = getCurrentAssetNetworks();
+      if (!networks.includes(selectedNetwork)) {
+        selectedNetwork = networks[0] || 'eth';
+      }
+
+      renderNetworkSelect();
+      renderAddress();
+      renderHero();
+      renderAssets();
+    }
+
+    function renderNetworkSelect() {
+      const networks = getCurrentAssetNetworks();
+
+      if (!networks.includes(selectedNetwork)) {
+        selectedNetwork = networks[0] || 'eth';
+      }
+
+      document.getElementById('networkSelect').innerHTML = networks.map(key => {
+        const n = networkMap[key] || networkMap.eth;
+        return `
+          <button class="network-btn ${selectedNetwork === key ? 'active' : ''}" onclick="setNetwork('${key}')">
+            ${escapeHtml(n.short)}
+          </button>
+        `;
+      }).join('');
+
+      document.getElementById('sendNetwork').innerHTML = networks.map(key => {
+        const n = networkMap[key] || networkMap.eth;
+        return `<option value="${key}" ${selectedNetwork === key ? 'selected' : ''}>${escapeHtml(n.network)} ${escapeHtml(n.short)}</option>`;
+      }).join('');
+    }
+
+    async function setNetwork(key) {
+      selectedNetwork = normalizeNetwork(key);
+      renderNetworkSelect();
+      renderAddress();
+      renderHero();
+
+      try {
+        const res = await fetch('/api/wallet/usdt-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ network: selectedNetwork })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          walletState.usdtNetwork = data.usdtNetwork || selectedNetwork;
+        }
+      } catch {}
     }
 
     function renderAddress() {
@@ -2065,13 +1996,11 @@
       const network = networkMap[selectedNetwork] || networkMap.eth;
 
       document.getElementById('receiveAddress').textContent = address;
-      document.getElementById('selectedNetworkPill').textContent = `${selectedAsset} • ${selectedAssetType === 'tensor' ? 'Tensor Wallet' : network.network}`;
+      document.getElementById('selectedNetworkPill').textContent =
+        `${selectedAsset} • ${selectedAssetType === 'tensor' ? 'Tensor Wallet' : network.network}`;
 
-      const modalAddress = document.getElementById('modalReceiveAddress');
-      if (modalAddress) modalAddress.textContent = address;
-
-      const modalAsset = document.getElementById('receiveModalAsset');
-      if (modalAsset) modalAsset.textContent = selectedAsset;
+      document.getElementById('modalReceiveAddress').textContent = address;
+      document.getElementById('receiveModalAsset').textContent = selectedAsset;
 
       drawQrCodes();
     }
@@ -2079,53 +2008,85 @@
     function drawQrCodes() {
       const address = getCurrentAddress();
       const payload = `${selectedAsset}:${address}?network=${selectedNetwork}&type=${selectedAssetType}`;
-      const qrCanvas = document.getElementById('qrCanvas');
-      const modalQrCanvas = document.getElementById('modalQrCanvas');
 
-      if (window.QRCode && qrCanvas) {
-        QRCode.toCanvas(qrCanvas, payload, {
+      if (window.QRCode) {
+        QRCode.toCanvas(document.getElementById('qrCanvas'), payload, {
+          width: 154,
+          margin: 1,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+
+        QRCode.toCanvas(document.getElementById('modalQrCanvas'), payload, {
           width: 154,
           margin: 1,
           color: { dark: '#000000', light: '#ffffff' }
         });
       }
-
-      if (window.QRCode && modalQrCanvas) {
-        QRCode.toCanvas(modalQrCanvas, payload, {
-          width: 154,
-          margin: 1,
-          color: { dark: '#000000', light: '#ffffff' }
-        });
-      }
     }
 
-    function renderSeeds() {
-      document.getElementById('normalSeedBox').textContent = walletState.normalSeed || deterministicSeed('normal');
-      document.getElementById('tensorSeedBox').textContent = walletState.tensorSeed || deterministicSeed('tensor');
-    }
-
-    function toggleSeeds() {
-      const panel = document.getElementById('seedPanel');
-      seedsVisible = !seedsVisible;
-      panel.style.display = seedsVisible ? 'block' : 'none';
-      renderSeeds();
-    }
-
-    function toggleSeedMask(id) {
-      const box = document.getElementById(id);
-      if (box) box.classList.toggle('masked');
-    }
-
-    async function copySeed(kind) {
-      const seed = kind === 'tensor'
-        ? (walletState.tensorSeed || deterministicSeed('tensor'))
-        : (walletState.normalSeed || deterministicSeed('normal'));
+    async function copyCurrentAddress() {
+      const address = getCurrentAddress();
 
       try {
-        await navigator.clipboard.writeText(seed);
-        showToast(`${kind === 'tensor' ? 'Tensor' : 'Normal'} seed copied`);
+        await navigator.clipboard.writeText(address);
+        showToast('Address copied');
       } catch {
-        prompt('Copy seed:', seed);
+        prompt('Copy address:', address);
+      }
+    }
+
+    function openReceiveModal() {
+      renderAddress();
+      document.getElementById('receiveModal').classList.add('show');
+    }
+
+    function closeReceiveModal() {
+      document.getElementById('receiveModal').classList.remove('show');
+    }
+
+    function focusSendForm() {
+      document.getElementById('sendPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => document.getElementById('sendAmount').focus(), 350);
+    }
+
+    async function sendSelectedAsset() {
+      const parsed = parseAssetValue(document.getElementById('sendAsset').value);
+      const network = document.getElementById('sendNetwork').value;
+      const amount = Number(document.getElementById('sendAmount').value || 0);
+      const toAddress = document.getElementById('sendTo').value.trim();
+
+      if (!parsed.symbol || !amount || amount <= 0 || !toAddress) {
+        showToast('Fill send details');
+        return;
+      }
+
+      try {
+        const endpoint = parsed.type === 'tensor' ? '/api/tensor/send' : '/api/wallet/send';
+
+        const body = parsed.type === 'tensor'
+          ? { tokenId: parsed.tokenId, amount, toAddress }
+          : { asset: parsed.symbol, network, amount, toAddress };
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Send failed');
+          return;
+        }
+
+        document.getElementById('sendAmount').value = '';
+        document.getElementById('sendTo').value = '';
+
+        showToast(data.txHash ? `Sent: ${shortAddress(data.txHash)}` : 'Sent');
+        await refreshWallet();
+      } catch {
+        showToast('Network error');
       }
     }
 
@@ -2324,121 +2285,30 @@
       document.getElementById('historyView').style.display = tab === 'history' ? 'grid' : 'none';
     }
 
-    function selectAsset(symbol, tokenId = '', type = 'standard') {
-      selectedAsset = symbol;
-      selectedTokenId = tokenId || '';
-      selectedAssetType = type || 'standard';
-
-      const networks = getAssetNetworks();
-      if (!networks.includes(selectedNetwork)) selectedNetwork = networks[0] || 'eth';
-
-      renderNetworkSelect();
-      renderAssets();
-      renderAddress();
-      renderHero();
-
-      const sendAsset = document.getElementById('sendAsset');
-      const receiveAsset = document.getElementById('receiveAssetSelect');
-      const val = selectedAssetType === 'tensor' ? `tensor:${selectedTokenId}` : `standard:${selectedAsset}`;
-
-      if (sendAsset) sendAsset.value = val;
-      if (receiveAsset) receiveAsset.value = val;
+    function toggleSeedPanel() {
+      const panel = document.getElementById('seedPanel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      renderSeeds();
     }
 
-    async function setNetwork(key) {
-      selectedNetwork = normalizeNetwork(key);
-      renderNetworkSelect();
-      renderAddress();
-      renderHero();
-
-      try {
-        const res = await fetch('/api/wallet/usdt-network', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ network: selectedNetwork })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          walletState.usdtNetwork = data.usdtNetwork || selectedNetwork;
-        }
-      } catch {}
+    function toggleSeedBlur(id) {
+      const box = document.getElementById(id);
+      if (box) box.classList.toggle('revealed');
     }
 
-    async function copyCurrentAddress() {
-      const address = getCurrentAddress();
+    function renderSeeds() {
+      document.getElementById('normalSeedBox').textContent = walletState.normalSeed || deterministicSeed('normal');
+      document.getElementById('tensorSeedBox').textContent = walletState.tensorSeed || deterministicSeed('tensor');
+    }
+
+    async function copyBothSeeds() {
+      const text = `Normal: ${walletState.normalSeed || deterministicSeed('normal')}\nTensor: ${walletState.tensorSeed || deterministicSeed('tensor')}`;
 
       try {
-        await navigator.clipboard.writeText(address);
-        showToast('Address copied');
+        await navigator.clipboard.writeText(text);
+        showToast('Seeds copied');
       } catch {
-        prompt('Copy address:', address);
-      }
-    }
-
-    function openReceiveModal() {
-      renderAddress();
-      document.getElementById('receiveModal').classList.add('show');
-    }
-
-    function closeReceiveModal() {
-      document.getElementById('receiveModal').classList.remove('show');
-    }
-
-    function focusSendForm() {
-      document.getElementById('sendPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => document.getElementById('sendAmount').focus(), 350);
-    }
-
-    async function sendAsset() {
-      const parsed = parseAssetSelectValue(document.getElementById('sendAsset').value);
-      const network = document.getElementById('sendNetwork').value;
-      const amount = Number(document.getElementById('sendAmount').value || 0);
-      const toAddress = document.getElementById('sendTo').value.trim();
-
-      if (!parsed.symbol || !network || !amount || amount <= 0 || !toAddress) {
-        showToast('Fill send details');
-        return;
-      }
-
-      try {
-        let endpoint = '/api/wallet/send';
-        let body = {
-          asset: parsed.symbol,
-          network,
-          amount,
-          toAddress
-        };
-
-        if (parsed.type === 'tensor') {
-          endpoint = '/api/tensor/send';
-          body = {
-            tokenId: parsed.tokenId,
-            amount,
-            toAddress
-          };
-        }
-
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          showToast(data.error || 'Send failed');
-          return;
-        }
-
-        document.getElementById('sendAmount').value = '';
-        document.getElementById('sendTo').value = '';
-
-        showToast(data.txHash ? `Sent: ${shortAddress(data.txHash)}` : 'Sent');
-        await refreshWallet();
-      } catch {
-        showToast('Network error');
+        prompt('Copy seeds:', text);
       }
     }
 
@@ -2474,184 +2344,41 @@
       }
     }
 
-    async function deployTensorToken() {
-      if (!isAdmin()) return showToast('Admin only');
-
-      const payload = {
-        name: document.getElementById('adminTokenName').value.trim(),
-        symbol: document.getElementById('adminTokenSymbol').value.trim().toUpperCase(),
-        price: Number(document.getElementById('adminTokenPrice').value || 0),
-        supply: Number(document.getElementById('adminTokenSupply').value || 0),
-        bias: document.getElementById('adminTokenBias').value,
-        bullChance: Number(document.getElementById('adminTokenBullChance').value || 54),
-        minPct: Number(document.getElementById('adminTokenMinPct').value || 0.2),
-        maxPct: Number(document.getElementById('adminTokenMaxPct').value || 1.2),
-        icon: document.getElementById('adminTokenSymbol').value.trim().slice(0, 1).toUpperCase() || 'T'
-      };
-
-      if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
-        showToast('Fill token fields');
-        return;
-      }
+    async function refreshPrices() {
+      prices = prices || {};
 
       try {
-        const res = await fetch('/api/tensor/deploy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const liveRes = await fetch(`/api/live-prices?_t=${Date.now()}`);
+        if (liveRes.ok) {
+          const liveData = await liveRes.json();
+          prices.live = liveData.prices || {};
+        }
+      } catch {}
+
+      try {
+        const ids = Object.values(assetMeta).map(x => x.priceId).filter(Boolean).join(',');
+        const cgRes = await fetch(`/api/prices?ids=${encodeURIComponent(ids)}&_t=${Date.now()}`);
+
+        if (cgRes.ok) {
+          prices.cg = await cgRes.json();
+        }
+      } catch {}
+
+      renderHero();
+      renderAssets();
+    }
+
+    async function refreshTensor() {
+      try {
+        const res = await fetch(`/api/tensor?_t=${Date.now()}`);
+        if (!res.ok) return;
 
         const data = await res.json();
 
-        if (!res.ok) {
-          showToast(data.error || 'Deploy failed');
-          return;
-        }
-
-        showToast('Tensor token deployed');
-        document.getElementById('adminTokenName').value = '';
-        document.getElementById('adminTokenSymbol').value = '';
-        document.getElementById('adminTokenPrice').value = '';
-        document.getElementById('adminTokenSupply').value = '';
-        await refreshWallet();
-      } catch {
-        showToast('Network error');
-      }
-    }
-
-    function openAdminTokenModal() {
-      document.getElementById('adminTokenModalTitle').textContent = 'Add Tensor Token';
-      document.getElementById('editTokenId').value = '';
-      document.getElementById('modalTokenName').value = '';
-      document.getElementById('modalTokenSymbol').value = '';
-      document.getElementById('modalTokenPrice').value = '';
-      document.getElementById('modalTokenSupply').value = '';
-      document.getElementById('modalTokenBias').value = 'balanced';
-      document.getElementById('modalTokenBullChance').value = 54;
-      document.getElementById('modalTokenMinPct').value = 0.2;
-      document.getElementById('modalTokenMaxPct').value = 1.2;
-      document.getElementById('adminTokenModal').classList.add('show');
-    }
-
-    function openEditTokenModal(tokenId) {
-      const token = tensorRegistry.find(t => String(t.id) === String(tokenId));
-      if (!token) return;
-
-      document.getElementById('adminTokenModalTitle').textContent = `Edit ${token.symbol}`;
-      document.getElementById('editTokenId').value = token.id;
-      document.getElementById('modalTokenName').value = token.name || '';
-      document.getElementById('modalTokenSymbol').value = token.symbol || '';
-      document.getElementById('modalTokenPrice').value = token.price || '';
-      document.getElementById('modalTokenSupply').value = token.supply || '';
-      document.getElementById('modalTokenBias').value = token.bias || 'balanced';
-      document.getElementById('modalTokenBullChance').value = token.bullChance || 54;
-      document.getElementById('modalTokenMinPct').value = Number(token.minPct || 0.002) * 100;
-      document.getElementById('modalTokenMaxPct').value = Number(token.maxPct || 0.012) * 100;
-      document.getElementById('adminTokenModal').classList.add('show');
-    }
-
-    function closeAdminTokenModal() {
-      document.getElementById('adminTokenModal').classList.remove('show');
-    }
-
-    async function saveTensorTokenFromModal() {
-      if (!isAdmin()) return showToast('Admin only');
-
-      const tokenId = document.getElementById('editTokenId').value.trim();
-
-      const payload = {
-        name: document.getElementById('modalTokenName').value.trim(),
-        symbol: document.getElementById('modalTokenSymbol').value.trim().toUpperCase(),
-        price: Number(document.getElementById('modalTokenPrice').value || 0),
-        startPrice: Number(document.getElementById('modalTokenPrice').value || 0),
-        supply: Number(document.getElementById('modalTokenSupply').value || 0),
-        bias: document.getElementById('modalTokenBias').value,
-        bullChance: Number(document.getElementById('modalTokenBullChance').value || 54),
-        minPct: Number(document.getElementById('modalTokenMinPct').value || 0.2),
-        maxPct: Number(document.getElementById('modalTokenMaxPct').value || 1.2),
-        icon: document.getElementById('modalTokenSymbol').value.trim().slice(0, 1).toUpperCase() || 'T'
-      };
-
-      if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
-        showToast('Fill token fields');
-        return;
-      }
-
-      try {
-        const endpoint = tokenId ? `/api/tensor/update/${encodeURIComponent(tokenId)}` : '/api/tensor/deploy';
-        const method = tokenId ? 'PUT' : 'POST';
-
-        const res = await fetch(endpoint, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          showToast(data.error || 'Save failed');
-          return;
-        }
-
-        closeAdminTokenModal();
-        showToast(tokenId ? 'Token updated' : 'Token deployed');
-        await refreshWallet();
-      } catch {
-        showToast('Network error');
-      }
-    }
-
-    async function mintTensorToken(tokenId) {
-      if (!isAdmin()) return showToast('Admin only');
-
-      const amount = Number(prompt('Mint amount to admin wallet:', '1000'));
-      if (!amount || amount <= 0) return;
-
-      try {
-        const res = await fetch('/api/tensor/admin-mint', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tokenId, amount })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          showToast(data.error || 'Mint failed');
-          return;
-        }
-
-        showToast('Minted');
-        await refreshWallet();
-      } catch {
-        showToast('Network error');
-      }
-    }
-
-    async function deleteTensorToken(tokenId) {
-      if (!isAdmin()) return showToast('Admin only');
-      if (!confirm('Remove this Tensor token from the registry?')) return;
-
-      try {
-        const res = await fetch(`/api/tensor/delete/${encodeURIComponent(tokenId)}`, {
-          method: 'DELETE'
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          showToast(data.error || 'Delete failed');
-          return;
-        }
-
-        if (selectedTokenId === tokenId) selectAsset('USDT', '', 'standard');
-
-        showToast('Token removed');
-        await refreshWallet();
-      } catch {
-        showToast('Network error');
-      }
+        tensorRegistry = data.registry || [];
+        walletState.tensorAddress = data.address || walletState.tensorAddress;
+        walletState.tensorBalances = data.balances || walletState.tensorBalances || {};
+      } catch {}
     }
 
     async function refreshWallet() {
@@ -2689,12 +2416,12 @@
           walletState.copyTrades = state.copyTrades || [];
           walletState.copyDeposits = state.copyDeposits || [];
           walletState.walletTxHistory = state.walletTxHistory || walletState.walletTxHistory || [];
-
-          selectedNetwork = normalizeNetwork(walletState.usdtNetwork || selectedNetwork);
+          walletState.receiveAddresses = state.receiveAddresses || walletState.receiveAddresses || {};
         }
 
         await refreshTensor();
         await refreshPrices();
+
         renderAll();
       } catch (e) {
         console.error('refreshWallet error:', e);
@@ -2702,68 +2429,211 @@
       }
     }
 
-    async function refreshTensor() {
-      try {
-        const res = await fetch(`/api/tensor?_t=${Date.now()}`);
-        if (!res.ok) return;
+    function renderSendAndReceiveSelectors() {
+      renderAssetSelects();
+      renderNetworkSelect();
 
-        const data = await res.json();
+      document.getElementById('sendAsset').onchange = function() {
+        const parsed = parseAssetValue(this.value);
+        selectAsset(parsed.symbol, parsed.tokenId, parsed.type);
+      };
 
-        tensorRegistry = data.registry || [];
-        walletState.tensorAddress = data.address || walletState.tensorAddress;
-        walletState.tensorBalances = data.balances || walletState.tensorBalances || {};
-      } catch {}
+      document.getElementById('receiveAsset').onchange = function() {
+        const parsed = parseAssetValue(this.value);
+        selectAsset(parsed.symbol, parsed.tokenId, parsed.type);
+      };
+
+      document.getElementById('sendNetwork').onchange = function() {
+        setNetwork(this.value);
+      };
     }
 
-    async function refreshPrices() {
-      const ids = Object.values(assetMeta)
-        .map(a => a.priceId)
-        .filter(Boolean)
-        .join(',');
+    function openTokenModal() {
+      if (!isAdmin()) return;
 
-      if (!ids) {
-        renderHero();
-        renderAssets();
+      document.getElementById('tokenModalTitle').textContent = 'Add Tensor Token';
+      document.getElementById('modalTokenId').value = '';
+      document.getElementById('modalTokenName').value = '';
+      document.getElementById('modalTokenSymbol').value = '';
+      document.getElementById('modalTokenPrice').value = '';
+      document.getElementById('modalTokenSupply').value = '';
+      document.getElementById('modalTokenBias').value = 'balanced';
+      document.getElementById('modalTokenBullChance').value = 54;
+      document.getElementById('modalTokenMinPct').value = 0.2;
+      document.getElementById('modalTokenMaxPct').value = 1.2;
+
+      document.getElementById('tokenModal').classList.add('show');
+    }
+
+    function closeTokenModal() {
+      document.getElementById('tokenModal').classList.remove('show');
+    }
+
+    function editTensorToken(tokenId) {
+      if (!isAdmin()) return;
+
+      const token = tensorRegistry.find(t => String(t.id) === String(tokenId));
+      if (!token) return;
+
+      document.getElementById('tokenModalTitle').textContent = `Edit ${token.symbol}`;
+      document.getElementById('modalTokenId').value = token.id;
+      document.getElementById('modalTokenName').value = token.name || '';
+      document.getElementById('modalTokenSymbol').value = token.symbol || '';
+      document.getElementById('modalTokenPrice').value = token.price || '';
+      document.getElementById('modalTokenSupply').value = token.supply || '';
+      document.getElementById('modalTokenBias').value = token.bias || 'balanced';
+      document.getElementById('modalTokenBullChance').value = token.bullChance || 54;
+      document.getElementById('modalTokenMinPct').value = Number(token.minPct || 0.002) * 100;
+      document.getElementById('modalTokenMaxPct').value = Number(token.maxPct || 0.012) * 100;
+
+      document.getElementById('tokenModal').classList.add('show');
+    }
+
+    function getTokenPayloadFrom(prefix) {
+      return {
+        name: document.getElementById(`${prefix}TokenName`).value.trim(),
+        symbol: document.getElementById(`${prefix}TokenSymbol`).value.trim().toUpperCase(),
+        price: Number(document.getElementById(`${prefix}TokenPrice`).value || 0),
+        startPrice: Number(document.getElementById(`${prefix}TokenPrice`).value || 0),
+        supply: Number(document.getElementById(`${prefix}TokenSupply`).value || 0),
+        bias: document.getElementById(`${prefix}TokenBias`).value,
+        bullChance: Number(document.getElementById(`${prefix}TokenBullChance`).value || 54),
+        minPct: Number(document.getElementById(`${prefix}TokenMinPct`).value || 0.2),
+        maxPct: Number(document.getElementById(`${prefix}TokenMaxPct`).value || 1.2),
+        icon: document.getElementById(`${prefix}TokenSymbol`).value.trim().slice(0, 1).toUpperCase() || 'T'
+      };
+    }
+
+    async function deployQuickToken() {
+      if (!isAdmin()) return showToast('Admin only');
+
+      const payload = getTokenPayloadFrom('quick');
+
+      if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
+        showToast('Fill token fields');
         return;
       }
 
       try {
-        const res = await fetch(`/api/prices?ids=${encodeURIComponent(ids)}&_t=${Date.now()}`);
-        if (res.ok) prices = await res.json();
-      } catch {}
+        const res = await fetch('/api/tensor/deploy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-      renderHero();
-      renderAssets();
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Deploy failed');
+          return;
+        }
+
+        document.getElementById('quickTokenName').value = '';
+        document.getElementById('quickTokenSymbol').value = '';
+        document.getElementById('quickTokenPrice').value = '';
+        document.getElementById('quickTokenSupply').value = '';
+
+        showToast('Token deployed');
+        await refreshWallet();
+      } catch {
+        showToast('Network error');
+      }
     }
 
-    function renderSendSelectors() {
-      renderSendAssetOptions();
-      renderReceiveAssetOptions();
-      renderNetworkSelect();
+    async function saveTokenFromModal() {
+      if (!isAdmin()) return showToast('Admin only');
 
-      const sendAsset = document.getElementById('sendAsset');
-      const sendNetwork = document.getElementById('sendNetwork');
-      const receiveAsset = document.getElementById('receiveAssetSelect');
+      const tokenId = document.getElementById('modalTokenId').value.trim();
+      const payload = getTokenPayloadFrom('modal');
 
-      sendAsset.onchange = function() {
-        const parsed = parseAssetSelectValue(this.value);
-        selectAsset(parsed.symbol, parsed.tokenId, parsed.type);
-      };
+      if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
+        showToast('Fill token fields');
+        return;
+      }
 
-      receiveAsset.onchange = function() {
-        const parsed = parseAssetSelectValue(this.value);
-        selectAsset(parsed.symbol, parsed.tokenId, parsed.type);
-      };
+      try {
+        const endpoint = tokenId ? `/api/tensor/update/${encodeURIComponent(tokenId)}` : '/api/tensor/deploy';
+        const method = tokenId ? 'PUT' : 'POST';
 
-      sendNetwork.onchange = function() {
-        setNetwork(this.value);
-      };
+        const res = await fetch(endpoint, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Save failed');
+          return;
+        }
+
+        closeTokenModal();
+        showToast(tokenId ? 'Token updated' : 'Token deployed');
+        await refreshWallet();
+      } catch {
+        showToast('Network error');
+      }
+    }
+
+    async function mintTensorToken(tokenId) {
+      if (!isAdmin()) return showToast('Admin only');
+
+      const amount = Number(prompt('Mint amount to admin wallet:', '1000'));
+      if (!amount || amount <= 0) return;
+
+      try {
+        const res = await fetch('/api/tensor/admin-mint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tokenId, amount })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Mint failed');
+          return;
+        }
+
+        showToast('Minted');
+        await refreshWallet();
+      } catch {
+        showToast('Network error');
+      }
+    }
+
+    async function removeTensorToken(tokenId) {
+      if (!isAdmin()) return showToast('Admin only');
+      if (!confirm('Remove this Tensor token?')) return;
+
+      try {
+        const res = await fetch(`/api/tensor/delete/${encodeURIComponent(tokenId)}`, {
+          method: 'DELETE'
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Remove failed');
+          return;
+        }
+
+        if (selectedTensorTokenId === tokenId) {
+          selectAsset('USDT', '', 'standard');
+        }
+
+        showToast('Token removed');
+        await refreshWallet();
+      } catch {
+        showToast('Network error');
+      }
     }
 
     function renderAll() {
       updateAdminDetectionUI();
       renderHero();
-      renderSendSelectors();
+      renderSendAndReceiveSelectors();
       renderAssets();
       renderNetworkSelect();
       renderAddress();
@@ -2778,7 +2648,6 @@
 
     async function bootWallet() {
       document.documentElement.setAttribute('data-theme', currentTheme);
-      selectedNetwork = normalizeNetwork(walletState.usdtNetwork || selectedNetwork);
 
       renderAll();
       await refreshWallet();
@@ -2787,7 +2656,7 @@
 
       refreshInterval = setInterval(async () => {
         await refreshWallet();
-      }, 5000);
+      }, 6000);
     }
 
     window.addEventListener('load', bootWallet);
