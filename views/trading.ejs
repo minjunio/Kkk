@@ -219,24 +219,6 @@
       color: var(--text-main);
     }
 
-    .admin-badge {
-      display: none;
-      padding: 7px 10px;
-      border: 1px solid rgba(139,92,246,0.42);
-      background: rgba(139,92,246,0.16);
-      color: #c4b5fd;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 950;
-      white-space: nowrap;
-    }
-
-    .admin-badge.show {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
     .market-strip-container {
       width: 100%;
       padding: 10px 12px 0;
@@ -788,30 +770,6 @@
       font-weight: 900;
     }
 
-    .copy-trade-toggle {
-      display: none;
-      align-items: center;
-      gap: 9px;
-      margin: 4px 0 13px;
-      padding: 10px;
-      background: rgba(139,92,246,0.10);
-      border: 1px solid rgba(139,92,246,0.24);
-      border-radius: 14px;
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      font-weight: 850;
-    }
-
-    .copy-trade-toggle.show {
-      display: flex;
-    }
-
-    .copy-trade-toggle input {
-      width: 16px;
-      height: 16px;
-      accent-color: #8b5cf6;
-    }
-
     .leverage-bar {
       margin-bottom: 16px;
     }
@@ -1194,10 +1152,6 @@
         display: none;
       }
 
-      .admin-badge {
-        display: none !important;
-      }
-
       .copy-stats {
         grid-template-columns: 1fr 1fr;
       }
@@ -1238,8 +1192,6 @@
       </a>
 
       <div class="top-actions">
-        <div id="adminDetectedBadge" class="admin-badge">● Admin</div>
-
         <div class="mode-switch">
           <button id="modeLive" class="active" onclick="setTradingMode('live')">Live</button>
           <button id="modePaper" onclick="setTradingMode('paper')">Paper</button>
@@ -1274,20 +1226,19 @@
                 Copy Portfolio
               </div>
               <div class="section-sub">
-                One public admin copy portfolio. Users can view, copy, and stop copying. Admin can edit stats, days trading, publish status, and delete from settings.
+                Public copy portfolio. Users can view, copy, and stop copying. Running positions, ROI, PNL, days trading, and minimum copy amount are displayed here.
               </div>
             </div>
 
             <div class="copy-toolbar">
               <button class="mini-btn" onclick="loadCopyPortfolio(true)">Refresh</button>
-              <button class="primary-btn" id="copySettingsBtn" style="display:none;" onclick="openCopySettingsModal()">Settings</button>
             </div>
           </div>
 
           <div class="copy-profile-wrap" id="copyProfileWrap">
             <div class="copy-profile-card">
               <div class="profile-name">Loading portfolio...</div>
-              <div class="copy-note">Syncing USDT balance and admin copy data.</div>
+              <div class="copy-note">Syncing USDT balance and copy data.</div>
             </div>
           </div>
         </section>
@@ -1390,11 +1341,6 @@
           <span class="input-suffix">USDT</span>
         </div>
 
-        <label class="copy-trade-toggle" id="copyPortfolioToggleWrap">
-          <input type="checkbox" id="includeInCopyPortfolio" checked>
-          <span>Display this trade in copy portfolio and mirror to copiers</span>
-        </label>
-
         <div class="leverage-bar">
           <div class="lev-top">
             <span>Leverage</span>
@@ -1463,69 +1409,6 @@
       </button>
     </nav>
 
-    <div class="modal-backdrop" id="copySettingsModal">
-      <div class="modal">
-        <div class="modal-title">Copy Portfolio Settings</div>
-        <div class="modal-desc">
-          Publish, edit, pause, or delete the admin copy portfolio. ROI and PNL can be edited manually, and each admin trade can add on top of the current ROI/PNL.
-        </div>
-
-        <div class="field">
-          <label>Portfolio Name</label>
-          <input id="settingsProfileName" placeholder="Tensor Alpha Copy">
-        </div>
-
-        <div class="field">
-          <label>Description</label>
-          <textarea id="settingsProfileDesc" rows="3" placeholder="Admin live trading copy portfolio"></textarea>
-        </div>
-
-        <div class="field">
-          <label>Current ROI %</label>
-          <input id="settingsProfileRoi" type="number" step="any" placeholder="0">
-        </div>
-
-        <div class="field">
-          <label>Current PNL USDT</label>
-          <input id="settingsProfilePnl" type="number" step="any" placeholder="0">
-        </div>
-
-        <div class="field">
-          <label>Days Trading</label>
-          <input id="settingsProfileDays" type="number" step="1" placeholder="1">
-        </div>
-
-        <div class="field">
-          <label>Minimum Copy USDT</label>
-          <input id="settingsProfileMin" type="number" step="any" placeholder="50">
-        </div>
-
-        <div class="field">
-          <label>Risk</label>
-          <select id="settingsProfileRisk">
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Status</label>
-          <select id="settingsProfileStatus">
-            <option value="active">Active / Published</option>
-            <option value="paused">Paused</option>
-          </select>
-        </div>
-
-        <div class="modal-actions">
-          <button class="danger-btn" onclick="deleteCopyPortfolio()">Delete</button>
-          <button class="primary-btn" onclick="saveCopyPortfolioSettings()">Save / Publish</button>
-        </div>
-
-        <button class="mini-btn" style="width:100%; margin-top:10px;" onclick="closeCopySettingsModal()">Close</button>
-      </div>
-    </div>
-
     <div class="modal-backdrop" id="copyModal">
       <div class="modal">
         <div class="modal-title" id="copyModalTitle">Copy Portfolio</div>
@@ -1548,7 +1431,7 @@
     <div class="modal-backdrop" id="profilePositionsModal">
       <div class="modal">
         <div class="modal-title" id="profilePositionsTitle">Copy Portfolio Positions</div>
-        <div class="modal-desc" id="profilePositionsDesc">Running admin positions displayed in this copy portfolio.</div>
+        <div class="modal-desc" id="profilePositionsDesc">Running positions displayed in this copy portfolio.</div>
         <div id="profilePositionsBody" style="margin-top:12px;"></div>
         <div class="modal-actions">
           <button class="mini-btn" onclick="closeProfilePositionsModal()">Close</button>
@@ -1612,24 +1495,6 @@
     let priceInterval = null;
     let hasInitialZoomed = false;
     let dataInterval = null;
-
-    function isAdmin() {
-      const role = String(SERVER_ROLE || '').toLowerCase();
-      const email = String(SERVER_EMAIL || '').toLowerCase();
-      const walletRole = String(SERVER_WALLET?.role || '').toLowerCase();
-
-      return role === 'staff'
-        || role === 'admin'
-        || walletRole === 'staff'
-        || walletRole === 'admin'
-        || email === 'admin@tensorwallet.local';
-    }
-
-    function updateAdminDetectionUI() {
-      document.getElementById('adminDetectedBadge').classList.toggle('show', isAdmin());
-      document.getElementById('copySettingsBtn').style.display = isAdmin() ? 'inline-block' : 'none';
-      document.getElementById('copyPortfolioToggleWrap').classList.toggle('show', isAdmin());
-    }
 
     function formatPriceSmart(price) {
       price = Number(price) || 0;
@@ -1861,7 +1726,7 @@
       return Math.max(0.000001, localVisualPrice);
     }
 
-    function calculateLocalAdminPortfolioStats() {
+    function calculateLocalPortfolioStats() {
       const positions = Array.isArray(liveState.positions) ? liveState.positions : [];
       const history = Array.isArray(liveState.orderHistory) ? liveState.orderHistory : [];
 
@@ -1871,32 +1736,29 @@
       let closedMargin = 0;
 
       history.forEach(t => {
-        if (t.includeInCopyPortfolio === false) return;
         closedPnl += Number(t.pnl || 0);
         closedMargin += Number(t.margin || 0);
       });
 
-      const running = positions
-        .filter(p => p.includeInCopyPortfolio !== false)
-        .map(p => {
-          const token = tensorAssets.find(t => t.id === p.tokenId);
-          const currentPrice = token ? Number(token.price) : Number(p.markPrice || p.entryPrice || 0);
-          const entry = Number(p.entryPrice || 0);
-          const size = Number(p.size || 0);
-          const margin = Number(p.margin || 0);
-          let pnl = 0;
-          let roi = 0;
+      const running = positions.map(p => {
+        const token = tensorAssets.find(t => t.id === p.tokenId);
+        const currentPrice = token ? Number(token.price) : Number(p.markPrice || p.entryPrice || 0);
+        const entry = Number(p.entryPrice || 0);
+        const size = Number(p.size || 0);
+        const margin = Number(p.margin || 0);
+        let pnl = 0;
+        let roi = 0;
 
-          if (entry > 0 && size > 0) {
-            const pnlRaw = p.side === 'long' ? currentPrice - entry : entry - currentPrice;
-            pnl = (pnlRaw / entry) * size;
-            roi = margin > 0 ? (pnl / margin) * 100 : 0;
-            openPnl += pnl;
-            openMargin += margin;
-          }
+        if (entry > 0 && size > 0) {
+          const pnlRaw = p.side === 'long' ? currentPrice - entry : entry - currentPrice;
+          pnl = (pnlRaw / entry) * size;
+          roi = margin > 0 ? (pnl / margin) * 100 : 0;
+          openPnl += pnl;
+          openMargin += margin;
+        }
 
-          return { ...p, markPrice: currentPrice, pnl, roi, adminPositionId: p.id };
-        });
+        return { ...p, markPrice: currentPrice, pnl, roi, adminPositionId: p.id };
+      });
 
       const totalPnl = closedPnl + openPnl;
       const totalMargin = closedMargin + openMargin;
@@ -1916,14 +1778,14 @@
 
     function getLocalPortfolio() {
       const saved = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null');
-      const stats = calculateLocalAdminPortfolioStats();
+      const stats = calculateLocalPortfolioStats();
 
       const base = saved || {
         id: 'admin_copy_portfolio',
         publicId: 'admin_copy_portfolio',
         name: 'Tensor Alpha Copy',
-        tag: 'Admin copy portfolio',
-        description: 'Live admin copy portfolio.',
+        tag: 'Public copy portfolio',
+        description: 'Live copy portfolio.',
         risk: 'Medium',
         minCopyUsdt: 50,
         status: 'active',
@@ -1946,8 +1808,6 @@
     }
 
     async function loadCopyPortfolio(manual = false) {
-      updateAdminDetectionUI();
-
       let serverProfiles = [];
 
       try {
@@ -1959,13 +1819,7 @@
         }
       } catch {}
 
-      const adminProfiles = serverProfiles.filter(p => {
-        const source = String(p.source || '').toLowerCase();
-        const tag = String(p.tag || '').toLowerCase();
-        return source.includes('admin') || tag.includes('admin') || p.id === 'admin_copy_portfolio';
-      });
-
-      const chosen = adminProfiles[0] || null;
+      const chosen = serverProfiles[0] || null;
       const local = getLocalPortfolio();
 
       if (chosen) {
@@ -1995,7 +1849,7 @@
         wrap.innerHTML = `
           <div class="copy-profile-card">
             <div class="profile-name">Copy portfolio not published</div>
-            <div class="copy-note">Admin can publish it from Settings.</div>
+            <div class="copy-note">Copy portfolio will appear here once published.</div>
           </div>
         `;
         return;
@@ -2013,7 +1867,7 @@
           <div class="profile-top">
             <div style="min-width:0;">
               <div class="profile-name">${escapeHtml(p.name || 'Copy Portfolio')}</div>
-              <div class="profile-tag">${escapeHtml(p.description || p.tag || 'Admin live portfolio')}</div>
+              <div class="profile-tag">${escapeHtml(p.description || p.tag || 'Live portfolio')}</div>
             </div>
             <div class="profile-status ${p.status === 'paused' ? 'paused' : ''}">${escapeHtml(p.status || 'active')}</div>
           </div>
@@ -2047,7 +1901,7 @@
 
           <div class="copy-note">
             USDT synced: <b style="color:var(--text-main)">${formatMoney(liveState.usdtBalance)} USDT</b> available.
-            Every admin trade with the copy checkbox enabled is shown here and can be mirrored to copiers.
+            Running portfolio positions are shown here and can be mirrored to copiers.
           </div>
 
           ${renderProfilePositionsMini(p)}
@@ -2073,7 +1927,7 @@
       const positions = getProfilePositions(profile);
 
       if (!positions.length) {
-        return `<div class="copy-note">No admin running positions right now. New checked admin trades will appear here.</div>`;
+        return `<div class="copy-note">No running positions right now. New portfolio trades will appear here.</div>`;
       }
 
       return `
@@ -2094,100 +1948,6 @@
           }).join('')}
         </div>
       `;
-    }
-
-    function openCopySettingsModal() {
-      if (!isAdmin()) return;
-
-      const p = getLocalPortfolio();
-
-      document.getElementById('settingsProfileName').value = p.name || '';
-      document.getElementById('settingsProfileDesc').value = p.description || '';
-      document.getElementById('settingsProfileRoi').value = Number(p.manualRoi || 0);
-      document.getElementById('settingsProfilePnl').value = Number(p.manualPnl || 0);
-      document.getElementById('settingsProfileDays').value = Number(p.daysTrading || 1);
-      document.getElementById('settingsProfileMin').value = Number(p.minCopyUsdt || 50);
-      document.getElementById('settingsProfileRisk').value = p.risk || 'Medium';
-      document.getElementById('settingsProfileStatus').value = p.status || 'active';
-
-      document.getElementById('copySettingsModal').classList.add('show');
-    }
-
-    function closeCopySettingsModal() {
-      document.getElementById('copySettingsModal').classList.remove('show');
-    }
-
-    async function saveCopyPortfolioSettings() {
-      if (!isAdmin()) return;
-
-      const current = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null') || {};
-      const saved = {
-        ...current,
-        id: current.id || 'admin_copy_portfolio',
-        publicId: current.publicId || 'admin_copy_portfolio',
-        name: document.getElementById('settingsProfileName').value.trim() || 'Tensor Alpha Copy',
-        description: document.getElementById('settingsProfileDesc').value.trim() || 'Live admin copy portfolio.',
-        tag: 'Admin copy portfolio',
-        manualRoi: Number(document.getElementById('settingsProfileRoi').value || 0),
-        manualPnl: Number(document.getElementById('settingsProfilePnl').value || 0),
-        daysTrading: Number(document.getElementById('settingsProfileDays').value || 1),
-        minCopyUsdt: Number(document.getElementById('settingsProfileMin').value || 50),
-        risk: document.getElementById('settingsProfileRisk').value || 'Medium',
-        status: document.getElementById('settingsProfileStatus').value || 'active',
-        shareUrl: `${location.origin}/trading?copy=admin_copy_portfolio`
-      };
-
-      localStorage.setItem('copy_portfolio_single', JSON.stringify(saved));
-
-      try {
-        const payload = {
-          name: saved.name,
-          tag: saved.tag,
-          description: saved.description,
-          risk: saved.risk,
-          minCopyUsdt: saved.minCopyUsdt,
-          status: saved.status,
-          roi: saved.manualRoi,
-          pnl: saved.manualPnl,
-          daysTrading: saved.daysTrading,
-          source: 'admin_live_trading'
-        };
-
-        if (copyPortfolio && copyPortfolio.id && !String(copyPortfolio.id).startsWith('admin_copy_portfolio')) {
-          await fetch(`/api/copy/admin/profile/${encodeURIComponent(copyPortfolio.id)}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } else {
-          await fetch('/api/copy/admin/profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        }
-      } catch {}
-
-      closeCopySettingsModal();
-      await loadCopyPortfolio(false);
-    }
-
-    async function deleteCopyPortfolio() {
-      if (!isAdmin()) return;
-
-      const saved = JSON.parse(localStorage.getItem('copy_portfolio_single') || 'null') || {};
-      saved.status = 'deleted';
-      localStorage.setItem('copy_portfolio_single', JSON.stringify(saved));
-
-      try {
-        if (copyPortfolio && copyPortfolio.id && !String(copyPortfolio.id).startsWith('admin_copy_portfolio')) {
-          await fetch(`/api/copy/admin/profile/${encodeURIComponent(copyPortfolio.id)}`, { method: 'DELETE' });
-        }
-      } catch {}
-
-      copyPortfolio = { ...saved, status: 'deleted' };
-      closeCopySettingsModal();
-      renderCopyPortfolio();
     }
 
     function openCopyModal() {
@@ -2214,7 +1974,7 @@
       const positions = getProfilePositions(profile);
 
       if (!positions.length) {
-        return `<div class="copy-note">No admin running positions right now. If you copy, new checked admin trades will be mirrored.</div>`;
+        return `<div class="copy-note">No running positions right now. If you copy, new portfolio trades can be mirrored.</div>`;
       }
 
       return `
@@ -3124,7 +2884,7 @@
                   </div>
                 `).join('')}
               </div>
-            ` : `<div class="copy-note">Waiting for admin running positions or new copied trades.</div>`}
+            ` : `<div class="copy-note">Waiting for running positions or new copied trades.</div>`}
 
             <button class="danger-btn" style="margin-top:11px;" onclick="stopCopyTrade('${c.id}')">Stop Copying</button>
           </div>
@@ -3144,7 +2904,7 @@
     async function executeTrade(side) {
       const margin = Number(document.getElementById('tradeAmt').value);
       const lev = Number(document.getElementById('levSlider').value);
-      const includeInCopyPortfolio = !isAdmin() ? false : document.getElementById('includeInCopyPortfolio').checked;
+      const includeInCopyPortfolio = false;
 
       if (!margin || margin <= 0) return alert('Enter margin amount');
       if (!activeToken) return alert('No asset selected');
@@ -3258,12 +3018,9 @@
         const data = await res.json();
 
         if (res.ok) {
-          const old = liveState.positions.find(p => String(p.id) === String(id));
-
           liveState.usdtBalance = data.usdtBalance;
           liveState.positions = liveState.positions.filter(p => String(p.id) !== String(id));
 
-          data.historyRecord.includeInCopyPortfolio = old ? old.includeInCopyPortfolio !== false : true;
           liveState.orderHistory.unshift(data.historyRecord);
 
           if (data.publicTradeCard) {
@@ -3335,7 +3092,6 @@
     async function bootTradingPage() {
       document.documentElement.setAttribute('data-theme', currentTheme);
 
-      updateAdminDetectionUI();
       renderAssetStrip();
       initApexChart();
       updateNetworkDestination();
