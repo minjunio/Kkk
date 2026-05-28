@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Tensor Admin Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-base: #070a0f;
+      --bg-base-2: #0b0f17;
+      --bg-panel: rgba(17, 24, 39, 0.88);
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --bg-hover: rgba(45, 55, 72, 0.92);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.25);
+      --green: #0ecb81;
+      --red: #f6465d;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139, 92, 246, 0.18);
+      --green-soft: rgba(14, 203, 129, 0.15);
+      --red-soft: rgba(246, 70, 93, 0.15);
+      --shadow: 0 24px 80px rgba(0,0,0,0.42);
+      --radius: 18px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f6f8fb;
+      --bg-base-2: #eef2f8;
+      --bg-panel: rgba(255,255,255,0.92);
+      --bg-card: rgba(255,255,255,0.86);
+      --bg-hover: rgba(226, 232, 240, 0.92);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: rgba(15, 23, 42, 0.10);
+      --border-strong: rgba(15, 23, 42, 0.18);
+      --shadow: 0 18px 55px rgba(15,23,42,0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(139,92,246,0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(59,130,246,0.16), transparent 24%),
+        linear-gradient(180deg, var(--bg-base), var(--bg-base-2));
+      color: var(--text-main);
+      overflow-x: hidden;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.026) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.026) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent 70%);
+      z-index: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      outline: none;
+      border: none;
+      background: transparent;
+      color: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      padding: calc(10px + var(--safe-top)) 14px 10px;
+      background: rgba(7, 10, 15, 0.78);
+      backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    [data-theme="light"] .topbar {
+      background: rgba(255,255,255,0.78);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.35), transparent 22%),
+        linear-gradient(135deg, var(--purple), var(--blue));
+      box-shadow: 0 14px 34px rgba(139,92,246,0.35);
+      flex: 0 0 auto;
+    }
+
+    .brand-title {
+      font-weight: 950;
+      font-size: 1.02rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-sub {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 850;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(139,92,246,0.34);
+      background: rgba(139,92,246,0.14);
+      color: #c4b5fd;
+      font-size: 0.72rem;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .page {
+      width: min(1720px, 100%);
+      margin: 0 auto;
+      padding: 14px 12px calc(34px + var(--safe-bottom));
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
+      border-radius: 24px;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(139,92,246,0.30), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(14,203,129,0.12), transparent 24%),
+        var(--bg-panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .hero-title {
+      font-size: clamp(1.45rem, 4vw, 3.4rem);
+      line-height: 0.98;
+      letter-spacing: -0.07em;
+      font-weight: 950;
+    }
+
+    .hero-sub {
+      margin-top: 9px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 780;
+      line-height: 1.5;
+      max-width: 900px;
+    }
+
+    .stats-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 9px;
+    }
+
+    .stat-card {
+      background: rgba(7,10,15,0.42);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    [data-theme="light"] .stat-card {
+      background: rgba(255,255,255,0.74);
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      margin-top: 7px;
+      font-weight: 950;
+      font-size: 1rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 3px;
+      border-radius: 18px;
+      background: rgba(7,10,15,0.38);
+      border: 1px solid var(--border);
+      position: sticky;
+      top: calc(59px + var(--safe-top));
+      z-index: 50;
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab {
+      min-height: 40px;
+      padding: 9px 13px;
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 950;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .nav-tab.active {
+      color: white;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .layout {
+      display: grid;
+      gap: 14px;
+    }
+
+    @media (min-width: 1180px) {
+      .layout.two {
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+        align-items: start;
+      }
+
+      .layout.three {
+        grid-template-columns: minmax(0, 0.85fr) minmax(360px, 0.75fr) minmax(360px, 0.75fr);
+        align-items: start;
+      }
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      min-width: 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1rem;
+      font-weight: 950;
+    }
+
+    .section-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: var(--purple-soft);
+      color: #c4b5fd;
+      flex: 0 0 auto;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 760;
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .primary-btn,
+    .mini-btn,
+    .danger-btn,
+    .green-btn,
+    .yellow-btn {
+      min-height: 40px;
+      border-radius: 13px;
+      padding: 9px 12px;
+      font-size: 0.77rem;
+      font-weight: 950;
+      border: 1px solid transparent;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .primary-btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      box-shadow: 0 14px 30px rgba(59,130,246,0.18);
+    }
+
+    .green-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #0ecb81, #10b981);
+      box-shadow: 0 14px 30px rgba(14,203,129,0.14);
+    }
+
+    .yellow-btn {
+      color: #111827;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+
+    .mini-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .danger-btn {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: rgba(246,70,93,0.24);
+    }
+
+    .form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .form-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: var(--text-muted);
+      font-size: 0.66rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      min-height: 42px;
+      background: rgba(7,10,15,0.58);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 9px 11px;
+      font-size: 0.84rem;
+      font-weight: 850;
+      width: 100%;
+    }
+
+    [data-theme="light"] .field input,
+    [data-theme="light"] .field select,
+    [data-theme="light"] .field textarea {
+      background: rgba(248,250,252,0.92);
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: rgba(139,92,246,0.72);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.10);
+    }
+
+    .note {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 760;
+      line-height: 1.45;
+    }
+
+    .small-note {
+      color: var(--text-muted);
+      font-size: 0.67rem;
+      font-weight: 760;
+      line-height: 1.45;
+    }
+
+    .list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 17px;
+      padding: 12px;
+      background: rgba(7,10,15,0.44);
+      border: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    [data-theme="light"] .card {
+      background: rgba(255,255,255,0.78);
+    }
+
+    .card.active {
+      border-color: rgba(139,92,246,0.60);
+      box-shadow: 0 16px 40px rgba(139,92,246,0.12);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .token-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .token-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(139,92,246,0.88), rgba(59,130,246,0.82));
+      color: white;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .token-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .token-title {
+      font-size: 0.92rem;
+      font-weight: 950;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .token-sub {
+      color: var(--text-muted);
+      font-size: 0.69rem;
+      font-weight: 820;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 0.66rem;
+      font-weight: 950;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.58);
+      color: var(--text-muted);
+    }
+
+    .badge.green {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: rgba(14,203,129,0.24);
+    }
+
+    .badge.red {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: rgba(246,70,93,0.24);
+    }
+
+    .badge.purple {
+      background: var(--purple-soft);
+      color: #c4b5fd;
+      border-color: rgba(139,92,246,0.30);
+    }
+
+    .badge.yellow {
+      background: rgba(245,158,11,0.15);
+      color: var(--yellow);
+      border-color: rgba(245,158,11,0.24);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .metric {
+      padding: 9px;
+      border-radius: 13px;
+      background: rgba(15,23,42,0.45);
+      border: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    [data-theme="light"] .metric {
+      background: rgba(248,250,252,0.74);
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.62rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-value {
+      margin-top: 5px;
+      font-size: 0.82rem;
+      font-weight: 950;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 7px;
+      max-height: 250px;
+      overflow: auto;
+      padding: 4px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: rgba(7,10,15,0.34);
+    }
+
+    .icon-choice {
+      aspect-ratio: 1;
+      min-height: 40px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .icon-choice.active {
+      border-color: rgba(139,92,246,0.82);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+      background: linear-gradient(135deg, rgba(139,92,246,0.36), rgba(59,130,246,0.22));
+    }
+
+    .icon-choice svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 9px;
+      align-items: center;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      padding: 0;
+      min-height: 4px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border: 2px solid white;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px;
+      background: rgba(7,10,15,0.22);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      min-width: 240px;
+      max-width: calc(100% - 28px);
+      padding: 12px 14px;
+      border-radius: 15px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid var(--border-strong);
+      color: white;
+      font-weight: 900;
+      font-size: 0.78rem;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.18s ease;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.68);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(720px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--bg-base-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.56);
+    }
+
+    .danger-zone {
+      border-color: rgba(246,70,93,0.24);
+      background:
+        radial-gradient(circle at top right, rgba(246,70,93,0.14), transparent 34%),
+        var(--bg-panel);
+    }
+
+    .admin-only-warning {
+      display: none;
+      min-height: 100vh;
+      place-items: center;
+      padding: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .warning-card {
+      width: min(560px, 100%);
+      padding: 22px;
+      border-radius: 24px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .warning-title {
+      font-size: 1.4rem;
+      font-weight: 950;
+      margin-top: 12px;
+    }
+
+    .warning-text {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      font-weight: 780;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .form-grid,
+      .form-grid.three {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .icon-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+
+      .brand-sub {
+        display: none;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .top-actions {
+        gap: 6px;
+      }
+
+      .pill {
+        display: none;
+      }
+
+      .hero-head {
+        flex-direction: column;
+      }
+
+      .btn-row {
+        justify-content: stretch;
+      }
+
+      .btn-row button,
+      .btn-row a {
+        flex: 1;
+      }
+
+      .stats-grid,
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .icon-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="adminDenied" class="admin-only-warning">
+    <div class="warning-card">
+      <div class="brand-logo" style="margin:0 auto;">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+          <path d="M12 8v5"/>
+          <path d="M12 17h.01"/>
+        </svg>
+      </div>
+      <div class="warning-title">Admin access only</div>
+      <div class="warning-text">
+        This dashboard is locked to the staff/admin account. Log in through the staff form on the index page.
+      </div>
+      <div class="btn-row" style="justify-content:center;margin-top:16px;">
+        <a class="primary-btn" href="/index.html">Go to login</a>
+        <a class="mini-btn" href="/trading">Back to trading</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminApp" class="app hidden">
+    <script>
+      const SERVER_EMAIL = <%- JSON.stringify(typeof email !== 'undefined' ? email : '') %>;
+      const SERVER_ROLE = <%- JSON.stringify(typeof role !== 'undefined' ? role : '') %>;
+      const SERVER_WALLET = <%- typeof wallet !== 'undefined' ? wallet : 'null' %>;
+    </script>
+
+    <header class="topbar">
+      <a href="/dashboard" class="brand">
+        <span class="brand-logo">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5V4.5A2.5 2.5 0 0 1 6.5 2h11A2.5 2.5 0 0 1 20 4.5v15A2.5 2.5 0 0 1 17.5 22h-11A2.5 2.5 0 0 1 4 19.5Z"/>
+            <path d="M8 7h8"/>
+            <path d="M8 12h8"/>
+            <path d="M8 17h4"/>
+          </svg>
+        </span>
+        <span style="min-width:0;">
+          <div class="brand-title">Tensor Admin</div>
+          <div class="brand-sub">Dashboard • Copy portfolios • Tensor assets • Wallet control</div>
+        </span>
+      </a>
+
+      <div class="top-actions">
+        <span class="pill">● Admin</span>
+        <button class="mini-btn" onclick="refreshAll()">Refresh</button>
+        <button class="mini-btn" onclick="toggleTheme()">Theme</button>
+        <a class="mini-btn" href="/wallet">Wallet</a>
+        <a class="mini-btn" href="/trading">Trading</a>
+        <a class="danger-btn" href="/logout">Logout</a>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-head">
+          <div>
+            <div class="hero-title">Admin Control Center</div>
+            <div class="hero-sub">
+              Manage copy trading profiles, Tensor tokens, volatility rules, token movement limits, stable coins, and admin balances. This page only controls the interface; your `admin.js` must protect every endpoint server-side.
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="primary-btn" onclick="openTokenModal('create')">New Tensor Token</button>
+            <button class="green-btn" onclick="openCopyModal('create')">New Copy Profile</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Tensor Tokens</div>
+            <div class="stat-value" id="statTokens">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Copy Profiles</div>
+            <div class="stat-value" id="statProfiles">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Admin USDT</div>
+            <div class="stat-value">$<span id="statUsdt">0.00</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Admin OUSD</div>
+            <div class="stat-value">$<span id="statOusd">0.00</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Open Positions</div>
+            <div class="stat-value" id="statPositions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Copy Followers</div>
+            <div class="stat-value" id="statFollowers">0</div>
+          </div>
+        </div>
+      </section>
+
+      <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="switchSection('overview', this)">Overview</button>
+        <button class="nav-tab" onclick="switchSection('copy', this)">Copy Trading</button>
+        <button class="nav-tab" onclick="switchSection('tokens', this)">Tensor Tokens</button>
+        <button class="nav-tab" onclick="switchSection('wallet', this)">Admin Wallet</button>
+        <button class="nav-tab" onclick="switchSection('users', this)">User Wallet Edits</button>
+      </nav>
+
+      <section id="section-overview" class="dashboard-section">
+        <div class="layout three">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M3 3v18h18"/>
+                      <path d="M7 15l4-4 3 3 5-6"/>
+                    </svg>
+                  </span>
+                  Latest Copy Profiles
+                </div>
+                <div class="section-sub">Public portfolios users can view and copy.</div>
+              </div>
+            </div>
+            <div id="overviewCopyList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v12"/>
+                      <path d="M6 12h12"/>
+                    </svg>
+                  </span>
+                  Latest Tokens
+                </div>
+                <div class="section-sub">Newest assets in the Tensor registry.</div>
+              </div>
+            </div>
+            <div id="overviewTokenList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M3 7h18"/>
+                      <path d="M3 12h18"/>
+                      <path d="M3 17h18"/>
+                    </svg>
+                  </span>
+                  Admin Balances
+                </div>
+                <div class="section-sub">Quick balance overview for admin account.</div>
+              </div>
+            </div>
+            <div id="overviewWalletList" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-copy" class="dashboard-section hidden">
+        <div class="layout two">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M16 3h5v5"/>
+                      <path d="M4 20 21 3"/>
+                      <path d="M21 16v5h-5"/>
+                      <path d="M15 15l6 6"/>
+                      <path d="M4 4l5 5"/>
+                    </svg>
+                  </span>
+                  Copy Trading Profiles
+                </div>
+                <div class="section-sub">
+                  Make multiple public copy trading profiles. Each profile can show ROI, PNL, minimum copy, days trading, risk, and active positions.
+                </div>
+              </div>
+
+              <div class="btn-row">
+                <button class="primary-btn" onclick="openCopyModal('create')">Create Profile</button>
+              </div>
+            </div>
+
+            <div id="copyProfilesList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M12 20V10"/>
+                      <path d="M18 20V4"/>
+                      <path d="M6 20v-4"/>
+                    </svg>
+                  </span>
+                  Profile Settings
+                </div>
+                <div class="section-sub">Use this form to publish or update the selected copy profile.</div>
+              </div>
+            </div>
+
+            <form class="form" onsubmit="saveCopyProfile(event)">
+              <input type="hidden" id="copyProfileId">
+
+              <div class="field">
+                <label>Profile name</label>
+                <input id="copyName" placeholder="Tensor Alpha Copy">
+              </div>
+
+              <div class="field">
+                <label>Tag</label>
+                <input id="copyTag" placeholder="Admin live strategy">
+              </div>
+
+              <div class="field">
+                <label>Description</label>
+                <textarea id="copyDescription" rows="3" placeholder="Describe the strategy..."></textarea>
+              </div>
+
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Manual ROI %</label>
+                  <input id="copyManualRoi" type="number" step="any" placeholder="0">
+                </div>
+
+                <div class="field">
+                  <label>Manual PNL</label>
+                  <input id="copyManualPnl" type="number" step="any" placeholder="0">
+                </div>
+
+                <div class="field">
+                  <label>Days trading</label>
+                  <input id="copyDaysTrading" type="number" step="1" min="0" placeholder="1">
+                </div>
+              </div>
+
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Min copy USDT</label>
+                  <input id="copyMinCopy" type="number" step="any" min="1" placeholder="50">
+                </div>
+
+                <div class="field">
+                  <label>Risk</label>
+                  <select id="copyRisk">
+                    <option>Low</option>
+                    <option selected>Medium</option>
+                    <option>High</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Status</label>
+                  <select id="copyStatus">
+                    <option selected>active</option>
+                    <option>paused</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Positions shown publicly</label>
+                <select id="copyPositionSource">
+                  <option value="admin_live" selected>Use admin live copy-position trades</option>
+                  <option value="manual">Use manual positions JSON</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Manual positions JSON</label>
+                <textarea id="copyPositionsJson" rows="4" placeholder='[{"symbol":"ETH","side":"long","leverage":10,"roi":4.2}]'></textarea>
+              </div>
+
+              <div class="btn-row">
+                <button type="button" class="mini-btn" onclick="clearCopyForm()">Clear</button>
+                <button type="button" class="danger-btn" onclick="deleteSelectedCopyProfile()">Delete</button>
+                <button type="submit" class="green-btn">Publish / Save</button>
+              </div>
+
+              <div class="note">
+                Backend suggestion: save profiles in `db.copyProfiles`. Keep `admin_copy_portfolio` for live admin-copy if you still want one default portfolio.
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-tokens" class="dashboard-section hidden">
+        <div class="layout two">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 6v12"/>
+                      <path d="M6 12h12"/>
+                    </svg>
+                  </span>
+                  Tensor Tokens
+                </div>
+                <div class="section-sub">
+                  Add, edit, or delete Tensor tokens. Choose SVG icon, stable coin behavior, volatility, price move percentage, and bullish/bearish price zones.
+                </div>
+              </div>
+
+              <div class="btn-row">
+                <button class="primary-btn" onclick="openTokenModal('create')">Create Token</button>
+              </div>
+            </div>
+
+            <div id="tokenList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M12 20h9"/>
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                  </span>
+                  Token Editor
+                </div>
+                <div class="section-sub">The interval fields are for your market loop to respect price movement zones.</div>
+              </div>
+            </div>
+
+            <form class="form" onsubmit="saveToken(event)">
+              <input type="hidden" id="tokenId">
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Name</label>
+                  <input id="tokenName" placeholder="Tensor AI">
+                </div>
+
+                <div class="field">
+                  <label>Symbol</label>
+                  <input id="tokenSymbol" placeholder="TAI">
+                </div>
+              </div>
+
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Start price</label>
+                  <input id="tokenPrice" type="number" step="any" placeholder="1.25">
+                </div>
+
+                <div class="field">
+                  <label>Supply</label>
+                  <input id="tokenSupply" type="number" step="any" placeholder="10000000">
+                </div>
+
+                <div class="field">
+                  <label>Stable coin</label>
+                  <select id="tokenStable">
+                    <option value="false" selected>No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Volatility mode</label>
+                  <select id="tokenVolatilityMode">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Move interval seconds</label>
+                  <input id="tokenMoveEverySec" type="number" min="1" step="1" placeholder="3">
+                </div>
+
+                <div class="field">
+                  <label>Bias</label>
+                  <select id="tokenBias">
+                    <option value="balanced" selected>Balanced</option>
+                    <option value="bullish">Bullish</option>
+                    <option value="bearish">Bearish</option>
+                    <option value="pegged">Pegged / Stable</option>
+                    <option value="real">Real market</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Min price move % <span id="minMoveLabel">1%</span></label>
+                  <div class="range-row">
+                    <input id="tokenMinMovePct" type="range" min="1" max="50" step="1" value="1" oninput="syncRangeLabels()">
+                    <input id="tokenMinMovePctNum" type="number" min="1" max="50" step="1" value="1" oninput="syncRangeInputs('min')">
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Max price move % <span id="maxMoveLabel">5%</span></label>
+                  <div class="range-row">
+                    <input id="tokenMaxMovePct" type="range" min="1" max="50" step="1" value="5" oninput="syncRangeLabels()">
+                    <input id="tokenMaxMovePctNum" type="number" min="1" max="50" step="1" value="5" oninput="syncRangeInputs('max')">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Bullish zone min</label>
+                  <input id="tokenBullMin" type="number" step="any" placeholder="100">
+                </div>
+
+                <div class="field">
+                  <label>Bullish zone max</label>
+                  <input id="tokenBullMax" type="number" step="any" placeholder="150">
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Bearish zone min</label>
+                  <input id="tokenBearMin" type="number" step="any" placeholder="200">
+                </div>
+
+                <div class="field">
+                  <label>Bearish zone max</label>
+                  <input id="tokenBearMax" type="number" step="any" placeholder="270">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Icon SVG</label>
+                <input id="tokenIcon" placeholder="Auto filled when you choose an icon">
+              </div>
+
+              <div class="field">
+                <label>Choose from 60 SVG icons</label>
+                <div id="iconGrid" class="icon-grid"></div>
+              </div>
+
+              <div class="btn-row">
+                <button type="button" class="mini-btn" onclick="clearTokenForm()">Clear</button>
+                <button type="button" class="danger-btn" onclick="deleteSelectedToken()">Delete</button>
+                <button type="submit" class="green-btn">Save Token</button>
+              </div>
+
+              <div class="note">
+                Backend fields to save: `stableCoin`, `moveEverySec`, `minPct`, `maxPct`, `bullZoneMin`, `bullZoneMax`, `bearZoneMin`, `bearZoneMax`, `volatilityMode`.
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-wallet" class="dashboard-section hidden">
+        <div class="layout two">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5v-11Z"/>
+                      <path d="M18 12h.01"/>
+                      <path d="M3 8h18"/>
+                    </svg>
+                  </span>
+                  Admin Wallet
+                </div>
+                <div class="section-sub">Add or remove crypto and Tensor balances from the admin wallet.</div>
+              </div>
+            </div>
+
+            <div id="adminWalletList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M12 5v14"/>
+                      <path d="M5 12h14"/>
+                    </svg>
+                  </span>
+                  Edit Admin Balance
+                </div>
+                <div class="section-sub">Use positive amount to add, negative amount to remove.</div>
+              </div>
+            </div>
+
+            <form class="form" onsubmit="adjustAdminWallet(event)">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Wallet type</label>
+                  <select id="adminWalletType" onchange="renderAdminAssetSelect()">
+                    <option value="crypto">Normal crypto wallet</option>
+                    <option value="tensor">Tensor wallet</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Asset / Token</label>
+                  <select id="adminWalletAsset"></select>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Amount</label>
+                  <input id="adminWalletAmount" type="number" step="any" placeholder="1000 or -500">
+                </div>
+
+                <div class="field">
+                  <label>Reason</label>
+                  <input id="adminWalletReason" placeholder="Manual admin adjustment">
+                </div>
+              </div>
+
+              <div class="btn-row">
+                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletAmount').value='1000'">+1000</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletAmount').value='-1000'">-1000</button>
+                <button type="submit" class="green-btn">Apply Balance Edit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-users" class="dashboard-section hidden">
+        <div class="layout two">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </span>
+                  Users
+                </div>
+                <div class="section-sub">Search users and edit their crypto or Tensor balances.</div>
+              </div>
+              <div class="btn-row">
+                <button class="mini-btn" onclick="loadUsers()">Reload Users</button>
+              </div>
+            </div>
+
+            <div class="field" style="margin-bottom:10px;">
+              <label>Search</label>
+              <input id="userSearch" placeholder="email or wallet id" oninput="renderUsers()">
+            </div>
+
+            <div id="usersList" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <div class="section-title">
+                  <span class="section-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M12 20h9"/>
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                  </span>
+                  Edit Selected User
+                </div>
+                <div class="section-sub">Select a user from the list first.</div>
+              </div>
+            </div>
+
+            <form class="form" onsubmit="adjustUserWallet(event)">
+              <div class="field">
+                <label>Selected user email</label>
+                <input id="selectedUserEmail" readonly placeholder="No user selected">
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Wallet type</label>
+                  <select id="userWalletType" onchange="renderUserAssetSelect()">
+                    <option value="crypto">Normal crypto wallet</option>
+                    <option value="tensor">Tensor wallet</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>Asset / Token</label>
+                  <select id="userWalletAsset"></select>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Amount</label>
+                  <input id="userWalletAmount" type="number" step="any" placeholder="1000 or -500">
+                </div>
+
+                <div class="field">
+                  <label>Reason</label>
+                  <input id="userWalletReason" placeholder="Manual balance edit">
+                </div>
+              </div>
+
+              <div class="btn-row">
+                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletAmount').value='1000'">+1000</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletAmount').value='-1000'">-1000</button>
+                <button type="submit" class="green-btn">Apply User Edit</button>
+              </div>
+            </form>
+
+            <div class="panel danger-zone" style="margin-top:12px;box-shadow:none;">
+              <div class="section-title" style="margin-bottom:8px;">
+                <span class="section-icon" style="background:var(--red-soft);color:var(--red);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 6h18"/>
+                    <path d="M8 6V4h8v2"/>
+                    <path d="M19 6l-1 14H6L5 6"/>
+                  </svg>
+                </span>
+                Dangerous User Actions
+              </div>
+              <div class="note">Only enable these backend routes if you truly need them.</div>
+              <div class="btn-row" style="margin-top:10px;justify-content:flex-start;">
+                <button class="danger-btn" onclick="resetSelectedUserWallet()">Reset User Wallet</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast">Done</div>
+
+    <div class="modal-backdrop" id="tokenModal">
+      <div class="modal">
+        <div class="section-head">
+          <div>
+            <div class="section-title">
+              <span class="section-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v12"/>
+                  <path d="M6 12h12"/>
+                </svg>
+              </span>
+              Quick Token Create
+            </div>
+            <div class="section-sub">Fill the token editor behind this modal, then save.</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="mini-btn" onclick="closeModal('tokenModal')">Close</button>
+          <button class="primary-btn" onclick="closeModal('tokenModal'); switchSectionByName('tokens')">Open Token Editor</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="copyModal">
+      <div class="modal">
+        <div class="section-head">
+          <div>
+            <div class="section-title">
+              <span class="section-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M16 3h5v5"/>
+                  <path d="M4 20 21 3"/>
+                  <path d="M21 16v5h-5"/>
+                </svg>
+              </span>
+              Quick Copy Profile Create
+            </div>
+            <div class="section-sub">Fill the copy profile editor behind this modal, then publish.</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="mini-btn" onclick="closeModal('copyModal')">Close</button>
+          <button class="primary-btn" onclick="closeModal('copyModal'); switchSectionByName('copy')">Open Copy Editor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTheme = localStorage.getItem('blue_theme') || 'dark';
+    let adminWallet = SERVER_WALLET || {};
+    let tokens = [];
+    let copyProfiles = [];
+    let users = [];
+    let selectedIconId = 'icon-ai';
+    let selectedUser = null;
+
+    const cryptoAssets = ['USDT', 'OUSD', 'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE'];
+
+    const iconLibrary = [
+      ['icon-ai', '<svg viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg>'],
+      ['icon-bot', '<svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><path d="M12 7V3"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M9 17h6"/></svg>'],
+      ['icon-chip', '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 9h3"/><path d="M4 15h3"/><path d="M17 9h3"/><path d="M17 15h3"/><path d="M9 4v3"/><path d="M15 4v3"/><path d="M9 17v3"/><path d="M15 17v3"/></svg>'],
+      ['icon-orbit', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12c3-6 15-6 18 0c-3 6-15 6-18 0Z"/><path d="M12 3c6 3 6 15 0 18c-6-3-6-15 0-18Z"/></svg>'],
+      ['icon-rocket', '<svg viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.2-2 3-2 5c2 0 3.8-.5 5-2"/><path d="M9 15l-3-3c1-4 4-7 9-9c2 2 2 6 0 9l-3 3"/><path d="M9 15l-1 4l4-1"/><circle cx="14" cy="8" r="1.5"/></svg>'],
+      ['icon-star', '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.1l6.7.9l-4.8 4.7l1.1 6.6L12 17.2l-5.9 3.1l1.1-6.6L2.4 9l6.7-.9Z"/></svg>'],
+      ['icon-bolt', '<svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8l11-14h-8Z"/></svg>'],
+      ['icon-flame', '<svg viewBox="0 0 24 24"><path d="M12 22c4 0 7-3 7-7c0-5-4-7-5-12c-3 2-7 6-7 12c0 4 2 7 5 7Z"/><path d="M12 22c2 0 3.5-1.5 3.5-3.5c0-2.5-2-3.5-2.5-6c-1.5 1-3.5 3-3.5 6c0 2 1 3.5 2.5 3.5Z"/></svg>'],
+      ['icon-diamond', '<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6l-10 12L2 9Z"/><path d="M2 9h20"/><path d="M12 21L8 9l4-6l4 6Z"/></svg>'],
+      ['icon-crown', '<svg viewBox="0 0 24 24"><path d="M3 8l4 3l5-7l5 7l4-3v11H3Z"/><path d="M3 19h18"/></svg>'],
+      ['icon-shield', '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3l-8 3v7c0 6 8 10 8 10Z"/></svg>'],
+      ['icon-vault', '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M12 9v6"/><path d="M9 12h6"/></svg>'],
+      ['icon-wave', '<svg viewBox="0 0 24 24"><path d="M2 12c3-4 6-4 9 0s6 4 11 0"/><path d="M2 17c3-4 6-4 9 0s6 4 11 0"/><path d="M2 7c3-4 6-4 9 0s6 4 11 0"/></svg>'],
+      ['icon-moon', '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3A7 7 0 0 0 21 12.8Z"/></svg>'],
+      ['icon-sun', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>'],
+      ['icon-cloud', '<svg viewBox="0 0 24 24"><path d="M17.5 19H7a5 5 0 1 1 1.4-9.8A7 7 0 0 1 21 13.5A3.5 3.5 0 0 1 17.5 19Z"/></svg>'],
+      ['icon-leaf', '<svg viewBox="0 0 24 24"><path d="M21 3S9 3 5 7s-2 10 3 12s10-1 12-8c1-4 1-8 1-8Z"/><path d="M5 19c3-6 7-9 16-16"/></svg>'],
+      ['icon-tree', '<svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M7 15h10l-5-7Z"/><path d="M8 10h8l-4-6Z"/></svg>'],
+      ['icon-fish', '<svg viewBox="0 0 24 24"><path d="M3 12s4-5 10-5s8 5 8 5s-2 5-8 5s-10-5-10-5Z"/><path d="M3 12l-2-3v6Z"/><circle cx="16" cy="11" r=".5"/></svg>'],
+      ['icon-anchor', '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><path d="M12 8v13"/><path d="M5 12H2v3"/><path d="M19 12h3v3"/><path d="M5 12c0 6 14 6 14 0"/></svg>'],
+      ['icon-globe', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20"/><path d="M12 2a15 15 0 0 0 0 20"/></svg>'],
+      ['icon-map', '<svg viewBox="0 0 24 24"><path d="M9 18l-6 3V6l6-3l6 3l6-3v15l-6 3Z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>'],
+      ['icon-gem', '<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6l-10 12L2 9Z"/></svg>'],
+      ['icon-cube', '<svg viewBox="0 0 24 24"><path d="M21 16V8l-9-5l-9 5v8l9 5Z"/><path d="M3.3 7.5L12 12l8.7-4.5"/><path d="M12 22V12"/></svg>'],
+      ['icon-box', '<svg viewBox="0 0 24 24"><path d="M21 8l-9-5l-9 5l9 5Z"/><path d="M3 8v8l9 5l9-5V8"/><path d="M12 13v8"/></svg>'],
+      ['icon-key', '<svg viewBox="0 0 24 24"><circle cx="7.5" cy="14.5" r="4.5"/><path d="M11 11l10-10"/><path d="M17 5l2 2"/><path d="M14 8l2 2"/></svg>'],
+      ['icon-lock', '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'],
+      ['icon-eye', '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7s10 7 10 7s-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>'],
+      ['icon-scan', '<svg viewBox="0 0 24 24"><path d="M4 7V4h3"/><path d="M17 4h3v3"/><path d="M20 17v3h-3"/><path d="M7 20H4v-3"/><path d="M7 12h10"/></svg>'],
+      ['icon-target', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'],
+      ['icon-crosshair', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>'],
+      ['icon-compass', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-2 6l-6 2l2-6Z"/></svg>'],
+      ['icon-chart', '<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4l3 3l5-6"/></svg>'],
+      ['icon-candle', '<svg viewBox="0 0 24 24"><path d="M8 3v18"/><rect x="5" y="7" width="6" height="8" rx="1"/><path d="M16 3v18"/><rect x="13" y="10" width="6" height="7" rx="1"/></svg>'],
+      ['icon-bars', '<svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20V8"/></svg>'],
+      ['icon-bank', '<svg viewBox="0 0 24 24"><path d="M3 9l9-6l9 6Z"/><path d="M5 10v8"/><path d="M9 10v8"/><path d="M15 10v8"/><path d="M19 10v8"/><path d="M3 21h18"/></svg>'],
+      ['icon-card', '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/></svg>'],
+      ['icon-wallet', '<svg viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5v-11Z"/><path d="M18 12h.01"/><path d="M3 8h18"/></svg>'],
+      ['icon-coin', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M9 9.5A3 3 0 0 1 12 8h1a2.5 2.5 0 0 1 0 5h-2a2.5 2.5 0 0 0 0 5h1a3 3 0 0 0 3-1.5"/></svg>'],
+      ['icon-stack', '<svg viewBox="0 0 24 24"><path d="M12 3l9 5l-9 5l-9-5Z"/><path d="M3 12l9 5l9-5"/><path d="M3 16l9 5l9-5"/></svg>'],
+      ['icon-link', '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.2-1.2"/></svg>'],
+      ['icon-network', '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="19" cy="19" r="3"/><path d="M8 11l8-5"/><path d="M8 13l8 5"/></svg>'],
+      ['icon-pulse', '<svg viewBox="0 0 24 24"><path d="M3 12h4l2-6l4 12l2-6h6"/></svg>'],
+      ['icon-heart', '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6l1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>'],
+      ['icon-skull', '<svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 6v4h8v-4c2-1 4-3 4-6a8 8 0 0 0-8-8Z"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M10 15h4"/></svg>'],
+      ['icon-firework', '<svg viewBox="0 0 24 24"><path d="M12 12l7-7"/><path d="M12 12l-7 7"/><path d="M12 12l7 7"/><path d="M12 12L5 5"/><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/></svg>'],
+      ['icon-sparkles', '<svg viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6Z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8Z"/><path d="M5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8Z"/></svg>'],
+      ['icon-hourglass', '<svg viewBox="0 0 24 24"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M7 2c0 6 10 6 10 12c0 4-10 4-10 8"/><path d="M17 2c0 6-10 6-10 12c0 4 10 4 10 8"/></svg>'],
+      ['icon-clock', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'],
+      ['icon-truck', '<svg viewBox="0 0 24 24"><path d="M3 7h12v10H3Z"/><path d="M15 10h4l2 3v4h-6Z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>'],
+      ['icon-plane', '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20l-4-9l-9-4Z"/></svg>'],
+      ['icon-car', '<svg viewBox="0 0 24 24"><path d="M5 11l2-5h10l2 5"/><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M7 18v2"/><path d="M17 18v2"/><path d="M7 14h.01"/><path d="M17 14h.01"/></svg>'],
+      ['icon-house', '<svg viewBox="0 0 24 24"><path d="M3 10l9-7l9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 22V12h6v10"/></svg>'],
+      ['icon-building', '<svg viewBox="0 0 24 24"><path d="M4 22V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v18"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>'],
+      ['icon-book', '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>'],
+      ['icon-code', '<svg viewBox="0 0 24 24"><path d="M8 9l-4 3l4 3"/><path d="M16 9l4 3l-4 3"/><path d="M14 4l-4 16"/></svg>'],
+      ['icon-terminal', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3l-3 3"/><path d="M13 15h4"/></svg>'],
+      ['icon-game', '<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="10" rx="4"/><path d="M8 12v2"/><path d="M7 13h2"/><path d="M16 13h.01"/><path d="M18 11h.01"/></svg>'],
+      ['icon-music', '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'],
+      ['icon-camera', '<svg viewBox="0 0 24 24"><path d="M4 7h4l2-3h4l2 3h4v13H4Z"/><circle cx="12" cy="14" r="4"/></svg>'],
+      ['icon-brain', '<svg viewBox="0 0 24 24"><path d="M8 5a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3 0Z"/><path d="M16 5a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v1a3 3 0 0 1-6 0V5a3 3 0 0 1 3 0Z"/></svg>'],
+      ['icon-dna', '<svg viewBox="0 0 24 24"><path d="M7 3c8 4 8 14 0 18"/><path d="M17 3c-8 4-8 14 0 18"/><path d="M8 7h8"/><path d="M7 12h10"/><path d="M8 17h8"/></svg>'],
+      ['icon-atom', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>']
+    ];
+
+    function isAdmin() {
+      const role = String(SERVER_ROLE || '').toLowerCase();
+      const email = String(SERVER_EMAIL || '').toLowerCase();
+      const walletRole = String(adminWallet?.role || '').toLowerCase();
+
+      return role === 'staff'
+        || role === 'admin'
+        || walletRole === 'staff'
+        || walletRole === 'admin'
+        || email === 'admin@tensorwallet.local';
+    }
+
+    function apiBaseCandidates(kind) {
+      const map = {
+        summary: ['/api/admin/summary', '/api/admin/state'],
+        tokens: ['/api/admin/tensor/tokens', '/api/tensor'],
+        tokenCreate: ['/api/admin/tensor/tokens', '/api/tensor/deploy'],
+        tokenUpdate: id => [`/api/admin/tensor/tokens/${encodeURIComponent(id)}`, `/api/tensor/update/${encodeURIComponent(id)}`],
+        tokenDelete: id => [`/api/admin/tensor/tokens/${encodeURIComponent(id)}`, `/api/tensor/delete/${encodeURIComponent(id)}`],
+        copyProfiles: ['/api/admin/copy/profiles', '/api/copy/profiles'],
+        copyCreate: ['/api/admin/copy/profiles', '/api/copy/admin/profile'],
+        copyUpdate: id => [`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/copy/admin/profile/${encodeURIComponent(id)}`],
+        copyDelete: id => [`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/copy/admin/profile/${encodeURIComponent(id)}`],
+        adminWallet: ['/api/admin/wallet', '/api/wallet'],
+        adminWalletAdjust: ['/api/admin/wallet/adjust'],
+        users: ['/api/admin/users'],
+        userAdjust: ['/api/admin/users/adjust'],
+        userReset: ['/api/admin/users/reset-wallet']
+      };
+
+      return map[kind];
+    }
+
+    async function apiTry(candidates, options = {}) {
+      const list = typeof candidates === 'function' ? candidates(options.id) : candidates;
+      let lastError = null;
+
+      for (const url of list) {
+        try {
+          const res = await fetch(url, {
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(options.headers || {})
+            },
+            ...options,
+            body: options.body && typeof options.body !== 'string'
+              ? JSON.stringify(options.body)
+              : options.body
+          });
+
+          const contentType = res.headers.get('content-type') || '';
+          const data = contentType.includes('application/json')
+            ? await res.json()
+            : { text: await res.text() };
+
+          if (res.ok) {
+            return { ok: true, data, url };
+          }
+
+          lastError = data.error || data.text || `HTTP ${res.status}`;
+        } catch (err) {
+          lastError = err.message;
+        }
+      }
+
+      return { ok: false, error: lastError || 'Endpoint unavailable.' };
+    }
+
+    function formatMoney(n, decimals = 2) {
+      return (Number(n) || 0).toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function formatPrice(n) {
+      n = Number(n) || 0;
+      if (n >= 1000) return formatMoney(n, 2);
+      if (n >= 1) return formatMoney(n, 4);
+      return n.toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function showToast(message = 'Done') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 2100);
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      localStorage.setItem('blue_theme', currentTheme);
+    }
+
+    function switchSection(name, btn) {
+      document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`section-${name}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function switchSectionByName(name) {
+      const btn = Array.from(document.querySelectorAll('.nav-tab')).find(b => {
+        return b.textContent.trim().toLowerCase().includes(name);
+      });
+
+      switchSection(name, btn);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function openTokenModal(mode = 'create') {
+      if (mode === 'create') clearTokenForm();
+      document.getElementById('tokenModal').classList.add('show');
+    }
+
+    function openCopyModal(mode = 'create') {
+      if (mode === 'create') clearCopyForm();
+      document.getElementById('copyModal').classList.add('show');
+    }
+
+    function renderIconGrid() {
+      const grid = document.getElementById('iconGrid');
+
+      grid.innerHTML = iconLibrary.map(([id, svg]) => `
+        <button type="button" class="icon-choice ${selectedIconId === id ? 'active' : ''}" title="${escapeHtml(id)}" onclick="selectIcon('${escapeHtml(id)}')">
+          ${svg}
+        </button>
+      `).join('');
+    }
+
+    function selectIcon(id) {
+      selectedIconId = id;
+      const found = iconLibrary.find(x => x[0] === id);
+      document.getElementById('tokenIcon').value = found ? found[1] : id;
+      renderIconGrid();
+    }
+
+    function getIconHtml(icon) {
+      if (!icon) return iconLibrary[0][1];
+      if (String(icon).includes('<svg')) return icon;
+
+      const found = iconLibrary.find(x => x[0] === icon);
+      if (found) return found[1];
+
+      return `<span style="font-weight:950;">${escapeHtml(String(icon).slice(0, 2).toUpperCase())}</span>`;
+    }
+
+    function syncRangeLabels() {
+      const minRange = document.getElementById('tokenMinMovePct');
+      const maxRange = document.getElementById('tokenMaxMovePct');
+
+      let minVal = Number(minRange.value) || 1;
+      let maxVal = Number(maxRange.value) || 1;
+
+      if (minVal > maxVal) {
+        maxVal = minVal;
+        maxRange.value = maxVal;
+      }
+
+      document.getElementById('tokenMinMovePctNum').value = minVal;
+      document.getElementById('tokenMaxMovePctNum').value = maxVal;
+      document.getElementById('minMoveLabel').textContent = `${minVal}%`;
+      document.getElementById('maxMoveLabel').textContent = `${maxVal}%`;
+    }
+
+    function syncRangeInputs(type) {
+      const input = type === 'min'
+        ? document.getElementById('tokenMinMovePctNum')
+        : document.getElementById('tokenMaxMovePctNum');
+
+      const range = type === 'min'
+        ? document.getElementById('tokenMinMovePct')
+        : document.getElementById('tokenMaxMovePct');
+
+      range.value = Math.max(1, Math.min(50, Number(input.value) || 1));
+      syncRangeLabels();
+    }
+
+    async function refreshAll() {
+      await Promise.allSettled([
+        loadSummary(),
+        loadTokens(),
+        loadCopyProfiles(),
+        loadAdminWallet(),
+        loadUsers()
+      ]);
+
+      renderAll();
+      showToast('Dashboard refreshed');
+    }
+
+    async function loadSummary() {
+      const result = await apiTry(apiBaseCandidates('summary'));
+
+      if (result.ok) {
+        const data = result.data;
+        if (data.wallet) adminWallet = data.wallet;
+        if (Array.isArray(data.tokens)) tokens = data.tokens;
+        if (Array.isArray(data.tensorRegistry)) tokens = data.tensorRegistry;
+        if (Array.isArray(data.copyProfiles)) copyProfiles = data.copyProfiles;
+        if (Array.isArray(data.profiles)) copyProfiles = data.profiles;
+        if (Array.isArray(data.users)) users = data.users;
+      }
+    }
+
+    async function loadTokens() {
+      const result = await apiTry(apiBaseCandidates('tokens'));
+
+      if (!result.ok) {
+        console.warn(result.error);
+        return;
+      }
+
+      const data = result.data;
+      tokens = data.tokens || data.registry || data.tensorRegistry || [];
+    }
+
+    async function loadCopyProfiles() {
+      const result = await apiTry(apiBaseCandidates('copyProfiles'));
+
+      if (!result.ok) {
+        console.warn(result.error);
+        return;
+      }
+
+      const data = result.data;
+      copyProfiles = data.copyProfiles || data.profiles || (data.portfolio ? [data.portfolio] : []);
+    }
+
+    async function loadAdminWallet() {
+      const result = await apiTry(apiBaseCandidates('adminWallet'));
+
+      if (!result.ok) {
+        console.warn(result.error);
+        return;
+      }
+
+      adminWallet = result.data.wallet || result.data;
+    }
+
+    async function loadUsers() {
+      const result = await apiTry(apiBaseCandidates('users'));
+
+      if (!result.ok) {
+        console.warn(result.error);
+        users = [];
+        renderUsers();
+        return;
+      }
+
+      users = result.data.users || [];
+      renderUsers();
+    }
+
+    function renderAll() {
+      renderStats();
+      renderCopyProfiles();
+      renderTokens();
+      renderWallet();
+      renderUsers();
+      renderAdminAssetSelect();
+      renderUserAssetSelect();
+      renderOverview();
+      renderIconGrid();
+    }
+
+    function renderStats() {
+      document.getElementById('statTokens').textContent = tokens.length;
+      document.getElementById('statProfiles').textContent = copyProfiles.length;
+      document.getElementById('statUsdt').textContent = formatMoney(adminWallet.usdtBalance || 0);
+      document.getElementById('statOusd').textContent = formatMoney(adminWallet.ousdBalance || 0);
+      document.getElementById('statPositions').textContent = Array.isArray(adminWallet.positions) ? adminWallet.positions.length : 0;
+
+      const followers = copyProfiles.reduce((sum, p) => sum + Number(p.followers || 0), 0);
+      document.getElementById('statFollowers').textContent = followers;
+    }
+
+    function renderOverview() {
+      document.getElementById('overviewCopyList').innerHTML = copyProfiles.slice(0, 4).map(copyCardHtml).join('') || `<div class="empty">No copy profiles yet.</div>`;
+      document.getElementById('overviewTokenList').innerHTML = tokens.slice(0, 4).map(tokenCardHtml).join('') || `<div class="empty">No Tensor tokens yet.</div>`;
+
+      const rows = getWalletRows(adminWallet).slice(0, 8).map(row => `
+        <div class="card">
+          <div class="card-top">
+            <div>
+              <div class="token-title">${escapeHtml(row.symbol)}</div>
+              <div class="token-sub">${escapeHtml(row.type)}</div>
+            </div>
+            <div style="text-align:right;font-weight:950;">${formatPrice(row.balance)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('overviewWalletList').innerHTML = rows || `<div class="empty">No wallet data loaded.</div>`;
+    }
+
+    function copyCardHtml(p) {
+      const pnl = Number(p.pnl || p.manualPnl || 0);
+      const roi = Number(p.roi || p.manualRoi || 0);
+      const col = pnl >= 0 ? 'green' : 'red';
+      const statusBadge = p.status === 'active' ? 'green' : 'yellow';
+
+      return `
+        <div class="card">
+          <div class="card-top">
+            <div class="token-row">
+              <div class="token-icon">${iconLibrary[32][1]}</div>
+              <div>
+                <div class="token-title">${escapeHtml(p.name || 'Copy Profile')}</div>
+                <div class="token-sub">${escapeHtml(p.tag || 'Public strategy')} • ${escapeHtml(p.risk || 'Medium')} risk</div>
+              </div>
+            </div>
+            <span class="badge ${statusBadge}">${escapeHtml(p.status || 'active')}</span>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric"><div class="metric-label">ROI</div><div class="metric-value ${roi >= 0 ? 'text-green' : 'text-red'}">${roi >= 0 ? '+' : ''}${formatMoney(roi)}%</div></div>
+            <div class="metric"><div class="metric-label">PNL</div><div class="metric-value ${pnl >= 0 ? 'text-green' : 'text-red'}">${pnl >= 0 ? '+' : '-'}$${formatMoney(Math.abs(pnl))}</div></div>
+            <div class="metric"><div class="metric-label">Min Copy</div><div class="metric-value">$${formatMoney(p.minCopyUsdt || 50, 0)}</div></div>
+            <div class="metric"><div class="metric-label">Followers</div><div class="metric-value">${formatMoney(p.followers || 0, 0)}</div></div>
+          </div>
+
+          <div class="card-actions">
+            <button class="mini-btn" onclick="fillCopyForm('${escapeHtml(p.id || p.publicId || '')}')">Edit</button>
+            ${p.shareUrl ? `<button class="mini-btn" onclick="copyText('${escapeHtml(p.shareUrl)}')">Copy Link</button>` : ''}
+            <button class="danger-btn" onclick="deleteCopyProfile('${escapeHtml(p.id || p.publicId || '')}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCopyProfiles() {
+      document.getElementById('copyProfilesList').innerHTML = copyProfiles.map(copyCardHtml).join('') || `<div class="empty">No copy profiles. Create one.</div>`;
+    }
+
+    function tokenCardHtml(t) {
+      const stable = t.stableCoin || t.stable || t.bias === 'pegged';
+      const moveMin = Number(t.minPct || 0) * 100;
+      const moveMax = Number(t.maxPct || 0) * 100;
+
+      return `
+        <div class="card">
+          <div class="card-top">
+            <div class="token-row">
+              <div class="token-icon">${getIconHtml(t.iconSvg || t.iconId || t.icon)}</div>
+              <div>
+                <div class="token-title">${escapeHtml(t.symbol || 'TENSOR')} / USDT</div>
+                <div class="token-sub">${escapeHtml(t.name || 'Tensor Asset')}</div>
+              </div>
+            </div>
+            <span class="badge ${stable ? 'green' : 'purple'}">${stable ? 'Stable' : escapeHtml(t.bias || 'balanced')}</span>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric"><div class="metric-label">Price</div><div class="metric-value">$${formatPrice(t.price || 0)}</div></div>
+            <div class="metric"><div class="metric-label">Supply</div><div class="metric-value">${formatMoney(t.supply || 0, 0)}</div></div>
+            <div class="metric"><div class="metric-label">Move</div><div class="metric-value">${formatMoney(moveMin, 0)}-${formatMoney(moveMax, 0)}%</div></div>
+            <div class="metric"><div class="metric-label">Cap</div><div class="metric-value">$${formatMoney(t.marketCap || 0, 0)}</div></div>
+          </div>
+
+          <div class="small-note" style="margin-top:10px;">
+            Bull zone: ${escapeHtml(t.bullZoneMin ?? '—')} → ${escapeHtml(t.bullZoneMax ?? '—')} • Bear zone: ${escapeHtml(t.bearZoneMin ?? '—')} → ${escapeHtml(t.bearZoneMax ?? '—')}
+          </div>
+
+          <div class="card-actions">
+            <button class="mini-btn" onclick="fillTokenForm('${escapeHtml(t.id || '')}')">Edit</button>
+            <button class="danger-btn" onclick="deleteToken('${escapeHtml(t.id || '')}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTokens() {
+      document.getElementById('tokenList').innerHTML = tokens.map(tokenCardHtml).join('') || `<div class="empty">No Tensor tokens. Create one.</div>`;
+    }
+
+    function getWalletRows(wallet) {
+      const rows = cryptoAssets.map(symbol => {
+        const field = symbol === 'USDT'
+          ? 'usdtBalance'
+          : symbol === 'OUSD'
+            ? 'ousdBalance'
+            : `${symbol.toLowerCase()}Balance`;
+
+        return {
+          symbol,
+          type: 'Crypto',
+          balance: Number(wallet[field] || 0),
+          id: symbol
+        };
+      });
+
+      tokens.forEach(t => {
+        rows.push({
+          symbol: t.symbol || t.id,
+          type: 'Tensor',
+          balance: Number(wallet.tensorBalances?.[t.id] || 0),
+          id: t.id
+        });
+      });
+
+      return rows;
+    }
+
+    function renderWallet() {
+      const rows = getWalletRows(adminWallet);
+
+      document.getElementById('adminWalletList').innerHTML = rows.map(row => `
+        <div class="card">
+          <div class="card-top">
+            <div class="token-row">
+              <div class="token-icon">${row.type === 'Tensor' ? iconLibrary[0][1] : iconLibrary[37][1]}</div>
+              <div>
+                <div class="token-title">${escapeHtml(row.symbol)}</div>
+                <div class="token-sub">${escapeHtml(row.type)} wallet balance</div>
+              </div>
+            </div>
+            <span class="badge ${row.balance >= 0 ? 'green' : 'red'}">${formatPrice(row.balance)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminAssetSelect() {
+      const type = document.getElementById('adminWalletType')?.value || 'crypto';
+      const select = document.getElementById('adminWalletAsset');
+      if (!select) return;
+
+      if (type === 'tensor') {
+        select.innerHTML = tokens.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.symbol || t.id)} - ${escapeHtml(t.name || '')}</option>`).join('');
+      } else {
+        select.innerHTML = cryptoAssets.map(a => `<option value="${a}">${a}</option>`).join('');
+      }
+    }
+
+    function renderUserAssetSelect() {
+      const type = document.getElementById('userWalletType')?.value || 'crypto';
+      const select = document.getElementById('userWalletAsset');
+      if (!select) return;
+
+      if (type === 'tensor') {
+        select.innerHTML = tokens.map(t => `<option value="${escapeHtml(t.id)}">${escapeHtml(t.symbol || t.id)} - ${escapeHtml(t.name || '')}</option>`).join('');
+      } else {
+        select.innerHTML = cryptoAssets.map(a => `<option value="${a}">${a}</option>`).join('');
+      }
+    }
+
+    function renderUsers() {
+      const q = String(document.getElementById('userSearch')?.value || '').toLowerCase();
+      const filtered = users.filter(u => {
+        const text = JSON.stringify(u || {}).toLowerCase();
+        return !q || text.includes(q);
+      });
+
+      document.getElementById('usersList').innerHTML = filtered.map(u => `
+        <div class="card ${selectedUser && selectedUser.email === u.email ? 'active' : ''}">
+          <div class="card-top">
+            <div>
+              <div class="token-title">${escapeHtml(u.email || 'unknown')}</div>
+              <div class="token-sub">${escapeHtml(u.id || '')} • ${escapeHtml(u.role || 'user')}</div>
+            </div>
+            <span class="badge ${u.role === 'staff' ? 'purple' : 'green'}">${escapeHtml(u.role || 'user')}</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><div class="metric-label">USDT</div><div class="metric-value">$${formatMoney(u.usdtBalance || 0)}</div></div>
+            <div class="metric"><div class="metric-label">OUSD</div><div class="metric-value">$${formatMoney(u.ousdBalance || 0)}</div></div>
+            <div class="metric"><div class="metric-label">Trades</div><div class="metric-value">${Array.isArray(u.positions) ? u.positions.length : 0}</div></div>
+            <div class="metric"><div class="metric-label">Copy</div><div class="metric-value">${Array.isArray(u.copyTrades) ? u.copyTrades.length : 0}</div></div>
+          </div>
+          <div class="card-actions">
+            <button class="mini-btn" onclick="selectUser('${escapeHtml(u.email || '')}')">Select</button>
+          </div>
+        </div>
+      `).join('') || `<div class="empty">No users loaded. Make sure /api/admin/users exists.</div>`;
+    }
+
+    function selectUser(email) {
+      selectedUser = users.find(u => String(u.email) === String(email)) || null;
+      document.getElementById('selectedUserEmail').value = selectedUser ? selectedUser.email : '';
+      renderUsers();
+    }
+
+    function clearTokenForm() {
+      document.getElementById('tokenId').value = '';
+      document.getElementById('tokenName').value = '';
+      document.getElementById('tokenSymbol').value = '';
+      document.getElementById('tokenPrice').value = '';
+      document.getElementById('tokenSupply').value = '';
+      document.getElementById('tokenStable').value = 'false';
+      document.getElementById('tokenVolatilityMode').value = 'medium';
+      document.getElementById('tokenMoveEverySec').value = '3';
+      document.getElementById('tokenBias').value = 'balanced';
+      document.getElementById('tokenMinMovePct').value = '1';
+      document.getElementById('tokenMaxMovePct').value = '5';
+      document.getElementById('tokenBullMin').value = '';
+      document.getElementById('tokenBullMax').value = '';
+      document.getElementById('tokenBearMin').value = '';
+      document.getElementById('tokenBearMax').value = '';
+      selectedIconId = 'icon-ai';
+      selectIcon(selectedIconId);
+      syncRangeLabels();
+    }
+
+    function fillTokenForm(id) {
+      const t = tokens.find(x => String(x.id) === String(id));
+      if (!t) return showToast('Token not found');
+
+      switchSectionByName('tokens');
+
+      document.getElementById('tokenId').value = t.id || '';
+      document.getElementById('tokenName').value = t.name || '';
+      document.getElementById('tokenSymbol').value = t.symbol || '';
+      document.getElementById('tokenPrice').value = t.price || '';
+      document.getElementById('tokenSupply').value = t.supply || '';
+      document.getElementById('tokenStable').value = (t.stableCoin || t.stable || t.bias === 'pegged') ? 'true' : 'false';
+      document.getElementById('tokenVolatilityMode').value = t.volatilityMode || 'medium';
+      document.getElementById('tokenMoveEverySec').value = t.moveEverySec || 3;
+      document.getElementById('tokenBias').value = t.bias || 'balanced';
+
+      const minPct = Math.max(1, Math.min(50, Math.round(Number(t.minPct || 0.01) * 100)));
+      const maxPct = Math.max(1, Math.min(50, Math.round(Number(t.maxPct || 0.05) * 100)));
+
+      document.getElementById('tokenMinMovePct').value = minPct;
+      document.getElementById('tokenMaxMovePct').value = maxPct;
+
+      document.getElementById('tokenBullMin').value = t.bullZoneMin ?? '';
+      document.getElementById('tokenBullMax').value = t.bullZoneMax ?? '';
+      document.getElementById('tokenBearMin').value = t.bearZoneMin ?? '';
+      document.getElementById('tokenBearMax').value = t.bearZoneMax ?? '';
+
+      document.getElementById('tokenIcon').value = t.iconSvg || t.iconId || t.icon || '';
+
+      const found = iconLibrary.find(x => x[1] === t.iconSvg || x[0] === t.iconId || x[0] === t.icon);
+      selectedIconId = found ? found[0] : 'icon-ai';
+
+      syncRangeLabels();
+      renderIconGrid();
+    }
+
+    async function saveToken(event) {
+      event.preventDefault();
+
+      const id = document.getElementById('tokenId').value.trim();
+      const stableCoin = document.getElementById('tokenStable').value === 'true';
+      const minMove = Math.max(1, Math.min(50, Number(document.getElementById('tokenMinMovePct').value) || 1));
+      const maxMove = Math.max(minMove, Math.min(50, Number(document.getElementById('tokenMaxMovePct').value) || minMove));
+
+      const payload = {
+        name: document.getElementById('tokenName').value.trim(),
+        symbol: document.getElementById('tokenSymbol').value.trim().toUpperCase(),
+        price: Number(document.getElementById('tokenPrice').value || 0),
+        startPrice: Number(document.getElementById('tokenPrice').value || 0),
+        supply: Number(document.getElementById('tokenSupply').value || 0),
+        stableCoin,
+        stable,
+        bias: stableCoin ? 'pegged' : document.getElementById('tokenBias').value,
+        volatilityMode: document.getElementById('tokenVolatilityMode').value,
+        moveEverySec: Number(document.getElementById('tokenMoveEverySec').value || 3),
+        minPct: minMove,
+        maxPct: maxMove,
+        bullZoneMin: Number(document.getElementById('tokenBullMin').value || 0),
+        bullZoneMax: Number(document.getElementById('tokenBullMax').value || 0),
+        bearZoneMin: Number(document.getElementById('tokenBearMin').value || 0),
+        bearZoneMax: Number(document.getElementById('tokenBearMax').value || 0),
+        icon: selectedIconId,
+        iconId: selectedIconId,
+        iconSvg: document.getElementById('tokenIcon').value
+      };
+
+      if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
+        return showToast('Fill name, symbol, price, and supply');
+      }
+
+      const result = id
+        ? await apiTry(apiBaseCandidates('tokenUpdate')(id), { method: 'PUT', body: payload })
+        : await apiTry(apiBaseCandidates('tokenCreate'), { method: 'POST', body: payload });
+
+      if (!result.ok) return showToast(result.error || 'Token save failed');
+
+      showToast(id ? 'Token updated' : 'Token created');
+      await loadTokens();
+      renderAll();
+    }
+
+    async function deleteSelectedToken() {
+      const id = document.getElementById('tokenId').value.trim();
+      if (!id) return showToast('Select a token first');
+      await deleteToken(id);
+    }
+
+    async function deleteToken(id) {
+      if (!id) return;
+      if (!confirm('Delete this Tensor token? This can remove user balances/positions depending on your backend.')) return;
+
+      const result = await apiTry(apiBaseCandidates('tokenDelete')(id), { method: 'DELETE' });
+
+      if (!result.ok) return showToast(result.error || 'Delete failed');
+
+      showToast('Token deleted');
+      clearTokenForm();
+      await loadTokens();
+      renderAll();
+    }
+
+    function clearCopyForm() {
+      document.getElementById('copyProfileId').value = '';
+      document.getElementById('copyName').value = '';
+      document.getElementById('copyTag').value = '';
+      document.getElementById('copyDescription').value = '';
+      document.getElementById('copyManualRoi').value = '0';
+      document.getElementById('copyManualPnl').value = '0';
+      document.getElementById('copyDaysTrading').value = '1';
+      document.getElementById('copyMinCopy').value = '50';
+      document.getElementById('copyRisk').value = 'Medium';
+      document.getElementById('copyStatus').value = 'active';
+      document.getElementById('copyPositionSource').value = 'admin_live';
+      document.getElementById('copyPositionsJson').value = '';
+    }
+
+    function fillCopyForm(id) {
+      const p = copyProfiles.find(x => String(x.id || x.publicId) === String(id));
+      if (!p) return showToast('Copy profile not found');
+
+      switchSectionByName('copy');
+
+      document.getElementById('copyProfileId').value = p.id || p.publicId || '';
+      document.getElementById('copyName').value = p.name || '';
+      document.getElementById('copyTag').value = p.tag || '';
+      document.getElementById('copyDescription').value = p.description || '';
+      document.getElementById('copyManualRoi').value = p.manualRoi ?? p.roi ?? 0;
+      document.getElementById('copyManualPnl').value = p.manualPnl ?? p.pnl ?? 0;
+      document.getElementById('copyDaysTrading').value = p.daysTrading ?? 1;
+      document.getElementById('copyMinCopy').value = p.minCopyUsdt ?? 50;
+      document.getElementById('copyRisk').value = p.risk || 'Medium';
+      document.getElementById('copyStatus').value = p.status || 'active';
+      document.getElementById('copyPositionSource').value = p.positionSource || 'admin_live';
+      document.getElementById('copyPositionsJson').value = p.positions ? JSON.stringify(p.positions, null, 2) : '';
+    }
+
+    async function saveCopyProfile(event) {
+      event.preventDefault();
+
+      const id = document.getElementById('copyProfileId').value.trim();
+      let positions = [];
+
+      if (document.getElementById('copyPositionSource').value === 'manual') {
+        try {
+          positions = JSON.parse(document.getElementById('copyPositionsJson').value || '[]');
+          if (!Array.isArray(positions)) positions = [];
+        } catch {
+          return showToast('Positions JSON is invalid');
+        }
+      }
+
+      const payload = {
+        name: document.getElementById('copyName').value.trim(),
+        tag: document.getElementById('copyTag').value.trim(),
+        description: document.getElementById('copyDescription').value.trim(),
+        manualRoi: Number(document.getElementById('copyManualRoi').value || 0),
+        manualPnl: Number(document.getElementById('copyManualPnl').value || 0),
+        roi: Number(document.getElementById('copyManualRoi').value || 0),
+        pnl: Number(document.getElementById('copyManualPnl').value || 0),
+        daysTrading: Number(document.getElementById('copyDaysTrading').value || 0),
+        minCopyUsdt: Number(document.getElementById('copyMinCopy').value || 50),
+        risk: document.getElementById('copyRisk').value,
+        status: document.getElementById('copyStatus').value,
+        positionSource: document.getElementById('copyPositionSource').value,
+        positions
+      };
+
+      if (!payload.name) return showToast('Profile name is required');
+
+      const result = id
+        ? await apiTry(apiBaseCandidates('copyUpdate')(id), { method: 'PUT', body: payload })
+        : await apiTry(apiBaseCandidates('copyCreate'), { method: 'POST', body: payload });
+
+      if (!result.ok) return showToast(result.error || 'Copy profile save failed');
+
+      showToast(id ? 'Copy profile updated' : 'Copy profile created');
+      await loadCopyProfiles();
+      renderAll();
+    }
+
+    async function deleteSelectedCopyProfile() {
+      const id = document.getElementById('copyProfileId').value.trim();
+      if (!id) return showToast('Select a copy profile first');
+      await deleteCopyProfile(id);
+    }
+
+    async function deleteCopyProfile(id) {
+      if (!id) return;
+      if (!confirm('Delete this copy trading profile?')) return;
+
+      const result = await apiTry(apiBaseCandidates('copyDelete')(id), { method: 'DELETE' });
+
+      if (!result.ok) return showToast(result.error || 'Delete failed');
+
+      showToast('Copy profile deleted');
+      clearCopyForm();
+      await loadCopyProfiles();
+      renderAll();
+    }
+
+    async function adjustAdminWallet(event) {
+      event.preventDefault();
+
+      const payload = {
+        targetEmail: 'admin@tensorwallet.local',
+        walletType: document.getElementById('adminWalletType').value,
+        asset: document.getElementById('adminWalletAsset').value,
+        amount: Number(document.getElementById('adminWalletAmount').value || 0),
+        reason: document.getElementById('adminWalletReason').value || 'Manual admin wallet adjustment'
+      };
+
+      if (!payload.asset || !payload.amount) return showToast('Choose asset and amount');
+
+      const result = await apiTry(apiBaseCandidates('adminWalletAdjust'), {
+        method: 'POST',
+        body: payload
+      });
+
+      if (!result.ok) return showToast(result.error || 'Admin wallet edit failed');
+
+      showToast('Admin wallet updated');
+      document.getElementById('adminWalletAmount').value = '';
+      await loadAdminWallet();
+      renderAll();
+    }
+
+    async function adjustUserWallet(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('selectedUserEmail').value.trim();
+      if (!email) return showToast('Select a user first');
+
+      const payload = {
+        targetEmail: email,
+        walletType: document.getElementById('userWalletType').value,
+        asset: document.getElementById('userWalletAsset').value,
+        amount: Number(document.getElementById('userWalletAmount').value || 0),
+        reason: document.getElementById('userWalletReason').value || 'Manual user wallet adjustment'
+      };
+
+      if (!payload.asset || !payload.amount) return showToast('Choose asset and amount');
+
+      const result = await apiTry(apiBaseCandidates('userAdjust'), {
+        method: 'POST',
+        body: payload
+      });
+
+      if (!result.ok) return showToast(result.error || 'User wallet edit failed');
+
+      showToast('User wallet updated');
+      document.getElementById('userWalletAmount').value = '';
+      await loadUsers();
+      await loadAdminWallet();
+      renderAll();
+    }
+
+    async function resetSelectedUserWallet() {
+      const email = document.getElementById('selectedUserEmail').value.trim();
+      if (!email) return showToast('Select a user first');
+      if (!confirm(`Reset wallet for ${email}?`)) return;
+
+      const result = await apiTry(apiBaseCandidates('userReset'), {
+        method: 'POST',
+        body: { targetEmail: email }
+      });
+
+      if (!result.ok) return showToast(result.error || 'Reset failed');
+
+      showToast('User wallet reset');
+      await loadUsers();
+      renderAll();
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Copied');
+      } catch {
+        prompt('Copy:', text);
+      }
+    }
+
+    async function boot() {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+
+      if (!isAdmin()) {
+        document.getElementById('adminDenied').style.display = 'grid';
+        document.getElementById('adminApp').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('adminDenied').style.display = 'none';
+      document.getElementById('adminApp').classList.remove('hidden');
+
+      renderIconGrid();
+      clearTokenForm();
+      clearCopyForm();
+
+      await refreshAll();
+    }
+
+    window.addEventListener('load', boot);
+  </script>
+</body>
+</html>
