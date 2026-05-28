@@ -80,10 +80,7 @@
       z-index: 0;
     }
 
-    button,
-    input,
-    select,
-    textarea {
+    button, input, select, textarea {
       font: inherit;
       outline: none;
       border: none;
@@ -367,6 +364,12 @@
       flex: 0 0 auto;
     }
 
+    .section-icon svg,
+    .brand-logo svg {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .section-sub {
       color: var(--text-muted);
       font-size: 0.74rem;
@@ -383,11 +386,7 @@
       justify-content: flex-end;
     }
 
-    .primary-btn,
-    .mini-btn,
-    .danger-btn,
-    .green-btn,
-    .yellow-btn {
+    .primary-btn, .mini-btn, .danger-btn, .green-btn, .yellow-btn {
       min-height: 40px;
       border-radius: 13px;
       padding: 9px 12px;
@@ -464,9 +463,7 @@
       align-items: center;
     }
 
-    .field input,
-    .field select,
-    .field textarea {
+    .field input, .field select, .field textarea {
       min-height: 42px;
       background: rgba(7,10,15,0.58);
       border: 1px solid var(--border);
@@ -483,9 +480,7 @@
       background: rgba(248,250,252,0.92);
     }
 
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
+    .field input:focus, .field select:focus, .field textarea:focus {
       border-color: rgba(139,92,246,0.72);
       box-shadow: 0 0 0 3px rgba(139,92,246,0.10);
     }
@@ -668,7 +663,7 @@
       display: grid;
       grid-template-columns: repeat(10, 1fr);
       gap: 7px;
-      max-height: 250px;
+      max-height: 305px;
       overflow: auto;
       padding: 4px;
       border-radius: 15px;
@@ -701,32 +696,6 @@
       stroke-width: 2.4;
       stroke-linecap: round;
       stroke-linejoin: round;
-    }
-
-    .range-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 9px;
-      align-items: center;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      height: 4px;
-      border-radius: 999px;
-      background: var(--border-strong);
-      padding: 0;
-      min-height: 4px;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--purple), var(--blue));
-      border: 2px solid white;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.28);
     }
 
     .hidden {
@@ -769,40 +738,6 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(0,0,0,0.68);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      backdrop-filter: blur(12px);
-    }
-
-    .modal-backdrop.show {
-      display: flex;
-    }
-
-    .modal {
-      width: min(720px, 100%);
-      max-height: 90vh;
-      overflow: auto;
-      background: var(--bg-base-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: 0 30px 90px rgba(0,0,0,0.56);
-    }
-
-    .danger-zone {
-      border-color: rgba(246,70,93,0.24);
-      background:
-        radial-gradient(circle at top right, rgba(246,70,93,0.14), transparent 34%),
-        var(--bg-panel);
     }
 
     .admin-only-warning {
@@ -910,9 +845,7 @@
         </svg>
       </div>
       <div class="warning-title">Admin access only</div>
-      <div class="warning-text">
-        This dashboard is locked to the staff/admin account. Log in through the staff form on the index page.
-      </div>
+      <div class="warning-text">This dashboard is locked to the staff/admin account. Log in through the staff form on the index page.</div>
       <div class="btn-row" style="justify-content:center;margin-top:16px;">
         <a class="primary-btn" href="/index.html">Go to login</a>
         <a class="mini-btn" href="/trading">Back to trading</a>
@@ -930,7 +863,7 @@
     <header class="topbar">
       <a href="/dashboard" class="brand">
         <span class="brand-logo">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
             <path d="M4 19.5V4.5A2.5 2.5 0 0 1 6.5 2h11A2.5 2.5 0 0 1 20 4.5v15A2.5 2.5 0 0 1 17.5 22h-11A2.5 2.5 0 0 1 4 19.5Z"/>
             <path d="M8 7h8"/>
             <path d="M8 12h8"/>
@@ -939,7 +872,7 @@
         </span>
         <span style="min-width:0;">
           <div class="brand-title">Tensor Admin</div>
-          <div class="brand-sub">Dashboard • Copy portfolios • Tensor assets • Wallet control</div>
+          <div class="brand-sub">Dashboard • Copy portfolios • Tensor assets • Balance editor</div>
         </span>
       </a>
 
@@ -959,13 +892,13 @@
           <div>
             <div class="hero-title">Admin Control Center</div>
             <div class="hero-sub">
-              Manage copy trading profiles, Tensor tokens, volatility rules, token movement limits, stable coins, and admin balances. This page only controls the interface; your `admin.js` must protect every endpoint server-side.
+              Manage copy trading profiles, Tensor tokens, AI SVG icons, decimals for min/normal price movement, stable coin behavior, and admin/user balances.
             </div>
           </div>
 
           <div class="btn-row">
-            <button class="primary-btn" onclick="openTokenModal('create')">New Tensor Token</button>
-            <button class="green-btn" onclick="openCopyModal('create')">New Copy Profile</button>
+            <button class="primary-btn" onclick="switchSectionByName('tokens'); clearTokenForm()">New Tensor Token</button>
+            <button class="green-btn" onclick="switchSectionByName('copy'); clearCopyForm()">New Copy Profile</button>
           </div>
         </div>
 
@@ -1013,8 +946,9 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M3 3v18h18"/>
-                      <path d="M7 15l4-4 3 3 5-6"/>
+                      <path d="M16 3h5v5"/>
+                      <path d="M4 20 21 3"/>
+                      <path d="M21 16v5h-5"/>
                     </svg>
                   </span>
                   Latest Copy Profiles
@@ -1031,14 +965,14 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M12 6v12"/>
-                      <path d="M6 12h12"/>
+                      <path d="M12 2v4"/>
+                      <path d="M12 18v4"/>
+                      <circle cx="12" cy="12" r="4"/>
                     </svg>
                   </span>
                   Latest Tokens
                 </div>
-                <div class="section-sub">Newest assets in the Tensor registry.</div>
+                <div class="section-sub">Newest AI-themed Tensor assets.</div>
               </div>
             </div>
             <div id="overviewTokenList" class="list"></div>
@@ -1050,14 +984,14 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M3 7h18"/>
-                      <path d="M3 12h18"/>
-                      <path d="M3 17h18"/>
+                      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5Z"/>
+                      <path d="M18 12h.01"/>
+                      <path d="M3 8h18"/>
                     </svg>
                   </span>
                   Admin Balances
                 </div>
-                <div class="section-sub">Quick balance overview for admin account.</div>
+                <div class="section-sub">Quick admin wallet overview.</div>
               </div>
             </div>
             <div id="overviewWalletList" class="list"></div>
@@ -1073,25 +1007,19 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M16 3h5v5"/>
-                      <path d="M4 20 21 3"/>
-                      <path d="M21 16v5h-5"/>
-                      <path d="M15 15l6 6"/>
-                      <path d="M4 4l5 5"/>
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                     </svg>
                   </span>
                   Copy Trading Profiles
                 </div>
-                <div class="section-sub">
-                  Make multiple public copy trading profiles. Each profile can show ROI, PNL, minimum copy, days trading, risk, and active positions.
-                </div>
+                <div class="section-sub">Create, publish, edit, pause, or delete copy trading profiles.</div>
               </div>
-
               <div class="btn-row">
-                <button class="primary-btn" onclick="openCopyModal('create')">Create Profile</button>
+                <button class="primary-btn" onclick="clearCopyForm()">Create Profile</button>
               </div>
             </div>
-
             <div id="copyProfilesList" class="list"></div>
           </div>
 
@@ -1108,7 +1036,7 @@
                   </span>
                   Profile Settings
                 </div>
-                <div class="section-sub">Use this form to publish or update the selected copy profile.</div>
+                <div class="section-sub">Publish or update the selected copy profile.</div>
               </div>
             </div>
 
@@ -1122,7 +1050,7 @@
 
               <div class="field">
                 <label>Tag</label>
-                <input id="copyTag" placeholder="Admin live strategy">
+                <input id="copyTag" placeholder="AI live strategy">
               </div>
 
               <div class="field">
@@ -1172,14 +1100,6 @@
               </div>
 
               <div class="field">
-                <label>Positions shown publicly</label>
-                <select id="copyPositionSource">
-                  <option value="admin_live" selected>Use admin live copy-position trades</option>
-                  <option value="manual">Use manual positions JSON</option>
-                </select>
-              </div>
-
-              <div class="field">
                 <label>Manual positions JSON</label>
                 <textarea id="copyPositionsJson" rows="4" placeholder='[{"symbol":"ETH","side":"long","leverage":10,"roi":4.2}]'></textarea>
               </div>
@@ -1188,10 +1108,6 @@
                 <button type="button" class="mini-btn" onclick="clearCopyForm()">Clear</button>
                 <button type="button" class="danger-btn" onclick="deleteSelectedCopyProfile()">Delete</button>
                 <button type="submit" class="green-btn">Publish / Save</button>
-              </div>
-
-              <div class="note">
-                Backend suggestion: save profiles in `db.copyProfiles`. Keep `admin_copy_portfolio` for live admin-copy if you still want one default portfolio.
               </div>
             </form>
           </div>
@@ -1206,20 +1122,19 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M12 6v12"/>
-                      <path d="M6 12h12"/>
+                      <path d="M12 2v4"/>
+                      <path d="M12 18v4"/>
+                      <circle cx="12" cy="12" r="4"/>
                     </svg>
                   </span>
                   Tensor Tokens
                 </div>
                 <div class="section-sub">
-                  Add, edit, or delete Tensor tokens. Choose SVG icon, stable coin behavior, volatility, price move percentage, and bullish/bearish price zones.
+                  Add, edit, or delete AI-themed Tensor tokens. Price movement supports decimal percentages like 0.1%.
                 </div>
               </div>
-
               <div class="btn-row">
-                <button class="primary-btn" onclick="openTokenModal('create')">Create Token</button>
+                <button class="primary-btn" onclick="clearTokenForm()">Create Token</button>
               </div>
             </div>
 
@@ -1238,7 +1153,7 @@
                   </span>
                   Token Editor
                 </div>
-                <div class="section-sub">The interval fields are for your market loop to respect price movement zones.</div>
+                <div class="section-sub">Use min move and normal move as decimal percentages. Example: 0.1 means 0.1%.</div>
               </div>
             </div>
 
@@ -1290,7 +1205,7 @@
 
                 <div class="field">
                   <label>Move interval seconds</label>
-                  <input id="tokenMoveEverySec" type="number" min="1" step="1" placeholder="3">
+                  <input id="tokenMoveEverySec" type="number" min="1" step="1" value="3">
                 </div>
 
                 <div class="field">
@@ -1307,19 +1222,13 @@
 
               <div class="form-grid">
                 <div class="field">
-                  <label>Min price move % <span id="minMoveLabel">1%</span></label>
-                  <div class="range-row">
-                    <input id="tokenMinMovePct" type="range" min="1" max="50" step="1" value="1" oninput="syncRangeLabels()">
-                    <input id="tokenMinMovePctNum" type="number" min="1" max="50" step="1" value="1" oninput="syncRangeInputs('min')">
-                  </div>
+                  <label>Min price move % <span id="minMoveLabel">0.1%</span></label>
+                  <input id="tokenMinMovePctNum" type="number" min="0.01" max="50" step="0.01" value="0.1" oninput="syncMoveLabels()">
                 </div>
 
                 <div class="field">
-                  <label>Max price move % <span id="maxMoveLabel">5%</span></label>
-                  <div class="range-row">
-                    <input id="tokenMaxMovePct" type="range" min="1" max="50" step="1" value="5" oninput="syncRangeLabels()">
-                    <input id="tokenMaxMovePctNum" type="number" min="1" max="50" step="1" value="5" oninput="syncRangeInputs('max')">
-                  </div>
+                  <label>Normal price move % <span id="normalMoveLabel">1.0%</span></label>
+                  <input id="tokenNormalMovePctNum" type="number" min="0.01" max="50" step="0.01" value="1.0" oninput="syncMoveLabels()">
                 </div>
               </div>
 
@@ -1349,11 +1258,11 @@
 
               <div class="field">
                 <label>Icon SVG</label>
-                <input id="tokenIcon" placeholder="Auto filled when you choose an icon">
+                <input id="tokenIcon" placeholder="Auto filled when you choose an AI icon">
               </div>
 
               <div class="field">
-                <label>Choose from 60 SVG icons</label>
+                <label>Choose from 50 AI SVG icons</label>
                 <div id="iconGrid" class="icon-grid"></div>
               </div>
 
@@ -1364,7 +1273,7 @@
               </div>
 
               <div class="note">
-                Backend fields to save: `stableCoin`, `moveEverySec`, `minPct`, `maxPct`, `bullZoneMin`, `bullZoneMax`, `bearZoneMin`, `bearZoneMax`, `volatilityMode`.
+                Sends both percentage fields: <b>minPct</b>, <b>normalPct</b>, <b>minMovePct</b>, and <b>normalMovePct</b>. Your market loop can use normalPct as the normal move.
               </div>
             </form>
           </div>
@@ -1379,17 +1288,16 @@
                 <div class="section-title">
                   <span class="section-icon">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5v-11Z"/>
+                      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5Z"/>
                       <path d="M18 12h.01"/>
                       <path d="M3 8h18"/>
                     </svg>
                   </span>
                   Admin Wallet
                 </div>
-                <div class="section-sub">Add or remove crypto and Tensor balances from the admin wallet.</div>
+                <div class="section-sub">Edit admin normal crypto and Tensor token balances.</div>
               </div>
             </div>
-
             <div id="adminWalletList" class="list"></div>
           </div>
 
@@ -1405,7 +1313,7 @@
                   </span>
                   Edit Admin Balance
                 </div>
-                <div class="section-sub">Use positive amount to add, negative amount to remove.</div>
+                <div class="section-sub">Set, add, or subtract crypto and Tensor balances.</div>
               </div>
             </div>
 
@@ -1425,10 +1333,19 @@
                 </div>
               </div>
 
-              <div class="form-grid">
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Mode</label>
+                  <select id="adminWalletMode">
+                    <option value="set">Set exact balance</option>
+                    <option value="add">Add</option>
+                    <option value="subtract">Subtract</option>
+                  </select>
+                </div>
+
                 <div class="field">
                   <label>Amount</label>
-                  <input id="adminWalletAmount" type="number" step="any" placeholder="1000 or -500">
+                  <input id="adminWalletAmount" type="number" step="any" placeholder="1000">
                 </div>
 
                 <div class="field">
@@ -1438,9 +1355,9 @@
               </div>
 
               <div class="btn-row">
-                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletAmount').value='1000'">+1000</button>
-                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletAmount').value='-1000'">-1000</button>
-                <button type="submit" class="green-btn">Apply Balance Edit</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletMode').value='add';document.getElementById('adminWalletAmount').value='1000'">+1000</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('adminWalletMode').value='subtract';document.getElementById('adminWalletAmount').value='1000'">-1000</button>
+                <button type="submit" class="green-btn">Apply Admin Balance Edit</button>
               </div>
             </form>
           </div>
@@ -1458,7 +1375,6 @@
                       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                       <circle cx="9" cy="7" r="4"/>
                       <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                     </svg>
                   </span>
                   Users
@@ -1515,10 +1431,19 @@
                 </div>
               </div>
 
-              <div class="form-grid">
+              <div class="form-grid three">
+                <div class="field">
+                  <label>Mode</label>
+                  <select id="userWalletMode">
+                    <option value="set">Set exact balance</option>
+                    <option value="add">Add</option>
+                    <option value="subtract">Subtract</option>
+                  </select>
+                </div>
+
                 <div class="field">
                   <label>Amount</label>
-                  <input id="userWalletAmount" type="number" step="any" placeholder="1000 or -500">
+                  <input id="userWalletAmount" type="number" step="any" placeholder="1000">
                 </div>
 
                 <div class="field">
@@ -1528,84 +1453,17 @@
               </div>
 
               <div class="btn-row">
-                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletAmount').value='1000'">+1000</button>
-                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletAmount').value='-1000'">-1000</button>
-                <button type="submit" class="green-btn">Apply User Edit</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletMode').value='add';document.getElementById('userWalletAmount').value='1000'">+1000</button>
+                <button type="button" class="mini-btn" onclick="document.getElementById('userWalletMode').value='subtract';document.getElementById('userWalletAmount').value='1000'">-1000</button>
+                <button type="submit" class="green-btn">Apply User Balance Edit</button>
               </div>
             </form>
-
-            <div class="panel danger-zone" style="margin-top:12px;box-shadow:none;">
-              <div class="section-title" style="margin-bottom:8px;">
-                <span class="section-icon" style="background:var(--red-soft);color:var(--red);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M3 6h18"/>
-                    <path d="M8 6V4h8v2"/>
-                    <path d="M19 6l-1 14H6L5 6"/>
-                  </svg>
-                </span>
-                Dangerous User Actions
-              </div>
-              <div class="note">Only enable these backend routes if you truly need them.</div>
-              <div class="btn-row" style="margin-top:10px;justify-content:flex-start;">
-                <button class="danger-btn" onclick="resetSelectedUserWallet()">Reset User Wallet</button>
-              </div>
-            </div>
           </div>
         </div>
       </section>
     </main>
 
     <div class="toast" id="toast">Done</div>
-
-    <div class="modal-backdrop" id="tokenModal">
-      <div class="modal">
-        <div class="section-head">
-          <div>
-            <div class="section-title">
-              <span class="section-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 6v12"/>
-                  <path d="M6 12h12"/>
-                </svg>
-              </span>
-              Quick Token Create
-            </div>
-            <div class="section-sub">Fill the token editor behind this modal, then save.</div>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="mini-btn" onclick="closeModal('tokenModal')">Close</button>
-          <button class="primary-btn" onclick="closeModal('tokenModal'); switchSectionByName('tokens')">Open Token Editor</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-backdrop" id="copyModal">
-      <div class="modal">
-        <div class="section-head">
-          <div>
-            <div class="section-title">
-              <span class="section-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <path d="M16 3h5v5"/>
-                  <path d="M4 20 21 3"/>
-                  <path d="M21 16v5h-5"/>
-                </svg>
-              </span>
-              Quick Copy Profile Create
-            </div>
-            <div class="section-sub">Fill the copy profile editor behind this modal, then publish.</div>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="mini-btn" onclick="closeModal('copyModal')">Close</button>
-          <button class="primary-btn" onclick="closeModal('copyModal'); switchSectionByName('copy')">Open Copy Editor</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -1614,75 +1472,64 @@
     let tokens = [];
     let copyProfiles = [];
     let users = [];
-    let selectedIconId = 'icon-ai';
+    let selectedIconId = 'ai-brain-network';
     let selectedUser = null;
 
+    const ADMIN_EMAIL = 'admin@tensorwallet.local';
     const cryptoAssets = ['USDT', 'OUSD', 'BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE'];
 
-    const iconLibrary = [
-      ['icon-ai', '<svg viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg>'],
-      ['icon-bot', '<svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><path d="M12 7V3"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M9 17h6"/></svg>'],
-      ['icon-chip', '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 9h3"/><path d="M4 15h3"/><path d="M17 9h3"/><path d="M17 15h3"/><path d="M9 4v3"/><path d="M15 4v3"/><path d="M9 17v3"/><path d="M15 17v3"/></svg>'],
-      ['icon-orbit', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12c3-6 15-6 18 0c-3 6-15 6-18 0Z"/><path d="M12 3c6 3 6 15 0 18c-6-3-6-15 0-18Z"/></svg>'],
-      ['icon-rocket', '<svg viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.2-2 3-2 5c2 0 3.8-.5 5-2"/><path d="M9 15l-3-3c1-4 4-7 9-9c2 2 2 6 0 9l-3 3"/><path d="M9 15l-1 4l4-1"/><circle cx="14" cy="8" r="1.5"/></svg>'],
-      ['icon-star', '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.1l6.7.9l-4.8 4.7l1.1 6.6L12 17.2l-5.9 3.1l1.1-6.6L2.4 9l6.7-.9Z"/></svg>'],
-      ['icon-bolt', '<svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8l11-14h-8Z"/></svg>'],
-      ['icon-flame', '<svg viewBox="0 0 24 24"><path d="M12 22c4 0 7-3 7-7c0-5-4-7-5-12c-3 2-7 6-7 12c0 4 2 7 5 7Z"/><path d="M12 22c2 0 3.5-1.5 3.5-3.5c0-2.5-2-3.5-2.5-6c-1.5 1-3.5 3-3.5 6c0 2 1 3.5 2.5 3.5Z"/></svg>'],
-      ['icon-diamond', '<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6l-10 12L2 9Z"/><path d="M2 9h20"/><path d="M12 21L8 9l4-6l4 6Z"/></svg>'],
-      ['icon-crown', '<svg viewBox="0 0 24 24"><path d="M3 8l4 3l5-7l5 7l4-3v11H3Z"/><path d="M3 19h18"/></svg>'],
-      ['icon-shield', '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3l-8 3v7c0 6 8 10 8 10Z"/></svg>'],
-      ['icon-vault', '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M12 9v6"/><path d="M9 12h6"/></svg>'],
-      ['icon-wave', '<svg viewBox="0 0 24 24"><path d="M2 12c3-4 6-4 9 0s6 4 11 0"/><path d="M2 17c3-4 6-4 9 0s6 4 11 0"/><path d="M2 7c3-4 6-4 9 0s6 4 11 0"/></svg>'],
-      ['icon-moon', '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3A7 7 0 0 0 21 12.8Z"/></svg>'],
-      ['icon-sun', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>'],
-      ['icon-cloud', '<svg viewBox="0 0 24 24"><path d="M17.5 19H7a5 5 0 1 1 1.4-9.8A7 7 0 0 1 21 13.5A3.5 3.5 0 0 1 17.5 19Z"/></svg>'],
-      ['icon-leaf', '<svg viewBox="0 0 24 24"><path d="M21 3S9 3 5 7s-2 10 3 12s10-1 12-8c1-4 1-8 1-8Z"/><path d="M5 19c3-6 7-9 16-16"/></svg>'],
-      ['icon-tree', '<svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M7 15h10l-5-7Z"/><path d="M8 10h8l-4-6Z"/></svg>'],
-      ['icon-fish', '<svg viewBox="0 0 24 24"><path d="M3 12s4-5 10-5s8 5 8 5s-2 5-8 5s-10-5-10-5Z"/><path d="M3 12l-2-3v6Z"/><circle cx="16" cy="11" r=".5"/></svg>'],
-      ['icon-anchor', '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><path d="M12 8v13"/><path d="M5 12H2v3"/><path d="M19 12h3v3"/><path d="M5 12c0 6 14 6 14 0"/></svg>'],
-      ['icon-globe', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20"/><path d="M12 2a15 15 0 0 0 0 20"/></svg>'],
-      ['icon-map', '<svg viewBox="0 0 24 24"><path d="M9 18l-6 3V6l6-3l6 3l6-3v15l-6 3Z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>'],
-      ['icon-gem', '<svg viewBox="0 0 24 24"><path d="M6 3h12l4 6l-10 12L2 9Z"/></svg>'],
-      ['icon-cube', '<svg viewBox="0 0 24 24"><path d="M21 16V8l-9-5l-9 5v8l9 5Z"/><path d="M3.3 7.5L12 12l8.7-4.5"/><path d="M12 22V12"/></svg>'],
-      ['icon-box', '<svg viewBox="0 0 24 24"><path d="M21 8l-9-5l-9 5l9 5Z"/><path d="M3 8v8l9 5l9-5V8"/><path d="M12 13v8"/></svg>'],
-      ['icon-key', '<svg viewBox="0 0 24 24"><circle cx="7.5" cy="14.5" r="4.5"/><path d="M11 11l10-10"/><path d="M17 5l2 2"/><path d="M14 8l2 2"/></svg>'],
-      ['icon-lock', '<svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'],
-      ['icon-eye', '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7s10 7 10 7s-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>'],
-      ['icon-scan', '<svg viewBox="0 0 24 24"><path d="M4 7V4h3"/><path d="M17 4h3v3"/><path d="M20 17v3h-3"/><path d="M7 20H4v-3"/><path d="M7 12h10"/></svg>'],
-      ['icon-target', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'],
-      ['icon-crosshair', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>'],
-      ['icon-compass', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-2 6l-6 2l2-6Z"/></svg>'],
-      ['icon-chart', '<svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4l3 3l5-6"/></svg>'],
-      ['icon-candle', '<svg viewBox="0 0 24 24"><path d="M8 3v18"/><rect x="5" y="7" width="6" height="8" rx="1"/><path d="M16 3v18"/><rect x="13" y="10" width="6" height="7" rx="1"/></svg>'],
-      ['icon-bars', '<svg viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20V8"/></svg>'],
-      ['icon-bank', '<svg viewBox="0 0 24 24"><path d="M3 9l9-6l9 6Z"/><path d="M5 10v8"/><path d="M9 10v8"/><path d="M15 10v8"/><path d="M19 10v8"/><path d="M3 21h18"/></svg>'],
-      ['icon-card', '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/></svg>'],
-      ['icon-wallet', '<svg viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5.5A2.5 2.5 0 0 1 3 18.5v-11Z"/><path d="M18 12h.01"/><path d="M3 8h18"/></svg>'],
-      ['icon-coin', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M9 9.5A3 3 0 0 1 12 8h1a2.5 2.5 0 0 1 0 5h-2a2.5 2.5 0 0 0 0 5h1a3 3 0 0 0 3-1.5"/></svg>'],
-      ['icon-stack', '<svg viewBox="0 0 24 24"><path d="M12 3l9 5l-9 5l-9-5Z"/><path d="M3 12l9 5l9-5"/><path d="M3 16l9 5l9-5"/></svg>'],
-      ['icon-link', '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.2-1.2"/></svg>'],
-      ['icon-network', '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="19" cy="19" r="3"/><path d="M8 11l8-5"/><path d="M8 13l8 5"/></svg>'],
-      ['icon-pulse', '<svg viewBox="0 0 24 24"><path d="M3 12h4l2-6l4 12l2-6h6"/></svg>'],
-      ['icon-heart', '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6l1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>'],
-      ['icon-skull', '<svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 6v4h8v-4c2-1 4-3 4-6a8 8 0 0 0-8-8Z"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M10 15h4"/></svg>'],
-      ['icon-firework', '<svg viewBox="0 0 24 24"><path d="M12 12l7-7"/><path d="M12 12l-7 7"/><path d="M12 12l7 7"/><path d="M12 12L5 5"/><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/></svg>'],
-      ['icon-sparkles', '<svg viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6Z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8Z"/><path d="M5 14l.8 2.2L8 17l-2.2.8L5 20l-.8-2.2L2 17l2.2-.8Z"/></svg>'],
-      ['icon-hourglass', '<svg viewBox="0 0 24 24"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M7 2c0 6 10 6 10 12c0 4-10 4-10 8"/><path d="M17 2c0 6-10 6-10 12c0 4 10 4 10 8"/></svg>'],
-      ['icon-clock', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'],
-      ['icon-truck', '<svg viewBox="0 0 24 24"><path d="M3 7h12v10H3Z"/><path d="M15 10h4l2 3v4h-6Z"/><circle cx="7" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>'],
-      ['icon-plane', '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20l-4-9l-9-4Z"/></svg>'],
-      ['icon-car', '<svg viewBox="0 0 24 24"><path d="M5 11l2-5h10l2 5"/><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M7 18v2"/><path d="M17 18v2"/><path d="M7 14h.01"/><path d="M17 14h.01"/></svg>'],
-      ['icon-house', '<svg viewBox="0 0 24 24"><path d="M3 10l9-7l9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 22V12h6v10"/></svg>'],
-      ['icon-building', '<svg viewBox="0 0 24 24"><path d="M4 22V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v18"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg>'],
-      ['icon-book', '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>'],
-      ['icon-code', '<svg viewBox="0 0 24 24"><path d="M8 9l-4 3l4 3"/><path d="M16 9l4 3l-4 3"/><path d="M14 4l-4 16"/></svg>'],
-      ['icon-terminal', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3l-3 3"/><path d="M13 15h4"/></svg>'],
-      ['icon-game', '<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="10" rx="4"/><path d="M8 12v2"/><path d="M7 13h2"/><path d="M16 13h.01"/><path d="M18 11h.01"/></svg>'],
-      ['icon-music', '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'],
-      ['icon-camera', '<svg viewBox="0 0 24 24"><path d="M4 7h4l2-3h4l2 3h4v13H4Z"/><circle cx="12" cy="14" r="4"/></svg>'],
-      ['icon-brain', '<svg viewBox="0 0 24 24"><path d="M8 5a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3 0Z"/><path d="M16 5a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v1a3 3 0 0 1-6 0V5a3 3 0 0 1 3 0Z"/></svg>'],
-      ['icon-dna', '<svg viewBox="0 0 24 24"><path d="M7 3c8 4 8 14 0 18"/><path d="M17 3c-8 4-8 14 0 18"/><path d="M8 7h8"/><path d="M7 12h10"/><path d="M8 17h8"/></svg>'],
-      ['icon-atom', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg>']
+    const aiIconPaths = [
+      ['ai-brain-network', '<svg viewBox="0 0 24 24"><path d="M8 5a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 6 0V5a3 3 0 0 0-3 0Z"/><path d="M16 5a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v1a3 3 0 0 1-6 0V5a3 3 0 0 1 3 0Z"/><path d="M11 8h2"/><path d="M11 12h2"/><path d="M11 16h2"/></svg>'],
+      ['ai-chip-core', '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 9h3M4 15h3M17 9h3M17 15h3M9 4v3M15 4v3M9 17v3M15 17v3"/><circle cx="12" cy="12" r="2"/></svg>'],
+      ['ai-neural-nodes', '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="12" r="2"/><path d="M7 11l3-4M7 13l3 4M14 7l3 4M14 17l3-4M12 7v10"/></svg>'],
+      ['ai-bot-face', '<svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="4"/><path d="M12 7V3"/><path d="M8 13h.01M16 13h.01"/><path d="M9 17h6"/></svg>'],
+      ['ai-quantum-eye', '<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7s10 7 10 7s-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>'],
+      ['ai-orbit-chip', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(120 12 12)"/></svg>'],
+      ['ai-ml-graph', '<svg viewBox="0 0 24 24"><path d="M3 20V4"/><path d="M3 20h18"/><circle cx="7" cy="15" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8.5 13.5l2-2M14 9l2.5-2"/></svg>'],
+      ['ai-data-stream', '<svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><path d="M8 4v4M16 10v4M11 16v4"/></svg>'],
+      ['ai-prompt-box', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3l-3 3"/><path d="M13 15h4"/></svg>'],
+      ['ai-vector-spark', '<svg viewBox="0 0 24 24"><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 16l-1.7-5L6 9.3l4.3-1.7Z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8Z"/></svg>'],
+      ['ai-robot-arm', '<svg viewBox="0 0 24 24"><path d="M6 20h12"/><path d="M8 20v-4l4-4l3 3l-4 4"/><circle cx="12" cy="12" r="2"/><path d="M14 10l4-4"/><path d="M17 3l4 4"/></svg>'],
+      ['ai-layer-stack', '<svg viewBox="0 0 24 24"><path d="M12 3l9 5l-9 5l-9-5Z"/><path d="M3 12l9 5l9-5"/><path d="M3 16l9 5l9-5"/></svg>'],
+      ['ai-model-cube', '<svg viewBox="0 0 24 24"><path d="M21 16V8l-9-5l-9 5v8l9 5Z"/><path d="M3.3 7.5L12 12l8.7-4.5"/><path d="M12 22V12"/></svg>'],
+      ['ai-vision-scan', '<svg viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3"/><circle cx="12" cy="12" r="3"/><path d="M8 12h8"/></svg>'],
+      ['ai-language', '<svg viewBox="0 0 24 24"><path d="M4 5h10"/><path d="M9 5v14"/><path d="M4 12h10"/><path d="M16 19l4-10l4 10"/><path d="M17.5 15h5"/></svg>'],
+      ['ai-cloud-model', '<svg viewBox="0 0 24 24"><path d="M17.5 19H7a5 5 0 1 1 1.4-9.8A7 7 0 0 1 21 13.5A3.5 3.5 0 0 1 17.5 19Z"/><path d="M10 14h4M12 12v4"/></svg>'],
+      ['ai-secure-model', '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3l-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2l4-5"/></svg>'],
+      ['ai-automation', '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13-6"/><path d="M20 12a8 8 0 0 1-13 6"/><path d="M17 2v4h4"/><path d="M7 22v-4H3"/></svg>'],
+      ['ai-agent', '<svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/><path d="M9 7h.01M15 7h.01"/><path d="M10 10h4"/></svg>'],
+      ['ai-transformer', '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/><rect x="8.5" y="14" width="7" height="7" rx="2"/><path d="M10 8h4M12 11v3"/></svg>'],
+      ['ai-attention', '<svg viewBox="0 0 24 24"><path d="M12 3l3 6l6 1l-4.5 4.4l1 6.3L12 17.8l-5.5 2.9l1-6.3L3 10l6-1Z"/><circle cx="12" cy="12" r="2"/></svg>'],
+      ['ai-dataset', '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>'],
+      ['ai-cluster', '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M8.5 7.5l2 7M15.5 7.5l-2 7M9 6h6"/></svg>'],
+      ['ai-flow', '<svg viewBox="0 0 24 24"><path d="M4 6h7a3 3 0 0 1 3 3v0a3 3 0 0 0 3 3h3"/><path d="M4 18h7a3 3 0 0 0 3-3v0a3 3 0 0 1 3-3h3"/><path d="M18 9l3 3l-3 3"/></svg>'],
+      ['ai-signal', '<svg viewBox="0 0 24 24"><path d="M3 12h3l2-5l4 10l3-7l2 2h4"/><circle cx="12" cy="12" r="10"/></svg>'],
+      ['ai-hologram', '<svg viewBox="0 0 24 24"><path d="M12 3l8 4v10l-8 4l-8-4V7Z"/><path d="M12 3v18M4 7l8 4l8-4M4 17l8-4l8 4"/></svg>'],
+      ['ai-neuron', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 9V3M12 15v6M9 12H3M15 12h6M9.8 9.8L5.5 5.5M14.2 14.2l4.3 4.3M14.2 9.8l4.3-4.3M9.8 14.2l-4.3 4.3"/></svg>'],
+      ['ai-inference', '<svg viewBox="0 0 24 24"><path d="M4 4h6v6H4Z"/><path d="M14 4h6v6h-6Z"/><path d="M9 14h6v6H9Z"/><path d="M10 7h4M12 10v4"/></svg>'],
+      ['ai-training', '<svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 16l3-4l3 2l5-7"/><path d="M18 7h2v2"/></svg>'],
+      ['ai-optimizer', '<svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 1 0 8-8"/><path d="M12 5V2"/><path d="M12 22v-3"/><path d="M5 12H2"/><path d="M22 12h-3"/><path d="M9 12l2 2l4-5"/></svg>'],
+      ['ai-api', '<svg viewBox="0 0 24 24"><path d="M8 9l-4 3l4 3"/><path d="M16 9l4 3l-4 3"/><path d="M14 4l-4 16"/><circle cx="12" cy="12" r="10"/></svg>'],
+      ['ai-memory', '<svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9Z"/><path d="M3 9h2M3 15h2M19 9h2M19 15h2M9 3v2M15 3v2M9 19v2M15 19v2"/></svg>'],
+      ['ai-tokenizer', '<svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h7"/><path d="M17 14l3 3l-3 3"/></svg>'],
+      ['ai-copilot', '<svg viewBox="0 0 24 24"><path d="M12 2l7 4v6c0 5-3.5 9-7 10c-3.5-1-7-5-7-10V6Z"/><path d="M8 13l2 2l6-6"/></svg>'],
+      ['ai-circuit', '<svg viewBox="0 0 24 24"><path d="M5 5h5v5H5Z"/><path d="M14 14h5v5h-5Z"/><path d="M10 7h4a3 3 0 0 1 3 3v4"/><path d="M7 10v4a3 3 0 0 0 3 3h4"/></svg>'],
+      ['ai-predict', '<svg viewBox="0 0 24 24"><path d="M3 17l6-6l4 4l8-8"/><path d="M17 7h4v4"/><circle cx="9" cy="11" r="2"/><circle cx="13" cy="15" r="2"/></svg>'],
+      ['ai-model-card', '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/><circle cx="17" cy="17" r="1"/></svg>'],
+      ['ai-lab', '<svg viewBox="0 0 24 24"><path d="M9 2v6l-5 9a3 3 0 0 0 2.6 4.5h10.8A3 3 0 0 0 20 17L15 8V2"/><path d="M8 2h8"/><path d="M7 16h10"/></svg>'],
+      ['ai-synthetic', '<svg viewBox="0 0 24 24"><path d="M12 3l9 6l-9 6l-9-6Z"/><path d="M3 15l9 6l9-6"/><path d="M12 9v6"/></svg>'],
+      ['ai-router', '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11l10-5M7 13l10 5"/><path d="M12 12h4"/></svg>'],
+      ['ai-pipeline', '<svg viewBox="0 0 24 24"><path d="M4 6h6v6H4Z"/><path d="M14 12h6v6h-6Z"/><path d="M10 9h4a3 3 0 0 1 3 3"/><path d="M17 9l3 3l-3 3"/></svg>'],
+      ['ai-classifier', '<svg viewBox="0 0 24 24"><path d="M4 5h7v7H4Z"/><path d="M13 5h7v7h-7Z"/><path d="M4 14h7v5H4Z"/><path d="M13 14h7v5h-7Z"/></svg>'],
+      ['ai-generator', '<svg viewBox="0 0 24 24"><path d="M12 2l1.5 5L19 8.5L13.5 10L12 16l-1.5-6L5 8.5L10.5 7Z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8Z"/></svg>'],
+      ['ai-detector', '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/><path d="M8 11l2 2l4-5"/></svg>'],
+      ['ai-embedding', '<svg viewBox="0 0 24 24"><path d="M4 4h6v6H4Z"/><path d="M14 4h6v6h-6Z"/><path d="M4 14h6v6H4Z"/><path d="M14 14h6v6h-6Z"/><path d="M10 7h4M10 17h4M7 10v4M17 10v4"/></svg>'],
+      ['ai-reasoning', '<svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12c1 1 1 2 1 4h6c0-2 0-3 1-4a7 7 0 0 0-4-12Z"/></svg>'],
+      ['ai-swarm', '<svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="18" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/><circle cx="12" cy="12" r="2"/><path d="M8 8.5l2.5 2M16 8.5l-2.5 2M8 15.5l2.5-2M16 15.5l-2.5-2"/></svg>'],
+      ['ai-rag', '<svg viewBox="0 0 24 24"><path d="M4 5h10v14H4Z"/><path d="M14 8h6v11h-6"/><path d="M7 9h4M7 13h4"/><path d="M16 12h2"/></svg>'],
+      ['ai-finetune', '<svg viewBox="0 0 24 24"><path d="M4 6h10"/><path d="M4 12h16"/><path d="M4 18h10"/><circle cx="17" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>'],
+      ['ai-autopilot', '<svg viewBox="0 0 24 24"><path d="M12 2l8 20l-8-4l-8 4Z"/><path d="M12 2v16"/><path d="M8 13h8"/></svg>'],
+      ['ai-matrix', '<svg viewBox="0 0 24 24"><path d="M4 4h4v4H4Z"/><path d="M10 4h4v4h-4Z"/><path d="M16 4h4v4h-4Z"/><path d="M4 10h4v4H4Z"/><path d="M10 10h4v4h-4Z"/><path d="M16 10h4v4h-4Z"/><path d="M4 16h4v4H4Z"/><path d="M10 16h4v4h-4Z"/><path d="M16 16h4v4h-4Z"/></svg>']
     ];
 
     function isAdmin() {
@@ -1694,33 +1541,12 @@
         || role === 'admin'
         || walletRole === 'staff'
         || walletRole === 'admin'
-        || email === 'admin@tensorwallet.local';
+        || email === ADMIN_EMAIL;
     }
 
-    function apiBaseCandidates(kind) {
-      const map = {
-        summary: ['/api/admin/summary', '/api/admin/state'],
-        tokens: ['/api/admin/tensor/tokens', '/api/tensor'],
-        tokenCreate: ['/api/admin/tensor/tokens', '/api/tensor/deploy'],
-        tokenUpdate: id => [`/api/admin/tensor/tokens/${encodeURIComponent(id)}`, `/api/tensor/update/${encodeURIComponent(id)}`],
-        tokenDelete: id => [`/api/admin/tensor/tokens/${encodeURIComponent(id)}`, `/api/tensor/delete/${encodeURIComponent(id)}`],
-        copyProfiles: ['/api/admin/copy/profiles', '/api/copy/profiles'],
-        copyCreate: ['/api/admin/copy/profiles', '/api/copy/admin/profile'],
-        copyUpdate: id => [`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/copy/admin/profile/${encodeURIComponent(id)}`],
-        copyDelete: id => [`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/copy/admin/profile/${encodeURIComponent(id)}`],
-        adminWallet: ['/api/admin/wallet', '/api/wallet'],
-        adminWalletAdjust: ['/api/admin/wallet/adjust'],
-        users: ['/api/admin/users'],
-        userAdjust: ['/api/admin/users/adjust'],
-        userReset: ['/api/admin/users/reset-wallet']
-      };
-
-      return map[kind];
-    }
-
-    async function apiTry(candidates, options = {}) {
-      const list = typeof candidates === 'function' ? candidates(options.id) : candidates;
-      let lastError = null;
+    async function apiTry(urls, options = {}) {
+      const list = Array.isArray(urls) ? urls : [urls];
+      let lastError = '';
 
       for (const url of list) {
         try {
@@ -1741,10 +1567,7 @@
             ? await res.json()
             : { text: await res.text() };
 
-          if (res.ok) {
-            return { ok: true, data, url };
-          }
-
+          if (res.ok) return { ok: true, data, url };
           lastError = data.error || data.text || `HTTP ${res.status}`;
         } catch (err) {
           lastError = err.message;
@@ -1781,7 +1604,6 @@
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove('show'), 2100);
     }
@@ -1795,7 +1617,6 @@
     function switchSection(name, btn) {
       document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
       document.getElementById(`section-${name}`).classList.remove('hidden');
-
       document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
     }
@@ -1804,28 +1625,19 @@
       const btn = Array.from(document.querySelectorAll('.nav-tab')).find(b => {
         return b.textContent.trim().toLowerCase().includes(name);
       });
-
       switchSection(name, btn);
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.remove('show');
-    }
-
-    function openTokenModal(mode = 'create') {
-      if (mode === 'create') clearTokenForm();
-      document.getElementById('tokenModal').classList.add('show');
-    }
-
-    function openCopyModal(mode = 'create') {
-      if (mode === 'create') clearCopyForm();
-      document.getElementById('copyModal').classList.add('show');
+    function getIconHtml(icon) {
+      if (!icon) return aiIconPaths[0][1];
+      if (String(icon).includes('<svg')) return icon;
+      const found = aiIconPaths.find(x => x[0] === icon);
+      return found ? found[1] : aiIconPaths[0][1];
     }
 
     function renderIconGrid() {
       const grid = document.getElementById('iconGrid');
-
-      grid.innerHTML = iconLibrary.map(([id, svg]) => `
+      grid.innerHTML = aiIconPaths.map(([id, svg]) => `
         <button type="button" class="icon-choice ${selectedIconId === id ? 'active' : ''}" title="${escapeHtml(id)}" onclick="selectIcon('${escapeHtml(id)}')">
           ${svg}
         </button>
@@ -1834,50 +1646,26 @@
 
     function selectIcon(id) {
       selectedIconId = id;
-      const found = iconLibrary.find(x => x[0] === id);
+      const found = aiIconPaths.find(x => x[0] === id);
       document.getElementById('tokenIcon').value = found ? found[1] : id;
       renderIconGrid();
     }
 
-    function getIconHtml(icon) {
-      if (!icon) return iconLibrary[0][1];
-      if (String(icon).includes('<svg')) return icon;
+    function syncMoveLabels() {
+      const min = clamp(Number(document.getElementById('tokenMinMovePctNum').value || 0.1), 0.01, 50);
+      const normal = clamp(Number(document.getElementById('tokenNormalMovePctNum').value || 1), 0.01, 50);
 
-      const found = iconLibrary.find(x => x[0] === icon);
-      if (found) return found[1];
+      document.getElementById('tokenMinMovePctNum').value = min;
+      document.getElementById('tokenNormalMovePctNum').value = Math.max(min, normal);
 
-      return `<span style="font-weight:950;">${escapeHtml(String(icon).slice(0, 2).toUpperCase())}</span>`;
+      document.getElementById('minMoveLabel').textContent = `${min}%`;
+      document.getElementById('normalMoveLabel').textContent = `${Math.max(min, normal)}%`;
     }
 
-    function syncRangeLabels() {
-      const minRange = document.getElementById('tokenMinMovePct');
-      const maxRange = document.getElementById('tokenMaxMovePct');
-
-      let minVal = Number(minRange.value) || 1;
-      let maxVal = Number(maxRange.value) || 1;
-
-      if (minVal > maxVal) {
-        maxVal = minVal;
-        maxRange.value = maxVal;
-      }
-
-      document.getElementById('tokenMinMovePctNum').value = minVal;
-      document.getElementById('tokenMaxMovePctNum').value = maxVal;
-      document.getElementById('minMoveLabel').textContent = `${minVal}%`;
-      document.getElementById('maxMoveLabel').textContent = `${maxVal}%`;
-    }
-
-    function syncRangeInputs(type) {
-      const input = type === 'min'
-        ? document.getElementById('tokenMinMovePctNum')
-        : document.getElementById('tokenMaxMovePctNum');
-
-      const range = type === 'min'
-        ? document.getElementById('tokenMinMovePct')
-        : document.getElementById('tokenMaxMovePct');
-
-      range.value = Math.max(1, Math.min(50, Number(input.value) || 1));
-      syncRangeLabels();
+    function clamp(n, min, max) {
+      n = Number(n);
+      if (!Number.isFinite(n)) return min;
+      return Math.max(min, Math.min(max, n));
     }
 
     async function refreshAll() {
@@ -1894,59 +1682,40 @@
     }
 
     async function loadSummary() {
-      const result = await apiTry(apiBaseCandidates('summary'));
+      const result = await apiTry(['/api/admin/summary', '/api/admin/state']);
+      if (!result.ok) return;
 
-      if (result.ok) {
-        const data = result.data;
-        if (data.wallet) adminWallet = data.wallet;
-        if (Array.isArray(data.tokens)) tokens = data.tokens;
-        if (Array.isArray(data.tensorRegistry)) tokens = data.tensorRegistry;
-        if (Array.isArray(data.copyProfiles)) copyProfiles = data.copyProfiles;
-        if (Array.isArray(data.profiles)) copyProfiles = data.profiles;
-        if (Array.isArray(data.users)) users = data.users;
-      }
+      const data = result.data;
+      if (data.wallet) adminWallet = data.wallet;
+      if (data.summary && data.summary.copyPortfolio) copyProfiles = [data.summary.copyPortfolio];
+      if (Array.isArray(data.tokens)) tokens = data.tokens;
+      if (Array.isArray(data.tensorRegistry)) tokens = data.tensorRegistry;
+      if (Array.isArray(data.copyProfiles)) copyProfiles = data.copyProfiles;
+      if (Array.isArray(data.profiles)) copyProfiles = data.profiles;
+      if (Array.isArray(data.users)) users = data.users;
     }
 
     async function loadTokens() {
-      const result = await apiTry(apiBaseCandidates('tokens'));
-
-      if (!result.ok) {
-        console.warn(result.error);
-        return;
-      }
-
-      const data = result.data;
-      tokens = data.tokens || data.registry || data.tensorRegistry || [];
+      const result = await apiTry(['/api/admin/tensor/tokens', '/api/tensor']);
+      if (!result.ok) return;
+      tokens = result.data.tokens || result.data.registry || result.data.tensorRegistry || [];
     }
 
     async function loadCopyProfiles() {
-      const result = await apiTry(apiBaseCandidates('copyProfiles'));
-
-      if (!result.ok) {
-        console.warn(result.error);
-        return;
-      }
-
-      const data = result.data;
-      copyProfiles = data.copyProfiles || data.profiles || (data.portfolio ? [data.portfolio] : []);
+      const result = await apiTry(['/api/admin/copy/profiles', '/api/admin/copy/portfolio', '/api/copy/profiles']);
+      if (!result.ok) return;
+      copyProfiles = result.data.copyProfiles || result.data.profiles || (result.data.portfolio ? [result.data.portfolio] : []);
     }
 
     async function loadAdminWallet() {
-      const result = await apiTry(apiBaseCandidates('adminWallet'));
-
-      if (!result.ok) {
-        console.warn(result.error);
-        return;
-      }
-
-      adminWallet = result.data.wallet || result.data;
+      const result = await apiTry(['/api/admin/users/' + encodeURIComponent(ADMIN_EMAIL), '/api/wallet']);
+      if (!result.ok) return;
+      adminWallet = result.data.user || result.data.wallet || result.data;
     }
 
     async function loadUsers() {
-      const result = await apiTry(apiBaseCandidates('users'));
-
+      const result = await apiTry(['/api/admin/users']);
       if (!result.ok) {
-        console.warn(result.error);
         users = [];
         renderUsers();
         return;
@@ -1974,9 +1743,7 @@
       document.getElementById('statUsdt').textContent = formatMoney(adminWallet.usdtBalance || 0);
       document.getElementById('statOusd').textContent = formatMoney(adminWallet.ousdBalance || 0);
       document.getElementById('statPositions').textContent = Array.isArray(adminWallet.positions) ? adminWallet.positions.length : 0;
-
-      const followers = copyProfiles.reduce((sum, p) => sum + Number(p.followers || 0), 0);
-      document.getElementById('statFollowers').textContent = followers;
+      document.getElementById('statFollowers').textContent = copyProfiles.reduce((sum, p) => sum + Number(p.followers || 0), 0);
     }
 
     function renderOverview() {
@@ -2001,17 +1768,16 @@
     function copyCardHtml(p) {
       const pnl = Number(p.pnl || p.manualPnl || 0);
       const roi = Number(p.roi || p.manualRoi || 0);
-      const col = pnl >= 0 ? 'green' : 'red';
       const statusBadge = p.status === 'active' ? 'green' : 'yellow';
 
       return `
         <div class="card">
           <div class="card-top">
             <div class="token-row">
-              <div class="token-icon">${iconLibrary[32][1]}</div>
+              <div class="token-icon">${getIconHtml('ai-predict')}</div>
               <div>
                 <div class="token-title">${escapeHtml(p.name || 'Copy Profile')}</div>
-                <div class="token-sub">${escapeHtml(p.tag || 'Public strategy')} • ${escapeHtml(p.risk || 'Medium')} risk</div>
+                <div class="token-sub">${escapeHtml(p.tag || 'AI strategy')} • ${escapeHtml(p.risk || 'Medium')} risk</div>
               </div>
             </div>
             <span class="badge ${statusBadge}">${escapeHtml(p.status || 'active')}</span>
@@ -2037,10 +1803,16 @@
       document.getElementById('copyProfilesList').innerHTML = copyProfiles.map(copyCardHtml).join('') || `<div class="empty">No copy profiles. Create one.</div>`;
     }
 
+    function displayPctFromToken(value, fallback = 0) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return fallback;
+      return n;
+    }
+
     function tokenCardHtml(t) {
       const stable = t.stableCoin || t.stable || t.bias === 'pegged';
-      const moveMin = Number(t.minPct || 0) * 100;
-      const moveMax = Number(t.maxPct || 0) * 100;
+      const minMove = displayPctFromToken(t.minMovePct ?? t.minPct, 0.1);
+      const normalMove = displayPctFromToken(t.normalMovePct ?? t.normalPct ?? t.maxPct, 1);
 
       return `
         <div class="card">
@@ -2058,7 +1830,7 @@
           <div class="metric-grid">
             <div class="metric"><div class="metric-label">Price</div><div class="metric-value">$${formatPrice(t.price || 0)}</div></div>
             <div class="metric"><div class="metric-label">Supply</div><div class="metric-value">${formatMoney(t.supply || 0, 0)}</div></div>
-            <div class="metric"><div class="metric-label">Move</div><div class="metric-value">${formatMoney(moveMin, 0)}-${formatMoney(moveMax, 0)}%</div></div>
+            <div class="metric"><div class="metric-label">Move</div><div class="metric-value">${formatMoney(minMove, 2)}-${formatMoney(normalMove, 2)}%</div></div>
             <div class="metric"><div class="metric-label">Cap</div><div class="metric-value">$${formatMoney(t.marketCap || 0, 0)}</div></div>
           </div>
 
@@ -2113,7 +1885,7 @@
         <div class="card">
           <div class="card-top">
             <div class="token-row">
-              <div class="token-icon">${row.type === 'Tensor' ? iconLibrary[0][1] : iconLibrary[37][1]}</div>
+              <div class="token-icon">${row.type === 'Tensor' ? getIconHtml('ai-chip-core') : getIconHtml('ai-secure-model')}</div>
               <div>
                 <div class="token-title">${escapeHtml(row.symbol)}</div>
                 <div class="token-sub">${escapeHtml(row.type)} wallet balance</div>
@@ -2151,6 +1923,7 @@
 
     function renderUsers() {
       const q = String(document.getElementById('userSearch')?.value || '').toLowerCase();
+
       const filtered = users.filter(u => {
         const text = JSON.stringify(u || {}).toLowerCase();
         return !q || text.includes(q);
@@ -2165,12 +1938,14 @@
             </div>
             <span class="badge ${u.role === 'staff' ? 'purple' : 'green'}">${escapeHtml(u.role || 'user')}</span>
           </div>
+
           <div class="metric-grid">
             <div class="metric"><div class="metric-label">USDT</div><div class="metric-value">$${formatMoney(u.usdtBalance || 0)}</div></div>
             <div class="metric"><div class="metric-label">OUSD</div><div class="metric-value">$${formatMoney(u.ousdBalance || 0)}</div></div>
-            <div class="metric"><div class="metric-label">Trades</div><div class="metric-value">${Array.isArray(u.positions) ? u.positions.length : 0}</div></div>
-            <div class="metric"><div class="metric-label">Copy</div><div class="metric-value">${Array.isArray(u.copyTrades) ? u.copyTrades.length : 0}</div></div>
+            <div class="metric"><div class="metric-label">Trades</div><div class="metric-value">${u.positionsCount ?? (Array.isArray(u.positions) ? u.positions.length : 0)}</div></div>
+            <div class="metric"><div class="metric-label">Copy</div><div class="metric-value">${u.copyTradesCount ?? (Array.isArray(u.copyTrades) ? u.copyTrades.length : 0)}</div></div>
           </div>
+
           <div class="card-actions">
             <button class="mini-btn" onclick="selectUser('${escapeHtml(u.email || '')}')">Select</button>
           </div>
@@ -2185,6 +1960,7 @@
     }
 
     function clearTokenForm() {
+      switchSectionByName('tokens');
       document.getElementById('tokenId').value = '';
       document.getElementById('tokenName').value = '';
       document.getElementById('tokenSymbol').value = '';
@@ -2194,15 +1970,15 @@
       document.getElementById('tokenVolatilityMode').value = 'medium';
       document.getElementById('tokenMoveEverySec').value = '3';
       document.getElementById('tokenBias').value = 'balanced';
-      document.getElementById('tokenMinMovePct').value = '1';
-      document.getElementById('tokenMaxMovePct').value = '5';
+      document.getElementById('tokenMinMovePctNum').value = '0.1';
+      document.getElementById('tokenNormalMovePctNum').value = '1.0';
       document.getElementById('tokenBullMin').value = '';
       document.getElementById('tokenBullMax').value = '';
       document.getElementById('tokenBearMin').value = '';
       document.getElementById('tokenBearMax').value = '';
-      selectedIconId = 'icon-ai';
+      selectedIconId = 'ai-brain-network';
       selectIcon(selectedIconId);
-      syncRangeLabels();
+      syncMoveLabels();
     }
 
     function fillTokenForm(id) {
@@ -2221,23 +1997,19 @@
       document.getElementById('tokenMoveEverySec').value = t.moveEverySec || 3;
       document.getElementById('tokenBias').value = t.bias || 'balanced';
 
-      const minPct = Math.max(1, Math.min(50, Math.round(Number(t.minPct || 0.01) * 100)));
-      const maxPct = Math.max(1, Math.min(50, Math.round(Number(t.maxPct || 0.05) * 100)));
-
-      document.getElementById('tokenMinMovePct').value = minPct;
-      document.getElementById('tokenMaxMovePct').value = maxPct;
+      document.getElementById('tokenMinMovePctNum').value = displayPctFromToken(t.minMovePct ?? t.minPct, 0.1);
+      document.getElementById('tokenNormalMovePctNum').value = displayPctFromToken(t.normalMovePct ?? t.normalPct ?? t.maxPct, 1);
 
       document.getElementById('tokenBullMin').value = t.bullZoneMin ?? '';
       document.getElementById('tokenBullMax').value = t.bullZoneMax ?? '';
       document.getElementById('tokenBearMin').value = t.bearZoneMin ?? '';
       document.getElementById('tokenBearMax').value = t.bearZoneMax ?? '';
-
       document.getElementById('tokenIcon').value = t.iconSvg || t.iconId || t.icon || '';
 
-      const found = iconLibrary.find(x => x[1] === t.iconSvg || x[0] === t.iconId || x[0] === t.icon);
-      selectedIconId = found ? found[0] : 'icon-ai';
+      const found = aiIconPaths.find(x => x[1] === t.iconSvg || x[0] === t.iconId || x[0] === t.icon);
+      selectedIconId = found ? found[0] : 'ai-brain-network';
 
-      syncRangeLabels();
+      syncMoveLabels();
       renderIconGrid();
     }
 
@@ -2246,8 +2018,8 @@
 
       const id = document.getElementById('tokenId').value.trim();
       const stableCoin = document.getElementById('tokenStable').value === 'true';
-      const minMove = Math.max(1, Math.min(50, Number(document.getElementById('tokenMinMovePct').value) || 1));
-      const maxMove = Math.max(minMove, Math.min(50, Number(document.getElementById('tokenMaxMovePct').value) || minMove));
+      const minMovePct = clamp(Number(document.getElementById('tokenMinMovePctNum').value || 0.1), 0.01, 50);
+      const normalMovePct = Math.max(minMovePct, clamp(Number(document.getElementById('tokenNormalMovePctNum').value || 1), 0.01, 50));
 
       const payload = {
         name: document.getElementById('tokenName').value.trim(),
@@ -2255,17 +2027,25 @@
         price: Number(document.getElementById('tokenPrice').value || 0),
         startPrice: Number(document.getElementById('tokenPrice').value || 0),
         supply: Number(document.getElementById('tokenSupply').value || 0),
+
         stableCoin,
-        stable,
+        stable: stableCoin,
         bias: stableCoin ? 'pegged' : document.getElementById('tokenBias').value,
+
         volatilityMode: document.getElementById('tokenVolatilityMode').value,
         moveEverySec: Number(document.getElementById('tokenMoveEverySec').value || 3),
-        minPct: minMove,
-        maxPct: maxMove,
+
+        minPct: minMovePct,
+        maxPct: normalMovePct,
+        normalPct: normalMovePct,
+        minMovePct,
+        normalMovePct,
+
         bullZoneMin: Number(document.getElementById('tokenBullMin').value || 0),
         bullZoneMax: Number(document.getElementById('tokenBullMax').value || 0),
         bearZoneMin: Number(document.getElementById('tokenBearMin').value || 0),
         bearZoneMax: Number(document.getElementById('tokenBearMax').value || 0),
+
         icon: selectedIconId,
         iconId: selectedIconId,
         iconSvg: document.getElementById('tokenIcon').value
@@ -2276,8 +2056,8 @@
       }
 
       const result = id
-        ? await apiTry(apiBaseCandidates('tokenUpdate')(id), { method: 'PUT', body: payload })
-        : await apiTry(apiBaseCandidates('tokenCreate'), { method: 'POST', body: payload });
+        ? await apiTry([`/api/admin/tensor/update/${encodeURIComponent(id)}`, `/api/tensor/update/${encodeURIComponent(id)}`], { method: 'PUT', body: payload })
+        : await apiTry(['/api/admin/tensor/deploy', '/api/tensor/deploy'], { method: 'POST', body: payload });
 
       if (!result.ok) return showToast(result.error || 'Token save failed');
 
@@ -2294,9 +2074,9 @@
 
     async function deleteToken(id) {
       if (!id) return;
-      if (!confirm('Delete this Tensor token? This can remove user balances/positions depending on your backend.')) return;
+      if (!confirm('Delete this Tensor token?')) return;
 
-      const result = await apiTry(apiBaseCandidates('tokenDelete')(id), { method: 'DELETE' });
+      const result = await apiTry([`/api/admin/tensor/delete/${encodeURIComponent(id)}`, `/api/tensor/delete/${encodeURIComponent(id)}`], { method: 'DELETE' });
 
       if (!result.ok) return showToast(result.error || 'Delete failed');
 
@@ -2307,6 +2087,7 @@
     }
 
     function clearCopyForm() {
+      switchSectionByName('copy');
       document.getElementById('copyProfileId').value = '';
       document.getElementById('copyName').value = '';
       document.getElementById('copyTag').value = '';
@@ -2317,7 +2098,6 @@
       document.getElementById('copyMinCopy').value = '50';
       document.getElementById('copyRisk').value = 'Medium';
       document.getElementById('copyStatus').value = 'active';
-      document.getElementById('copyPositionSource').value = 'admin_live';
       document.getElementById('copyPositionsJson').value = '';
     }
 
@@ -2337,7 +2117,6 @@
       document.getElementById('copyMinCopy').value = p.minCopyUsdt ?? 50;
       document.getElementById('copyRisk').value = p.risk || 'Medium';
       document.getElementById('copyStatus').value = p.status || 'active';
-      document.getElementById('copyPositionSource').value = p.positionSource || 'admin_live';
       document.getElementById('copyPositionsJson').value = p.positions ? JSON.stringify(p.positions, null, 2) : '';
     }
 
@@ -2347,13 +2126,11 @@
       const id = document.getElementById('copyProfileId').value.trim();
       let positions = [];
 
-      if (document.getElementById('copyPositionSource').value === 'manual') {
-        try {
-          positions = JSON.parse(document.getElementById('copyPositionsJson').value || '[]');
-          if (!Array.isArray(positions)) positions = [];
-        } catch {
-          return showToast('Positions JSON is invalid');
-        }
+      try {
+        positions = JSON.parse(document.getElementById('copyPositionsJson').value || '[]');
+        if (!Array.isArray(positions)) positions = [];
+      } catch {
+        return showToast('Positions JSON is invalid');
       }
 
       const payload = {
@@ -2368,15 +2145,14 @@
         minCopyUsdt: Number(document.getElementById('copyMinCopy').value || 50),
         risk: document.getElementById('copyRisk').value,
         status: document.getElementById('copyStatus').value,
-        positionSource: document.getElementById('copyPositionSource').value,
         positions
       };
 
       if (!payload.name) return showToast('Profile name is required');
 
       const result = id
-        ? await apiTry(apiBaseCandidates('copyUpdate')(id), { method: 'PUT', body: payload })
-        : await apiTry(apiBaseCandidates('copyCreate'), { method: 'POST', body: payload });
+        ? await apiTry([`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/admin/copy/portfolio`, `/api/copy/admin/profile/${encodeURIComponent(id)}`], { method: 'PUT', body: payload })
+        : await apiTry(['/api/admin/copy/profiles', '/api/admin/copy/portfolio', '/api/copy/admin/profile'], { method: 'POST', body: payload });
 
       if (!result.ok) return showToast(result.error || 'Copy profile save failed');
 
@@ -2395,7 +2171,7 @@
       if (!id) return;
       if (!confirm('Delete this copy trading profile?')) return;
 
-      const result = await apiTry(apiBaseCandidates('copyDelete')(id), { method: 'DELETE' });
+      const result = await apiTry([`/api/admin/copy/profiles/${encodeURIComponent(id)}`, `/api/admin/copy/portfolio`, `/api/copy/admin/profile/${encodeURIComponent(id)}`], { method: 'DELETE' });
 
       if (!result.ok) return showToast(result.error || 'Delete failed');
 
@@ -2405,27 +2181,54 @@
       renderAll();
     }
 
+    async function adjustBalance({ targetEmail, walletType, asset, mode, amount, reason }) {
+      if (walletType === 'crypto') {
+        return await apiTry([`/api/admin/users/${encodeURIComponent(targetEmail)}/balance`], {
+          method: 'PUT',
+          body: { asset, mode, amount, reason }
+        });
+      }
+
+      const tokenId = asset;
+
+      const preferred = await apiTry(['/api/admin/tensor/balance-adjust', '/api/tensor/admin-balance-adjust'], {
+        method: 'POST',
+        body: { targetEmail, email: targetEmail, tokenId, mode, amount, reason }
+      });
+
+      if (preferred.ok) return preferred;
+
+      if (mode === 'add') {
+        return await apiTry(['/api/admin/tensor/mint', '/api/tensor/admin-mint'], {
+          method: 'POST',
+          body: { targetEmail, email: targetEmail, tokenId, amount, reason }
+        });
+      }
+
+      return {
+        ok: false,
+        error: 'Tensor set/subtract needs backend route POST /api/admin/tensor/balance-adjust. Add it to admin.js for full edit support.'
+      };
+    }
+
     async function adjustAdminWallet(event) {
       event.preventDefault();
 
       const payload = {
-        targetEmail: 'admin@tensorwallet.local',
+        targetEmail: ADMIN_EMAIL,
         walletType: document.getElementById('adminWalletType').value,
         asset: document.getElementById('adminWalletAsset').value,
+        mode: document.getElementById('adminWalletMode').value,
         amount: Number(document.getElementById('adminWalletAmount').value || 0),
-        reason: document.getElementById('adminWalletReason').value || 'Manual admin wallet adjustment'
+        reason: document.getElementById('adminWalletReason').value || 'Manual admin balance adjustment'
       };
 
-      if (!payload.asset || !payload.amount) return showToast('Choose asset and amount');
+      if (!payload.asset || payload.amount <= 0) return showToast('Choose asset and positive amount');
 
-      const result = await apiTry(apiBaseCandidates('adminWalletAdjust'), {
-        method: 'POST',
-        body: payload
-      });
+      const result = await adjustBalance(payload);
+      if (!result.ok) return showToast(result.error || 'Admin balance edit failed');
 
-      if (!result.ok) return showToast(result.error || 'Admin wallet edit failed');
-
-      showToast('Admin wallet updated');
+      showToast('Admin balance updated');
       document.getElementById('adminWalletAmount').value = '';
       await loadAdminWallet();
       renderAll();
@@ -2441,40 +2244,20 @@
         targetEmail: email,
         walletType: document.getElementById('userWalletType').value,
         asset: document.getElementById('userWalletAsset').value,
+        mode: document.getElementById('userWalletMode').value,
         amount: Number(document.getElementById('userWalletAmount').value || 0),
-        reason: document.getElementById('userWalletReason').value || 'Manual user wallet adjustment'
+        reason: document.getElementById('userWalletReason').value || 'Manual user balance adjustment'
       };
 
-      if (!payload.asset || !payload.amount) return showToast('Choose asset and amount');
+      if (!payload.asset || payload.amount <= 0) return showToast('Choose asset and positive amount');
 
-      const result = await apiTry(apiBaseCandidates('userAdjust'), {
-        method: 'POST',
-        body: payload
-      });
+      const result = await adjustBalance(payload);
+      if (!result.ok) return showToast(result.error || 'User balance edit failed');
 
-      if (!result.ok) return showToast(result.error || 'User wallet edit failed');
-
-      showToast('User wallet updated');
+      showToast('User balance updated');
       document.getElementById('userWalletAmount').value = '';
       await loadUsers();
       await loadAdminWallet();
-      renderAll();
-    }
-
-    async function resetSelectedUserWallet() {
-      const email = document.getElementById('selectedUserEmail').value.trim();
-      if (!email) return showToast('Select a user first');
-      if (!confirm(`Reset wallet for ${email}?`)) return;
-
-      const result = await apiTry(apiBaseCandidates('userReset'), {
-        method: 'POST',
-        body: { targetEmail: email }
-      });
-
-      if (!result.ok) return showToast(result.error || 'Reset failed');
-
-      showToast('User wallet reset');
-      await loadUsers();
       renderAll();
     }
 
