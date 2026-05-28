@@ -7,6 +7,10 @@ const crypto = require('crypto');
 const session = require('express-session');
 const nodemailer = require('nodemailer');
 
+const walletEngine = require('./wallet');
+const tensorEngine = require('./tensor');
+const createAdminRouter = require('./admin');
+
 const app = express();
 
 /* -------------------- Config -------------------- */
@@ -94,15 +98,6 @@ const SUPPORTED_WALLET_ASSETS = [
   'DOGE'
 ];
 
-const DEMO_SEED_WORDS = [
-  'alpha', 'orbit', 'matrix', 'tensor', 'vault', 'river', 'signal', 'quantum',
-  'neural', 'forest', 'silver', 'phoenix', 'rocket', 'cipher', 'galaxy',
-  'anchor', 'velvet', 'dragon', 'ember', 'crystal', 'shadow', 'summit',
-  'pixel', 'vector', 'ocean', 'kernel', 'nova', 'bridge', 'solar', 'radar',
-  'marble', 'logic', 'future', 'atlas', 'cobalt', 'prism', 'lunar', 'storm',
-  'cloud', 'binary', 'tempo', 'satoshi', 'origin', 'fusion', 'delta', 'prime'
-];
-
 /* -------------------- App Setup -------------------- */
 
 app.set('trust proxy', 1);
@@ -134,7 +129,7 @@ app.use(session({
   }
 }));
 
-/* -------------------- Helpers -------------------- */
+/* -------------------- General Helpers -------------------- */
 
 function nowIso() {
   return new Date().toISOString();
@@ -146,6 +141,10 @@ function sha(input) {
 
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
+}
+
+function normalizeAsset(asset) {
+  return String(asset || '').trim().toUpperCase();
 }
 
 function safeNumber(value, fallback = 0) {
@@ -219,18 +218,7 @@ function formatPrice(n) {
 }
 
 function normalizeNetwork(network) {
-  const raw = String(network || '').trim().toLowerCase();
-
-  if (raw.includes('arb')) return 'arbitrum';
-  if (raw.includes('sol')) return 'sol';
-  if (raw.includes('tron') || raw.includes('trc') || raw.includes('trx')) return 'trx';
-  if (raw.includes('eth') || raw.includes('erc')) return 'eth';
-
-  return 'eth';
-}
-
-function normalizeAsset(asset) {
-  return String(asset || '').trim().toUpperCase();
+  return walletEngine.normalizeNetwork(network);
 }
 
 function getAssetBalanceField(asset) {
@@ -282,36 +270,6 @@ function creditSpendableBalance(user, asset, amount) {
   return getSpendableBalance(user, symbol);
 }
 
-function seededWordIndex(seed, index) {
-  const hash = sha(`${seed}:${index}`);
-  const n = parseInt(hash.slice(0, 8), 16);
-  return n % DEMO_SEED_WORDS.length;
-}
-
-function makeDemoSeed(seedInput) {
-  const words = [];
-
-  for (let i = 0; i < 12; i++) {
-    words.push(DEMO_SEED_WORDS[seededWordIndex(seedInput, i)]);
-  }
-
-  return words.join(' ');
-}
-
-function ensureUserSeeds(user) {
-  if (!user) return;
-
-  const base = `${user.email || ''}:${user.id || ''}:${user.tensorAddress || ''}`;
-
-  if (!user.normalSeed) {
-    user.normalSeed = makeDemoSeed(`${base}:normal`);
-  }
-
-  if (!user.tensorSeed) {
-    user.tensorSeed = makeDemoSeed(`${base}:tensor`);
-  }
-}
-
 function inferUserUsdtNetwork(user) {
   const candidates = [];
 
@@ -342,61 +300,6 @@ function getTreasuryDestination(network) {
     key,
     ...TREASURY_USDT_ADDRESSES[key]
   };
-}
-
-function getWalletReceiveAddress(user, asset = 'USDT', network = 'eth') {
-  const symbol = normalizeAsset(asset);
-  const net = normalizeNetwork(network);
-
-  if (symbol === 'USDT' || symbol === 'OUSD') {
-    return getTreasuryDestination(net).address;
-  }
-
-  if (symbol.startsWith('TENSOR:')) {
-    return user.tensorAddress || getTreasuryDestination(net).address;
-  }
-
-  const candidates = [];
-
-  if (Array.isArray(user.publicWallets)) candidates.push(...user.publicWallets);
-  if (Array.isArray(user.assets)) candidates.push(...user.assets);
-  if (Array.isArray(user.wallets)) candidates.push(...user.wallets);
-  if (Array.isArray(user.balances)) candidates.push(...user.balances);
-
-  const found = candidates.find(item => {
-    const text = JSON.stringify(item || {}).toLowerCase();
-    return text.includes(symbol.toLowerCase()) && text.includes(net);
-  });
-
-  if (found) {
-    return found.address || found.publicAddress || found.walletAddress || found.depositAddress || '';
-  }
-
-  if (net === 'sol') return TREASURY_USDT_ADDRESSES.sol.address;
-  if (net === 'trx') return TREASURY_USDT_ADDRESSES.trx.address;
-
-  return user.tensorAddress || TREASURY_USDT_ADDRESSES.eth.address;
-}
-
-function buildReceiveAddresses(user) {
-  const result = {};
-
-  SUPPORTED_WALLET_ASSETS.forEach(asset => {
-    result[asset] = {};
-
-    Object.keys(TREASURY_USDT_ADDRESSES).forEach(network => {
-      result[asset][network] = getWalletReceiveAddress(user, asset, network);
-    });
-  });
-
-  result.TENSOR = {
-    eth: user.tensorAddress,
-    arbitrum: user.tensorAddress,
-    sol: user.tensorAddress,
-    trx: user.tensorAddress
-  };
-
-  return result;
 }
 
 function isStaffUser(user) {
@@ -676,6 +579,10 @@ function migrateDb(db) {
   if (!db.otps) db.otps = {};
   if (!Array.isArray(db.tensorRegistry)) db.tensorRegistry = [];
 
+  if (db.tensorRegistry.length === 0) {
+    db.tensorRegistry = defaultTensorAssets();
+  }
+
   if (!db.treasury) {
     db.treasury = {
       collectedFeesUsdt: 0,
@@ -711,18 +618,19 @@ function migrateDb(db) {
 
   migrateCopyPortfolio(db.copyPortfolio);
 
-  if (db.tensorRegistry.length === 0) {
-    db.tensorRegistry = defaultTensorAssets();
-  }
-
-  Object.values(db.users).forEach(migrateUser);
   db.tensorRegistry.forEach(migrateToken);
+
+  Object.values(db.users).forEach(user => {
+    migrateUser(user, db.tensorRegistry);
+  });
 }
 
-function migrateUser(user) {
+function migrateUser(user, tensorRegistry = []) {
   if (!user) return;
 
   if (!user.email) user.email = '';
+  user.email = normalizeEmail(user.email);
+
   if (!user.id && user.email) user.id = `wallet_${sha(user.email).slice(0, 20)}`;
   if (!user.role) user.role = 'user';
   if (!user.createdAt) user.createdAt = nowIso();
@@ -734,11 +642,6 @@ function migrateUser(user) {
   if (!Array.isArray(user.balances)) user.balances = [];
   if (!Array.isArray(user.walletTxHistory)) user.walletTxHistory = [];
 
-  if (!user.tensorAddress && user.email) {
-    user.tensorAddress = `T0x${sha(user.email).slice(0, 40)}`;
-  }
-
-  if (!user.tensorVault) user.tensorVault = null;
   if (!user.tensorBalances) user.tensorBalances = {};
   if (!Array.isArray(user.positions)) user.positions = [];
   if (!Array.isArray(user.orderHistory)) user.orderHistory = [];
@@ -770,10 +673,14 @@ function migrateUser(user) {
 
   user.usdtNetwork = normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user));
 
-  ensureUserSeeds(user);
+  walletEngine.ensureCryptoWalletForUser(user);
+  tensorEngine.ensureTensorWalletForUser(user, tensorRegistry);
 
   user.positions.forEach(migratePosition);
   user.copyTrades.forEach(migrateCopyTrade);
+
+  walletEngine.removePlaintextWalletSecrets(user);
+  tensorEngine.removePlaintextTensorSecrets(user);
 }
 
 function migratePosition(pos) {
@@ -862,14 +769,15 @@ function migrateCopyPortfolio(profile) {
   if (!profile.updatedAtIso) profile.updatedAtIso = nowIso();
 }
 
-/* -------------------- Users/Auth Helpers -------------------- */
+/* -------------------- User/Auth Helpers -------------------- */
 
 function createWalletRecord(email, role = 'user') {
-  const hash = sha(email);
+  const normEmail = normalizeEmail(email);
+  const hash = sha(normEmail);
 
   const record = {
     id: `wallet_${hash.slice(0, 20)}`,
-    email,
+    email: normEmail,
     role,
     createdAt: nowIso(),
     updatedAt: nowIso(),
@@ -879,7 +787,6 @@ function createWalletRecord(email, role = 'user') {
     wallets: [],
     balances: [],
     walletTxHistory: [],
-    tensorAddress: `T0x${hash.slice(0, 40)}`,
     tensorVault: null,
     tensorBalances: {},
     usdtBalance: role === 'staff' ? 1000000 : 15000,
@@ -899,7 +806,8 @@ function createWalletRecord(email, role = 'user') {
     copyDeposits: []
   };
 
-  ensureUserSeeds(record);
+  walletEngine.ensureCryptoWalletForUser(record);
+  tensorEngine.ensureTensorWalletForUser(record, []);
 
   return record;
 }
@@ -910,14 +818,16 @@ function getOrCreateUser(email, role = 'user') {
 
   if (!db.users[normEmail]) {
     db.users[normEmail] = createWalletRecord(normEmail, role);
+    migrateUser(db.users[normEmail], db.tensorRegistry);
     writeDb(db);
   } else {
-    migrateUser(db.users[normEmail]);
+    migrateUser(db.users[normEmail], db.tensorRegistry);
 
     if (role === 'staff' && db.users[normEmail].role !== 'staff') {
       db.users[normEmail].role = 'staff';
-      writeDb(db);
     }
+
+    writeDb(db);
   }
 
   return db.users[normEmail];
@@ -927,12 +837,14 @@ function getAdminUser(db) {
   const admin = db.users[ADMIN_EMAIL];
 
   if (admin) {
-    migrateUser(admin);
+    migrateUser(admin, db.tensorRegistry);
     admin.role = 'staff';
     return admin;
   }
 
   db.users[ADMIN_EMAIL] = createWalletRecord(ADMIN_EMAIL, 'staff');
+  migrateUser(db.users[ADMIN_EMAIL], db.tensorRegistry);
+
   return db.users[ADMIN_EMAIL];
 }
 
@@ -944,14 +856,6 @@ function requireAuth(req, res, next) {
 function requireAuthJson(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: 'Not authenticated.' });
-  }
-
-  next();
-}
-
-function requireAdminJson(req, res, next) {
-  if (!isStaffSession(req)) {
-    return res.status(403).json({ error: 'Admin access required.' });
   }
 
   next();
@@ -1529,7 +1433,7 @@ function mirrorNewAdminTradeToCopiers(db, adminPosition) {
   Object.values(db.users).forEach(user => {
     if (normalizeEmail(user.email) === ADMIN_EMAIL) return;
 
-    migrateUser(user);
+    migrateUser(user, db.tensorRegistry);
 
     user.copyTrades.forEach(copy => {
       migrateCopyTrade(copy);
@@ -1563,7 +1467,7 @@ function closeMirroredAdminTradeForCopiers(db, adminPositionId, closePrice) {
   Object.values(db.users).forEach(user => {
     if (normalizeEmail(user.email) === ADMIN_EMAIL) return;
 
-    migrateUser(user);
+    migrateUser(user, db.tensorRegistry);
 
     user.copyTrades.forEach(copy => {
       migrateCopyTrade(copy);
@@ -1686,7 +1590,7 @@ async function runMarketLoop() {
 
     Object.keys(db.users).forEach(email => {
       const user = db.users[email];
-      migrateUser(user);
+      migrateUser(user, db.tensorRegistry);
 
       syncCopyTradePerformance(db, user);
 
@@ -1750,7 +1654,7 @@ async function runMarketLoop() {
   }
 }
 
-/* -------------------- Public Trade Cards -------------------- */
+/* -------------------- Public Trade Card Rendering -------------------- */
 
 function buildTradeCardPayload({ req, db, user, trade }) {
   const publicId = makePublicId('trade');
@@ -1977,7 +1881,7 @@ function renderTradePublicPage(card) {
 </html>`;
 }
 
-function renderCopyProfilePage(req, profile) {
+function renderCopyProfilePage(profile) {
   if (!profile) return 'Copy profile not found.';
 
   const roiClass = profile.roi >= 0 ? '#0ecb81' : '#f6465d';
@@ -2144,7 +2048,7 @@ app.get('/copy/:id', (req, res) => {
   }
 
   res.set('Cache-Control', 'public, max-age=60');
-  res.send(renderCopyProfilePage(req, profile));
+  res.send(renderCopyProfilePage(profile));
 });
 
 /* -------------------- Auth Routes -------------------- */
@@ -2231,7 +2135,7 @@ app.post('/staff-login', (req, res) => {
     walletId: user.id
   };
 
-  req.session.save(() => res.redirect('/trading'));
+  req.session.save(() => res.redirect('/dashboard'));
 });
 
 app.get('/logout', (req, res) => {
@@ -2245,7 +2149,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/logout');
 });
 
-/* -------------------- Copy Portfolio APIs -------------------- */
+/* -------------------- Copy Portfolio User APIs -------------------- */
 
 app.get('/api/copy/profiles', requireAuthJson, (req, res) => {
   const db = readDb();
@@ -2274,106 +2178,6 @@ app.get('/api/copy/profile/:id', requireAuthJson, (req, res) => {
     ok: true,
     profile
   });
-});
-
-app.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const profile = db.copyPortfolio;
-
-  migrateCopyPortfolio(profile);
-
-  profile.name = String(req.body.name || profile.name || 'Tensor Alpha Copy').trim().slice(0, 80);
-  profile.tag = String(req.body.tag || 'Admin copy portfolio').trim().slice(0, 120);
-  profile.description = String(req.body.description || profile.description || '').trim().slice(0, 800);
-  profile.risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : profile.risk;
-  profile.minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, profile.minCopyUsdt));
-  profile.status = req.body.status === 'paused' ? 'paused' : 'active';
-  profile.daysTrading = Math.max(0, Math.floor(safeNumber(req.body.daysTrading, profile.daysTrading)));
-  profile.manualRoi = safeNumber(req.body.manualRoi ?? req.body.roi, profile.manualRoi);
-  profile.manualPnl = safeNumber(req.body.manualPnl ?? req.body.pnl, profile.manualPnl);
-  profile.deleted = false;
-  profile.updatedAt = Date.now();
-  profile.updatedAtIso = nowIso();
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    profile: publicCopyPortfolioForResponse(req, db)
-  });
-});
-
-app.put('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
-  if (String(req.params.id) !== 'admin_copy_portfolio') {
-    return res.status(404).json({ error: 'Copy portfolio not found.' });
-  }
-
-  const db = readDb();
-  const profile = db.copyPortfolio;
-
-  migrateCopyPortfolio(profile);
-
-  if (req.body.name !== undefined) profile.name = String(req.body.name || profile.name).trim().slice(0, 80);
-  if (req.body.tag !== undefined) profile.tag = String(req.body.tag || profile.tag).trim().slice(0, 120);
-  if (req.body.description !== undefined) profile.description = String(req.body.description || '').trim().slice(0, 800);
-  if (req.body.risk !== undefined) profile.risk = ['Low', 'Medium', 'High'].includes(req.body.risk) ? req.body.risk : profile.risk;
-  if (req.body.minCopyUsdt !== undefined) profile.minCopyUsdt = Math.max(1, safeNumber(req.body.minCopyUsdt, profile.minCopyUsdt));
-  if (req.body.status !== undefined) profile.status = req.body.status === 'paused' ? 'paused' : 'active';
-  if (req.body.daysTrading !== undefined) profile.daysTrading = Math.max(0, Math.floor(safeNumber(req.body.daysTrading, profile.daysTrading)));
-  if (req.body.manualRoi !== undefined || req.body.roi !== undefined) profile.manualRoi = safeNumber(req.body.manualRoi ?? req.body.roi, profile.manualRoi);
-  if (req.body.manualPnl !== undefined || req.body.pnl !== undefined) profile.manualPnl = safeNumber(req.body.manualPnl ?? req.body.pnl, profile.manualPnl);
-
-  profile.deleted = false;
-  profile.updatedAt = Date.now();
-  profile.updatedAtIso = nowIso();
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    profile: publicCopyPortfolioForResponse(req, db)
-  });
-});
-
-app.delete('/api/copy/admin/profile/:id', requireAdminJson, (req, res) => {
-  if (String(req.params.id) !== 'admin_copy_portfolio') {
-    return res.status(404).json({ error: 'Copy portfolio not found.' });
-  }
-
-  const db = readDb();
-
-  db.copyPortfolio.deleted = true;
-  db.copyPortfolio.status = 'paused';
-  db.copyPortfolio.updatedAt = Date.now();
-  db.copyPortfolio.updatedAtIso = nowIso();
-
-  Object.values(db.users).forEach(user => {
-    migrateUser(user);
-
-    user.copyTrades.forEach(copy => {
-      if (copy.profileId === 'admin_copy_portfolio' && copy.status === 'active') {
-        syncCopyTradePerformance(db, user);
-
-        const returnAmount = Math.max(0, safeNumber(copy.amountUsdt, 0) + safeNumber(copy.pnl, 0));
-        const fundingAsset = normalizeAsset(copy.fundingAsset || 'USDT');
-
-        creditSpendableBalance(user, fundingAsset, returnAmount);
-
-        copy.status = 'closed';
-        copy.closedAt = Date.now();
-        copy.closedAtIso = nowIso();
-        copy.returnedUsdt = returnAmount;
-        copy.closeReason = 'Copy portfolio deleted by admin';
-      }
-    });
-
-    user.copyTrades = user.copyTrades.filter(copy => copy.status === 'active');
-    user.updatedAt = nowIso();
-  });
-
-  writeDb(db);
-
-  res.json({ ok: true });
 });
 
 app.post('/api/copy/join', requireAuthJson, (req, res) => {
@@ -2409,7 +2213,7 @@ app.post('/api/copy/join', requireAuthJson, (req, res) => {
   }
 
   const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
 
   if (normalizeEmail(user.email) === ADMIN_EMAIL) {
     return res.status(400).json({ error: 'Admin cannot copy their own portfolio.' });
@@ -2513,7 +2317,7 @@ app.post('/api/copy/stop', requireAuthJson, (req, res) => {
     return res.status(401).json({ error: 'User not found.' });
   }
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
   syncCopyTradePerformance(db, user);
 
   const idx = user.copyTrades.findIndex(c => String(c.id) === copyTradeId && c.status === 'active');
@@ -2584,10 +2388,18 @@ app.get('/api/trading/state', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
   syncCopyTradePerformance(db, user);
 
   writeDb(db);
+
+  const walletPayload = walletEngine.buildWalletPublicPayload(user, {
+    includeSecrets: false
+  });
+
+  const tensorPayload = tensorEngine.buildTensorWalletPayload(user, db.tensorRegistry, {
+    includeSecrets: false
+  });
 
   res.json({
     usdtBalance: safeNumber(user.usdtBalance, 0),
@@ -2600,7 +2412,10 @@ app.get('/api/trading/state', requireAuthJson, (req, res) => {
     copyTrades: user.copyTrades || [],
     copyDeposits: user.copyDeposits || [],
     walletTxHistory: user.walletTxHistory || [],
-    receiveAddresses: buildReceiveAddresses(user),
+    evmAddress: walletPayload.evmAddress,
+    receiveAddresses: walletPayload.receiveAddresses,
+    tensorAddress: tensorPayload.tensorAddress,
+    tensorTokenAddresses: tensorPayload.tokenAddresses,
     treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
@@ -2635,7 +2450,7 @@ app.post('/api/trading/execute', requireAuthJson, (req, res) => {
     return res.status(401).json({ error: 'User not found.' });
   }
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
 
   const token = db.tensorRegistry.find(t => t.id === tokenId);
 
@@ -2735,7 +2550,7 @@ app.post('/api/trading/close', requireAuthJson, (req, res) => {
     return res.status(401).json({ error: 'User not found.' });
   }
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
 
   const posIdx = user.positions.findIndex(p => String(p.id) === positionId);
 
@@ -2844,36 +2659,76 @@ app.get('/api/wallet', requireAuthJson, (req, res) => {
   const db = readDb();
   const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
   syncCopyTradePerformance(db, user);
+
+  const walletPayload = walletEngine.buildWalletPublicPayload(user, {
+    includeSecrets: true
+  });
+
+  const tensorPayload = tensorEngine.buildTensorWalletPayload(user, db.tensorRegistry, {
+    includeSecrets: true
+  });
 
   user.updatedAt = nowIso();
   writeDb(db);
 
   res.json({
     ...user,
+
+    normalSeed: walletPayload.normalSeed,
+    evmPrivateKey: walletPayload.evmPrivateKey,
+    evmAddress: walletPayload.evmAddress,
+    receiveAddresses: walletPayload.receiveAddresses,
+    supportedNetworks: walletPayload.supportedNetworks,
+
+    tensorSeed: tensorPayload.tensorSeed,
+    tensorAddress: tensorPayload.tensorAddress,
+    tensorTokenAddresses: tensorPayload.tokenAddresses,
+
+    walletTxHistory: user.walletTxHistory || [],
+    tensorTxHistory: tensorPayload.tensorTxHistory || [],
+
     usdtBalance: safeNumber(user.usdtBalance, 0),
     ousdBalance: safeNumber(user.ousdBalance, 0),
     usdtNetwork: normalizeNetwork(user.usdtNetwork || inferUserUsdtNetwork(user)),
-    receiveAddresses: buildReceiveAddresses(user),
     supportedAssets: SUPPORTED_WALLET_ASSETS,
     treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
 
 app.get('/api/wallet/addresses', requireAuthJson, (req, res) => {
-  const user = getOrCreateUser(req.session.user.email, req.session.user.role);
+  const db = readDb();
+  const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
   const asset = normalizeAsset(req.query.asset || 'USDT');
   const network = normalizeNetwork(req.query.network || user.usdtNetwork || 'eth');
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
+
+  const walletPayload = walletEngine.buildWalletPublicPayload(user, {
+    includeSecrets: false
+  });
+
+  const tensorPayload = tensorEngine.buildTensorWalletPayload(user, db.tensorRegistry, {
+    includeSecrets: false
+  });
+
+  let address = walletPayload.receiveAddresses[network] || walletPayload.receiveAddresses.eth;
+
+  if (asset.startsWith('TENSOR:')) {
+    const tokenId = asset.replace('TENSOR:', '');
+    address = tensorPayload.tokenAddresses[tokenId]?.address || tensorPayload.tensorAddress;
+  }
 
   res.json({
     ok: true,
     asset,
     network,
-    address: getWalletReceiveAddress(user, asset, network),
-    receiveAddresses: buildReceiveAddresses(user),
+    address,
+    evmAddress: walletPayload.evmAddress,
+    receiveAddresses: walletPayload.receiveAddresses,
+    tensorAddress: tensorPayload.tensorAddress,
+    tensorTokenAddresses: tensorPayload.tokenAddresses,
     treasuryDestinations: TREASURY_USDT_ADDRESSES
   });
 });
@@ -2908,7 +2763,7 @@ app.post('/api/wallet/usdt-network', requireAuthJson, (req, res) => {
     return res.status(401).json({ error: 'User not found.' });
   }
 
-  migrateUser(user);
+  migrateUser(user, db.tensorRegistry);
 
   user.usdtNetwork = network;
   user.updatedAt = nowIso();
@@ -2916,83 +2771,66 @@ app.post('/api/wallet/usdt-network', requireAuthJson, (req, res) => {
   writeDb(db);
 
   const destination = getTreasuryDestination(network);
+  const walletPayload = walletEngine.buildWalletPublicPayload(user, { includeSecrets: false });
 
   res.json({
     ok: true,
     usdtNetwork: network,
     treasuryDestination: destination,
-    receiveAddresses: buildReceiveAddresses(user)
+    receiveAddresses: walletPayload.receiveAddresses
   });
 });
 
 app.post('/api/wallet/send', requireAuthJson, (req, res) => {
-  const network = normalizeNetwork(req.body.network || '');
-  const asset = normalizeAsset(req.body.asset || '');
-  const amount = safeNumber(req.body.amount, 0);
-  const toAddress = String(req.body.toAddress || '').trim();
+  try {
+    const db = readDb();
+    const user = db.users[req.session.user.email];
 
-  if (!network || !asset || amount <= 0 || !toAddress) {
-    return res.status(400).json({ error: 'Invalid request.' });
-  }
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-
-  if (!user) {
-    return res.status(401).json({ error: 'User not found.' });
-  }
-
-  migrateUser(user);
-
-  if (SUPPORTED_WALLET_ASSETS.includes(asset)) {
-    const debit = debitSpendableBalance(user, asset, amount);
-
-    if (!debit.ok) {
-      return res.status(400).json({ error: debit.error });
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
     }
-  } else {
-    return res.status(400).json({
-      error: 'Unsupported normal wallet asset. Use Tensor send for Tensor tokens.'
+
+    migrateUser(user, db.tensorRegistry);
+
+    const asset = normalizeAsset(req.body.asset || '');
+
+    if (!SUPPORTED_WALLET_ASSETS.includes(asset)) {
+      return res.status(400).json({
+        error: 'Unsupported normal wallet asset. Use Tensor send for Tensor tokens.'
+      });
+    }
+
+    const tx = walletEngine.applyWalletSendToUser(user, {
+      asset,
+      network: req.body.network,
+      amount: req.body.amount,
+      toAddress: req.body.toAddress
+    });
+
+    if (!db.treasury.walletSends) db.treasury.walletSends = [];
+
+    db.treasury.walletSends.unshift({
+      ...tx,
+      userEmail: user.email,
+      userWalletId: user.id
+    });
+
+    db.treasury.walletSends = db.treasury.walletSends.slice(0, 1000);
+
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      ...tx,
+      usdtBalance: user.usdtBalance,
+      ousdBalance: user.ousdBalance,
+      assetBalance: getSpendableBalance(user, asset)
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: err.message || 'Send failed.'
     });
   }
-
-  const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
-
-  const record = {
-    id: makeId('send'),
-    type: 'WALLET_SEND',
-    status: 'demo-sent',
-    asset,
-    amount,
-    network,
-    toAddress,
-    fromWalletId: user.id,
-    userEmail: user.email,
-    txHash,
-    note: 'Demo send record. No on-chain broadcast is performed without wallet signing infrastructure.',
-    createdAt: Date.now(),
-    createdAtIso: nowIso()
-  };
-
-  user.walletTxHistory.unshift(record);
-  user.walletTxHistory = user.walletTxHistory.slice(0, 200);
-  user.updatedAt = nowIso();
-
-  if (!db.treasury.walletSends) db.treasury.walletSends = [];
-  db.treasury.walletSends.unshift(record);
-  db.treasury.walletSends = db.treasury.walletSends.slice(0, 1000);
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    txHash,
-    status: 'demo-sent',
-    record,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance,
-    assetBalance: getSpendableBalance(user, asset)
-  });
 });
 
 /* -------------------- Tensor APIs -------------------- */
@@ -3003,6 +2841,8 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
 
     const db = readDb();
     const user = db.users[req.session.user.email] || getOrCreateUser(req.session.user.email, req.session.user.role);
+
+    migrateUser(user, db.tensorRegistry);
 
     db.tensorRegistry.forEach(token => {
       const oldPrice = token.price;
@@ -3026,14 +2866,22 @@ app.get('/api/tensor', requireAuthJson, async (req, res) => {
       }
     });
 
+    tensorEngine.ensureTensorWalletForUser(user, db.tensorRegistry);
+
+    const tensorPayload = tensorEngine.buildTensorWalletPayload(user, db.tensorRegistry, {
+      includeSecrets: false
+    });
+
     writeDb(db);
 
     res.json({
       registry: db.tensorRegistry,
-      address: user.tensorAddress,
+      address: tensorPayload.tensorAddress,
+      tensorAddress: tensorPayload.tensorAddress,
+      tensorTokenAddresses: tensorPayload.tokenAddresses,
       balances: user.tensorBalances || {},
       syncedAt: Date.now(),
-      treasury: req.session.user.role === 'staff' ? db.treasury : undefined,
+      treasury: isStaffSession(req) ? db.treasury : undefined,
       treasuryDestinations: TREASURY_USDT_ADDRESSES
     });
   } catch (err) {
@@ -3114,308 +2962,46 @@ app.post('/api/tensor/vault', requireAuthJson, (req, res) => {
   res.json({ ok: true });
 });
 
-app.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
-  const payload = sanitizeTokenPayload(req.body);
-
-  if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
-    return res.status(400).json({ error: 'Missing or invalid token parameters.' });
-  }
-
-  const db = readDb();
-  const id = `T0x${crypto.randomBytes(20).toString('hex')}`;
-
-  const token = {
-    id,
-    name: payload.name,
-    symbol: payload.symbol,
-    price: payload.price,
-    startPrice: payload.startPrice,
-    bias: payload.bias,
-    bullChance: payload.bullChance,
-    minPct: payload.minPct,
-    maxPct: payload.maxPct,
-    icon: payload.icon,
-    supply: payload.supply,
-    marketCap: payload.price * payload.supply,
-    volume: 0,
-    dominance: 0,
-    changePercent24h: 0,
-    high24h: payload.price,
-    low24h: payload.price,
-    lifetimeHigh: payload.price,
-    createdAt: Date.now(),
-    createdAtIso: nowIso()
-  };
-
-  db.tensorRegistry.push(token);
-  writeDb(db);
-
-  initializeCandlesForToken(id, payload.price);
-
-  res.json({
-    ok: true,
-    id,
-    token
-  });
-});
-
-app.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === req.params.id);
-
-  if (!token) {
-    return res.status(404).json({ error: 'Token not found.' });
-  }
-
-  const payload = sanitizeTokenPayload(req.body, token);
-
-  token.name = payload.name;
-  token.symbol = payload.symbol;
-  token.price = payload.price;
-  token.startPrice = payload.startPrice;
-  token.bias = payload.bias;
-  token.bullChance = payload.bullChance;
-  token.minPct = payload.minPct;
-  token.maxPct = payload.maxPct;
-  token.icon = payload.icon;
-  token.supply = payload.supply;
-  token.marketCap = token.price * token.supply;
-  token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
-  token.updatedAt = Date.now();
-  token.updatedAtIso = nowIso();
-
-  writeDb(db);
-  initializeCandlesForToken(token.id, token.price);
-
-  res.json({
-    ok: true,
-    token
-  });
-});
-
-app.delete('/api/tensor/delete/:id', requireAdminJson, (req, res) => {
-  const db = readDb();
-  const index = db.tensorRegistry.findIndex(t => t.id === req.params.id);
-
-  if (index === -1) {
-    return res.status(404).json({ error: 'Token not found.' });
-  }
-
-  db.tensorRegistry.splice(index, 1);
-  delete tensorCandleHistory[req.params.id];
-
-  Object.values(db.users).forEach(user => {
-    if (user.tensorBalances) delete user.tensorBalances[req.params.id];
-
-    if (Array.isArray(user.positions)) {
-      user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
-    }
-
-    if (Array.isArray(user.copyTrades)) {
-      user.copyTrades.forEach(copy => {
-        copy.mirroredPositions = (copy.mirroredPositions || []).filter(p => p.tokenId !== req.params.id);
-      });
-    }
-  });
-
-  writeDb(db);
-
-  res.json({ ok: true });
-});
-
-app.post('/api/tensor/admin-mint', requireAdminJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const amount = safeNumber(req.body.amount, 0);
-
-  if (!tokenId || amount <= 0) {
-    return res.status(400).json({ error: 'Invalid parameters.' });
-  }
-
-  const db = readDb();
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-
-  if (!token) {
-    return res.status(404).json({ error: 'Token not found.' });
-  }
-
-  const user = db.users[req.session.user.email];
-
-  if (!user) {
-    return res.status(401).json({ error: 'User not found.' });
-  }
-
-  migrateUser(user);
-
-  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + amount;
-  user.updatedAt = nowIso();
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    token,
-    minted: amount,
-    newBalance: user.tensorBalances[tokenId]
-  });
-});
-
-app.post('/api/tensor/swap', requireAuthJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const spend = safeNumber(req.body.usdtAmount, 0);
-  const spendAsset = normalizeAsset(req.body.asset || req.body.spendAsset || 'USDT');
-
-  if (!['USDT', 'OUSD'].includes(spendAsset)) {
-    return res.status(400).json({ error: 'Swap supports USDT or OUSD only.' });
-  }
-
-  if (!tokenId || spend <= 0) {
-    return res.status(400).json({ error: 'Invalid payload.' });
-  }
-
-  const db = readDb();
-  const user = db.users[req.session.user.email];
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
-
-  if (!user) {
-    return res.status(401).json({ error: 'User not found.' });
-  }
-
-  migrateUser(user);
-
-  if (!token) {
-    return res.status(404).json({ error: 'Token missing.' });
-  }
-
-  const debit = debitSpendableBalance(user, spendAsset, spend);
-
-  if (!debit.ok) {
-    return res.status(400).json({ error: debit.error });
-  }
-
-  const feeRate = 0.000001;
-  const feeAmount = spend * feeRate;
-  const netSpend = spend - feeAmount;
-
-  db.treasury.collectedFeesUsdt = safeNumber(db.treasury.collectedFeesUsdt, 0) + feeAmount;
-
-  let priceImpact = 0;
-
-  if (token.bias !== 'pegged' && token.bias !== 'real') {
-    const marketCap = Math.max(100, safeNumber(token.marketCap, token.price * token.supply));
-    const impactMultiplier = netSpend / marketCap;
-    priceImpact = Math.min(0.5, impactMultiplier * 0.8);
-  }
-
-  const originalPrice = token.price;
-  const executionPrice = originalPrice * (1 + priceImpact / 2);
-  const received = netSpend / executionPrice;
-
-  user.tensorBalances[tokenId] = safeNumber(user.tensorBalances[tokenId], 0) + received;
-
-  if (token.bias !== 'pegged' && token.bias !== 'real') {
-    token.price = Math.max(0.000001, originalPrice * (1 + priceImpact));
-    token.marketCap = token.price * token.supply;
-    token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
-  }
-
-  token.volume = safeNumber(token.volume, 0) + spend;
-
-  pushLiveCandle(token, originalPrice);
-
-  user.updatedAt = nowIso();
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    received,
-    impactPercent: Number((priceImpact * 100).toFixed(4)),
-    feePaid: feeAmount,
-    spendAsset,
-    usdtBalance: user.usdtBalance,
-    ousdBalance: user.ousdBalance,
-    spendAssetBalance: getSpendableBalance(user, spendAsset)
-  });
-});
-
 app.post('/api/tensor/send', requireAuthJson, (req, res) => {
-  const tokenId = String(req.body.tokenId || '');
-  const amount = safeNumber(req.body.amount, 0);
-  const toAddress = String(req.body.toAddress || '').trim();
+  try {
+    const db = readDb();
+    const sender = db.users[req.session.user.email];
 
-  if (!tokenId || amount <= 0 || !toAddress) {
-    return res.status(400).json({ error: 'Invalid parameters.' });
-  }
+    if (!sender) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
 
-  const db = readDb();
-  const sender = db.users[req.session.user.email];
+    migrateUser(sender, db.tensorRegistry);
 
-  if (!sender) {
-    return res.status(401).json({ error: 'User not found.' });
-  }
+    const tx = tensorEngine.applyTensorSendToUser(db, sender, {
+      tokenId: req.body.tokenId,
+      amount: req.body.amount,
+      toAddress: req.body.toAddress
+    });
 
-  migrateUser(sender);
+    if (!Array.isArray(sender.walletTxHistory)) {
+      sender.walletTxHistory = [];
+    }
 
-  const token = db.tensorRegistry.find(t => t.id === tokenId);
+    sender.walletTxHistory.unshift({
+      ...tx,
+      type: 'TENSOR_SEND'
+    });
 
-  if (!token) {
-    return res.status(404).json({ error: 'Token not found.' });
-  }
+    sender.walletTxHistory = sender.walletTxHistory.slice(0, 200);
 
-  if (safeNumber(sender.tensorBalances[tokenId], 0) < amount) {
-    return res.status(400).json({ error: 'Insufficient balance.' });
-  }
+    writeDb(db);
 
-  const recipientEmail = Object.keys(db.users).find(email => {
-    return db.users[email].tensorAddress === toAddress;
-  });
-
-  if (!recipientEmail) {
-    return res.status(404).json({
-      error: 'Recipient Tensor address not found. Tensor token sends are internal wallet-to-wallet in this demo.'
+    res.json({
+      ok: true,
+      ...tx,
+      newBalance: sender.tensorBalances?.[req.body.tokenId] || 0
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: err.message || 'Tensor send failed.'
     });
   }
-
-  const recipient = db.users[recipientEmail];
-  migrateUser(recipient);
-
-  sender.tensorBalances[tokenId] -= amount;
-  recipient.tensorBalances[tokenId] = safeNumber(recipient.tensorBalances[tokenId], 0) + amount;
-
-  const txHash = `TENSOR-${crypto.randomBytes(24).toString('hex')}`;
-
-  const record = {
-    id: makeId('tensor_send'),
-    type: 'TENSOR_SEND',
-    status: 'demo-sent',
-    tokenId,
-    symbol: token.symbol,
-    amount,
-    toAddress,
-    fromWalletId: sender.id,
-    userEmail: sender.email,
-    txHash,
-    createdAt: Date.now(),
-    createdAtIso: nowIso()
-  };
-
-  sender.walletTxHistory.unshift(record);
-  sender.walletTxHistory = sender.walletTxHistory.slice(0, 200);
-
-  sender.updatedAt = nowIso();
-  recipient.updatedAt = nowIso();
-
-  writeDb(db);
-
-  res.json({
-    ok: true,
-    txHash,
-    status: 'demo-sent',
-    token,
-    amount,
-    newBalance: sender.tensorBalances[tokenId],
-    record
-  });
 });
 
 /* -------------------- Standard Market APIs -------------------- */
@@ -3443,6 +3029,46 @@ app.get('/api/prices', requireAuthJson, async (req, res) => {
     res.json({});
   }
 });
+
+/* -------------------- Admin Router -------------------- */
+
+app.use(createAdminRouter({
+  ADMIN_EMAIL,
+  readDb,
+  writeDb,
+  getOrCreateUser,
+  getAdminUser,
+  safeJsonForEjs,
+  TREASURY_USDT_ADDRESSES,
+  SUPPORTED_WALLET_ASSETS,
+  tensorCandleHistory,
+  initializeCandlesForToken,
+  publicCopyPortfolioForResponse,
+  syncCopyTradePerformance,
+  migrateUser,
+  migrateToken,
+  migrateCopyPortfolio,
+  sanitizeTokenPayload,
+  normalizeEmail,
+  normalizeAsset,
+  normalizeNetwork,
+  safeNumber,
+  clamp,
+  makeId,
+  nowIso,
+  sha,
+  getSpendableBalance,
+  setSpendableBalance,
+  creditSpendableBalance,
+  debitSpendableBalance,
+  getAssetBalanceField,
+  getIncludedAdminPositions,
+  getIncludedAdminHistory,
+  calculateAdminCopyPortfolioStats,
+  closeMirroredAdminTradeForCopiers,
+  mirrorNewAdminTradeToCopiers,
+  calculatePnl
+}));
 
 /* -------------------- Health / Fallback -------------------- */
 
@@ -3472,6 +3098,7 @@ app.get('/health', (req, res) => {
       index: '/ or /index.html',
       wallet: '/wallet',
       trading: '/trading',
+      dashboard: '/dashboard',
       publicTrade: '/trade/:id',
       publicTradeImage: '/trade/:id/image.svg',
       publicCopyProfile: '/copy/admin_copy_portfolio'
@@ -3483,24 +3110,27 @@ app.get('/health', (req, res) => {
       tradingState: '/api/trading/state',
       tensor: '/api/tensor',
       tensorChart: '/api/tensor/chart',
-      tensorDeploy: '/api/tensor/deploy',
-      tensorUpdate: '/api/tensor/update/:id',
-      tensorDelete: '/api/tensor/delete/:id',
-      tensorMint: '/api/tensor/admin-mint',
       tensorSend: '/api/tensor/send',
-      copyProfiles: '/api/copy/profiles'
+      copyProfiles: '/api/copy/profiles',
+      adminSummary: '/api/admin/summary',
+      adminTokens: '/api/admin/tensor/tokens'
+    },
+    modules: {
+      walletJs: true,
+      tensorJs: true,
+      adminJs: true
     },
     candleBase: '5m',
     supportedChartTimeframes: ['5m', '15m', '30m', '1h'],
     treasuryDestinations: TREASURY_USDT_ADDRESSES,
     supportedWalletAssets: SUPPORTED_WALLET_ASSETS,
     walletFeatures: {
-      normalSeed: true,
-      tensorSeed: true,
+      encryptedNormalSeedStorage: true,
+      encryptedTensorSeedStorage: true,
+      decryptedSeedsReturnedOnlyToLoggedInWalletApi: true,
       ousd: true,
       receiveAddresses: true,
-      walletSendHistory: true,
-      tensorAdminDeployEditDeleteMint: true
+      walletSendHistory: true
     },
     dataDir: DATA_DIR,
     dbPath: DB_PATH,
@@ -3539,14 +3169,15 @@ app.listen(PORT, () => {
   console.log(`Startup page: /index.html -> views/index.ejs`);
   console.log(`Wallet page: /wallet -> views/wallet.ejs`);
   console.log(`Trading page: /trading -> views/trading.ejs`);
+  console.log(`Dashboard page: /dashboard -> views/dashboard.ejs`);
   console.log(`Chart base candles: 5m`);
   console.log(`Supported chart timeframes: 5m, 15m, 30m, 1h`);
   console.log(`Public trade page: /trade/:id`);
   console.log(`Public trade image: /trade/:id/image.svg`);
   console.log(`Public copy profile: /copy/admin_copy_portfolio`);
-  console.log(`Wallet API: /api/wallet`);
-  console.log(`Wallet send API: /api/wallet/send`);
-  console.log(`Tensor deploy/update/delete/mint APIs enabled`);
+  console.log(`Wallet module: wallet.js enabled`);
+  console.log(`Tensor module: tensor.js enabled`);
+  console.log(`Admin module: admin.js enabled`);
   console.log(`Data directory: ${DATA_DIR}`);
   console.log(`Database path: ${DB_PATH}`);
 });
