@@ -217,11 +217,11 @@
 
     .hero {
       padding: 16px;
-      border-radius: 22px;
+      border-radius: 24px;
       background:
-        radial-gradient(circle at 0% 0%, rgba(139,92,246,0.30), transparent 28%),
-        radial-gradient(circle at 100% 0%, rgba(14,203,129,0.12), transparent 24%),
-        var(--bg-panel);
+        radial-gradient(circle at 0% 0%, rgba(139,92,246,0.34), transparent 28%),
+        radial-gradient(circle at 100% 0%, rgba(14,203,129,0.16), transparent 24%),
+        linear-gradient(135deg, rgba(17,24,39,0.96), rgba(7,10,15,0.84));
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       overflow: hidden;
@@ -236,7 +236,7 @@
       right: -120px;
       width: 280px;
       height: 280px;
-      background: radial-gradient(circle, rgba(139,92,246,0.22), transparent 68%);
+      background: radial-gradient(circle, rgba(139,92,246,0.25), transparent 68%);
       pointer-events: none;
     }
 
@@ -257,12 +257,75 @@
       letter-spacing: 0.07em;
     }
 
+    .wallet-balance-wrap {
+      margin-top: 8px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .wallet-balance {
-      margin-top: 5px;
-      font-size: clamp(2rem, 7vw, 4.2rem);
+      font-size: clamp(2.4rem, 9vw, 5.2rem);
       font-weight: 950;
-      letter-spacing: -0.075em;
-      line-height: 1;
+      letter-spacing: -0.085em;
+      line-height: 0.95;
+      text-shadow: 0 18px 60px rgba(139,92,246,0.28);
+    }
+
+    .portfolio-pnl-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 950;
+      border: 1px solid rgba(14,203,129,0.26);
+      background: rgba(14,203,129,0.14);
+      color: var(--green);
+      margin-bottom: 7px;
+      white-space: nowrap;
+    }
+
+    .portfolio-pnl-pill.negative {
+      color: var(--red);
+      background: var(--red-glow);
+      border-color: rgba(246,70,93,0.26);
+    }
+
+    .portfolio-mini-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .portfolio-mini-card {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(7,10,15,0.42);
+      border: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .portfolio-mini-card {
+      background: rgba(255,255,255,0.72);
+    }
+
+    .portfolio-mini-label {
+      color: var(--text-muted);
+      font-size: 0.64rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .portfolio-mini-value {
+      margin-top: 6px;
+      font-weight: 950;
+      font-size: 1.05rem;
     }
 
     .wallet-sub {
@@ -341,44 +404,6 @@
       border-color: rgba(246,70,93,0.24);
     }
 
-    .stats-grid {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .stat-card {
-      background: rgba(7,10,15,0.42);
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 11px;
-      min-width: 0;
-    }
-
-    [data-theme="light"] .stat-card {
-      background: rgba(255,255,255,0.72);
-    }
-
-    .stat-label {
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      font-weight: 950;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .stat-value {
-      margin-top: 5px;
-      font-weight: 950;
-      font-size: 0.92rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     .section-head {
       display: flex;
       justify-content: space-between;
@@ -413,19 +438,23 @@
       margin-top: 3px;
     }
 
-    .asset-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .asset-scroll {
+      display: flex;
       gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 2px 2px 10px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
     }
 
-    @media (min-width: 760px) {
-      .asset-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    .asset-scroll::-webkit-scrollbar {
+      display: none;
     }
 
     .asset-card {
+      flex: 0 0 244px;
+      scroll-snap-align: start;
       position: relative;
       overflow: hidden;
       border-radius: 18px;
@@ -470,9 +499,9 @@
     }
 
     .coin-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 13px;
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
       display: grid;
       place-items: center;
       background: linear-gradient(135deg, rgba(139,92,246,0.88), rgba(59,130,246,0.82));
@@ -511,7 +540,7 @@
     .asset-price {
       margin-top: 12px;
       font-weight: 950;
-      font-size: 1.1rem;
+      font-size: 1.12rem;
       letter-spacing: -0.03em;
     }
 
@@ -586,6 +615,37 @@
       border-bottom-color: var(--tensor);
     }
 
+    .settings-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 4px;
+      background: rgba(7,10,15,0.38);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .settings-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .settings-tab {
+      min-height: 34px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 950;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .settings-tab.active {
+      color: white;
+      background: linear-gradient(135deg, var(--tensor), var(--tensor-2));
+    }
+
     .qr-card {
       display: grid;
       gap: 12px;
@@ -612,7 +672,8 @@
     }
 
     .address-box,
-    .seed-box {
+    .seed-box,
+    .balance-box {
       padding: 11px;
       border-radius: 14px;
       background: rgba(7,10,15,0.48);
@@ -623,6 +684,20 @@
       font-weight: 850;
       line-height: 1.44;
       text-align: center;
+    }
+
+    .balance-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      color: var(--text-muted);
+    }
+
+    .balance-box strong {
+      color: var(--text-main);
+      font-size: 0.9rem;
     }
 
     .seed-box {
@@ -637,7 +712,8 @@
     }
 
     [data-theme="light"] .address-box,
-    [data-theme="light"] .seed-box {
+    [data-theme="light"] .seed-box,
+    [data-theme="light"] .balance-box {
       background: rgba(248,250,252,0.90);
     }
 
@@ -908,11 +984,7 @@
         display: none;
       }
 
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .asset-grid {
+      .portfolio-mini-grid {
         grid-template-columns: 1fr;
       }
 
@@ -931,6 +1003,10 @@
 
       .form-grid {
         grid-template-columns: 1fr;
+      }
+
+      .asset-card {
+        flex-basis: 218px;
       }
     }
   </style>
@@ -987,43 +1063,43 @@
         <section class="hero">
           <div class="hero-head">
             <div>
-              <div class="wallet-label">Total Portfolio</div>
-              <div class="wallet-balance">$<span id="totalBalance">0.00</span></div>
+              <div class="wallet-label">Total Portfolio Value</div>
+
+              <div class="wallet-balance-wrap">
+                <div class="wallet-balance">$<span id="totalBalance">0.00</span></div>
+                <div id="portfolioPnlPill" class="portfolio-pnl-pill">+$0.00 • +0.00%</div>
+              </div>
+
               <div class="wallet-sub">
-                Crypto wallet and Tensor wallet are separated. Choose a currency first, then receive or send from the correct wallet.
+                Crypto wallet and Tensor wallet are separated. Select a currency first, then receive or send from the correct wallet.
               </div>
             </div>
 
-            <div class="network-pill" id="selectedNetworkPill">Crypto • Ethereum</div>
+            <div class="network-pill" id="selectedNetworkPill">Crypto • USDT • Ethereum</div>
+          </div>
+
+          <div class="portfolio-mini-grid">
+            <div class="portfolio-mini-card">
+              <div class="portfolio-mini-label">Crypto Value</div>
+              <div class="portfolio-mini-value">$<span id="cryptoTotalValue">0.00</span></div>
+            </div>
+
+            <div class="portfolio-mini-card">
+              <div class="portfolio-mini-label">Tensor Value</div>
+              <div class="portfolio-mini-value">$<span id="tensorTotalValue">0.00</span></div>
+            </div>
+
+            <div class="portfolio-mini-card">
+              <div class="portfolio-mini-label">Selected Balance</div>
+              <div class="portfolio-mini-value"><span id="selectedHeroBalance">0.00 USDT</span></div>
+            </div>
           </div>
 
           <div class="hero-actions">
             <button class="primary-btn" onclick="window.location.href='/trading'">Open Trading</button>
             <button class="green-btn" onclick="openReceiveModal()">Receive</button>
             <button class="mini-btn" onclick="focusSendForm()">Send</button>
-            <button class="yellow-btn" onclick="toggleSeedPanel()">Wallet Seeds</button>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">USDT</div>
-              <div class="stat-value">$<span id="usdtBalance">0.00</span></div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-label">OUSD</div>
-              <div class="stat-value">$<span id="ousdBalance">0.00</span></div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-label">Crypto Address</div>
-              <div class="stat-value" id="cryptoAddressShort">—</div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-label">Tensor Address</div>
-              <div class="stat-value" id="tensorAddressShort">—</div>
-            </div>
+            <button class="yellow-btn" onclick="switchSettingsTab('seeds')">Settings</button>
           </div>
         </section>
 
@@ -1040,13 +1116,13 @@
                 </span>
                 Crypto Wallet
               </div>
-              <div class="section-sub">Normal crypto assets. Crypto is selected automatically on page load.</div>
+              <div class="section-sub">Normal crypto assets. Swipe horizontally to view all coins.</div>
             </div>
 
             <button class="mini-btn" onclick="refreshWallet()">Refresh</button>
           </div>
 
-          <div class="asset-grid" id="normalAssetGrid"></div>
+          <div class="asset-scroll" id="normalAssetGrid"></div>
         </section>
 
         <section class="panel">
@@ -1061,45 +1137,62 @@
                 </span>
                 Tensor Wallet
               </div>
-              <div class="section-sub">Tensor token currencies with separate Tensor receive addresses.</div>
+              <div class="section-sub">Tensor token currencies. Swipe horizontally to view all tokens.</div>
             </div>
           </div>
 
-          <div class="asset-grid" id="tensorAssetGrid"></div>
+          <div class="asset-scroll" id="tensorAssetGrid"></div>
         </section>
 
-        <section class="panel" id="seedPanel" style="display:none;">
+        <section class="panel" id="settingsPanel">
           <div class="section-head">
             <div>
               <div class="section-title">
                 <span class="section-title-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
-                    <path d="M12 8v4"/>
-                    <path d="M12 16h.01"/>
+                    <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/>
+                    <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.05.05a2.1 2.1 0 0 1-2.97 2.97l-.05-.05a1.8 1.8 0 0 0-1.98-.36a1.8 1.8 0 0 0-1.1 1.65V21a2.1 2.1 0 0 1-4.2 0v-.08A1.8 1.8 0 0 0 8.4 19.3a1.8 1.8 0 0 0-1.98.36l-.05.05a2.1 2.1 0 1 1-2.97-2.97l.05-.05A1.8 1.8 0 0 0 3.8 15a1.8 1.8 0 0 0-1.65-1.1H2a2.1 2.1 0 0 1 0-4.2h.08A1.8 1.8 0 0 0 3.8 8.6a1.8 1.8 0 0 0-.36-1.98l-.05-.05A2.1 2.1 0 1 1 6.36 3.6l.05.05A1.8 1.8 0 0 0 8.4 4a1.8 1.8 0 0 0 1.1-1.65V2a2.1 2.1 0 0 1 4.2 0v.08A1.8 1.8 0 0 0 15 3.8a1.8 1.8 0 0 0 1.98-.36l.05-.05A2.1 2.1 0 1 1 20 6.36l-.05.05A1.8 1.8 0 0 0 19.6 8.4a1.8 1.8 0 0 0 1.65 1.1H22a2.1 2.1 0 0 1 0 4.2h-.08A1.8 1.8 0 0 0 19.4 15Z"/>
                   </svg>
                 </span>
-                Wallet Seeds
+                Settings
               </div>
-              <div class="section-sub">Only reveal seeds when you are alone. This should never be public in production.</div>
+              <div class="section-sub">Seeds are hidden by default. Reveal only when private.</div>
             </div>
           </div>
 
-          <div class="form-grid">
-            <div class="field">
-              <label>Crypto Wallet Seed</label>
-              <div class="seed-box" id="normalSeedBox">Hidden</div>
-              <button class="mini-btn" onclick="toggleSeedBlur('normalSeedBox')">Reveal / Hide</button>
-            </div>
+          <div class="settings-tabs">
+            <button id="settingsTabSeeds" class="settings-tab active" onclick="switchSettingsTab('seeds')">Seeds</button>
+            <button id="settingsTabVault" class="settings-tab" onclick="switchSettingsTab('vault')">Vault</button>
+          </div>
 
-            <div class="field">
-              <label>Tensor Wallet Seed</label>
-              <div class="seed-box" id="tensorSeedBox">Hidden</div>
-              <button class="mini-btn" onclick="toggleSeedBlur('tensorSeedBox')">Reveal / Hide</button>
-            </div>
+          <div id="settingsSeedsView">
+            <div class="form-grid">
+              <div class="field">
+                <label>Crypto Wallet Seed</label>
+                <div class="seed-box" id="normalSeedBox">Hidden</div>
+                <button class="mini-btn" onclick="toggleSeedBlur('normalSeedBox')">Reveal / Hide</button>
+              </div>
 
-            <div class="field full">
-              <button class="mini-btn" onclick="copyBothSeeds()">Copy Seeds</button>
+              <div class="field">
+                <label>Tensor Wallet Seed</label>
+                <div class="seed-box" id="tensorSeedBox">Hidden</div>
+                <button class="mini-btn" onclick="toggleSeedBlur('tensorSeedBox')">Reveal / Hide</button>
+              </div>
+
+              <div class="field full">
+                <button class="mini-btn" onclick="copyBothSeeds()">Copy Seeds</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="settingsVaultView" style="display:none;">
+            <div class="form">
+              <div class="field">
+                <label>Encrypted Vault JSON</label>
+                <textarea id="vaultInput" rows="4" placeholder="Encrypted wallet payload"></textarea>
+              </div>
+
+              <button class="mini-btn" onclick="saveVault()">Save Vault</button>
             </div>
           </div>
         </section>
@@ -1183,7 +1276,7 @@
                 </span>
                 Send
               </div>
-              <div class="section-sub">Send from crypto wallet or Tensor wallet.</div>
+              <div class="section-sub">You cannot send more than your selected balance.</div>
             </div>
           </div>
 
@@ -1193,6 +1286,11 @@
               <select id="sendAsset"></select>
             </div>
 
+            <div class="balance-box">
+              <span>Available Balance</span>
+              <strong id="sendAvailableBalance">0.00 USDT</strong>
+            </div>
+
             <div class="field">
               <label>Network</label>
               <select id="sendNetwork"></select>
@@ -1200,7 +1298,7 @@
 
             <div class="field">
               <label>Amount</label>
-              <input id="sendAmount" type="number" step="any" placeholder="0.00">
+              <input id="sendAmount" type="number" step="any" placeholder="0.00" oninput="validateSendAmountLive()">
             </div>
 
             <div class="field">
@@ -1208,37 +1306,11 @@
               <textarea id="sendTo" rows="3" placeholder="Paste recipient address"></textarea>
             </div>
 
-            <button class="green-btn" onclick="sendSelectedAsset()">Send Asset</button>
+            <button id="sendButton" class="green-btn" onclick="sendSelectedAsset()">Send Asset</button>
 
-            <div class="mini-note">
+            <div class="mini-note" id="sendValidationNote">
               Normal crypto calls <b>/api/wallet/send</b>. Tensor tokens call <b>/api/tensor/send</b>.
             </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="section-head">
-            <div>
-              <div class="section-title">
-                <span class="section-title-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
-                    <path d="M9 12l2 2 4-4"/>
-                  </svg>
-                </span>
-                Vault
-              </div>
-              <div class="section-sub">Encrypted vault storage hook.</div>
-            </div>
-          </div>
-
-          <div class="form">
-            <div class="field">
-              <label>Encrypted Vault JSON</label>
-              <textarea id="vaultInput" rows="4" placeholder="Encrypted wallet payload"></textarea>
-            </div>
-
-            <button class="mini-btn" onclick="saveVault()">Save Vault</button>
           </div>
         </section>
       </aside>
@@ -1470,6 +1542,11 @@
       return Number(walletState.tensorBalances?.[tokenId] || 0);
     }
 
+    function getSelectedBalance() {
+      if (selectedWalletType === 'tensor') return getTensorBalance(selectedTokenId);
+      return getCryptoBalance(selectedAsset);
+    }
+
     function getCryptoPrice(meta) {
       if (meta.stable) return 1;
 
@@ -1538,10 +1615,21 @@
       });
     }
 
-    function calculateTotalBalance() {
+    function calculateTotals() {
       const cryptoTotal = buildCryptoAssets().reduce((sum, a) => sum + Number(a.usdValue || 0), 0);
       const tensorTotal = buildTensorAssets().reduce((sum, a) => sum + Number(a.usdValue || 0), 0);
-      return cryptoTotal + tensorTotal;
+      const total = cryptoTotal + tensorTotal;
+
+      const realizedPnl = Number(walletState.realizedPnl || walletState.pnl || 0);
+      const historyPnl = (walletState.orderHistory || []).reduce((sum, h) => sum + Number(h.pnl || 0), 0);
+      const copyPnl = (walletState.copyTrades || []).reduce((sum, c) => sum + Number(c.pnl || 0), 0);
+      const positionsPnl = (walletState.positions || []).reduce((sum, p) => sum + calculatePositionPnl(p), 0);
+
+      const pnl = Number(walletState.portfolioPnl ?? (realizedPnl || historyPnl + copyPnl + positionsPnl));
+      const basis = Math.max(1, total - pnl);
+      const pct = (pnl / basis) * 100;
+
+      return { cryptoTotal, tensorTotal, total, pnl, pct };
     }
 
     function selectCurrency(type, symbol, tokenId = '') {
@@ -1580,18 +1668,51 @@
     }
 
     function renderHero() {
-      const cryptoAddress = getCryptoAddress('eth') || getCryptoAddress(selectedNetwork);
-      const tensorAddress = getTensorAddress();
+      const totals = calculateTotals();
+      const pnlPill = document.getElementById('portfolioPnlPill');
+      const pnlSign = totals.pnl >= 0 ? '+' : '-';
+      const pctSign = totals.pct >= 0 ? '+' : '';
 
-      document.getElementById('totalBalance').textContent = formatMoney(calculateTotalBalance());
-      document.getElementById('usdtBalance').textContent = formatMoney(getCryptoBalance('USDT'));
-      document.getElementById('ousdBalance').textContent = formatMoney(getCryptoBalance('OUSD'));
-      document.getElementById('cryptoAddressShort').textContent = shortAddress(cryptoAddress);
-      document.getElementById('tensorAddressShort').textContent = shortAddress(tensorAddress);
+      document.getElementById('totalBalance').textContent = formatMoney(totals.total);
+      document.getElementById('cryptoTotalValue').textContent = formatMoney(totals.cryptoTotal);
+      document.getElementById('tensorTotalValue').textContent = formatMoney(totals.tensorTotal);
+      document.getElementById('selectedHeroBalance').textContent = `${formatPriceSmart(getSelectedBalance())} ${selectedAsset}`;
+
+      pnlPill.textContent = `${pnlSign}$${formatMoney(Math.abs(totals.pnl))} • ${pctSign}${totals.pct.toFixed(2)}%`;
+      pnlPill.classList.toggle('negative', totals.pnl < 0);
 
       const network = networkMap[selectedNetwork] || networkMap.eth;
       document.getElementById('selectedNetworkPill').textContent =
         `${selectedWalletType === 'tensor' ? 'Tensor' : 'Crypto'} • ${selectedAsset} • ${selectedWalletType === 'tensor' ? 'Tensor Address' : network.network}`;
+    }
+
+    function renderSendBalance() {
+      const balance = getSelectedBalance();
+      const el = document.getElementById('sendAvailableBalance');
+
+      if (el) {
+        el.textContent = `${formatPriceSmart(balance)} ${selectedAsset}`;
+      }
+
+      validateSendAmountLive();
+    }
+
+    function validateSendAmountLive() {
+      const amount = Number(document.getElementById('sendAmount')?.value || 0);
+      const balance = getSelectedBalance();
+      const btn = document.getElementById('sendButton');
+      const note = document.getElementById('sendValidationNote');
+
+      if (!btn || !note) return;
+
+      if (amount > balance) {
+        btn.disabled = true;
+        note.innerHTML = `<span class="text-red">Insufficient ${escapeHtml(selectedAsset)} balance. Available: ${formatPriceSmart(balance)} ${escapeHtml(selectedAsset)}.</span>`;
+        return;
+      }
+
+      btn.disabled = false;
+      note.innerHTML = `Normal crypto calls <b>/api/wallet/send</b>. Tensor tokens call <b>/api/tensor/send</b>.`;
     }
 
     function renderAssetCard(asset) {
@@ -1645,7 +1766,7 @@
 
       document.getElementById('tensorAssetGrid').innerHTML = tensorAssets.length
         ? tensorAssets.map(renderAssetCard).join('')
-        : `<div class="empty" style="grid-column:1/-1;">No Tensor tokens found.</div>`;
+        : `<div class="empty" style="min-width:260px;">No Tensor tokens found.</div>`;
 
       renderCurrencySelects(cryptoAssets, tensorAssets);
     }
@@ -1786,8 +1907,20 @@
       const amount = Number(document.getElementById('sendAmount').value || 0);
       const toAddress = document.getElementById('sendTo').value.trim();
 
+      selectedWalletType = parsed.type;
+      selectedAsset = parsed.symbol;
+      selectedTokenId = parsed.tokenId || '';
+
+      const balance = getSelectedBalance();
+
       if (!parsed.symbol || !amount || amount <= 0 || !toAddress) {
         showToast('Fill send details');
+        return;
+      }
+
+      if (amount > balance) {
+        showToast(`Insufficient ${parsed.symbol} balance`);
+        validateSendAmountLive();
         return;
       }
 
@@ -1847,10 +1980,14 @@
       document.getElementById('tensorSeedBox').textContent = tensor;
     }
 
-    function toggleSeedPanel() {
-      const panel = document.getElementById('seedPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      renderSeeds();
+    function switchSettingsTab(tab) {
+      document.getElementById('settingsTabSeeds').classList.toggle('active', tab === 'seeds');
+      document.getElementById('settingsTabVault').classList.toggle('active', tab === 'vault');
+
+      document.getElementById('settingsSeedsView').style.display = tab === 'seeds' ? 'block' : 'none';
+      document.getElementById('settingsVaultView').style.display = tab === 'vault' ? 'block' : 'none';
+
+      document.getElementById('settingsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function toggleSeedBlur(id) {
@@ -2216,6 +2353,7 @@
       renderNetworkSelect();
       renderAddress();
       renderSeeds();
+      renderSendBalance();
       renderActivity();
       bindSelectors();
 
