@@ -27,21 +27,17 @@ function createAdminRouter(ctx) {
     normalizeAsset,
     normalizeNetwork,
     safeNumber,
-    clamp,
     makeId,
     nowIso,
-    sha,
     getSpendableBalance,
     setSpendableBalance,
     creditSpendableBalance,
     debitSpendableBalance,
-    getAssetBalanceField,
     getIncludedAdminPositions,
     getIncludedAdminHistory,
     calculateAdminCopyPortfolioStats,
     closeMirroredAdminTradeForCopiers,
-    mirrorNewAdminTradeToCopiers,
-    calculatePnl
+    mirrorNewAdminTradeToCopiers
   } = ctx;
 
   function isStaffSession(req) {
@@ -76,7 +72,7 @@ function createAdminRouter(ctx) {
   function adminPublicUser(user) {
     if (!user) return null;
 
-    const clean = {
+    return {
       id: user.id,
       email: user.email,
       role: user.role,
@@ -98,8 +94,6 @@ function createAdminRouter(ctx) {
       tradeDepositsCount: Array.isArray(user.tradeDeposits) ? user.tradeDeposits.length : 0,
       copyDepositsCount: Array.isArray(user.copyDeposits) ? user.copyDeposits.length : 0
     };
-
-    return clean;
   }
 
   function adminFullUser(user) {
@@ -115,6 +109,9 @@ function createAdminRouter(ctx) {
       tradeDeposits: Array.isArray(user.tradeDeposits) ? user.tradeDeposits : [],
       copyDeposits: Array.isArray(user.copyDeposits) ? user.copyDeposits : [],
       walletTxHistory: Array.isArray(user.walletTxHistory) ? user.walletTxHistory : [],
+      adminBalanceAdjustments: Array.isArray(user.adminBalanceAdjustments) ? user.adminBalanceAdjustments : [],
+      adminTensorAdjustments: Array.isArray(user.adminTensorAdjustments) ? user.adminTensorAdjustments : [],
+      adminMints: Array.isArray(user.adminMints) ? user.adminMints : [],
       tensorBalances: user.tensorBalances || {}
     };
   }
@@ -127,11 +124,13 @@ function createAdminRouter(ctx) {
 
     const userTotals = users.reduce((acc, user) => {
       migrateUser(user);
+
       acc.usdt += safeNumber(user.usdtBalance, 0);
       acc.ousd += safeNumber(user.ousdBalance, 0);
       acc.openPositions += Array.isArray(user.positions) ? user.positions.length : 0;
       acc.copyTrades += Array.isArray(user.copyTrades) ? user.copyTrades.length : 0;
       acc.history += Array.isArray(user.orderHistory) ? user.orderHistory.length : 0;
+
       return acc;
     }, {
       usdt: 0,
@@ -160,6 +159,118 @@ function createAdminRouter(ctx) {
     };
   }
 
+  function applyTokenDashboardExtras(token, body = {}) {
+    const stableCoin = body.stableCoin === true || body.stable === true || body.bias === 'pegged';
+
+    token.stableCoin = stableCoin;
+    token.stable = stableCoin;
+    token.volatilityMode = String(body.volatilityMode || token.volatilityMode || 'medium');
+    token.moveEverySec = Math.max(1, safeNumber(body.moveEverySec, token.moveEverySec || 3));
+
+    if (body.iconId !== undefined) token.iconId = String(body.iconId || '');
+    if (body.iconSvg !== undefined) token.iconSvg = String(body.iconSvg || '');
+    if (body.icon !== undefined) token.icon = String(body.icon || token.symbol?.slice(0, 1) || 'T');
+
+    if (body.bullZoneMin !== undefined) token.bullZoneMin = safeNumber(body.bullZoneMin, 0);
+    if (body.bullZoneMax !== undefined) token.bullZoneMax = safeNumber(body.bullZoneMax, 0);
+    if (body.bearZoneMin !== undefined) token.bearZoneMin = safeNumber(body.bearZoneMin, 0);
+    if (body.bearZoneMax !== undefined) token.bearZoneMax = safeNumber(body.bearZoneMax, 0);
+
+    if (stableCoin) {
+      token.bias = 'pegged';
+      token.bullChance = 50;
+      token.minPct = 0;
+      token.maxPct = 0;
+    }
+
+    token.marketCap = safeNumber(token.price, 0) * safeNumber(token.supply, 0);
+    token.updatedAt = Date.now();
+    token.updatedAtIso = nowIso();
+
+    return token;
+  }
+
+  function makeDashboardCopyProfile(req, profile = {}) {
+    const id = profile.id || profile.publicId || makePublicId('copy');
+
+    return {
+      id,
+      publicId: profile.publicId || id,
+      ownerEmail: profile.ownerEmail || ADMIN_EMAIL,
+      ownerWalletId: profile.ownerWalletId || 'system',
+      name: String(profile.name || 'Copy Trading Profile').trim().slice(0, 80),
+      tag: String(profile.tag || 'Admin strategy').trim().slice(0, 120),
+      description: String(profile.description || '').trim().slice(0, 800),
+      risk: ['Low', 'Medium', 'High'].includes(profile.risk) ? profile.risk : 'Medium',
+      minCopyUsdt: Math.max(1, safeNumber(profile.minCopyUsdt, 50)),
+      status: profile.status === 'paused' ? 'paused' : 'active',
+      daysTrading: Math.max(0, Math.floor(safeNumber(profile.daysTrading, 1))),
+      manualRoi: safeNumber(profile.manualRoi ?? profile.roi, 0),
+      manualPnl: safeNumber(profile.manualPnl ?? profile.pnl, 0),
+      roi: safeNumber(profile.manualRoi ?? profile.roi, 0),
+      pnl: safeNumber(profile.manualPnl ?? profile.pnl, 0),
+      followers: Math.max(0, Math.floor(safeNumber(profile.followers, 0))),
+      positionSource: profile.positionSource || 'admin_live',
+      positions: Array.isArray(profile.positions) ? profile.positions.slice(0, 50) : [],
+      shareUrl: `${req.protocol}://${req.get('host')}/copy/${profile.publicId || id}`,
+      joinUrl: `${req.protocol}://${req.get('host')}/trading?copy=${encodeURIComponent(profile.publicId || id)}`,
+      deleted: false,
+      createdAt: profile.createdAt || Date.now(),
+      createdAtIso: profile.createdAtIso || nowIso(),
+      updatedAt: Date.now(),
+      updatedAtIso: nowIso()
+    };
+  }
+
+  function ensureCopyProfiles(db) {
+    if (!db.copyProfiles || typeof db.copyProfiles !== 'object') {
+      db.copyProfiles = {};
+    }
+
+    if (db.copyPortfolio && !db.copyProfiles.admin_copy_portfolio) {
+      db.copyProfiles.admin_copy_portfolio = {
+        ...db.copyPortfolio,
+        id: 'admin_copy_portfolio',
+        publicId: 'admin_copy_portfolio',
+        positionSource: 'admin_live'
+      };
+    }
+
+    return db.copyProfiles;
+  }
+
+  function publicDashboardCopyProfile(req, db, profile) {
+    const clean = makeDashboardCopyProfile(req, profile);
+
+    if (clean.id === 'admin_copy_portfolio' || clean.positionSource === 'admin_live') {
+      const live = publicCopyPortfolioForResponse(req, db);
+
+      if (live) {
+        return {
+          ...clean,
+          ...live,
+          id: clean.id,
+          publicId: clean.publicId,
+          name: clean.name,
+          tag: clean.tag,
+          description: clean.description,
+          risk: clean.risk,
+          minCopyUsdt: clean.minCopyUsdt,
+          status: clean.status,
+          daysTrading: clean.daysTrading,
+          manualRoi: clean.manualRoi,
+          manualPnl: clean.manualPnl,
+          roi: clean.manualRoi + safeNumber(live.roi, 0),
+          pnl: clean.manualPnl + safeNumber(live.pnl, 0),
+          shareUrl: `${req.protocol}://${req.get('host')}/copy/${clean.publicId}`,
+          joinUrl: `${req.protocol}://${req.get('host')}/trading?copy=${encodeURIComponent(clean.publicId)}`
+        };
+      }
+    }
+
+    return clean;
+  }
+
   /* -------------------- Dashboard Page -------------------- */
 
   router.get('/dashboard', requireAdminPage, (req, res) => {
@@ -182,6 +293,26 @@ function createAdminRouter(ctx) {
 
   /* -------------------- Admin Overview APIs -------------------- */
 
+  router.get('/api/admin/state', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const admin = getAdminUser(db);
+
+    migrateUser(admin);
+
+    const copyProfiles = Object.values(ensureCopyProfiles(db))
+      .filter(p => !p.deleted)
+      .map(p => publicDashboardCopyProfile(req, db, p));
+
+    res.json({
+      ok: true,
+      wallet: adminFullUser(admin),
+      tokens: db.tensorRegistry || [],
+      copyProfiles,
+      users: Object.values(db.users || {}).map(adminPublicUser),
+      summary: getAdminStats(db, req)
+    });
+  });
+
   router.get('/api/admin/summary', requireAdminJson, (req, res) => {
     const db = readDb();
 
@@ -203,6 +334,110 @@ function createAdminRouter(ctx) {
       copyPortfolioStatus: db.copyPortfolio ? db.copyPortfolio.status : null,
       treasuryDestinations: TREASURY_USDT_ADDRESSES,
       supportedWalletAssets: SUPPORTED_WALLET_ASSETS
+    });
+  });
+
+  /* -------------------- Admin Wallet APIs -------------------- */
+
+  router.get('/api/admin/wallet', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const admin = getAdminUser(db);
+
+    migrateUser(admin);
+    syncCopyTradePerformance(db, admin);
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      wallet: adminFullUser(admin)
+    });
+  });
+
+  router.post('/api/admin/wallet/adjust', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const admin = getAdminUser(db);
+
+    migrateUser(admin);
+
+    const walletType = String(req.body.walletType || 'crypto').toLowerCase();
+    const asset = normalizeAsset(req.body.asset || 'USDT');
+    const amount = safeNumber(req.body.amount, 0);
+    const reason = String(req.body.reason || 'Admin wallet adjustment').slice(0, 220);
+
+    if (!amount) {
+      return res.status(400).json({
+        error: 'Amount is required.'
+      });
+    }
+
+    let before = 0;
+    let after = 0;
+
+    if (walletType === 'tensor') {
+      const token = db.tensorRegistry.find(t => String(t.id) === String(req.body.asset));
+
+      if (!token) {
+        return res.status(404).json({
+          error: 'Tensor token not found.'
+        });
+      }
+
+      before = safeNumber(admin.tensorBalances[token.id], 0);
+      admin.tensorBalances[token.id] = Math.max(0, before + amount);
+      after = admin.tensorBalances[token.id];
+
+      if (!Array.isArray(admin.adminTensorAdjustments)) admin.adminTensorAdjustments = [];
+
+      admin.adminTensorAdjustments.unshift({
+        id: makeId('tensor_adjust'),
+        tokenId: token.id,
+        symbol: token.symbol,
+        amount,
+        before,
+        after,
+        reason,
+        adminEmail: req.session.user.email,
+        createdAt: Date.now(),
+        createdAtIso: nowIso()
+      });
+
+      admin.adminTensorAdjustments = admin.adminTensorAdjustments.slice(0, 200);
+    } else {
+      if (!SUPPORTED_WALLET_ASSETS.includes(asset)) {
+        return res.status(400).json({
+          error: 'Unsupported crypto asset.'
+        });
+      }
+
+      before = getSpendableBalance(admin, asset);
+      setSpendableBalance(admin, asset, Math.max(0, before + amount));
+      after = getSpendableBalance(admin, asset);
+
+      if (!Array.isArray(admin.adminBalanceAdjustments)) admin.adminBalanceAdjustments = [];
+
+      admin.adminBalanceAdjustments.unshift({
+        id: makeId('balance_adjust'),
+        asset,
+        amount,
+        before,
+        after,
+        reason,
+        adminEmail: req.session.user.email,
+        createdAt: Date.now(),
+        createdAtIso: nowIso()
+      });
+
+      admin.adminBalanceAdjustments = admin.adminBalanceAdjustments.slice(0, 200);
+    }
+
+    admin.updatedAt = nowIso();
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      before,
+      after,
+      wallet: adminFullUser(admin)
     });
   });
 
@@ -368,6 +603,159 @@ function createAdminRouter(ctx) {
     });
   });
 
+  router.post('/api/admin/users/adjust', requireAdminJson, (req, res) => {
+    const targetEmail = normalizeEmail(req.body.targetEmail || req.body.email);
+    const walletType = String(req.body.walletType || 'crypto').toLowerCase();
+    const asset = normalizeAsset(req.body.asset || 'USDT');
+    const amount = safeNumber(req.body.amount, 0);
+    const reason = String(req.body.reason || 'Admin user wallet adjustment').slice(0, 220);
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      return res.status(400).json({
+        error: 'Target email is required.'
+      });
+    }
+
+    if (!amount) {
+      return res.status(400).json({
+        error: 'Amount is required.'
+      });
+    }
+
+    const db = readDb();
+    const user = db.users[targetEmail];
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found.'
+      });
+    }
+
+    migrateUser(user);
+
+    let before = 0;
+    let after = 0;
+
+    if (walletType === 'tensor') {
+      const token = db.tensorRegistry.find(t => String(t.id) === String(req.body.asset));
+
+      if (!token) {
+        return res.status(404).json({
+          error: 'Tensor token not found.'
+        });
+      }
+
+      before = safeNumber(user.tensorBalances[token.id], 0);
+      user.tensorBalances[token.id] = Math.max(0, before + amount);
+      after = user.tensorBalances[token.id];
+
+      if (!Array.isArray(user.adminTensorAdjustments)) user.adminTensorAdjustments = [];
+
+      user.adminTensorAdjustments.unshift({
+        id: makeId('tensor_adjust'),
+        tokenId: token.id,
+        symbol: token.symbol,
+        amount,
+        before,
+        after,
+        reason,
+        adminEmail: req.session.user.email,
+        createdAt: Date.now(),
+        createdAtIso: nowIso()
+      });
+
+      user.adminTensorAdjustments = user.adminTensorAdjustments.slice(0, 200);
+    } else {
+      if (!SUPPORTED_WALLET_ASSETS.includes(asset)) {
+        return res.status(400).json({
+          error: 'Unsupported crypto asset.'
+        });
+      }
+
+      before = getSpendableBalance(user, asset);
+      setSpendableBalance(user, asset, Math.max(0, before + amount));
+      after = getSpendableBalance(user, asset);
+
+      if (!Array.isArray(user.adminBalanceAdjustments)) user.adminBalanceAdjustments = [];
+
+      user.adminBalanceAdjustments.unshift({
+        id: makeId('balance_adjust'),
+        asset,
+        amount,
+        before,
+        after,
+        reason,
+        adminEmail: req.session.user.email,
+        createdAt: Date.now(),
+        createdAtIso: nowIso()
+      });
+
+      user.adminBalanceAdjustments = user.adminBalanceAdjustments.slice(0, 200);
+    }
+
+    user.updatedAt = nowIso();
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      before,
+      after,
+      user: adminFullUser(user)
+    });
+  });
+
+  router.post('/api/admin/users/reset-wallet', requireAdminJson, (req, res) => {
+    const targetEmail = normalizeEmail(req.body.targetEmail || req.body.email);
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      return res.status(400).json({
+        error: 'Target email is required.'
+      });
+    }
+
+    if (targetEmail === ADMIN_EMAIL) {
+      return res.status(400).json({
+        error: 'Main admin wallet cannot be reset from this route.'
+      });
+    }
+
+    const db = readDb();
+    const user = db.users[targetEmail];
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found.'
+      });
+    }
+
+    migrateUser(user);
+
+    user.usdtBalance = 15000;
+    user.ousdBalance = 5000;
+    user.btcBalance = 0;
+    user.ethBalance = 0;
+    user.solBalance = 0;
+    user.bnbBalance = 0;
+    user.xrpBalance = 0;
+    user.dogeBalance = 0;
+    user.tensorBalances = {};
+    user.positions = [];
+    user.orderHistory = [];
+    user.copyTrades = [];
+    user.copyDeposits = [];
+    user.tradeDeposits = [];
+    user.walletTxHistory = [];
+    user.publicTradeCards = [];
+    user.updatedAt = nowIso();
+
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      user: adminFullUser(user)
+    });
+  });
+
   router.delete('/api/admin/users/:email', requireAdminJson, (req, res) => {
     const email = normalizeEmail(req.params.email);
 
@@ -407,6 +795,56 @@ function createAdminRouter(ctx) {
     });
   });
 
+  router.post('/api/admin/tensor/tokens', requireAdminJson, (req, res) => {
+    const payload = sanitizeTokenPayload(req.body);
+
+    if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
+      return res.status(400).json({
+        error: 'Missing or invalid token parameters.'
+      });
+    }
+
+    const db = readDb();
+    const id = `T0x${crypto.randomBytes(20).toString('hex')}`;
+
+    const token = {
+      id,
+      name: payload.name,
+      symbol: payload.symbol,
+      price: payload.price,
+      startPrice: payload.startPrice,
+      bias: payload.bias,
+      bullChance: payload.bullChance,
+      minPct: payload.minPct,
+      maxPct: payload.maxPct,
+      icon: payload.icon,
+      supply: payload.supply,
+      marketCap: payload.price * payload.supply,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: payload.price,
+      low24h: payload.price,
+      lifetimeHigh: payload.price,
+      createdBy: req.session.user.email,
+      createdAt: Date.now(),
+      createdAtIso: nowIso()
+    };
+
+    applyTokenDashboardExtras(token, req.body);
+
+    db.tensorRegistry.push(token);
+    writeDb(db);
+
+    initializeCandlesForToken(id, payload.price);
+
+    res.json({
+      ok: true,
+      id,
+      token
+    });
+  });
+
   router.post('/api/admin/tensor/deploy', requireAdminJson, (req, res) => {
     const payload = sanitizeTokenPayload(req.body);
 
@@ -443,6 +881,8 @@ function createAdminRouter(ctx) {
       createdAtIso: nowIso()
     };
 
+    applyTokenDashboardExtras(token, req.body);
+
     db.tensorRegistry.push(token);
     writeDb(db);
 
@@ -451,6 +891,45 @@ function createAdminRouter(ctx) {
     res.json({
       ok: true,
       id,
+      token
+    });
+  });
+
+  router.put('/api/admin/tensor/tokens/:id', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const token = db.tensorRegistry.find(t => String(t.id) === String(req.params.id));
+
+    if (!token) {
+      return res.status(404).json({
+        error: 'Token not found.'
+      });
+    }
+
+    const payload = sanitizeTokenPayload(req.body, token);
+
+    token.name = payload.name;
+    token.symbol = payload.symbol;
+    token.price = payload.price;
+    token.startPrice = payload.startPrice;
+    token.bias = payload.bias;
+    token.bullChance = payload.bullChance;
+    token.minPct = payload.minPct;
+    token.maxPct = payload.maxPct;
+    token.icon = payload.icon;
+    token.supply = payload.supply;
+    token.marketCap = token.price * token.supply;
+    token.lifetimeHigh = Math.max(safeNumber(token.lifetimeHigh, token.price), token.price);
+    token.updatedBy = req.session.user.email;
+    token.updatedAt = Date.now();
+    token.updatedAtIso = nowIso();
+
+    applyTokenDashboardExtras(token, req.body);
+
+    writeDb(db);
+    initializeCandlesForToken(token.id, token.price);
+
+    res.json({
+      ok: true,
       token
     });
   });
@@ -483,12 +962,59 @@ function createAdminRouter(ctx) {
     token.updatedAt = Date.now();
     token.updatedAtIso = nowIso();
 
+    applyTokenDashboardExtras(token, req.body);
+
     writeDb(db);
     initializeCandlesForToken(token.id, token.price);
 
     res.json({
       ok: true,
       token
+    });
+  });
+
+  router.delete('/api/admin/tensor/tokens/:id', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const index = db.tensorRegistry.findIndex(t => String(t.id) === String(req.params.id));
+
+    if (index === -1) {
+      return res.status(404).json({
+        error: 'Token not found.'
+      });
+    }
+
+    const removed = db.tensorRegistry[index];
+
+    db.tensorRegistry.splice(index, 1);
+
+    if (tensorCandleHistory) {
+      delete tensorCandleHistory[req.params.id];
+    }
+
+    Object.values(db.users || {}).forEach(user => {
+      migrateUser(user);
+
+      if (user.tensorBalances) {
+        delete user.tensorBalances[req.params.id];
+      }
+
+      if (Array.isArray(user.positions)) {
+        user.positions = user.positions.filter(p => p.tokenId !== req.params.id);
+      }
+
+      if (Array.isArray(user.copyTrades)) {
+        user.copyTrades.forEach(copy => {
+          copy.mirroredPositions = (copy.mirroredPositions || []).filter(p => p.tokenId !== req.params.id);
+          copy.closedMirrors = (copy.closedMirrors || []).filter(p => p.tokenId !== req.params.id);
+        });
+      }
+    });
+
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      removed
     });
   });
 
@@ -591,15 +1117,56 @@ function createAdminRouter(ctx) {
     });
   });
 
-  /*
-    Compatibility routes:
-    Your older trading/wallet pages may still call these.
-    Keep them here, then remove the same routes from server.js.
-  */
+  /* -------------------- Compatibility Routes For Existing Pages -------------------- */
 
-  router.post('/api/tensor/deploy', requireAdminJson, (req, res, next) => {
-    req.url = '/api/admin/tensor/deploy';
-    next();
+  router.post('/api/tensor/deploy', requireAdminJson, (req, res) => {
+    const payload = sanitizeTokenPayload(req.body);
+
+    if (!payload.name || !payload.symbol || payload.price <= 0 || payload.supply <= 0) {
+      return res.status(400).json({
+        error: 'Missing or invalid token parameters.'
+      });
+    }
+
+    const db = readDb();
+    const id = `T0x${crypto.randomBytes(20).toString('hex')}`;
+
+    const token = {
+      id,
+      name: payload.name,
+      symbol: payload.symbol,
+      price: payload.price,
+      startPrice: payload.startPrice,
+      bias: payload.bias,
+      bullChance: payload.bullChance,
+      minPct: payload.minPct,
+      maxPct: payload.maxPct,
+      icon: payload.icon,
+      supply: payload.supply,
+      marketCap: payload.price * payload.supply,
+      volume: 0,
+      dominance: 0,
+      changePercent24h: 0,
+      high24h: payload.price,
+      low24h: payload.price,
+      lifetimeHigh: payload.price,
+      createdBy: req.session.user.email,
+      createdAt: Date.now(),
+      createdAtIso: nowIso()
+    };
+
+    applyTokenDashboardExtras(token, req.body);
+
+    db.tensorRegistry.push(token);
+    writeDb(db);
+
+    initializeCandlesForToken(id, payload.price);
+
+    res.json({
+      ok: true,
+      id,
+      token
+    });
   });
 
   router.put('/api/tensor/update/:id', requireAdminJson, (req, res) => {
@@ -630,6 +1197,8 @@ function createAdminRouter(ctx) {
     token.updatedAt = Date.now();
     token.updatedAtIso = nowIso();
 
+    applyTokenDashboardExtras(token, req.body);
+
     writeDb(db);
     initializeCandlesForToken(token.id, token.price);
 
@@ -650,6 +1219,7 @@ function createAdminRouter(ctx) {
     }
 
     const removed = db.tensorRegistry[index];
+
     db.tensorRegistry.splice(index, 1);
 
     if (tensorCandleHistory) {
@@ -851,10 +1421,103 @@ function createAdminRouter(ctx) {
     });
   });
 
-  /*
-    Compatibility with your current trading.ejs.
-    You can later update the frontend to use /api/admin/copy/portfolio directly.
-  */
+  /* -------------------- Multiple Copy Profile APIs -------------------- */
+
+  router.get('/api/admin/copy/profiles', requireAdminJson, (req, res) => {
+    const db = readDb();
+
+    const profiles = Object.values(ensureCopyProfiles(db))
+      .filter(p => !p.deleted)
+      .map(p => publicDashboardCopyProfile(req, db, p));
+
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      profiles,
+      copyProfiles: profiles
+    });
+  });
+
+  router.post('/api/admin/copy/profiles', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const profiles = ensureCopyProfiles(db);
+
+    const id = makePublicId('copy');
+
+    const profile = makeDashboardCopyProfile(req, {
+      ...req.body,
+      id,
+      publicId: id
+    });
+
+    profiles[profile.id] = profile;
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      profile: publicDashboardCopyProfile(req, db, profile)
+    });
+  });
+
+  router.put('/api/admin/copy/profiles/:id', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const profiles = ensureCopyProfiles(db);
+
+    const key = Object.keys(profiles).find(k => {
+      return String(k) === String(req.params.id) || String(profiles[k].publicId) === String(req.params.id);
+    });
+
+    if (!key) {
+      return res.status(404).json({
+        error: 'Copy profile not found.'
+      });
+    }
+
+    profiles[key] = makeDashboardCopyProfile(req, {
+      ...profiles[key],
+      ...req.body,
+      id: profiles[key].id || key,
+      publicId: profiles[key].publicId || key,
+      updatedBy: req.session.user.email
+    });
+
+    writeDb(db);
+
+    res.json({
+      ok: true,
+      profile: publicDashboardCopyProfile(req, db, profiles[key])
+    });
+  });
+
+  router.delete('/api/admin/copy/profiles/:id', requireAdminJson, (req, res) => {
+    const db = readDb();
+    const profiles = ensureCopyProfiles(db);
+
+    const key = Object.keys(profiles).find(k => {
+      return String(k) === String(req.params.id) || String(profiles[k].publicId) === String(req.params.id);
+    });
+
+    if (!key) {
+      return res.status(404).json({
+        error: 'Copy profile not found.'
+      });
+    }
+
+    profiles[key].deleted = true;
+    profiles[key].status = 'paused';
+    profiles[key].updatedBy = req.session.user.email;
+    profiles[key].updatedAt = Date.now();
+    profiles[key].updatedAtIso = nowIso();
+
+    writeDb(db);
+
+    res.json({
+      ok: true
+    });
+  });
+
+  /* -------------------- Compatibility With Current Trading.ejs Copy Routes -------------------- */
 
   router.post('/api/copy/admin/profile', requireAdminJson, (req, res) => {
     const db = readDb();
@@ -1081,6 +1744,13 @@ function createAdminRouter(ctx) {
         user.ousdBalance = 5000;
       }
 
+      user.btcBalance = 0;
+      user.ethBalance = 0;
+      user.solBalance = 0;
+      user.bnbBalance = 0;
+      user.xrpBalance = 0;
+      user.dogeBalance = 0;
+
       user.updatedAt = nowIso();
     });
 
@@ -1102,6 +1772,20 @@ function createAdminRouter(ctx) {
       db.copyPortfolio.status = 'active';
       db.copyPortfolio.updatedAt = Date.now();
       db.copyPortfolio.updatedAtIso = nowIso();
+    }
+
+    if (db.copyProfiles && typeof db.copyProfiles === 'object') {
+      Object.values(db.copyProfiles).forEach(profile => {
+        profile.followers = 0;
+        profile.manualRoi = 0;
+        profile.manualPnl = 0;
+        profile.roi = 0;
+        profile.pnl = 0;
+        profile.deleted = false;
+        profile.status = 'active';
+        profile.updatedAt = Date.now();
+        profile.updatedAtIso = nowIso();
+      });
     }
 
     writeDb(db);
