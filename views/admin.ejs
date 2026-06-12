@@ -8,127 +8,351 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     body { font-family: 'Inter', system_ui, sans-serif; }
-    .glass { background: rgba(255,255,255,0.95); border: 1px solid #e2e8f0; }
-    .section-header { font-size: 1.75rem; font-weight: 700; letter-spacing: -.025em; }
+    .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .section-header { font-size: 1.5rem; font-weight: 700; letter-spacing: -.025em; }
     .modern-input { background: white; border: 1px solid #cbd5e1; }
     .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
+    .nav-active { background: #eff6ff; color: #1e40af; font-weight: 600; }
+    .logo-option { transition: all 0.2s ease; cursor: pointer; }
+    .logo-option:hover { transform: scale(1.05); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .logo-option.selected { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .editor-preview { border: 2px dashed #e2e8f0; min-height: 400px; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
+  <!-- Top Navigation -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-x-3">
-        <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-          <span class="text-white font-bold text-xl">C</span>
-        </div>
-        <span class="font-semibold text-xl">Credity Admin</span>
-      </div>
       <div class="flex items-center gap-x-4">
-        <div class="text-sm text-slate-600">Welcome, Admin</div>
-        <a href="/logout" class="px-4 py-2 text-sm border border-slate-300 rounded-xl hover:bg-slate-100 transition-colors">Logout</a>
+        <div class="flex items-center gap-x-3">
+          <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center">
+            <span class="text-white font-bold text-2xl tracking-tighter">C</span>
+          </div>
+          <div>
+            <span class="font-semibold text-2xl tracking-tighter">Credity</span>
+            <span class="text-xs font-mono text-blue-600/70">Admin</span>
+          </div>
+        </div>
+        <div class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-2xl">Enterprise</div>
+      </div>
+      
+      <div class="flex items-center gap-x-4">
+        <div class="flex items-center gap-x-2 text-sm">
+          <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-user text-slate-600"></i>
+          </div>
+          <div>
+            <div class="font-medium text-sm">Admin User</div>
+            <div class="text-xs text-slate-500">Super Admin</div>
+          </div>
+        </div>
+        <a href="/logout" class="px-4 py-2 text-sm border border-slate-300 rounded-2xl hover:bg-slate-100 transition-colors">Logout</a>
       </div>
     </div>
   </nav>
 
   <div class="max-w-7xl mx-auto px-6 pt-8 pb-16">
+    <!-- Header -->
     <div class="flex items-end justify-between mb-8">
       <div>
-        <div class="text-sm text-blue-600 font-medium tracking-widest">ADMIN CONTROL PANEL</div>
-        <h1 class="text-4xl font-semibold tracking-tight">Platform Overview</h1>
+        <div class="text-sm text-blue-600 font-medium tracking-widest">ADMIN CONTROL CENTER</div>
+        <h1 class="text-4xl font-semibold tracking-tight">Platform Management</h1>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-slate-500">Last sync: just now</div>
       </div>
     </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
-      <div class="glass p-6 rounded-3xl border border-slate-200">
-        <div class="text-xs text-slate-500">TOTAL BADGES ISSUED</div>
-        <div class="text-4xl font-semibold mt-1"><%= badges.length + issuedBadges.length %></div>
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+      <div class="glass p-5 rounded-3xl border border-slate-200">
+        <div class="text-xs text-slate-500">TOTAL CREDENTIALS</div>
+        <div class="text-3xl font-semibold mt-1"><%= badges.length + issuedBadges.length %></div>
       </div>
-      <div class="glass p-6 rounded-3xl border border-slate-200">
-        <div class="text-xs text-slate-500">ACTIVE EVENTS</div>
-        <div class="text-4xl font-semibold mt-1"><%= events.length %></div>
+      <div class="glass p-5 rounded-3xl border border-slate-200">
+        <div class="text-xs text-slate-500">ACTIVE ASSESSMENTS</div>
+        <div class="text-3xl font-semibold mt-1"><%= tests.length %></div>
       </div>
-      <div class="glass p-6 rounded-3xl border border-slate-200">
-        <div class="text-xs text-slate-500">TESTS CREATED</div>
-        <div class="text-4xl font-semibold mt-1"><%= tests.length %></div>
+      <div class="glass p-5 rounded-3xl border border-slate-200">
+        <div class="text-xs text-slate-500">STUDY MATERIALS</div>
+        <div class="text-3xl font-semibold mt-1">184</div>
       </div>
-      <div class="glass p-6 rounded-3xl border border-slate-200">
+      <div class="glass p-5 rounded-3xl border border-slate-200">
+        <div class="text-xs text-slate-500">EVENTS PUBLISHED</div>
+        <div class="text-3xl font-semibold mt-1"><%= events.length %></div>
+      </div>
+      <div class="glass p-5 rounded-3xl border border-slate-200">
         <div class="text-xs text-slate-500">REGISTERED USERS</div>
-        <div class="text-4xl font-semibold mt-1">247</div>
+        <div class="text-3xl font-semibold mt-1">1,248</div>
       </div>
     </div>
 
-    <!-- Quick Actions + Forms (Create Badge, Event, Test) -->
-    <div class="mb-10">
-      <div class="section-header mb-4">Quick Actions</div>
-      <div class="grid md:grid-cols-3 gap-4">
-        <button onclick="document.getElementById('create-badge-section').scrollIntoView({behavior:'smooth'})" class="glass p-5 rounded-3xl border border-slate-200 text-left hover:border-blue-300 transition-colors">
-          <i class="fa-solid fa-plus text-blue-600 mb-3"></i>
-          <div class="font-semibold">Create New Badge</div>
-        </button>
-        <button onclick="document.getElementById('post-event-section').scrollIntoView({behavior:'smooth'})" class="glass p-5 rounded-3xl border border-slate-200 text-left hover:border-blue-300 transition-colors">
-          <i class="fa-solid fa-calendar-plus text-blue-600 mb-3"></i>
-          <div class="font-semibold">Post Special Event</div>
-        </button>
-        <button onclick="document.getElementById('create-test-section').scrollIntoView({behavior:'smooth'})" class="glass p-5 rounded-3xl border border-slate-200 text-left hover:border-blue-300 transition-colors">
-          <i class="fa-solid fa-file-lines text-blue-600 mb-3"></i>
-          <div class="font-semibold">Create Assessment</div>
-        </button>
+    <!-- Main Tabs -->
+    <div class="flex border-b border-slate-200 mb-6">
+      <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-medium border-b-2 border-blue-600 text-blue-600" id="tab-certificates">Certificate Editor</button>
+      <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-600 hover:text-slate-900" id="tab-badges">Badge Editor</button>
+      <button onclick="showTab('assessments')" class="tab-btn px-6 py-3 font-medium text-slate-600 hover:text-slate-900" id="tab-assessments">Assessment Creator</button>
+      <button onclick="showTab('materials')" class="tab-btn px-6 py-3 font-medium text-slate-600 hover:text-slate-900" id="tab-materials">Study Materials</button>
+      <button onclick="showTab('events')" class="tab-btn px-6 py-3 font-medium text-slate-600 hover:text-slate-900" id="tab-events">Events</button>
+    </div>
+
+    <!-- Certificate Editor -->
+    <div id="certificates-tab" class="tab-content">
+      <div class="glass p-8 rounded-3xl border border-slate-200 mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <div class="section-header">Certificate Editor</div>
+            <p class="text-slate-600">Create professional certificates with advanced design options</p>
+          </div>
+          <button onclick="previewCertificate()" class="px-6 py-2.5 border border-slate-300 rounded-2xl text-sm font-medium hover:bg-slate-100">Preview</button>
+        </div>
+
+        <form action="/create-badge" method="POST" class="grid md:grid-cols-2 gap-8">
+          <div class="space-y-5">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">CERTIFICATE TITLE</label>
+              <input type="text" name="title" value="Certificate of Achievement" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium" required>
+            </div>
+            
+            <div>
+              <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">DESCRIPTION / ACHIEVEMENT</label>
+              <textarea name="description" class="modern-input w-full px-4 py-3 rounded-2xl h-24" placeholder="For outstanding performance in..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">PRIMARY COLOR</label>
+                <input type="color" name="designColor" value="#1e40af" class="w-full h-12 p-1 border border-slate-300 rounded-2xl cursor-pointer">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">ACCENT COLOR</label>
+                <input type="color" value="#3b82f6" class="w-full h-12 p-1 border border-slate-300 rounded-2xl cursor-pointer">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-3">DESIGN PRESETS</label>
+            <div class="grid grid-cols-3 gap-3 mb-6">
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Classic</div>
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Modern</div>
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Elegant</div>
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Minimal</div>
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Prestigious</div>
+              <div class="border border-slate-200 p-3 rounded-2xl text-center text-xs cursor-pointer hover:border-blue-300">Academic</div>
+            </div>
+
+            <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-3">CHOOSE LOGO (90+ options)</label>
+            <div class="max-h-64 overflow-y-auto border border-slate-200 rounded-2xl p-4 mb-4">
+              <div class="grid grid-cols-6 gap-3" id="logo-grid"></div>
+            </div>
+            
+            <div class="flex gap-3">
+              <input type="text" id="custom-logo-url" placeholder="Or paste custom logo URL" class="modern-input flex-1 px-4 py-2.5 rounded-2xl text-sm">
+              <button type="button" onclick="addCustomLogo()" class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-2xl">Add</button>
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold rounded-3xl text-lg">Create & Publish Certificate</button>
+          </div>
+        </form>
       </div>
     </div>
 
-    <!-- Create Badge Form -->
-    <div id="create-badge-section" class="glass p-8 rounded-3xl border border-slate-200 mb-8">
-      <div class="section-header mb-6">Create Badge or Certificate</div>
-      <form action="/create-badge" method="POST" class="grid md:grid-cols-2 gap-6">
-        <div>
-          <label class="text-xs font-medium text-slate-600 block mb-1">TYPE</label>
-          <select name="type" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
-            <option value="badge">Skill Badge</option>
-            <option value="certificate">Certificate</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600 block mb-1">TITLE</label>
-          <input type="text" name="title" value="Advanced Data Analysis" class="modern-input w-full px-4 py-3 rounded-2xl text-sm" required>
-        </div>
-        <div class="md:col-span-2">
-          <label class="text-xs font-medium text-slate-600 block mb-1">DESCRIPTION</label>
-          <textarea name="description" class="modern-input w-full px-4 py-3 rounded-2xl text-sm h-20">Completed rigorous training in data analysis and visualization.</textarea>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600 block mb-1">PRIMARY COLOR</label>
-          <input type="color" name="designColor" value="#3b82f6" class="w-full h-11 p-1 border border-slate-300 rounded-2xl">
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600 block mb-1">SIGNATURE</label>
-          <input type="text" name="signature" value="Admin" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
-        </div>
-        <div class="md:col-span-2">
-          <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl hover:bg-blue-700 transition-colors">Create & Publish</button>
-        </div>
-      </form>
+    <!-- Badge Editor -->
+    <div id="badges-tab" class="tab-content hidden">
+      <div class="glass p-8 rounded-3xl border border-slate-200">
+        <div class="section-header mb-6">Badge Editor</div>
+        <form action="/create-badge" method="POST">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-5">
+              <input type="text" name="title" placeholder="Badge Title" class="modern-input w-full px-4 py-3 rounded-2xl" required>
+              <textarea name="description" placeholder="Badge description" class="modern-input w-full px-4 py-3 rounded-2xl h-24"></textarea>
+              <div>
+                <label class="text-xs font-semibold text-slate-600 block mb-2">BADGE STYLE</label>
+                <select name="type" class="modern-input w-full px-4 py-3 rounded-2xl">
+                  <option value="badge">Standard Badge</option>
+                  <option value="premium">Premium Badge</option>
+                  <option value="gold">Gold Badge</option>
+                  <option value="platinum">Platinum Badge</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-600 block mb-3">CHOOSE LOGO</label>
+              <div class="max-h-52 overflow-y-auto border border-slate-200 rounded-2xl p-4">
+                <div class="grid grid-cols-5 gap-3" id="badge-logo-grid"></div>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="mt-6 w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl">Create Badge</button>
+        </form>
+      </div>
     </div>
 
-    <!-- Post Event Form -->
-    <div id="post-event-section" class="glass p-8 rounded-3xl border border-slate-200 mb-8">
-      <div class="section-header mb-6">Post Special Event</div>
-      <form action="/post-event" method="POST">
-        <input type="text" name="title" placeholder="Spring Skill Challenge 2026" class="modern-input w-full px-4 py-3 rounded-2xl text-sm mb-4" required>
-        <textarea name="description" placeholder="Complete 3 skill badges to earn exclusive recognition." class="modern-input w-full px-4 py-3 rounded-2xl text-sm h-20 mb-4"></textarea>
-        <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl hover:bg-blue-700 transition-colors">Publish Event</button>
-      </form>
+    <!-- Assessment Creator -->
+    <div id="assessments-tab" class="tab-content hidden">
+      <div class="glass p-8 rounded-3xl border border-slate-200">
+        <div class="section-header mb-6">Advanced Assessment Creator</div>
+        
+        <form action="/create-test" method="POST">
+          <div class="mb-6">
+            <input type="text" name="title" value="Advanced Python Assessment" class="modern-input w-full px-5 py-4 text-xl font-semibold rounded-3xl" required>
+          </div>
+
+          <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+              <div class="font-semibold">Questions</div>
+              <button type="button" onclick="addQuestion()" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-2xl flex items-center gap-x-2">
+                <i class="fa-solid fa-plus"></i> Add Question
+              </button>
+            </div>
+            <div id="questions-container" class="space-y-6"></div>
+          </div>
+
+          <div class="mb-8">
+            <label class="font-semibold block mb-3">Study Materials (Link files by unit)</label>
+            <div class="border border-slate-200 rounded-2xl p-5">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <input type="text" placeholder="Unit 1: Fundamentals" class="modern-input w-full px-4 py-2.5 rounded-2xl text-sm mb-2">
+                  <input type="text" placeholder="https://drive.google.com/file/..." class="modern-input w-full px-4 py-2.5 rounded-2xl text-sm">
+                </div>
+                <div>
+                  <input type="text" placeholder="Unit 2: Advanced Topics" class="modern-input w-full px-4 py-2.5 rounded-2xl text-sm mb-2">
+                  <input type="text" placeholder="https://drive.google.com/file/..." class="modern-input w-full px-4 py-2.5 rounded-2xl text-sm">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl">Create Assessment with Anti-Cheat</button>
+        </form>
+      </div>
     </div>
 
-    <!-- Create Test Form -->
-    <div id="create-test-section" class="glass p-8 rounded-3xl border border-slate-200">
-      <div class="section-header mb-6">Create Assessment</div>
-      <form action="/create-test" method="POST">
-        <input type="text" name="title" value="Midterm Data Science Assessment" class="modern-input w-full px-4 py-3 rounded-2xl text-sm mb-4" required>
-        <textarea name="questions" class="modern-input w-full px-4 py-3 rounded-2xl text-sm h-32 font-mono text-xs mb-4" placeholder='[{"q":"Explain correlation vs causation.","type":"frq","timer":180}]'>[{"q":"What is the mean?","type":"mcq","options":["Average","Median","Mode"],"timer":60}]</textarea>
-        <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl hover:bg-blue-700 transition-colors">Create Test with Anti-Cheat</button>
-      </form>
+    <!-- Study Materials -->
+    <div id="materials-tab" class="tab-content hidden">
+      <div class="glass p-8 rounded-3xl border border-slate-200">
+        <div class="section-header mb-6">Study Materials Library</div>
+        <div class="mb-6">
+          <button class="px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-sm flex items-center gap-x-2">
+            <i class="fa-solid fa-upload"></i> Upload New Material
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div class="border border-slate-200 rounded-2xl p-5">
+            <div class="font-semibold mb-1">Unit 1: Introduction to Programming</div>
+            <div class="text-sm text-slate-600 mb-3">3 files • 2 videos</div>
+            <div class="flex flex-wrap gap-2">
+              <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl">intro.pdf</div>
+              <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl">basics.mp4</div>
+            </div>
+          </div>
+          <div class="border border-slate-200 rounded-2xl p-5">
+            <div class="font-semibold mb-1">Unit 2: Data Structures</div>
+            <div class="text-sm text-slate-600 mb-3">5 files</div>
+            <div class="flex flex-wrap gap-2">
+              <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl">arrays.pdf</div>
+              <div class="text-xs px-3 py-1 bg-slate-100 rounded-2xl">linkedlist.pdf</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div id="events-tab" class="tab-content hidden">
+      <div class="glass p-8 rounded-3xl border border-slate-200">
+        <div class="section-header mb-6">Manage Events</div>
+        <form action="/post-event" method="POST" class="max-w-lg">
+          <input type="text" name="title" placeholder="Event Title" class="modern-input w-full px-4 py-3 rounded-2xl mb-4" required>
+          <textarea name="description" placeholder="Event description" class="modern-input w-full px-4 py-3 rounded-2xl h-28 mb-4"></textarea>
+          <button type="submit" class="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-3xl">Publish Event</button>
+        </form>
+      </div>
     </div>
   </div>
+
+  <script>
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tab + '-tab').classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600'));
+      document.getElementById('tab-' + tab).classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+    }
+    
+    function populateLogos() {
+      const logoGrid = document.getElementById('logo-grid');
+      const badgeLogoGrid = document.getElementById('badge-logo-grid');
+      const categories = ['University','Company','Tech','Science','Business','Education','Health','Finance','Engineering','Design','Marketing','Law'];
+      let html = '';
+      for (let i = 1; i <= 96; i++) {
+        const cat = categories[(i-1) % categories.length];
+        html += `<div onclick="selectLogo(this, 'https://via.placeholder.com/80x80/3b82f6/ffffff?text=\( {cat}')" class="logo-option border border-slate-200 p-2 rounded-2xl text-center"><img src="https://via.placeholder.com/80x80/3b82f6/ffffff?text= \){cat}" class="w-12 h-12 mx-auto rounded-xl mb-1" alt="\( {cat}"><div class="text-[10px] text-slate-500"> \){cat}</div></div>`;
+      }
+      if (logoGrid) logoGrid.innerHTML = html;
+      if (badgeLogoGrid) badgeLogoGrid.innerHTML = html;
+    }
+    
+    function selectLogo(element, url) {
+      document.querySelectorAll('#logo-grid .logo-option, #badge-logo-grid .logo-option').forEach(el => el.classList.remove('selected', 'border-blue-500'));
+      element.classList.add('selected', 'border-blue-500');
+    }
+    
+    function addCustomLogo() {
+      const url = document.getElementById('custom-logo-url').value;
+      if (!url) return alert('Please enter a logo URL');
+      const grid = document.getElementById('logo-grid');
+      const div = document.createElement('div');
+      div.className = 'logo-option border border-blue-500 p-2 rounded-2xl text-center selected';
+      div.innerHTML = `<img src="${url}" class="w-12 h-12 mx-auto rounded-xl mb-1" alt="Custom"><div class="text-[10px] text-blue-600">Custom</div>`;
+      grid.appendChild(div);
+      document.getElementById('custom-logo-url').value = '';
+    }
+    
+    function addQuestion() {
+      const container = document.getElementById('questions-container');
+      const qNum = container.children.length + 1;
+      const div = document.createElement('div');
+      div.className = 'border border-slate-200 rounded-2xl p-5';
+      div.innerHTML = `
+        <div class="flex justify-between mb-4">
+          <div class="font-semibold">Question ${qNum}</div>
+          <select class="text-sm border border-slate-300 rounded-xl px-3 py-1">
+            <option value="mcq">Multiple Choice</option>
+            <option value="frq">Free Response</option>
+          </select>
+        </div>
+        <input type="text" placeholder="Question text" class="modern-input w-full px-4 py-2.5 rounded-2xl mb-3">
+        <div class="mb-3">
+          <label class="text-xs text-slate-500">Image URL (optional)</label>
+          <input type="text" placeholder="https://example.com/image.jpg" class="modern-input w-full px-4 py-2 rounded-2xl text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-slate-500">Timer (seconds)</label><input type="number" value="60" class="modern-input w-full px-4 py-2 rounded-2xl text-sm"></div>
+          <div><label class="text-xs text-slate-500">Points</label><input type="number" value="10" class="modern-input w-full px-4 py-2 rounded-2xl text-sm"></div>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+    
+    function previewCertificate() {
+      alert('Certificate preview would open here with live design rendering.');
+    }
+    
+    function initAdmin() {
+      populateLogos();
+      document.getElementById('certificates-tab').classList.remove('hidden');
+      document.getElementById('tab-certificates').classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+      setTimeout(() => {
+        const container = document.getElementById('questions-container');
+        if (container && container.children.length === 0) addQuestion();
+      }, 500);
+    }
+    
+    window.onload = initAdmin;
+  </script>
 </body>
 </html>
