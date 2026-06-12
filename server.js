@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'credifysupport@gmail.com',
-    pass: 'wuae yhmw jhqn nynz'
+    pass: 'wuae yhmw jhqn nynz' // Recommendation: Move this to a .env file for security
   }
 });
 
@@ -48,12 +48,13 @@ async function generateQR(text) {
   try {
     return await QRCode.toDataURL(text);
   } catch (err) {
+    console.error("QR Generation failed:", err);
     return null;
   }
 }
 
 function generateCredentialHash(userId, assessmentId) {
-  const raw = `\( {userId}- \){assessmentId}-${Date.now()}`;
+  const raw = `${userId}-${assessmentId}-${Date.now()}`;
   return crypto.createHash('sha256').update(raw).digest('hex').substring(0, 18);
 }
 
@@ -115,18 +116,13 @@ app.get('/student-dashboard', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
 
   const userCredentials = issuedCredentials.filter(c => c.userId === req.session.user.id);
-
-  // Add countdown info for upcoming exams
   const upcomingExams = tests
     .filter(t => t.examStartTime)
     .map(t => {
       const start = new Date(t.examStartTime);
       const now = new Date();
       const diff = start.getTime() - now.getTime();
-      return {
-        ...t,
-        countdown: diff > 0 ? Math.floor(diff / 1000) : 0
-      };
+      return { ...t, countdown: diff > 0 ? Math.floor(diff / 1000) : 0 };
     });
 
   res.render('student-dashboard', { 
@@ -145,26 +141,39 @@ app.get('/teacher-dashboard', (req, res) => {
 
 app.get('/admin', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  res.render('admin', { user: req.session.user, badges: credentialTemplates, tests, issuedBadges: issuedCredentials });
+  res.render('admin', { user: req.session.user, badges: credentialTemplates, tests, issuedBadges: issuedCredentials, users });
 });
 
 // ==================== ENHANCED TEST CREATION ====================
+
+// GET: Render the Assessment Creation UI
+app.get('/assessment', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
+  res.render('assessment'); // Ensure your enhanced creator UI is saved as views/assessment.ejs
+});
+
+// POST: Handle the Assessment Creation Submission
 app.post('/assessment', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
 
   let questions = [];
-  try { questions = JSON.parse(req.body.questions || '[]'); } catch (e) {}
+  try { 
+    questions = JSON.parse(req.body.questions || '[]'); 
+  } catch (e) {
+    console.error("Failed to parse questions data.");
+  }
+
+  const hasGraphData = questions.some(q => q.graphData !== undefined);
 
   const newTest = {
     id: tests.length + 1,
-    title: req.body.title,
+    title: req.body.title || 'Untitled Assessment',
     questions,
     questionType: req.body.questionType || 'mcq',
     timePerQuestion: parseInt(req.body.timePerQuestion) || 60,
     topics: req.body.topics || '',
     resources: req.body.resources || '',
-    hasGraph: req.body.hasGraph === 'true',
-    graphUrls: req.body.graphUrls ? req.body.graphUrls.split(',').map(s => s.trim()) : [],
+    hasGraph: hasGraphData,
     calculatorEnabled: req.body.calculatorEnabled !== 'false',
     attachedCredentialTemplateId: req.body.attachedCredentialTemplateId ? parseInt(req.body.attachedCredentialTemplateId) : null,
     examStartTime: req.body.examStartTime || null,
@@ -177,9 +186,8 @@ app.post('/assessment', (req, res) => {
 
   tests.push(newTest);
 
-  // Log scheduled exam notification (in production use cron)
   if (newTest.examStartTime) {
-    console.log(`[SCHEDULED] Exam "${newTest.title}" starts at \( {newTest.examStartTime} ( \){newTest.teacherTimezone})`);
+    console.log(`[SCHEDULED] Exam "${newTest.title}" starts at ${newTest.examStartTime} (${newTest.teacherTimezone})`);
   }
 
   res.redirect(req.session.user.email === 'admin' ? '/admin' : '/teacher-dashboard');
@@ -196,10 +204,10 @@ app.get('/take-test/:id', (req, res) => {
   req.session.currentTestId = test.id;
   req.session.examStartTime = Date.now();
 
-  res.render('assessment', { user: req.session.user, test });
+  res.render('take-test', { user: req.session.user, test }); // Saved as take-test.ejs
 });
 
-// ==================== SUBMIT TEST + CREDENTIAL + EMAIL ====================
+// ==================== SUBMIT TEST ====================
 app.post('/submit-test/:id', async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
 
@@ -209,8 +217,6 @@ app.post('/submit-test/:id', async (req, res) => {
 
   const score = parseInt(req.body.score) || 85;
   const passed = score >= 70;
-
-  let issuedCredential = null;
 
   if (passed && test.attachedCredentialTemplateId) {
     const template = credentialTemplates.find(t => t.templateId === test.attachedCredentialTemplateId);
@@ -236,18 +242,15 @@ app.post('/submit-test/:id', async (req, res) => {
       }
 
       issuedCredentials.push(newCred);
-      issuedCredential = newCred;
 
-      // Send results email
       await sendEmail(req.session.user.email, `Your Results - ${test.title}`, `
         <h2>Congratulations ${req.session.user.name}!</h2>
-        <p>You scored <strong>\( {score}%</strong> on " \){test.title}".</p>
-        <p>Your credential is ready: <a href="\( {newCred.shareLink}"> \){newCred.shareLink}</a></p>
+        <p>You scored <strong>${score}%</strong> on "${test.title}".</p>
+        <p>Your credential is ready: <a href="${newCred.shareLink}">${newCred.shareLink}</a></p>
       `);
     }
   }
 
-  // Network logging
   if (test.networkLoggingEnabled) {
     networkLogs.push({
       testId,
@@ -264,13 +267,12 @@ app.post('/submit-test/:id', async (req, res) => {
   res.redirect('/student-dashboard');
 });
 
-// ==================== VERIFICATION ====================
+// ==================== VERIFICATION & LOGS ====================
 app.get('/verify/:hash', (req, res) => {
   const cred = issuedCredentials.find(c => c.verifyHash === req.params.hash);
   res.render('verify', { credential: cred, status: cred ? 'valid' : 'invalid' });
 });
 
-// ==================== NETWORK LOGS (Teacher View) ====================
 app.get('/network-logs/:testId', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
   const logs = networkLogs.filter(l => l.testId == req.params.testId);
