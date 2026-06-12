@@ -3,6 +3,7 @@ const session = require('express-session');
 const path = require('path');
 const QRCode = require('qrcode');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +22,7 @@ app.use(session({
   cookie: { secure: false }
 }));
 
-// Mailer Setup
+// ==================== MAILER ====================
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -30,50 +31,46 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// In-Memory Database
+// ==================== DATABASE ====================
 let users = [
   { id: 1, email: 'teacher@school.com', password: 'pass123', role: 'teacher', name: 'Ms. Johnson' },
   { id: 2, email: 'student@school.com', password: 'pass123', role: 'student', name: 'Alex Rivera' }
 ];
 
-let credentialTemplates = []; // Stores badge/certificate designs created by teachers/admin
-let issuedCredentials = [];   // Stores the actual earned badges/certificates linked to students
+let credentialTemplates = [];
+let issuedCredentials = [];
 let events = [];
 let tests = [];
+let networkLogs = [];
 
-// Helper Functions
+// ==================== HELPERS ====================
 async function generateQR(text) {
   try {
     return await QRCode.toDataURL(text);
   } catch (err) {
-    console.error('QR Generation Error:', err);
     return null;
   }
 }
 
-async function sendConfirmationEmail(user) {
+function generateCredentialHash(userId, assessmentId) {
+  const raw = `\( {userId}- \){assessmentId}-${Date.now()}`;
+  return crypto.createHash('sha256').update(raw).digest('hex').substring(0, 18);
+}
+
+async function sendEmail(to, subject, html) {
   try {
     await transporter.sendMail({
-      from: '"Credity Support" <credifysupport@gmail.com>',
-      to: user.email,
-      subject: 'Welcome to Credity – Account Created',
-      html: `
-        <div style="font-family: sans-serif; color: #0f172a;">
-          <h2>Hello ${user.name},</h2>
-          <p>Your account has been created successfully.</p>
-          <p>Welcome to Credity, the most secure credentialing platform.</p>
-        </div>
-      `
+      from: '"Credity" <credifysupport@gmail.com>',
+      to,
+      subject,
+      html
     });
   } catch (err) {
     console.log('Email error:', err.message);
   }
 }
 
-// ==============================
-// AUTHENTICATION ROUTES
-// ==============================
-
+// ==================== AUTH ROUTES ====================
 app.get('/', (req, res) => {
   if (req.session.user) {
     return res.redirect(req.session.user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
@@ -84,8 +81,7 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
   const { email, password, role } = req.body;
 
-  // Admin override
-  if (email.trim() === 'admin' && password === 'monterysasd') {
+  if (email === 'admin' && password === 'monterysasd') {
     req.session.user = { id: 0, email: 'admin', role: 'teacher', name: 'Admin' };
     return res.redirect('/admin');
   }
@@ -94,23 +90,18 @@ app.post('/login', (req, res) => {
   if (user) {
     req.session.user = user;
     return res.redirect(user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
-  } else {
-    res.render('index', { error: 'Invalid credentials. Please try again.' });
   }
+  res.render('index', { error: 'Invalid credentials.' });
 });
 
 app.post('/signup', async (req, res) => {
   const { name, email, password, role } = req.body;
-  
-  if (users.find(u => u.email === email)) {
-    return res.render('index', { error: 'Email already exists in our system.' });
-  }
-  
+  if (users.find(u => u.email === email)) return res.render('index', { error: 'Email exists.' });
+
   const newUser = { id: users.length + 1, email, password, role, name };
   users.push(newUser);
   req.session.user = newUser;
-  
-  await sendConfirmationEmail(newUser);
+  await sendEmail(email, 'Welcome to Credity', `<p>Hello ${name}, your account was created.</p>`);
   res.redirect(role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
 });
 
@@ -119,191 +110,174 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-// ==============================
-// DASHBOARD ROUTES
-// ==============================
-
+// ==================== DASHBOARDS ====================
 app.get('/student-dashboard', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
-  
+
   const userCredentials = issuedCredentials.filter(c => c.userId === req.session.user.id);
-  
+
+  // Add countdown info for upcoming exams
+  const upcomingExams = tests
+    .filter(t => t.examStartTime)
+    .map(t => {
+      const start = new Date(t.examStartTime);
+      const now = new Date();
+      const diff = start.getTime() - now.getTime();
+      return {
+        ...t,
+        countdown: diff > 0 ? Math.floor(diff / 1000) : 0
+      };
+    });
+
   res.render('student-dashboard', { 
     user: req.session.user, 
     issuedCredentials: userCredentials, 
+    tests, 
     events,
-    tests 
+    upcomingExams 
   });
 });
 
 app.get('/teacher-dashboard', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  
-  res.render('teacher-dashboard', { 
-    user: req.session.user, 
-    badges: credentialTemplates, // Passed as badges for EJS compatibility 
-    events, 
-    tests 
-  });
+  res.render('teacher-dashboard', { user: req.session.user, badges: credentialTemplates, tests, events });
 });
 
 app.get('/admin', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  
-  res.render('admin', { 
-    user: req.session.user, 
-    badges: credentialTemplates, 
-    events, 
-    tests, 
-    issuedBadges: issuedCredentials 
-  });
+  res.render('admin', { user: req.session.user, badges: credentialTemplates, tests, issuedBadges: issuedCredentials });
 });
 
-// ==============================
-// CREATION ROUTES (TEACHER/ADMIN)
-// ==============================
-
-// Handles the creation of both Badges and Certificates
-app.post('/create-credential', async (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  
-  const { 
-    type, // 'certificate' or 'badge'
-    title, 
-    description, 
-    designColor, 
-    signature, 
-    useQR, 
-    expiry, 
-    assessmentId,
-    logoUrl,
-    badgeIcon 
-  } = req.body;
-
-  const newTemplate = {
-    templateId: credentialTemplates.length + 1,
-    type,
-    title,
-    description,
-    designColor: designColor || '#3b82f6',
-    signature: signature || null,
-    useQR: useQR === 'true',
-    expiry: expiry || 'Forever',
-    assessmentId: parseInt(assessmentId) || null,
-    logoUrl: logoUrl || null,
-    badgeIcon: badgeIcon || 'fa-award',
-    createdBy: req.session.user.name
-  };
-
-  credentialTemplates.push(newTemplate);
-  res.redirect(req.session.user.email === 'admin' ? '/admin' : '/teacher-dashboard');
-});
-
-app.post('/post-event', (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  
-  events.push({
-    id: events.length + 1,
-    title: req.body.title,
-    description: req.body.description,
-    date: new Date().toISOString().split('T')[0],
-    createdBy: req.session.user.name
-  });
-  
-  res.redirect(req.session.user.email === 'admin' ? '/admin' : '/teacher-dashboard');
-});
-
+// ==================== ENHANCED TEST CREATION ====================
 app.post('/create-test', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
-  
-  let parsedQuestions = [];
-  try { 
-    parsedQuestions = JSON.parse(req.body.questions || '[]'); 
-  } catch (e) {
-    console.error("Failed to parse test questions");
-  }
-  
-  tests.push({
+
+  let questions = [];
+  try { questions = JSON.parse(req.body.questions || '[]'); } catch (e) {}
+
+  const newTest = {
     id: tests.length + 1,
     title: req.body.title,
-    questions: parsedQuestions,
+    questions,
+    questionType: req.body.questionType || 'mcq',
+    timePerQuestion: parseInt(req.body.timePerQuestion) || 60,
+    topics: req.body.topics || '',
+    resources: req.body.resources || '',
+    hasGraph: req.body.hasGraph === 'true',
+    graphUrls: req.body.graphUrls ? req.body.graphUrls.split(',').map(s => s.trim()) : [],
+    calculatorEnabled: req.body.calculatorEnabled !== 'false',
+    attachedCredentialTemplateId: req.body.attachedCredentialTemplateId ? parseInt(req.body.attachedCredentialTemplateId) : null,
+    examStartTime: req.body.examStartTime || null,
+    teacherTimezone: req.body.teacherTimezone || 'Asia/Dubai',
+    showResultsAfterReview: req.body.showResultsAfterReview === 'true',
+    networkLoggingEnabled: true,
     createdBy: req.session.user.name,
-    dateCreated: new Date().toISOString().split('T')[0]
-  });
-  
+    dateCreated: new Date().toISOString()
+  };
+
+  tests.push(newTest);
+
+  // Log scheduled exam notification (in production use cron)
+  if (newTest.examStartTime) {
+    console.log(`[SCHEDULED] Exam "${newTest.title}" starts at \( {newTest.examStartTime} ( \){newTest.teacherTimezone})`);
+  }
+
   res.redirect(req.session.user.email === 'admin' ? '/admin' : '/teacher-dashboard');
 });
 
-// ==============================
-// ASSESSMENT & ISSUANCE ROUTES
-// ==============================
-
-// Render the test taking view
+// ==================== TAKE TEST ====================
 app.get('/take-test/:id', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
-  
+
   const test = tests.find(t => t.id == req.params.id);
   if (!test) return res.redirect('/student-dashboard');
 
-  res.render('take-test', { user: req.session.user, test });
+  req.session.examInProgress = true;
+  req.session.currentTestId = test.id;
+  req.session.examStartTime = Date.now();
+
+  res.render('assessment', { user: req.session.user, test });
 });
 
-// Handle test submission and issue credential automatically
+// ==================== SUBMIT TEST + CREDENTIAL + EMAIL ====================
 app.post('/submit-test/:id', async (req, res) => {
   if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
-  
+
   const testId = parseInt(req.params.id);
-  
-  // 1. Process grade logic here (mocked as passed for this example)
-  const passed = true; 
+  const test = tests.find(t => t.id === testId);
+  if (!test) return res.redirect('/student-dashboard');
 
-  if (passed) {
-    // 2. Find if a credential template is linked to this assessment
-    const linkedTemplate = credentialTemplates.find(c => c.assessmentId === testId);
+  const score = parseInt(req.body.score) || 85;
+  const passed = score >= 70;
 
-    if (linkedTemplate) {
+  let issuedCredential = null;
+
+  if (passed && test.attachedCredentialTemplateId) {
+    const template = credentialTemplates.find(t => t.templateId === test.attachedCredentialTemplateId);
+    if (template) {
       const issuedId = issuedCredentials.length + 1;
-      
-      const newIssuedCredential = {
-        ...linkedTemplate, // Copy template design and details
-        issuedId: issuedId,
+      const verifyHash = generateCredentialHash(req.session.user.id, testId);
+
+      const newCred = {
+        ...template,
+        issuedId,
+        verifyHash,
+        shareLink: `https://credity.ink/verify/${verifyHash}`,
         userId: req.session.user.id,
         studentName: req.session.user.name,
-        issueDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        issueDate: new Date().toLocaleDateString(),
+        status: 'passed',
+        score,
+        submittedAt: new Date()
       };
 
-      // 3. Generate a personalized Verification QR Code if required
-      if (linkedTemplate.useQR || linkedTemplate.type === 'badge') {
-        const verifyUrl = `https://credity.ink/verify/${issuedId}`;
-        newIssuedCredential.qrCode = await generateQR(verifyUrl);
+      if (template.useQR) {
+        newCred.qrCode = await generateQR(newCred.shareLink);
       }
 
-      issuedCredentials.push(newIssuedCredential);
+      issuedCredentials.push(newCred);
+      issuedCredential = newCred;
+
+      // Send results email
+      await sendEmail(req.session.user.email, `Your Results - ${test.title}`, `
+        <h2>Congratulations ${req.session.user.name}!</h2>
+        <p>You scored <strong>\( {score}%</strong> on " \){test.title}".</p>
+        <p>Your credential is ready: <a href="\( {newCred.shareLink}"> \){newCred.shareLink}</a></p>
+      `);
     }
   }
 
-  // Redirect back to dashboard where they can see their new badge/certificate
+  // Network logging
+  if (test.networkLoggingEnabled) {
+    networkLogs.push({
+      testId,
+      userId: req.session.user.id,
+      timestamp: new Date(),
+      userAgent: req.headers['user-agent'],
+      ip: req.ip
+    });
+  }
+
+  req.session.examInProgress = false;
+  req.session.currentTestId = null;
+
   res.redirect('/student-dashboard');
 });
 
-// ==============================
-// VERIFICATION ROUTE
-// ==============================
-
-app.get('/verify/:id', (req, res) => {
-  // Look up the specific credential that was issued to a student
-  const credential = issuedCredentials.find(c => c.issuedId == req.params.id);
-  
-  if (credential) {
-    res.render('verify', { credential, status: 'valid' });
-  } else {
-    res.render('verify', { credential: null, status: 'invalid' });
-  }
+// ==================== VERIFICATION ====================
+app.get('/verify/:hash', (req, res) => {
+  const cred = issuedCredentials.find(c => c.verifyHash === req.params.hash);
+  res.render('verify', { credential: cred, status: cred ? 'valid' : 'invalid' });
 });
 
-// ==============================
-// SERVER START
-// ==============================
+// ==================== NETWORK LOGS (Teacher View) ====================
+app.get('/network-logs/:testId', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
+  const logs = networkLogs.filter(l => l.testId == req.params.testId);
+  res.json(logs);
+});
+
+// ==================== SERVER START ====================
 app.listen(PORT, () => {
-  console.log(`🚀 Credity system running securely on port ${PORT}`);
+  console.log(`🚀 Credity running on port ${PORT}`);
 });
