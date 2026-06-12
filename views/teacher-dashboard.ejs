@@ -3,59 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Teacher Dashboard • Credity</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@500;700&family=Montserrat:wght@400;500;600;700&family=Pinyon+Script&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@500;700;800&family=Montserrat:wght@400;500;600;700;800&family=Pinyon+Script&display=swap');
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      min-width: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: #f6f7f9;
       color: #0f172a;
-      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    .sidebar {
+      width: 304px;
+      min-width: 304px;
+      max-width: 304px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      overflow: hidden;
+      z-index: 50;
+    }
+
+    .sidebar-inner {
+      height: 100%;
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 18px;
+    }
+
+    .main-shell {
+      flex: 1;
+      width: calc(100vw - 304px);
+      max-width: calc(100vw - 304px);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 100%;
+      padding: 24px;
+    }
+
     .panel {
-      background: #fff;
+      background: #ffffff;
       border: 1px solid #e5e7eb;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
 
     .panel-strong {
-      background: #fff;
+      background: #ffffff;
       border: 1px solid #dbe1ea;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
     }
 
     .input {
-      background: #fff;
+      width: 100%;
+      max-width: 100%;
+      background: #ffffff;
       border: 1px solid #d8dee8;
-      transition: border-color .18s ease, box-shadow .18s ease;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
     .input:focus {
       border-color: #2563eb;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
     }
 
     .btn {
       font-weight: 500;
       border-radius: 12px;
-      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+      transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+      max-width: 100%;
+      text-align: center;
     }
 
-    .btn:active { transform: translateY(1px); }
+    .btn:active {
+      transform: translateY(1px);
+    }
 
     .btn-primary {
       background: #1d4ed8;
-      color: #fff;
+      color: #ffffff;
       border: 1px solid #1d4ed8;
     }
 
@@ -66,7 +124,7 @@
 
     .btn-dark {
       background: #111827;
-      color: #fff;
+      color: #ffffff;
       border: 1px solid #111827;
     }
 
@@ -76,7 +134,7 @@
     }
 
     .btn-light {
-      background: #fff;
+      background: #ffffff;
       color: #111827;
       border: 1px solid #d8dee8;
     }
@@ -88,7 +146,7 @@
 
     .btn-green {
       background: #059669;
-      color: #fff;
+      color: #ffffff;
       border: 1px solid #059669;
     }
 
@@ -99,13 +157,24 @@
 
     .btn-purple {
       background: #7c3aed;
-      color: #fff;
+      color: #ffffff;
       border: 1px solid #7c3aed;
     }
 
     .btn-purple:hover {
       background: #6d28d9;
       border-color: #6d28d9;
+    }
+
+    .btn-red {
+      background: #dc2626;
+      color: #ffffff;
+      border: 1px solid #dc2626;
+    }
+
+    .btn-red:hover {
+      background: #b91c1c;
+      border-color: #b91c1c;
     }
 
     .side-link {
@@ -118,7 +187,8 @@
       color: #475569;
       font-size: 14px;
       font-weight: 500;
-      transition: all .16s ease;
+      transition: all 0.16s ease;
+      border: 1px solid transparent;
     }
 
     .side-link:hover {
@@ -129,14 +199,43 @@
     .side-link.active {
       background: #eff6ff;
       color: #1d4ed8;
-      border: 1px solid #bfdbfe;
+      border-color: #bfdbfe;
     }
 
-    .class-link.active,
+    .class-box {
+      width: 100%;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px;
+      transition: all 0.16s ease;
+      overflow: hidden;
+    }
+
+    .class-box:hover {
+      border-color: #bfdbfe;
+      background: #f8fafc;
+    }
+
+    .class-box.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    .class-box.active .muted-on-active {
+      color: rgba(255, 255, 255, 0.68);
+    }
+
     .task-link.active {
       background: #111827;
-      color: #fff;
+      color: #ffffff;
       border-color: #111827;
+    }
+
+    .task-link.active .muted-on-active {
+      color: rgba(255,255,255,0.68);
     }
 
     .custom-scroll::-webkit-scrollbar {
@@ -154,17 +253,60 @@
       border-radius: 999px;
     }
 
-    .font-signature { font-family: 'Pinyon Script', cursive; }
+    .table-wrap {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .safe-table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: collapse;
+    }
+
+    .grid-safe {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .two-col-safe {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .three-col-safe {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .font-signature {
+      font-family: 'Pinyon Script', cursive;
+    }
 
     .cert-container {
       container-type: inline-size;
       perspective: 1000px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .certificate-preview {
+      width: 100%;
+      max-width: 100%;
       background: white;
-      box-shadow: 0 18px 44px rgba(15, 23, 42, .16);
-      transition: all .3s ease;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
       transform-style: preserve-3d;
@@ -173,15 +315,47 @@
       color: #1e293b;
     }
 
+    .anti-forge-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.22;
+    }
+
+    .anti-forge-line {
+      position: absolute;
+      left: -10%;
+      width: 120%;
+      white-space: nowrap;
+      font-size: 0.92cqi;
+      letter-spacing: 0.22em;
+      color: rgba(15, 23, 42, 0.18);
+      text-transform: uppercase;
+      transform: rotate(-10deg);
+      font-weight: 700;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .anti-forge-line:nth-child(1) { top: 15%; }
+    .anti-forge-line:nth-child(2) { top: 24%; }
+    .anti-forge-line:nth-child(3) { top: 33%; }
+    .anti-forge-line:nth-child(4) { top: 42%; }
+    .anti-forge-line:nth-child(5) { top: 51%; }
+    .anti-forge-line:nth-child(6) { top: 60%; }
+    .anti-forge-line:nth-child(7) { top: 69%; }
+    .anti-forge-line:nth-child(8) { top: 78%; }
+
     .cert-wave-watermark {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      opacity: .13;
+      opacity: 0.13;
       background:
-        radial-gradient(circle at 25% 18%, rgba(37, 99, 235, .16), transparent 30%),
-        radial-gradient(circle at 80% 74%, rgba(124, 58, 237, .14), transparent 32%);
+        radial-gradient(circle at 25% 18%, rgba(37, 99, 235, 0.16), transparent 30%),
+        radial-gradient(circle at 80% 74%, rgba(124, 58, 237, 0.14), transparent 32%);
     }
 
     .cert-wave-watermark::before {
@@ -197,6 +371,35 @@
       transform: rotate(-8deg);
     }
 
+    .cert-seal {
+      width: 9cqi;
+      height: 9cqi;
+      border-radius: 50%;
+      border: 0.45cqi double currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.1cqi;
+      margin: 0 auto 1.5cqi;
+      position: relative;
+      opacity: 0.92;
+    }
+
+    .cert-seal::before,
+    .cert-seal::after {
+      content: '';
+      position: absolute;
+      inset: -0.9cqi;
+      border: 0.18cqi solid currentColor;
+      border-radius: 50%;
+      opacity: 0.25;
+    }
+
+    .cert-seal::after {
+      inset: 1.1cqi;
+      opacity: 0.18;
+    }
+
     .draggable-logo {
       position: absolute;
       cursor: grab;
@@ -209,7 +412,9 @@
       pointer-events: auto;
     }
 
-    .draggable-logo:active { cursor: grabbing; }
+    .draggable-logo:active {
+      cursor: grabbing;
+    }
 
     .draggable-logo img {
       width: 100%;
@@ -221,88 +426,164 @@
 
     .tpl-1-degree {
       font-family: 'Cinzel', serif;
-      border: 2.5cqw solid #1e293b;
-      outline: .6cqw solid #1e293b;
-      outline-offset: -1.2cqw;
-      background: linear-gradient(#fffdf8, #fefaf0);
-      box-shadow: inset 0 0 0 1.5cqw #f8f1e3, inset 0 0 90px rgba(180, 83, 9, .07);
+      border: 2.6cqw solid #111827;
+      outline: 0.55cqw solid #b45309;
+      outline-offset: -1.35cqw;
+      background:
+        radial-gradient(circle at center, rgba(180,83,9,0.055), transparent 42%),
+        linear-gradient(#fffdf8, #fefaf0);
+      box-shadow: inset 0 0 0 1.5cqw #f8f1e3, inset 0 0 90px rgba(180, 83, 9, 0.08);
     }
 
     .tpl-1-degree::before {
       content: '';
       position: absolute;
-      inset: 1.6cqw;
-      border: .45cqw solid #1e293b;
-      opacity: .12;
+      inset: 2.1cqw;
+      border: 0.28cqw solid rgba(17,24,39,0.22);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .tpl-1-degree::after {
+      content: '';
+      position: absolute;
+      inset: 3cqw;
+      border: 0.12cqw dashed rgba(180,83,9,0.34);
       pointer-events: none;
       z-index: 2;
     }
 
     .tpl-1-degree .cert-title {
-      font-size: 4.4cqi;
-      color: #1e293b;
-      font-weight: 700;
-      border-bottom: 2.5px solid #b45309;
-      padding-bottom: 1.4cqw;
+      font-size: 4.3cqi;
+      color: #111827;
+      font-weight: 800;
+      border-bottom: 0.28cqw solid #b45309;
+      padding-bottom: 1.15cqw;
       display: inline-block;
-      letter-spacing: .02em;
+      letter-spacing: 0.035em;
     }
 
     .tpl-2-university {
       font-family: 'Playfair Display', serif;
-      border: 3cqw solid #1e293b;
-      background: #fff;
+      border: 3cqw solid #172554;
+      background:
+        linear-gradient(135deg, rgba(29,78,216,0.05), transparent 35%),
+        linear-gradient(#ffffff, #f8fafc);
+    }
+
+    .tpl-2-university::before {
+      content: '';
+      position: absolute;
+      inset: 1.7cqw;
+      border: 0.45cqw double #1d4ed8;
+      opacity: 0.42;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .tpl-2-university::after {
+      content: 'ACADEMIC EXCELLENCE';
+      position: absolute;
+      left: 50%;
+      bottom: 3.5cqw;
+      transform: translateX(-50%);
+      font-size: 0.95cqi;
+      letter-spacing: 0.45em;
+      color: rgba(30,64,175,0.38);
+      font-family: 'Montserrat', sans-serif;
+      z-index: 2;
     }
 
     .tpl-2-university .cert-title {
-      font-size: 3.8cqi;
+      font-size: 3.75cqi;
       text-transform: uppercase;
-      letter-spacing: .25em;
-      color: #1e293b;
+      letter-spacing: 0.25em;
+      color: #172554;
+      font-weight: 800;
     }
 
     .tpl-3-corporate {
       font-family: 'Montserrat', sans-serif;
-      border-top: 5.5cqw solid #1e293b;
-      border-bottom: 1.8cqw solid #1e293b;
-      background: #fff;
+      border-top: 5.7cqw solid #0f172a;
+      border-bottom: 1.9cqw solid #0f172a;
+      background:
+        linear-gradient(90deg, rgba(15,23,42,0.035) 0 1px, transparent 1px),
+        linear-gradient(#ffffff, #f8fafc);
+      background-size: 4cqw 4cqw;
+    }
+
+    .tpl-3-corporate::before {
+      content: '';
+      position: absolute;
+      top: 1.5cqw;
+      left: 3cqw;
+      right: 3cqw;
+      height: 0.22cqw;
+      background: linear-gradient(90deg, #2563eb, #7c3aed, #0f172a);
+      z-index: 2;
     }
 
     .tpl-3-corporate .cert-title {
-      font-size: 3.5cqi;
-      font-weight: 700;
-      letter-spacing: .12em;
-      color: #1e293b;
+      font-size: 3.35cqi;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: #0f172a;
+      text-transform: uppercase;
     }
 
     .tpl-4-tech {
       font-family: 'Space Grotesk', sans-serif;
-      border: .6cqw solid #1e293b;
-      background: #fff;
-      background-image:
-        linear-gradient(rgba(15,23,42,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15,23,42,.04) 1px, transparent 1px);
-      background-size: 3.8cqw 3.8cqw;
+      border: 0.7cqw solid #0f172a;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(37,99,235,0.12), transparent 20%),
+        radial-gradient(circle at 90% 75%, rgba(124,58,237,0.10), transparent 24%),
+        linear-gradient(rgba(15,23,42,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.045) 1px, transparent 1px),
+        #ffffff;
+      background-size: auto, auto, 3.3cqw 3.3cqw, 3.3cqw 3.3cqw;
+    }
+
+    .tpl-4-tech::before {
+      content: '';
+      position: absolute;
+      inset: 2cqw;
+      border: 0.2cqw solid rgba(37,99,235,0.34);
+      box-shadow: 0 0 0 0.5cqw rgba(124,58,237,0.06);
+      z-index: 2;
+      pointer-events: none;
     }
 
     .tpl-4-tech .cert-title {
-      font-size: 3.5cqi;
+      font-size: 3.35cqi;
       text-transform: uppercase;
-      color: #1e293b;
-      letter-spacing: .1em;
+      color: #0f172a;
+      letter-spacing: 0.11em;
+      font-weight: 800;
     }
 
     .tpl-5-scholar {
       font-family: 'Cinzel', serif;
-      border: 1.6cqw solid #b45309;
-      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1.75cqw solid #92400e;
+      background:
+        radial-gradient(circle at center, rgba(146,64,14,0.08), transparent 38%),
+        linear-gradient(135deg, #fffbeb, #fef3c7);
+    }
+
+    .tpl-5-scholar::before {
+      content: '';
+      position: absolute;
+      inset: 1.15cqw;
+      border: 0.35cqw double #b45309;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.72;
     }
 
     .tpl-5-scholar::after {
       content: '';
       position: absolute;
-      inset: .6cqw;
-      border: .35cqw solid #b45309;
+      inset: 3.2cqw;
+      border: 0.14cqw solid rgba(146,64,14,0.25);
       pointer-events: none;
       z-index: 2;
     }
@@ -310,26 +591,53 @@
     .tpl-5-scholar .cert-title {
       font-size: 4cqi;
       color: #92400e;
+      font-weight: 800;
     }
 
     .tpl-6-minimal {
       font-family: 'Inter', sans-serif;
-      border-left: 6.5cqw solid #1e293b;
-      background: #f8fafc;
+      border-left: 6.8cqw solid #0f172a;
+      background:
+        linear-gradient(90deg, rgba(15,23,42,0.04), transparent 45%),
+        #f8fafc;
+    }
+
+    .tpl-6-minimal::before {
+      content: '';
+      position: absolute;
+      top: 4cqw;
+      right: 4cqw;
+      width: 14cqw;
+      height: 14cqw;
+      border: 0.35cqw solid rgba(15,23,42,0.08);
+      border-radius: 50%;
+      z-index: 2;
+      pointer-events: none;
     }
 
     .tpl-6-minimal .cert-title {
-      font-size: 3.6cqi;
-      font-weight: 600;
+      font-size: 3.55cqi;
+      font-weight: 800;
       text-align: left;
-      color: #1e293b;
+      color: #0f172a;
     }
 
     .tpl-7-dark {
       font-family: 'Space Grotesk', sans-serif;
-      border: .55cqw solid #334155;
-      background: radial-gradient(circle at 50% 0%, #1e293b, #0f172a);
+      border: 0.65cqw solid #334155;
+      background:
+        radial-gradient(circle at 50% 0%, #1e293b, #0f172a 62%),
+        #0f172a;
       color: #f8fafc !important;
+    }
+
+    .tpl-7-dark::before {
+      content: '';
+      position: absolute;
+      inset: 2cqw;
+      border: 0.18cqw solid rgba(255,255,255,0.18);
+      pointer-events: none;
+      z-index: 2;
     }
 
     .tpl-7-dark .cert-title,
@@ -337,16 +645,91 @@
       color: white !important;
     }
 
-    .tpl-7-dark .draggable-logo {
-      mix-blend-mode: normal;
-      filter: drop-shadow(0 0 6px rgba(255,255,255,.55));
+    .tpl-7-dark .anti-forge-line {
+      color: rgba(255,255,255,0.13);
     }
 
-    .shape-circle { border-radius: 50%; }
-    .shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
-    .shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
-    .shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-    .shape-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+    .tpl-7-dark .draggable-logo {
+      mix-blend-mode: normal;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
+    }
+
+    .badge-preview-shape-circle { border-radius: 50%; }
+    .badge-preview-shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
+    .badge-preview-shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    .badge-preview-shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+    .badge-preview-shape-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+
+    .mobile-overlay {
+      display: none;
+    }
+
+    @media (max-width: 1279px) {
+      .app-shell {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        transform: translateX(-100%);
+        transition: transform 0.22s ease;
+        z-index: 80;
+        width: 304px;
+        max-width: calc(100vw - 32px);
+        min-width: 0;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.42);
+        z-index: 70;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+      }
+
+      .mobile-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .main-shell {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .page {
+        padding: 16px;
+      }
+
+      .two-col-safe,
+      .three-col-safe {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 14px;
+      }
+
+      .panel,
+      .panel-strong {
+        border-radius: 16px;
+      }
+
+      .safe-table {
+        min-width: 720px;
+      }
+    }
   </style>
 </head>
 
@@ -362,6 +745,12 @@
     const teacherName = user && user.name ? user.name : 'Teacher';
     const firstName = teacherName.split(' ')[0];
 
+    function assignedForClass(cls) {
+      return Array.isArray(cls.assignedTests)
+        ? cls.assignedTests
+        : safeTests.filter(t => Array.isArray(cls.assignedTestIds) && cls.assignedTestIds.map(Number).includes(Number(t.id)));
+    }
+
     const totalStudents = safeClasses.reduce((sum, c) => {
       if (Array.isArray(c.students)) return sum + c.students.length;
       return sum + Number(c.usageCount || 0);
@@ -370,66 +759,70 @@
     const totalSubmissions = typeof submissions !== 'undefined' && Array.isArray(submissions)
       ? submissions.length
       : safeClasses.reduce((sum, c) => sum + Number(c.submissionCount || 0), 0);
-
-    function assignedForClass(cls) {
-      return Array.isArray(cls.assignedTests)
-        ? cls.assignedTests
-        : safeTests.filter(t => Array.isArray(cls.assignedTestIds) && cls.assignedTestIds.map(Number).includes(Number(t.id)));
-    }
-
-    function firstClassId() {
-      return safeClasses.length > 0 ? String(safeClasses[0].id) : '';
-    }
   %>
 
-  <div class="min-h-screen flex">
-    <aside class="hidden xl:flex w-80 shrink-0 border-r border-slate-200 bg-white min-h-screen sticky top-0">
-      <div class="w-full h-screen overflow-y-auto custom-scroll p-5 flex flex-col">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span class="text-white font-semibold text-xl">C</span>
+  <div id="mobileOverlay" class="mobile-overlay" onclick="closeSidebar()"></div>
+
+  <div class="app-shell">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-inner custom-scroll">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+              <span class="text-white font-semibold text-xl">C</span>
+            </div>
+
+            <div>
+              <div class="font-semibold text-xl leading-none truncate">Credity</div>
+              <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1 truncate">Teacher Dashboard</div>
+            </div>
           </div>
-          <div>
-            <div class="font-semibold text-xl leading-none">Credity</div>
-            <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1">Teacher Dashboard</div>
-          </div>
+
+          <button type="button" onclick="closeSidebar()" class="xl:hidden w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
         <div class="panel rounded-xl p-4 mb-5">
-          <div class="text-sm font-semibold"><%= teacherName %></div>
+          <div class="text-sm font-semibold truncate"><%= teacherName %></div>
           <div class="text-xs text-slate-500 mt-1">Teacher workspace</div>
         </div>
 
         <nav class="space-y-1 mb-6">
           <button class="side-link active" data-view-link="overview" onclick="showView('overview')">
-            <i class="fa-solid fa-gauge-high w-5"></i>
-            Overview
+            <i class="fa-solid fa-gauge-high w-5 shrink-0"></i>
+            <span class="truncate">Overview</span>
           </button>
+
           <button class="side-link" data-view-link="classes" onclick="showView('classes')">
-            <i class="fa-solid fa-users-rectangle w-5"></i>
-            Classes
+            <i class="fa-solid fa-users-rectangle w-5 shrink-0"></i>
+            <span class="truncate">Classes</span>
           </button>
+
           <button class="side-link" data-view-link="tasks" onclick="showView('tasks')">
-            <i class="fa-solid fa-clipboard-question w-5"></i>
-            Task Bar
+            <i class="fa-solid fa-clipboard-question w-5 shrink-0"></i>
+            <span class="truncate">Assignments</span>
           </button>
+
           <button class="side-link" data-view-link="credentials" onclick="showView('credentials')">
-            <i class="fa-solid fa-certificate w-5"></i>
-            Certificates
+            <i class="fa-solid fa-certificate w-5 shrink-0"></i>
+            <span class="truncate">Certificates</span>
           </button>
+
           <button class="side-link" data-view-link="badges" onclick="showView('badges')">
-            <i class="fa-solid fa-award w-5"></i>
-            Badges
+            <i class="fa-solid fa-award w-5 shrink-0"></i>
+            <span class="truncate">Badges</span>
           </button>
+
           <button class="side-link" data-view-link="announcements" onclick="showView('announcements')">
-            <i class="fa-solid fa-bullhorn w-5"></i>
-            Announcements
+            <i class="fa-solid fa-bullhorn w-5 shrink-0"></i>
+            <span class="truncate">Announcements</span>
           </button>
         </nav>
 
         <div class="mb-5">
           <div class="flex items-center justify-between mb-2">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Classes</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Class Boxes</div>
             <span class="text-xs text-slate-400"><%= safeClasses.length %></span>
           </div>
 
@@ -441,14 +834,16 @@
               %>
                 <button
                   type="button"
-                  class="class-link w-full text-left px-3 py-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition <%= idx === 0 ? 'active' : '' %>"
+                  class="class-box <%= idx === 0 ? 'active' : '' %>"
                   data-class-button="<%= cls.id %>"
                   onclick="selectClass('<%= cls.id %>')">
                   <div class="flex items-center justify-between gap-2">
-                    <div class="text-sm font-medium truncate"><%= cls.className %></div>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200"><%= cTasks.length %></span>
+                    <div class="text-sm font-semibold truncate"><%= cls.className %></div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 shrink-0 text-slate-700"><%= cTasks.length %></span>
                   </div>
-                  <div class="text-xs opacity-70 mt-1"><%= cStudents.length || cls.usageCount || 0 %> students</div>
+                  <div class="text-xs text-slate-500 muted-on-active mt-1 truncate">
+                    <%= cStudents.length || cls.usageCount || 0 %> students • <%= cTasks.length %> assignments
+                  </div>
                 </button>
               <% }) %>
             <% } else { %>
@@ -461,35 +856,36 @@
 
         <div class="mb-5">
           <div class="flex items-center justify-between mb-2">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Task Bar</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Assignment Bar</div>
             <span class="text-xs text-slate-400"><%= safeTests.length %></span>
           </div>
 
           <div class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1">
             <% if (safeTests.length > 0) { %>
-              <% safeTests.forEach((task, idx) => { %>
+              <% safeTests.forEach(task => { %>
                 <button
                   type="button"
                   class="task-link w-full text-left px-3 py-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition"
                   data-task-button="<%= task.id %>"
                   onclick="selectTask('<%= task.id %>')">
                   <div class="text-sm font-medium truncate"><%= task.title %></div>
-                  <div class="text-xs opacity-70 mt-1"><%= task.questions ? task.questions.length : 0 %> questions</div>
+                  <div class="text-xs text-slate-500 muted-on-active mt-1 truncate"><%= task.questions ? task.questions.length : 0 %> questions</div>
                 </button>
               <% }) %>
             <% } else { %>
               <div class="text-sm text-slate-500 border border-dashed border-slate-300 rounded-xl p-4 text-center">
-                No tasks yet
+                No assignments yet
               </div>
             <% } %>
           </div>
         </div>
 
-        <div class="mt-auto space-y-2">
+        <div class="mt-6 space-y-2">
           <a href="/assessment" class="btn btn-primary w-full py-3 text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i>
-            Create Assessment
+            Make Assignment
           </a>
+
           <a href="/logout" class="btn btn-light w-full py-3 text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             Logout
@@ -498,109 +894,154 @@
       </div>
     </aside>
 
-    <main class="flex-1 min-w-0">
+    <main class="main-shell">
       <nav class="xl:hidden bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div class="px-4 py-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span class="text-white font-semibold text-xl">C</span>
-            </div>
+            <button type="button" onclick="openSidebar()" class="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+
             <div>
-              <div class="font-semibold text-xl leading-none">Credity</div>
-              <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1">Teacher</div>
+              <div class="font-semibold text-lg leading-none truncate">Credity Teacher</div>
+              <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1 truncate">Dashboard</div>
             </div>
           </div>
-          <a href="/logout" class="btn btn-light px-4 py-2 text-sm">Logout</a>
+
+          <a href="/assessment" class="btn btn-dark px-4 py-2 text-sm shrink-0">
+            New
+          </a>
         </div>
       </nav>
 
-      <div class="max-w-[92rem] mx-auto px-4 sm:px-6 py-8">
-        <section class="mb-8 view-panel" data-view-panel="overview">
-          <div class="panel-strong rounded-2xl p-6 md:p-9">
-            <div class="grid xl:grid-cols-12 gap-8 items-center">
-              <div class="xl:col-span-7">
+      <div class="page">
+        <section class="view-panel" data-view-panel="overview">
+          <div class="panel-strong rounded-2xl p-5 md:p-8 mb-6">
+            <div class="grid lg:grid-cols-[minmax(0,1.3fr)_minmax(260px,.7fr)] gap-6 items-center">
+              <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium tracking-[1.5px] rounded-lg border border-blue-100 mb-5">
                   <i class="fa-solid fa-chart-simple"></i>
                   <span>TEACHER ACTION CENTER</span>
                 </div>
 
-                <h1 class="text-4xl md:text-6xl font-semibold tracking-tighter text-slate-950 leading-none">
+                <h1 class="text-4xl md:text-6xl font-semibold tracking-tighter text-slate-950 leading-none break-words">
                   Welcome back, <%= firstName %>.
                 </h1>
 
                 <p class="mt-5 text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed">
-                  Use the side dashboard to click a class, view its tasks, students, scores, submissions, and announcements.
+                  Manage class boxes, create and delete assignments, design professional certificates with anti-forge marks, and build verified badges.
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-3">
-                  <a href="/assessment" class="btn btn-primary inline-flex items-center justify-center gap-3 px-7 py-4">
+                  <a href="/assessment" class="btn btn-primary inline-flex items-center justify-center gap-3 px-6 py-3.5">
                     <i class="fa-solid fa-file-circle-plus"></i>
-                    Create Assessment
+                    Make Assignment
                   </a>
 
-                  <button onclick="showView('classes')" class="btn btn-light inline-flex items-center justify-center gap-3 px-7 py-4">
+                  <button onclick="showView('classes')" class="btn btn-light inline-flex items-center justify-center gap-3 px-6 py-3.5">
                     <i class="fa-solid fa-users-rectangle text-emerald-600"></i>
-                    Manage Classes
+                    View Classes
                   </button>
 
-                  <button onclick="showView('credentials')" class="btn btn-light inline-flex items-center justify-center gap-3 px-7 py-4">
+                  <button onclick="showView('credentials')" class="btn btn-light inline-flex items-center justify-center gap-3 px-6 py-3.5">
                     <i class="fa-solid fa-certificate text-blue-600"></i>
-                    Design Credential
+                    Create Certificate
                   </button>
                 </div>
               </div>
 
-              <div class="xl:col-span-5">
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="panel rounded-xl p-5">
-                    <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center mb-4 border border-emerald-100">
-                      <i class="fa-solid fa-users-rectangle"></i>
-                    </div>
-                    <div class="text-4xl font-semibold"><%= safeClasses.length %></div>
-                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Classes</div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="panel rounded-xl p-4">
+                  <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center mb-4 border border-emerald-100">
+                    <i class="fa-solid fa-users-rectangle"></i>
                   </div>
+                  <div class="text-3xl md:text-4xl font-semibold"><%= safeClasses.length %></div>
+                  <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Classes</div>
+                </div>
 
-                  <div class="panel rounded-xl p-5">
-                    <div class="w-10 h-10 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center mb-4 border border-blue-100">
-                      <i class="fa-solid fa-clipboard-question"></i>
-                    </div>
-                    <div class="text-4xl font-semibold"><%= safeTests.length %></div>
-                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Assessments</div>
+                <div class="panel rounded-xl p-4">
+                  <div class="w-10 h-10 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center mb-4 border border-blue-100">
+                    <i class="fa-solid fa-clipboard-question"></i>
                   </div>
+                  <div class="text-3xl md:text-4xl font-semibold"><%= safeTests.length %></div>
+                  <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Assignments</div>
+                </div>
 
-                  <div class="panel rounded-xl p-5">
-                    <div class="w-10 h-10 bg-violet-50 text-violet-700 rounded-lg flex items-center justify-center mb-4 border border-violet-100">
-                      <i class="fa-solid fa-user-group"></i>
-                    </div>
-                    <div class="text-4xl font-semibold"><%= totalStudents %></div>
-                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Students</div>
+                <div class="panel rounded-xl p-4">
+                  <div class="w-10 h-10 bg-violet-50 text-violet-700 rounded-lg flex items-center justify-center mb-4 border border-violet-100">
+                    <i class="fa-solid fa-award"></i>
                   </div>
+                  <div class="text-3xl md:text-4xl font-semibold"><%= safeBadges.length %></div>
+                  <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Badges</div>
+                </div>
 
-                  <div class="panel rounded-xl p-5">
-                    <div class="w-10 h-10 bg-amber-50 text-amber-700 rounded-lg flex items-center justify-center mb-4 border border-amber-100">
-                      <i class="fa-solid fa-square-poll-vertical"></i>
-                    </div>
-                    <div class="text-4xl font-semibold"><%= totalSubmissions %></div>
-                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Submissions</div>
+                <div class="panel rounded-xl p-4">
+                  <div class="w-10 h-10 bg-amber-50 text-amber-700 rounded-lg flex items-center justify-center mb-4 border border-amber-100">
+                    <i class="fa-solid fa-square-poll-vertical"></i>
                   </div>
+                  <div class="text-3xl md:text-4xl font-semibold"><%= totalSubmissions %></div>
+                  <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Submissions</div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="grid-safe">
+            <% if (safeClasses.length > 0) { %>
+              <% safeClasses.forEach(cls => {
+                const cTasks = assignedForClass(cls);
+                const cStudents = Array.isArray(cls.students) ? cls.students : [];
+                const cResults = Array.isArray(cls.results) ? cls.results : [];
+              %>
+                <button type="button" onclick="selectClass('<%= cls.id %>')" class="panel-strong rounded-2xl p-5 text-left hover:border-blue-300 transition">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-lg font-semibold truncate"><%= cls.className %></div>
+                      <div class="text-sm text-slate-500 mt-1 truncate"><%= cls.key %></div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300 shrink-0"></i>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2 mt-5">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="text-xs text-slate-500 uppercase tracking-wider">Tasks</div>
+                      <div class="text-xl font-semibold mt-1"><%= cTasks.length %></div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="text-xs text-slate-500 uppercase tracking-wider">Students</div>
+                      <div class="text-xl font-semibold mt-1"><%= cStudents.length || cls.usageCount || 0 %></div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="text-xs text-slate-500 uppercase tracking-wider">Scores</div>
+                      <div class="text-xl font-semibold mt-1"><%= cResults.length %></div>
+                    </div>
+                  </div>
+                </button>
+              <% }) %>
+            <% } else { %>
+              <div class="panel-strong rounded-2xl p-10 text-center">
+                <i class="fa-solid fa-users-rectangle text-4xl text-slate-300 mb-4"></i>
+                <div class="text-xl font-semibold">No classes yet</div>
+                <p class="text-slate-500 mt-2">Create your first class key from the Classes section.</p>
+              </div>
+            <% } %>
+          </div>
         </section>
 
         <section class="view-panel hidden" data-view-panel="classes">
-          <div class="grid xl:grid-cols-12 gap-8">
-            <div class="xl:col-span-4 panel-strong rounded-2xl p-6 md:p-8 h-fit">
+          <div class="grid lg:grid-cols-[minmax(260px,360px)_minmax(0,1fr)] gap-6">
+            <div class="panel-strong rounded-2xl p-5 md:p-6 h-fit">
               <h3 class="text-2xl font-semibold">Create Class Key</h3>
               <p class="text-sm text-slate-500 mt-1 mb-6">
-                Create a class, then students join with its key. You can assign assessments after.
+                Create a class, share the key, then assign assessments.
               </p>
 
               <form action="/generate-student-key" method="POST" class="space-y-5">
                 <div>
                   <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Class Name</label>
-                  <input type="text" name="className" placeholder="Grade 10A - Python" class="input w-full px-4 py-3 rounded-lg font-medium" required>
+                  <input type="text" name="className" placeholder="Grade 10A - Python" class="input px-4 py-3 rounded-lg font-medium" required>
                 </div>
 
                 <button type="submit" class="btn btn-green w-full py-4">
@@ -612,14 +1053,14 @@
                 <div class="font-semibold text-emerald-800">Class flow</div>
                 <ol class="text-sm text-emerald-700 mt-2 space-y-1 list-decimal list-inside">
                   <li>Create a class key.</li>
-                  <li>Student joins the class.</li>
-                  <li>Assign tests from the class panel.</li>
+                  <li>Students join with the key.</li>
+                  <li>Assign new or existing assessments.</li>
                   <li>View scores and submissions.</li>
                 </ol>
               </div>
             </div>
 
-            <div class="xl:col-span-8 space-y-5">
+            <div>
               <% if (safeClasses.length > 0) { %>
                 <% safeClasses.forEach((cls, idx) => {
                   const assignedTests = assignedForClass(cls);
@@ -627,37 +1068,37 @@
                   const students = Array.isArray(cls.students) ? cls.students : [];
                   const results = Array.isArray(cls.results) ? cls.results : [];
                 %>
-                  <div class="class-panel panel-strong rounded-2xl p-6 md:p-7 <%= idx === 0 ? '' : 'hidden' %>" data-class-panel="<%= cls.id %>">
+                  <div class="class-panel panel-strong rounded-2xl p-5 md:p-6 <%= idx === 0 ? '' : 'hidden' %>" data-class-panel="<%= cls.id %>">
                     <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
                       <div>
                         <div class="flex flex-wrap items-center gap-2">
-                          <h3 class="text-3xl font-semibold text-slate-950"><%= cls.className %></h3>
+                          <h3 class="text-2xl md:text-3xl font-semibold text-slate-950 break-words"><%= cls.className %></h3>
                           <span class="text-[10px] font-medium px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700">
                             <%= cls.active === false ? 'DISABLED' : 'ACTIVE' %>
                           </span>
                         </div>
 
                         <div class="text-sm text-slate-500 mt-1">
-                          <%= students.length || cls.usageCount || 0 %> students joined • <%= assignedTests.length %> tasks • <%= results.length %> submissions
+                          <%= students.length || cls.usageCount || 0 %> students joined • <%= assignedTests.length %> assignments • <%= results.length %> submissions
                         </div>
                       </div>
 
-                      <div class="flex items-center gap-2">
-                        <code class="px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg text-xs font-semibold tracking-wider"><%= cls.key %></code>
+                      <div class="flex flex-wrap items-center gap-2">
+                        <code class="max-w-full overflow-x-auto custom-scroll px-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg text-xs font-semibold tracking-wider"><%= cls.key %></code>
                         <button type="button" onclick="copyText('<%= cls.key %>')" class="btn btn-dark px-3 py-2 text-xs">
                           Copy
                         </button>
                       </div>
                     </div>
 
-                    <div class="grid md:grid-cols-3 gap-3 mt-6">
+                    <div class="three-col-safe mt-6">
                       <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
                         <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Students</div>
                         <div class="text-3xl font-semibold mt-1"><%= students.length || cls.usageCount || 0 %></div>
                       </div>
 
                       <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                        <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Tasks</div>
+                        <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Assignments</div>
                         <div class="text-3xl font-semibold mt-1"><%= assignedTests.length %></div>
                       </div>
 
@@ -667,53 +1108,70 @@
                       </div>
                     </div>
 
-                    <div class="grid lg:grid-cols-2 gap-5 mt-6">
+                    <div class="two-col-safe mt-6">
                       <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
                         <div class="flex items-center justify-between gap-3 mb-4">
                           <div>
-                            <div class="font-semibold">Assign Assessment</div>
-                            <p class="text-xs text-slate-500 mt-1">Assign a test to this exact class.</p>
+                            <div class="font-semibold">Assignments</div>
+                            <p class="text-xs text-slate-500 mt-1">Assign existing work or make a new one.</p>
                           </div>
 
-                          <a href="/assessment" class="btn btn-primary text-xs px-3 py-2">New Test</a>
+                          <a href="/assessment" class="btn btn-primary text-xs px-3 py-2 shrink-0">
+                            New Assignment
+                          </a>
                         </div>
 
-                        <form action="/assign-class-test" method="POST" class="flex flex-col sm:flex-row gap-2">
+                        <form action="/assign-class-test" method="POST" class="grid sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
                           <input type="hidden" name="classId" value="<%= cls.id %>">
 
-                          <select name="testId" class="input flex-1 px-4 py-3 rounded-lg text-sm font-medium" required>
-                            <option value="">Select assessment...</option>
+                          <select name="testId" class="input px-4 py-3 rounded-lg text-sm font-medium" required>
+                            <option value="">Select assignment...</option>
                             <% safeTests.forEach(t => { %>
                               <option value="<%= t.id %>"><%= t.title %></option>
                             <% }) %>
                           </select>
 
-                          <button type="submit" class="btn btn-dark px-5 py-3 text-sm">Assign</button>
+                          <button type="submit" class="btn btn-dark px-5 py-3 text-sm">
+                            Assign
+                          </button>
                         </form>
 
                         <div class="mt-4">
-                          <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Class Tasks</div>
+                          <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Assigned to this class</div>
 
                           <% if (assignedTests.length > 0) { %>
                             <div class="space-y-2">
                               <% assignedTests.forEach(t => { %>
-                                <div class="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-lg p-3 task-row" data-task-row="<%= t.id %>">
-                                  <div>
-                                    <div class="text-sm font-medium"><%= t.title %></div>
-                                    <div class="text-xs text-slate-500"><%= t.questions ? t.questions.length : 0 %> questions</div>
-                                  </div>
+                                <div class="bg-white border border-slate-200 rounded-lg p-3 task-row" data-task-row="<%= t.id %>">
+                                  <div class="flex items-center justify-between gap-3">
+                                    <div>
+                                      <div class="text-sm font-medium truncate"><%= t.title %></div>
+                                      <div class="text-xs text-slate-500"><%= t.questions ? t.questions.length : 0 %> questions</div>
+                                    </div>
 
-                                  <form action="/unassign-class-test" method="POST">
-                                    <input type="hidden" name="classId" value="<%= cls.id %>">
-                                    <input type="hidden" name="testId" value="<%= t.id %>">
-                                    <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-600">Remove</button>
-                                  </form>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                      <form action="/unassign-class-test" method="POST">
+                                        <input type="hidden" name="classId" value="<%= cls.id %>">
+                                        <input type="hidden" name="testId" value="<%= t.id %>">
+                                        <button type="submit" class="btn btn-light px-3 py-2 text-xs">
+                                          Unassign
+                                        </button>
+                                      </form>
+
+                                      <form action="/delete-test" method="POST" onsubmit="return confirm('Delete this assignment completely? Scores and class links will remain historically in submissions, but the assignment will be removed.');">
+                                        <input type="hidden" name="testId" value="<%= t.id %>">
+                                        <button type="submit" class="btn btn-red px-3 py-2 text-xs">
+                                          Delete
+                                        </button>
+                                      </form>
+                                    </div>
+                                  </div>
                                 </div>
                               <% }) %>
                             </div>
                           <% } else { %>
                             <div class="text-sm text-slate-500 bg-white border border-dashed border-slate-300 rounded-lg p-4 text-center">
-                              No tasks assigned to this class.
+                              No assignments attached to this class.
                             </div>
                           <% } %>
                         </div>
@@ -726,10 +1184,12 @@
                         <form action="/class-announcement" method="POST" class="space-y-3">
                           <input type="hidden" name="classId" value="<%= cls.id %>">
 
-                          <input type="text" name="title" placeholder="Announcement title" class="input w-full px-4 py-3 rounded-lg text-sm font-medium" required>
-                          <textarea name="description" placeholder="Write the announcement..." class="input w-full px-4 py-3 rounded-lg h-20 text-sm"></textarea>
+                          <input type="text" name="title" placeholder="Announcement title" class="input px-4 py-3 rounded-lg text-sm font-medium" required>
+                          <textarea name="description" placeholder="Write the announcement..." class="input px-4 py-3 rounded-lg h-20 text-sm"></textarea>
 
-                          <button type="submit" class="btn btn-purple w-full py-3 text-sm">Post to Class</button>
+                          <button type="submit" class="btn btn-purple w-full py-3 text-sm">
+                            Post to Class
+                          </button>
                         </form>
 
                         <div class="mt-4">
@@ -739,8 +1199,8 @@
                             <div class="space-y-2 max-h-44 overflow-y-auto custom-scroll pr-1">
                               <% classAnnouncements.slice().reverse().forEach(a => { %>
                                 <div class="bg-white border border-slate-200 rounded-lg p-3">
-                                  <div class="text-sm font-medium"><%= a.title %></div>
-                                  <div class="text-xs text-slate-500 mt-1"><%= a.description || 'No description.' %></div>
+                                  <div class="text-sm font-medium break-words"><%= a.title %></div>
+                                  <div class="text-xs text-slate-500 mt-1 break-words"><%= a.description || 'No description.' %></div>
                                 </div>
                               <% }) %>
                             </div>
@@ -760,8 +1220,8 @@
                       </div>
 
                       <% if (students.length > 0) { %>
-                        <div class="overflow-x-auto custom-scroll">
-                          <table class="w-full text-left text-sm">
+                        <div class="table-wrap custom-scroll">
+                          <table class="safe-table text-left text-sm">
                             <thead>
                               <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 bg-white">
                                 <th class="px-5 py-3 font-medium">Student</th>
@@ -780,14 +1240,22 @@
                                     <div class="font-medium text-slate-950"><%= student.fullName %></div>
                                     <div class="text-xs text-slate-500">ID: <%= student.userId %></div>
                                   </td>
+
                                   <td class="px-5 py-4 text-slate-600"><%= student.email %></td>
                                   <td class="px-5 py-4 text-slate-600 whitespace-nowrap"><%= student.joinedAtFormatted || '—' %></td>
+
                                   <td class="px-5 py-4">
-                                    <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium"><%= student.completedCount || 0 %></span>
+                                    <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
+                                      <%= student.completedCount || 0 %>
+                                    </span>
                                   </td>
+
                                   <td class="px-5 py-4">
-                                    <span class="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-medium"><%= student.pendingCount || 0 %></span>
+                                    <span class="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-medium">
+                                      <%= student.pendingCount || 0 %>
+                                    </span>
                                   </td>
+
                                   <td class="px-5 py-4">
                                     <% if (student.averageScore !== null && student.averageScore !== undefined) { %>
                                       <span class="font-semibold text-slate-950"><%= student.averageScore %>%</span>
@@ -806,13 +1274,17 @@
                                         <% student.submissions.forEach(submission => { %>
                                           <div class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-3">
                                             <div>
-                                              <div class="text-sm font-medium text-slate-900"><%= submission.testTitle %></div>
+                                              <div class="text-sm font-medium text-slate-900 truncate"><%= submission.testTitle %></div>
                                               <div class="text-xs text-slate-500 mt-1"><%= submission.submittedAtFormatted || '' %></div>
                                             </div>
 
-                                            <div class="text-right">
-                                              <div class="text-lg font-semibold <%= submission.passed ? 'text-emerald-700' : 'text-red-600' %>"><%= submission.score %>%</div>
-                                              <div class="text-[10px] uppercase tracking-wider text-slate-500"><%= submission.passed ? 'Passed' : 'Failed' %></div>
+                                            <div class="text-right shrink-0">
+                                              <div class="text-lg font-semibold <%= submission.passed ? 'text-emerald-700' : 'text-red-600' %>">
+                                                <%= submission.score %>%
+                                              </div>
+                                              <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                                <%= submission.passed ? 'Passed' : 'Failed' %>
+                                              </div>
                                             </div>
                                           </div>
                                         <% }) %>
@@ -832,55 +1304,6 @@
                         </div>
                       <% } %>
                     </div>
-
-                    <div class="mt-6 bg-white border border-slate-200 rounded-xl overflow-hidden">
-                      <div class="px-5 py-4 border-b border-slate-200 bg-slate-50">
-                        <div class="font-semibold">Recent Submissions</div>
-                        <div class="text-xs text-slate-500 mt-1">Latest scores submitted in this class.</div>
-                      </div>
-
-                      <% if (results.length > 0) { %>
-                        <div class="overflow-x-auto custom-scroll">
-                          <table class="w-full text-left text-sm">
-                            <thead>
-                              <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 bg-white">
-                                <th class="px-5 py-3 font-medium">Student</th>
-                                <th class="px-5 py-3 font-medium">Email</th>
-                                <th class="px-5 py-3 font-medium">Assessment</th>
-                                <th class="px-5 py-3 font-medium">Score</th>
-                                <th class="px-5 py-3 font-medium">Status</th>
-                                <th class="px-5 py-3 font-medium">Submitted</th>
-                              </tr>
-                            </thead>
-
-                            <tbody class="divide-y divide-slate-100">
-                              <% results.forEach(result => { %>
-                                <tr class="hover:bg-slate-50">
-                                  <td class="px-5 py-4 font-medium text-slate-950"><%= result.studentName %></td>
-                                  <td class="px-5 py-4 text-slate-600"><%= result.studentEmail %></td>
-                                  <td class="px-5 py-4 text-slate-600"><%= result.testTitle %></td>
-                                  <td class="px-5 py-4 font-semibold"><%= result.score %>%</td>
-                                  <td class="px-5 py-4">
-                                    <% if (result.passed) { %>
-                                      <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">Passed</span>
-                                    <% } else { %>
-                                      <span class="px-2.5 py-1 rounded-full bg-red-50 border border-red-100 text-red-700 text-xs font-medium">Failed</span>
-                                    <% } %>
-                                  </td>
-                                  <td class="px-5 py-4 text-slate-500 whitespace-nowrap"><%= result.submittedAtFormatted || '—' %></td>
-                                </tr>
-                              <% }) %>
-                            </tbody>
-                          </table>
-                        </div>
-                      <% } else { %>
-                        <div class="p-8 text-center text-slate-500">
-                          <i class="fa-solid fa-chart-simple text-3xl text-slate-300 mb-3"></i>
-                          <div class="font-medium text-slate-800">No submissions yet</div>
-                          <p class="text-sm mt-1">Scores will appear here when students submit assigned assessments.</p>
-                        </div>
-                      <% } %>
-                    </div>
                   </div>
                 <% }) %>
               <% } else { %>
@@ -895,21 +1318,22 @@
         </section>
 
         <section class="view-panel hidden" data-view-panel="tasks">
-          <div class="panel-strong rounded-2xl p-6 md:p-8">
+          <div class="panel-strong rounded-2xl p-5 md:p-6">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
               <div>
-                <h2 class="text-3xl font-semibold tracking-tight">Task Bar</h2>
-                <p class="text-slate-500 mt-1">Click a task from the side bar to quickly highlight it inside the selected class.</p>
+                <h2 class="text-3xl font-semibold tracking-tight">Assignments</h2>
+                <p class="text-slate-500 mt-1">Create new assignments from the builder, or delete existing ones here.</p>
               </div>
-              <a href="/assessment" class="btn btn-primary px-5 py-3 text-sm inline-flex items-center gap-2">
+
+              <a href="/assessment" class="btn btn-primary px-5 py-3 text-sm inline-flex items-center justify-center gap-2">
                 <i class="fa-solid fa-plus"></i>
-                Create Task
+                New Assignment
               </a>
             </div>
 
             <% if (safeTests.length > 0) { %>
-              <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <% safeTests.forEach(task => { 
+              <div class="grid-safe">
+                <% safeTests.forEach(task => {
                   const linkedClasses = safeClasses.filter(cls => {
                     const ids = Array.isArray(cls.assignedTestIds) ? cls.assignedTestIds.map(Number) : [];
                     return ids.includes(Number(task.id));
@@ -918,11 +1342,12 @@
                   <div class="panel rounded-xl p-5 task-card" data-task-card="<%= task.id %>">
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <h3 class="text-lg font-semibold"><%= task.title %></h3>
+                        <h3 class="text-lg font-semibold truncate"><%= task.title %></h3>
                         <p class="text-xs text-slate-500 mt-1"><%= task.questions ? task.questions.length : 0 %> questions</p>
                       </div>
-                      <span class="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
-                        Task
+
+                      <span class="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium shrink-0">
+                        Assignment
                       </span>
                     </div>
 
@@ -931,7 +1356,7 @@
                       <% if (linkedClasses.length > 0) { %>
                         <div class="flex flex-wrap gap-2">
                           <% linkedClasses.forEach(cls => { %>
-                            <button onclick="selectClass('<%= cls.id %>')" class="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700">
+                            <button type="button" onclick="selectClass('<%= cls.id %>')" class="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 max-w-full truncate">
                               <%= cls.className %>
                             </button>
                           <% }) %>
@@ -940,13 +1365,20 @@
                         <div class="text-sm text-slate-500">Not assigned to a class yet.</div>
                       <% } %>
                     </div>
+
+                    <form action="/delete-test" method="POST" class="mt-5" onsubmit="return confirm('Delete this assignment completely?');">
+                      <input type="hidden" name="testId" value="<%= task.id %>">
+                      <button type="submit" class="btn btn-red w-full py-3 text-sm">
+                        Delete Assignment
+                      </button>
+                    </form>
                   </div>
                 <% }) %>
               </div>
             <% } else { %>
               <div class="border border-dashed border-slate-300 rounded-xl p-12 text-center">
                 <i class="fa-solid fa-clipboard-question text-4xl text-slate-300 mb-4"></i>
-                <div class="font-medium">No tasks yet</div>
+                <div class="font-medium">No assignments yet</div>
                 <p class="text-sm text-slate-500 mt-1">Create an assessment first.</p>
               </div>
             <% } %>
@@ -954,20 +1386,21 @@
         </section>
 
         <section class="view-panel hidden" data-view-panel="credentials">
-          <form id="certificateForm" action="/create-credential" method="POST" class="flex flex-col xl:flex-row gap-8">
+          <form id="certificateForm" action="/create-credential" method="POST" class="grid xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,.75fr)] gap-6">
             <input type="hidden" name="type" value="certificate">
             <input type="hidden" name="templateStyle" id="selected-certificate-template" value="tpl-1-degree">
+            <input type="hidden" name="antiForge" value="true">
             <div id="certificate-hidden-logos"></div>
 
-            <div class="xl:w-3/5 panel-strong p-6 md:p-8 rounded-2xl space-y-6">
+            <div class="panel-strong p-5 md:p-6 rounded-2xl space-y-6">
               <div>
-                <h3 class="text-2xl font-semibold">Certificate Designer</h3>
-                <p class="text-sm text-slate-500 mt-1">Certificates can be standalone or optionally linked to an assessment.</p>
+                <h3 class="text-2xl font-semibold">Professional Certificate Designer</h3>
+                <p class="text-sm text-slate-500 mt-1">Detailed templates with QR preview, seal, wave watermark, and anti-forge micro text.</p>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
                 <label class="text-xs font-medium text-blue-800 uppercase tracking-wider block mb-2">Optional Assessment Link</label>
-                <select name="assessmentId" class="input w-full px-4 py-3 rounded-lg text-sm font-medium bg-white">
+                <select name="assessmentId" class="input px-4 py-3 rounded-lg text-sm font-medium bg-white">
                   <option value="">Standalone certificate — no assessment</option>
                   <% safeTests.forEach(t => { %>
                     <option value="<%= t.id %>"><%= t.title %></option>
@@ -978,24 +1411,24 @@
               <div class="grid md:grid-cols-3 gap-4 p-4 border border-slate-200 rounded-xl bg-slate-50">
                 <div>
                   <label class="text-[10px] font-medium text-slate-500 uppercase tracking-wider block mb-2">Preview Student</label>
-                  <input type="text" id="cert-student" value="Alex Rivera" oninput="updateCert()" class="input w-full px-3 py-2 rounded-lg text-sm">
+                  <input type="text" id="cert-student" value="Alex Rivera" oninput="updateCert()" class="input px-3 py-2 rounded-lg text-sm">
                 </div>
 
                 <div>
                   <label class="text-[10px] font-medium text-slate-500 uppercase tracking-wider block mb-2">Signature</label>
-                  <input type="text" name="signature" id="cert-signature" value="<%= teacherName %>" oninput="updateCert()" class="input w-full px-3 py-2 rounded-lg text-sm">
+                  <input type="text" name="signature" id="cert-signature" value="<%= teacherName %>" oninput="updateCert()" class="input px-3 py-2 rounded-lg text-sm">
                 </div>
 
                 <div>
                   <label class="text-[10px] font-medium text-slate-500 uppercase tracking-wider block mb-2">Issue Date Preview</label>
-                  <input type="date" id="cert-date" oninput="updateCert()" class="input w-full px-3 py-2 rounded-lg text-sm">
+                  <input type="date" id="cert-date" oninput="updateCert()" class="input px-3 py-2 rounded-lg text-sm">
                 </div>
               </div>
 
               <div class="grid md:grid-cols-2 gap-5">
                 <div>
                   <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-2">Certificate Title</label>
-                  <input type="text" name="title" id="cert-title" value="Certificate of Achievement" oninput="updateCert()" class="input w-full px-4 py-3 rounded-lg text-sm font-medium" required>
+                  <input type="text" name="title" id="cert-title" value="Certificate of Achievement" oninput="updateCert()" class="input px-4 py-3 rounded-lg text-sm font-medium" required>
                 </div>
 
                 <div>
@@ -1006,11 +1439,11 @@
 
               <div>
                 <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-2">Description</label>
-                <textarea name="description" id="cert-desc" oninput="updateCert()" class="input w-full px-4 py-3 rounded-lg h-24 text-sm" required>has successfully completed the required learning experience and demonstrated strong understanding of the subject.</textarea>
+                <textarea name="description" id="cert-desc" oninput="updateCert()" class="input px-4 py-3 rounded-lg h-24 text-sm" required>has successfully completed the required learning experience and demonstrated strong understanding of the subject.</textarea>
               </div>
 
               <div>
-                <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-3">Templates</label>
+                <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-3">Professional Templates</label>
                 <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x"></div>
               </div>
 
@@ -1020,8 +1453,8 @@
                   <button type="button" onclick="clearCertificateLogos()" class="text-xs font-medium text-red-500">Clear logos</button>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-2 mb-4">
-                  <input type="text" id="custom-logo-input" placeholder="Paste logo URL..." class="input flex-1 px-4 py-2.5 rounded-lg text-sm">
+                <div class="grid sm:grid-cols-[minmax(0,1fr)_auto] gap-2 mb-4">
+                  <input type="text" id="custom-logo-input" placeholder="Paste logo URL..." class="input px-4 py-2.5 rounded-lg text-sm">
                   <button type="button" onclick="addCustomLogo()" class="btn btn-dark px-5 py-2.5 text-sm">Add Logo</button>
                 </div>
 
@@ -1038,21 +1471,41 @@
               </button>
             </div>
 
-            <div class="xl:w-2/5 cert-container">
-              <div class="sticky top-8">
+            <div class="cert-container">
+              <div class="sticky top-6">
                 <div class="flex justify-between items-center mb-4">
                   <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wider">Live Preview</h3>
                   <div class="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
-                    Wave watermark
+                    Anti-forge active
                   </div>
                 </div>
 
-                <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center">
+                <div id="cert-preview" class="certificate-preview tpl-1-degree aspect-[1.414] p-[5%] flex flex-col items-center text-center">
                   <div class="cert-wave-watermark"></div>
+
+                  <div class="anti-forge-layer">
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                    <div class="anti-forge-line">CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE • CREDITY VERIFY • AUTHENTIC CERTIFICATE</div>
+                  </div>
+
                   <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none"></div>
 
-                  <div class="w-full relative z-10 mt-[7%]">
-                    <div class="text-[1.65cqi] tracking-[0.3em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">
+                  <div class="w-full relative z-10 mt-[5%]">
+                    <div class="cert-seal cert-text-color">
+                      <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div class="text-[1.45cqi] tracking-[0.34em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">
+                      Official verified credential
+                    </div>
+
+                    <div class="text-[1.35cqi] tracking-[0.22em] text-slate-500 uppercase mb-[2.5%] cert-text-color font-semibold">
                       This certifies that
                     </div>
 
@@ -1061,12 +1514,12 @@
                     </div>
                   </div>
 
-                  <div class="px-[7%] my-[5%] relative z-10 w-full flex-grow">
-                    <div id="preview-title" class="cert-title mb-[4%] drop-shadow-sm">
+                  <div class="px-[7%] my-[4%] relative z-10 w-full flex-grow">
+                    <div id="preview-title" class="cert-title mb-[3.5%] drop-shadow-sm">
                       Certificate of Achievement
                     </div>
 
-                    <div id="preview-desc" class="text-[1.6cqi] text-slate-600 cert-text-color leading-relaxed">
+                    <div id="preview-desc" class="text-[1.6cqi] text-slate-600 cert-text-color leading-relaxed max-w-[82%] mx-auto">
                       has successfully completed the required learning experience and demonstrated strong understanding of the subject.
                     </div>
                   </div>
@@ -1077,7 +1530,7 @@
                         <%= teacherName %>
                       </div>
                       <div class="text-[0.85cqi] text-slate-500 uppercase tracking-widest cert-text-color font-semibold">
-                        Teacher
+                        Authorized Teacher
                       </div>
                     </div>
 
@@ -1100,7 +1553,7 @@
                 </div>
 
                 <p class="text-xs text-slate-500 mt-4 leading-relaxed">
-                  Logos are draggable in the preview. The QR verification link is generated when the credential is issued.
+                  Anti-forge micro text is 8 transparent rows across the certificate. It stays subtle but makes screenshots and edits easier to detect.
                 </p>
               </div>
             </div>
@@ -1108,20 +1561,20 @@
         </section>
 
         <section class="view-panel hidden" data-view-panel="badges">
-          <form action="/create-credential" method="POST" class="flex flex-col lg:flex-row gap-8">
-            <input type="hidden" name="type" value="badge">
-            <input type="hidden" id="selected-badge-icon" name="badgeIcon" value="fa-shield-halved">
-            <input type="hidden" id="selected-badge-shape" name="badgeShape" value="shape-shield">
+          <div class="grid lg:grid-cols-2 gap-6">
+            <form action="/create-credential" method="POST" class="panel-strong p-5 md:p-6 rounded-2xl space-y-6">
+              <input type="hidden" name="type" value="badge">
+              <input type="hidden" id="selected-badge-icon" name="badgeIcon" value="fa-shield-halved">
+              <input type="hidden" id="selected-badge-shape" name="badgeShape" value="badge-preview-shape-shield">
 
-            <div class="lg:w-1/2 panel-strong p-6 md:p-8 rounded-2xl space-y-6">
               <div>
-                <h3 class="text-2xl font-semibold">Badge Creator</h3>
-                <p class="text-sm text-slate-500 mt-1">Badges can also be standalone or linked to an assessment.</p>
+                <h3 class="text-2xl font-semibold">Professional Badge Creator</h3>
+                <p class="text-sm text-slate-500 mt-1">Create skill badges for students and optional assessments.</p>
               </div>
 
               <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
                 <label class="text-xs font-medium text-blue-800 uppercase tracking-wider block mb-2">Optional Assessment Link</label>
-                <select name="assessmentId" class="input w-full px-4 py-3 rounded-lg text-sm font-medium bg-white">
+                <select name="assessmentId" class="input px-4 py-3 rounded-lg text-sm font-medium bg-white">
                   <option value="">Standalone badge — no assessment</option>
                   <% safeTests.forEach(t => { %>
                     <option value="<%= t.id %>"><%= t.title %></option>
@@ -1131,23 +1584,23 @@
 
               <div>
                 <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-2">Badge Title</label>
-                <input type="text" name="title" id="badge-title" value="Certified Learner" oninput="updateBadge()" class="input w-full px-4 py-3 rounded-lg font-medium" required>
+                <input type="text" name="title" id="badge-title" value="Certified Learner" oninput="updateBadge()" class="input px-4 py-3 rounded-lg font-medium" required>
               </div>
 
               <div>
                 <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-2">Description</label>
-                <textarea name="description" class="input w-full px-4 py-3 rounded-lg h-20 text-sm">Awarded for demonstrating strong skill understanding.</textarea>
+                <textarea name="description" class="input px-4 py-3 rounded-lg h-20 text-sm">Awarded for demonstrating strong skill understanding.</textarea>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-2">Shape</label>
-                  <select id="badge-shape" onchange="updateBadge()" class="input w-full px-4 py-3 rounded-lg">
-                    <option value="shape-shield">Shield</option>
-                    <option value="shape-hexagon">Hexagon</option>
-                    <option value="shape-circle">Circle</option>
-                    <option value="shape-diamond">Diamond</option>
-                    <option value="shape-star">Star</option>
+                  <select id="badge-shape" onchange="updateBadge()" class="input px-4 py-3 rounded-lg">
+                    <option value="badge-preview-shape-shield">Shield</option>
+                    <option value="badge-preview-shape-hexagon">Hexagon</option>
+                    <option value="badge-preview-shape-circle">Circle</option>
+                    <option value="badge-preview-shape-diamond">Diamond</option>
+                    <option value="badge-preview-shape-star">Star</option>
                   </select>
                 </div>
 
@@ -1159,7 +1612,7 @@
 
               <div>
                 <label class="text-xs font-medium text-slate-500 uppercase tracking-wider block mb-3">Icon</label>
-                <div class="grid grid-cols-6 gap-2">
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   <button type="button" onclick="setBadgeIcon('fa-shield-halved')" class="btn btn-light p-3"><i class="fa-solid fa-shield-halved text-xl"></i></button>
                   <button type="button" onclick="setBadgeIcon('fa-award')" class="btn btn-light p-3"><i class="fa-solid fa-award text-xl"></i></button>
                   <button type="button" onclick="setBadgeIcon('fa-code')" class="btn btn-light p-3"><i class="fa-solid fa-code text-xl"></i></button>
@@ -1172,44 +1625,75 @@
               <button type="submit" class="btn btn-dark w-full py-4">
                 Create Badge
               </button>
-            </div>
+            </form>
 
-            <div class="lg:w-1/2 flex items-center justify-center bg-slate-100 rounded-2xl p-10 md:p-14 border border-slate-200 shadow-inner overflow-hidden relative">
-              <div class="absolute inset-0" style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 24px 24px; opacity: .55;"></div>
+            <div class="space-y-6">
+              <div class="flex items-center justify-center bg-slate-100 rounded-2xl p-8 md:p-12 border border-slate-200 shadow-inner overflow-hidden relative">
+                <div class="absolute inset-0" style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 24px 24px; opacity: 0.55;"></div>
 
-              <div class="text-center w-full relative z-10 flex flex-col items-center">
-                <div id="preview-badge-text" class="text-[15px] font-semibold tracking-[3px] uppercase text-slate-900 mb-7 drop-shadow-sm">
-                  Certified Learner
-                </div>
+                <div class="text-center w-full relative z-10 flex flex-col items-center">
+                  <div id="preview-badge-text" class="text-[15px] font-semibold tracking-[3px] uppercase text-slate-900 mb-7 drop-shadow-sm break-words">
+                    Certified Learner
+                  </div>
 
-                <div class="badge-preview-container relative w-56 h-56 mb-8">
-                  <div id="preview-badge-base" class="shape-shield w-full h-full shadow-2xl flex flex-col justify-center items-center relative" style="background: linear-gradient(145deg, #0f172a, #1e2937);">
-                    <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.9rem] text-white mb-3 drop-shadow-xl z-20"></i>
+                  <div class="badge-preview-container relative w-56 h-56 max-w-full mb-8">
+                    <div id="preview-badge-base" class="badge-preview-shape-shield w-full h-full shadow-2xl flex flex-col justify-center items-center relative" style="background: linear-gradient(145deg, #0f172a, #1e2937);">
+                      <div class="absolute inset-[10%] border border-white/20"></div>
+                      <div class="absolute inset-[18%] border border-white/10"></div>
+                      <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.9rem] text-white mb-3 drop-shadow-xl z-20"></i>
+                    </div>
+                  </div>
+
+                  <div class="text-xs text-slate-500 font-medium">
+                    Students receive a verification QR when issued.
                   </div>
                 </div>
+              </div>
 
-                <div class="text-xs text-slate-500 font-medium">
-                  Students receive a verification QR when issued.
-                </div>
+              <div class="panel-strong rounded-2xl p-5">
+                <h3 class="text-xl font-semibold mb-4">Created Badges</h3>
+
+                <% if (safeBadges.length > 0) { %>
+                  <div class="space-y-3 max-h-[28rem] overflow-y-auto custom-scroll pr-1">
+                    <% safeBadges.slice().reverse().forEach(b => { %>
+                      <div class="flex items-center gap-3 border border-slate-200 rounded-xl p-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white shrink-0" style="background:<%= b.designColor || '#0f172a' %>;">
+                          <i class="fa-solid <%= b.badgeIcon || 'fa-award' %>"></i>
+                        </div>
+
+                        <div>
+                          <div class="font-semibold truncate"><%= b.title %></div>
+                          <div class="text-xs text-slate-500">
+                            <%= b.type || 'badge' %> • <%= b.assessmentId ? 'Linked to assignment' : 'Standalone' %>
+                          </div>
+                        </div>
+                      </div>
+                    <% }) %>
+                  </div>
+                <% } else { %>
+                  <div class="text-sm text-slate-500 border border-dashed border-slate-300 rounded-xl p-8 text-center">
+                    No badges created yet.
+                  </div>
+                <% } %>
               </div>
             </div>
-          </form>
+          </div>
         </section>
 
         <section class="view-panel hidden" data-view-panel="announcements">
-          <div class="grid xl:grid-cols-12 gap-8">
-            <div class="xl:col-span-5 panel-strong rounded-2xl p-6 md:p-8">
+          <div class="grid lg:grid-cols-[minmax(260px,420px)_minmax(0,1fr)] gap-6">
+            <div class="panel-strong rounded-2xl p-5 md:p-6 h-fit">
               <h3 class="text-2xl font-semibold">Post Global Announcement</h3>
               <p class="text-sm text-slate-500 mt-1 mb-6">
-                Global announcements appear for students generally. For a class-only post, use the selected class panel.
+                Global announcements appear for students generally. For class-only posts, use the selected class panel.
               </p>
 
               <form action="/post-event" method="POST" class="space-y-5">
-                <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="input w-full px-4 py-3 rounded-lg font-medium" required>
+                <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="input px-4 py-3 rounded-lg font-medium" required>
 
-                <textarea name="description" placeholder="Complete 3 badges to earn recognition." class="input w-full px-4 py-3 rounded-lg h-24 text-sm"></textarea>
+                <textarea name="description" placeholder="Complete 3 badges to earn recognition." class="input px-4 py-3 rounded-lg h-24 text-sm"></textarea>
 
-                <select name="specialBadgeId" class="input w-full px-4 py-3 rounded-lg font-medium">
+                <select name="specialBadgeId" class="input px-4 py-3 rounded-lg font-medium">
                   <option value="">No special badge attached</option>
                   <% safeBadges.forEach(b => { %>
                     <option value="<%= b.id || b.templateId %>"><%= b.title %></option>
@@ -1222,15 +1706,15 @@
               </form>
             </div>
 
-            <div class="xl:col-span-7 panel-strong rounded-2xl p-6 md:p-8">
+            <div class="panel-strong rounded-2xl p-5 md:p-6">
               <h3 class="text-2xl font-semibold mb-5">Global Announcements</h3>
 
               <% if (safeEvents.length > 0) { %>
                 <div class="space-y-3 max-h-[30rem] overflow-y-auto custom-scroll pr-1">
                   <% safeEvents.slice().reverse().forEach(e => { %>
                     <div class="bg-white border border-slate-200 rounded-lg p-5">
-                      <div class="font-medium"><%= e.title %></div>
-                      <p class="text-sm text-slate-500 mt-1"><%= e.description || 'No description.' %></p>
+                      <div class="font-medium break-words"><%= e.title %></div>
+                      <p class="text-sm text-slate-500 mt-1 break-words"><%= e.description || 'No description.' %></p>
                     </div>
                   <% }) %>
                 </div>
@@ -1250,12 +1734,12 @@
   <script>
     const templates = [
       { id: '1-degree', name: 'Classic Degree' },
-      { id: '2-university', name: 'University' },
-      { id: '3-corporate', name: 'Corporate' },
+      { id: '2-university', name: 'University Seal' },
+      { id: '3-corporate', name: 'Corporate Board' },
       { id: '4-tech', name: 'Tech Grid' },
-      { id: '5-scholar', name: 'Scholar' },
-      { id: '6-minimal', name: 'Minimal' },
-      { id: '7-dark', name: 'Dark Pro' }
+      { id: '5-scholar', name: 'Gold Scholar' },
+      { id: '6-minimal', name: 'Executive Minimal' },
+      { id: '7-dark', name: 'Dark Verified' }
     ];
 
     const presetLogos = [
@@ -1271,9 +1755,22 @@
     let currentTemplate = 'tpl-1-degree';
     let activeLogos = [];
 
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('mobileOverlay').classList.add('open');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('mobileOverlay').classList.remove('open');
+    }
+
     function initDashboard() {
       const hash = window.location.hash.replace('#', '');
-      if (hash && document.querySelector(`[data-view-panel="${hash}"]`)) showView(hash);
+
+      if (hash && document.querySelector(`[data-view-panel="${hash}"]`)) {
+        showView(hash, false);
+      }
 
       const dateInput = document.getElementById('cert-date');
       if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
@@ -1285,35 +1782,48 @@
       updateBadge();
     }
 
-    function showView(view) {
+    function showView(view, scroll = true) {
       document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+
       const panel = document.querySelector(`[data-view-panel="${view}"]`);
       if (panel) panel.classList.remove('hidden');
 
       document.querySelectorAll('[data-view-link]').forEach(el => el.classList.remove('active'));
+
       const link = document.querySelector(`[data-view-link="${view}"]`);
       if (link) link.classList.add('active');
 
       history.replaceState(null, '', '#' + view);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      closeSidebar();
+
+      if (scroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     function selectClass(classId) {
       showView('classes');
 
       document.querySelectorAll('[data-class-button]').forEach(el => el.classList.remove('active'));
+
       const btn = document.querySelector(`[data-class-button="${classId}"]`);
       if (btn) btn.classList.add('active');
 
       document.querySelectorAll('[data-class-panel]').forEach(el => el.classList.add('hidden'));
+
       const panel = document.querySelector(`[data-class-panel="${classId}"]`);
-      if (panel) panel.classList.remove('hidden');
+      if (panel) {
+        panel.classList.remove('hidden');
+        setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+      }
     }
 
     function selectTask(taskId) {
       showView('tasks');
 
       document.querySelectorAll('[data-task-button]').forEach(el => el.classList.remove('active'));
+
       const btn = document.querySelector(`[data-task-button="${taskId}"]`);
       if (btn) btn.classList.add('active');
 
@@ -1326,7 +1836,7 @@
       if (card) {
         card.style.outline = '3px solid rgba(37,99,235,.25)';
         card.style.outlineOffset = '2px';
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
       }
     }
 
@@ -1422,7 +1932,9 @@
     function addCustomLogo() {
       const input = document.getElementById('custom-logo-input');
       const url = input.value.trim();
+
       if (!url) return;
+
       addLogoToDoc(url);
       input.value = '';
     }
@@ -1437,6 +1949,7 @@
       if (!boundary) return;
 
       const id = 'logo_' + Date.now();
+
       const wrapper = document.createElement('div');
       wrapper.id = id;
       wrapper.className = 'draggable-logo';
@@ -1451,18 +1964,23 @@
         wrapper.appendChild(img);
         boundary.appendChild(wrapper);
         makeDraggable(wrapper);
+
         activeLogos.push({ id, url });
         renderActiveLogosList();
         syncHiddenLogos();
       };
 
-      img.onerror = () => alert('Logo could not load. Use a direct image URL.');
+      img.onerror = () => {
+        alert('Logo could not load. Use a direct image URL.');
+      };
     }
 
     function removeLogo(id) {
       activeLogos = activeLogos.filter(l => l.id !== id);
+
       const el = document.getElementById(id);
       if (el) el.remove();
+
       renderActiveLogosList();
       syncHiddenLogos();
     }
@@ -1472,6 +1990,7 @@
         const el = document.getElementById(l.id);
         if (el) el.remove();
       });
+
       activeLogos = [];
       renderActiveLogosList();
       syncHiddenLogos();
@@ -1490,14 +2009,16 @@
 
       activeLogos.forEach((logo, index) => {
         const badge = document.createElement('div');
-        badge.className = 'flex items-center gap-2 bg-slate-100 pl-2 pr-1 py-1 rounded-lg text-xs font-medium border border-slate-200';
+        badge.className = 'flex items-center gap-2 bg-slate-100 pl-2 pr-1 py-1 rounded-lg text-xs font-medium border border-slate-200 max-w-full';
+
         badge.innerHTML = `
-          <img src="${logo.url}" class="w-4 h-4 object-contain" alt="">
-          <span>Logo ${index + 1}</span>
-          <button type="button" onclick="removeLogo('${logo.id}')" class="text-red-500 hover:text-red-600 px-1">
+          <img src="${logo.url}" class="w-4 h-4 object-contain shrink-0" alt="">
+          <span class="truncate">Logo ${index + 1}</span>
+          <button type="button" onclick="removeLogo('${logo.id}')" class="text-red-500 hover:text-red-600 px-1 shrink-0">
             <i class="fa-solid fa-xmark"></i>
           </button>
         `;
+
         list.appendChild(badge);
       });
     }
@@ -1544,6 +2065,7 @@
 
       function dragMove(e) {
         const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
+
         const deltaX = ((e.clientX - startX) / boundary.width) * 100;
         const deltaY = ((e.clientY - startY) / boundary.height) * 100;
 
@@ -1562,13 +2084,14 @@
     function setBadgeIcon(iconClass) {
       const hidden = document.getElementById('selected-badge-icon');
       const icon = document.getElementById('preview-badge-icon');
+
       if (hidden) hidden.value = iconClass;
       if (icon) icon.className = `fa-solid ${iconClass} text-[3.9rem] text-white mb-3 drop-shadow-xl z-20`;
     }
 
     function updateBadge() {
       const title = document.getElementById('badge-title')?.value || 'Badge Title';
-      const shape = document.getElementById('badge-shape')?.value || 'shape-shield';
+      const shape = document.getElementById('badge-shape')?.value || 'badge-preview-shape-shield';
       const color = document.getElementById('badge-color')?.value || '#0f172a';
 
       const titleEl = document.getElementById('preview-badge-text');
@@ -1577,6 +2100,7 @@
 
       if (titleEl) titleEl.innerText = title;
       if (shapeHidden) shapeHidden.value = shape;
+
       if (base) {
         base.className = `${shape} w-full h-full shadow-2xl flex flex-col justify-center items-center relative`;
         base.style.background = `linear-gradient(145deg, ${color}, #0f172a)`;
