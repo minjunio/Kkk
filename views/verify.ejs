@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Credential • Credity.ink</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: 'Inter', system_ui, sans-serif; }</style>
+</head>
+<body class="bg-zinc-950 text-white flex items-center justify-center min-h-screen">
+  <div class="max-w-md w-full p-8">
+    <div class="text-center mb-8">
+      <div class="mx-auto w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center mb-4">
+        <i class="fa-solid fa-check-double text-4xl"></i>
+      </div>
+      <h1 class="text-3xl font-semibold">Credential Verified</h1>
+      <p class="text-emerald-400 text-sm mt-1">This credential is authentic and issued by Credity.ink</p>
+    </div>
+    
+    <div class="glass p-8 rounded-3xl">
+      <div class="flex justify-between items-start mb-6">
+        <div>
+          <div class="font-semibold text-2xl"><%= badge.title %></div>
+          <div class="text-white/60 text-sm"><%= badge.type.toUpperCase() %></div>
+        </div>
+        <div class="px-4 py-1 text-xs bg-emerald-400/10 text-emerald-400 rounded-3xl h-fit">VERIFIED</div>
+      </div>
+      
+      <div class="space-y-4 text-sm">
+        <div><span class="text-white/60">Issued to:</span> <span class="font-medium">Alex Rivera</span></div>
+        <div><span class="text-white/60">Issued by:</span> <span class="font-medium"><%= badge.createdBy %></span></div>
+        <div><span class="text-white/60">Date:</span> <span class="font-medium"><%= new Date().toLocaleDateString() %></span></div>
+      </div>
+      
+      <div class="mt-8 pt-6 border-t border-white/10 text-xs text-center text-white/60">
+        This badge is cryptographically verifiable and tamper-proof.
+      </div>
+    </div>
+    
+    <div class="text-center mt-8">
+      <a href="/" class="text-xs text-white/60 hover:text-white">← Back to Credity.ink</a>
+    </div>
+  </div>
+</body>
+</html>
