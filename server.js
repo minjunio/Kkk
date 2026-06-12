@@ -130,6 +130,10 @@ function loadDB() {
       if (!c.normalizedKey) c.normalizedKey = normalizeAccessKey(c.key);
       c.usageCount = Number(c.usageCount || 0);
     });
+
+    tests.forEach(t => {
+      if (!Array.isArray(t.classIds)) t.classIds = [];
+    });
   } catch (err) {
     console.error('DB load error:', err.message);
   }
@@ -452,7 +456,7 @@ app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
-// ==================== DASHBOARDS ====================
+// ==================== STUDENT DASHBOARD ====================
 app.get('/student-dashboard', requireStudent, (req, res) => {
   const user = currentUser(req);
 
@@ -462,7 +466,23 @@ app.get('/student-dashboard', requireStudent, (req, res) => {
 
   const enrollments = classEnrollments.filter(e => Number(e.userId) === Number(user.id));
   const enrolledClassIds = enrollments.map(e => Number(e.classId));
-  const studentClasses = classes.filter(c => enrolledClassIds.includes(Number(c.id)));
+
+  const studentClasses = classes
+    .filter(c => enrolledClassIds.includes(Number(c.id)))
+    .map(cls => {
+      const assignedTestIds = Array.isArray(cls.assignedTestIds)
+        ? cls.assignedTestIds.map(Number)
+        : [];
+
+      const assignedTests = tests.filter(t => assignedTestIds.includes(Number(t.id)));
+
+      return {
+        ...cls,
+        assignedTests,
+        assignedTaskCount: assignedTests.length,
+        announcements: Array.isArray(cls.announcements) ? cls.announcements : []
+      };
+    });
 
   const visibleTests = tests
     .filter(t => studentHasAccessToTest(user.id, t))
@@ -476,7 +496,21 @@ app.get('/student-dashboard', requireStudent, (req, res) => {
         countdown = diff > 0 ? Math.floor(diff / 1000) : 0;
       }
 
-      return { ...t, countdown };
+      const classNames = studentClasses
+        .filter(cls => {
+          const assignedIds = Array.isArray(cls.assignedTestIds)
+            ? cls.assignedTestIds.map(Number)
+            : [];
+
+          return assignedIds.includes(Number(t.id));
+        })
+        .map(cls => cls.className);
+
+      return {
+        ...t,
+        countdown,
+        classNames
+      };
     });
 
   const classAnnouncementCards = [];
@@ -508,13 +542,101 @@ app.get('/student-dashboard', requireStudent, (req, res) => {
   });
 });
 
+// ==================== TEACHER DASHBOARD ====================
 app.get('/teacher-dashboard', requireTeacher, (req, res) => {
   const user = currentUser(req);
 
   const teacherTests = tests.filter(t => Number(t.teacherId) === Number(user.id));
   const teacherBadges = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
   const teacherEvents = events.filter(e => !e.teacherId || Number(e.teacherId) === Number(user.id));
-  const teacherClasses = classes.filter(c => Number(c.teacherId) === Number(user.id));
+  const teacherClassesRaw = classes.filter(c => Number(c.teacherId) === Number(user.id));
+
+  const teacherClasses = teacherClassesRaw.map(cls => {
+    const assignedTestIds = Array.isArray(cls.assignedTestIds)
+      ? cls.assignedTestIds.map(Number)
+      : [];
+
+    const assignedTests = teacherTests.filter(t => assignedTestIds.includes(Number(t.id)));
+
+    const classEnrolls = classEnrollments.filter(e =>
+      Number(e.classId) === Number(cls.id)
+    );
+
+    const students = classEnrolls.map(enrollment => {
+      const userRecord = users.find(u => Number(u.id) === Number(enrollment.userId));
+
+      const studentSubmissions = submissions
+        .filter(s =>
+          Number(s.userId) === Number(enrollment.userId) &&
+          assignedTestIds.includes(Number(s.testId))
+        )
+        .map(s => {
+          const test = tests.find(t => Number(t.id) === Number(s.testId));
+
+          return {
+            ...s,
+            testTitle: s.testTitle || (test ? test.title : 'Assessment'),
+            submittedAtFormatted: s.submittedAt
+              ? new Date(s.submittedAt).toLocaleString()
+              : ''
+          };
+        });
+
+      const completedTestIds = studentSubmissions.map(s => Number(s.testId));
+      const pendingTests = assignedTests.filter(t => !completedTestIds.includes(Number(t.id)));
+
+      const averageScore = studentSubmissions.length
+        ? Math.round(studentSubmissions.reduce((sum, s) => sum + Number(s.score || 0), 0) / studentSubmissions.length)
+        : null;
+
+      return {
+        enrollmentId: enrollment.id,
+        userId: enrollment.userId,
+        fullName: enrollment.studentName || (userRecord ? userRecord.name : 'Unknown Student'),
+        email: enrollment.studentEmail || (userRecord ? userRecord.email : 'No email'),
+        joinedAt: enrollment.joinedAt,
+        joinedAtFormatted: enrollment.joinedAt
+          ? new Date(enrollment.joinedAt).toLocaleString()
+          : '',
+        submissions: studentSubmissions,
+        pendingTests,
+        completedCount: studentSubmissions.length,
+        pendingCount: pendingTests.length,
+        averageScore
+      };
+    });
+
+    const classResults = submissions
+      .filter(s =>
+        assignedTestIds.includes(Number(s.testId)) &&
+        classEnrolls.some(e => Number(e.userId) === Number(s.userId))
+      )
+      .map(s => {
+        const test = tests.find(t => Number(t.id) === Number(s.testId));
+        const enrollment = classEnrolls.find(e => Number(e.userId) === Number(s.userId));
+        const userRecord = users.find(u => Number(u.id) === Number(s.userId));
+
+        return {
+          ...s,
+          studentName: s.studentName || (enrollment ? enrollment.studentName : userRecord ? userRecord.name : 'Unknown Student'),
+          studentEmail: s.studentEmail || (enrollment ? enrollment.studentEmail : userRecord ? userRecord.email : 'No email'),
+          testTitle: s.testTitle || (test ? test.title : 'Assessment'),
+          submittedAtFormatted: s.submittedAt
+            ? new Date(s.submittedAt).toLocaleString()
+            : ''
+        };
+      })
+      .sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
+
+    return {
+      ...cls,
+      assignedTests,
+      students,
+      results: classResults,
+      studentCount: students.length,
+      submissionCount: classResults.length
+    };
+  });
 
   res.render('teacher-dashboard', {
     user,
@@ -522,7 +644,10 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
     tests: teacherTests,
     events: teacherEvents,
     classes: teacherClasses,
-    studentKeys: teacherClasses
+    studentKeys: teacherClasses,
+    enrollments: classEnrollments,
+    submissions,
+    users
   });
 });
 
@@ -542,7 +667,8 @@ app.get('/admin', requireTeacher, (req, res) => {
     classes: visibleClasses,
     studentKeys: visibleClasses,
     classEnrollments,
-    events
+    events,
+    submissions
   });
 });
 
@@ -579,6 +705,11 @@ app.post('/generate-student-key', requireTeacher, (req, res) => {
     if (test) {
       classRecord.assignedTestIds.push(test.id);
       test.requiresKey = true;
+
+      if (!Array.isArray(test.classIds)) test.classIds = [];
+      if (!test.classIds.map(Number).includes(Number(classRecord.id))) {
+        test.classIds.push(classRecord.id);
+      }
     }
   }
 
@@ -645,7 +776,7 @@ app.post('/join-class', requireStudent, async (req, res) => {
     'Class Joined',
     `You are now enrolled in <strong>${escapeHtml(classRecord.className)}</strong>. Any assessments or announcements assigned by your teacher will appear on your dashboard.`,
     [
-      { label: 'Back to Dashboard', href: '/student-dashboard', primary: true }
+      { label: 'Back to Dashboard', href: '/student-dashboard#classes', primary: true }
     ]
   ));
 });
@@ -1022,11 +1153,29 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
   const score = parseInt(req.body.score) || 85;
   const passed = score >= 70;
 
+  const studentClassIdsForTest = classes
+    .filter(cls => {
+      const assignedIds = Array.isArray(cls.assignedTestIds)
+        ? cls.assignedTestIds.map(Number)
+        : [];
+
+      return assignedIds.includes(Number(testId)) &&
+        classEnrollments.some(e =>
+          Number(e.classId) === Number(cls.id) &&
+          Number(e.userId) === Number(user.id)
+        );
+    })
+    .map(cls => cls.id);
+
   submissions.push({
     id: nextId(submissions),
     testId,
+    testTitle: test.title,
+    teacherId: test.teacherId,
+    classIds: studentClassIdsForTest,
     userId: user.id,
     studentName: user.name,
+    studentEmail: user.email,
     score,
     passed,
     submittedAt: new Date().toISOString()
@@ -1093,7 +1242,7 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
   req.session.currentTestId = null;
 
   saveDB();
-  res.redirect('/student-dashboard');
+  res.redirect('/student-dashboard#tasks');
 });
 
 // ==================== VERIFY / LOGS ====================
@@ -1133,7 +1282,8 @@ app.get('/api/health', (req, res) => {
     issuedCredentials: issuedCredentials.length,
     tests: tests.length,
     classes: classes.length,
-    enrollments: classEnrollments.length
+    enrollments: classEnrollments.length,
+    submissions: submissions.length
   });
 });
 
