@@ -8,292 +8,351 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: 'Inter', system_ui, sans-serif; }
-    .section-header { font-size: 12px; letter-spacing: 1px; }
-    .code-editor { font-family: monospace; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
-    
-    /* Mock Student Preview Overlay */
-    #student-preview-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 9999;
-      background: #f8fafc; overflow-y: auto;
-    }
-    #student-preview-overlay.active { display: block; }
+    body { font-family: 'Inter', system_ui, sans-serif; background-color: #f8fafc; }
+    .section-header { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .code-editor { font-family: 'Courier New', Courier, monospace; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
   </style>
 </head>
-<body class="bg-slate-50">
+<body class="text-slate-800">
 
-  <div id="builder-ui">
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div class="max-w-screen-2xl mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-x-3 w-full md:w-auto">
-          <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-            <span class="text-white font-bold text-2xl">C</span>
-          </div>
-          <span class="font-semibold text-xl md:text-2xl tracking-tight">Assessment Builder</span>
+  <nav class="glass-nav border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-y-3">
+      <div class="flex items-center gap-x-3">
+        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <span class="text-white font-bold text-xl">C</span>
         </div>
-
-        <div class="flex flex-wrap items-center justify-end gap-2 md:gap-3 w-full md:w-auto">
-          <button type="button" onclick="openCodeModal()" class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium border border-slate-300 hover:bg-slate-50 rounded-xl flex items-center gap-x-2">
-            <i class="fa-solid fa-code"></i><span>Load via JSON</span>
-          </button>
-
-          <button type="button" onclick="startPreviewMode()" class="px-3 md:px-5 py-2 text-xs md:text-sm font-semibold border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl flex items-center gap-x-2">
-            <i class="fa-solid fa-play"></i><span>Preview Exam</span>
-          </button>
-
-          <button type="button" onclick="saveAssessment()" class="px-4 md:px-6 py-2 bg-slate-900 hover:bg-black text-white font-semibold rounded-xl text-xs md:text-sm flex items-center gap-x-2">
-            <i class="fa-solid fa-save"></i><span>Save Assessment</span>
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    <div class="max-w-screen-2xl mx-auto px-4 md:px-8 py-8">
-      <form id="assessment-form" method="POST" action="/assessment">
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
-          
-          <div class="xl:col-span-4 space-y-6">
-            
-            <div class="bg-white rounded-3xl p-6 border border-slate-200">
-              <div class="section-header font-bold text-slate-500 mb-4">CORE DETAILS</div>
-              <div class="space-y-4">
-                <div>
-                  <label class="text-xs font-semibold text-slate-500 block mb-1">EXAM TITLE</label>
-                  <input type="text" name="title" id="assessment-title" placeholder="e.g., Final Exam - Calculus" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-base">
-                </div>
-                <div>
-                  <label class="text-xs font-semibold text-slate-500 block mb-1">TIME PER QUESTION (Seconds)</label>
-                  <input type="number" name="timePerQuestion" value="60" class="w-full px-4 py-3 border border-slate-200 rounded-xl">
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-3xl p-6 border border-slate-200">
-              <div class="section-header font-bold text-slate-500 mb-4">AVAILABILITY & SECURITY</div>
-              
-              <div class="mb-4">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="isOpenExam" name="isOpenExam" value="true" checked onchange="toggleScheduleFields()" class="w-4 h-4 text-blue-600 rounded">
-                  <span class="text-sm font-semibold text-slate-700">Open Exam (Take Anytime)</span>
-                </label>
-              </div>
-
-              <div id="schedule-fields" class="hidden space-y-4 mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div>
-                  <label class="text-xs font-semibold text-slate-500 block mb-1">START TIME</label>
-                  <input type="datetime-local" name="startTime" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
-                </div>
-                <div>
-                  <label class="text-xs font-semibold text-slate-500 block mb-1">END TIME</label>
-                  <input type="datetime-local" name="endTime" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
-                </div>
-              </div>
-
-              <div class="pt-4 border-t border-slate-100">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" name="requireFullScreen" value="true" checked class="w-4 h-4 text-blue-600 rounded">
-                  <span class="text-sm font-semibold text-slate-700">Require Full Screen (Proctoring)</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-3xl p-6 border border-slate-200">
-              <div class="section-header font-bold text-slate-500 mb-4">ATTACH CREDENTIAL ON PASS</div>
-              <select name="attachedCredentialTemplateId" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm">
-                <option value="">-- No Credential Attached --</option>
-                <% if(typeof userTemplates !== 'undefined' && userTemplates.length > 0) { %>
-                  <% userTemplates.forEach(t => { %>
-                    <option value="<%= t.templateId %>"><%= t.title %> (<%= t.type %>)</option>
-                  <% }) %>
-                <% } %>
-              </select>
-            </div>
-          </div>
-
-          <div class="xl:col-span-8">
-            <div class="flex justify-between items-center mb-5">
-              <h2 class="text-2xl font-semibold">Questions</h2>
-              <button type="button" onclick="addBlankQuestion()" class="flex items-center gap-x-2 px-4 py-2 bg-slate-100 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-200">
-                <i class="fa-solid fa-plus"></i><span>Add Question</span>
-              </button>
-            </div>
-            
-            <div id="questions-container" class="space-y-5"></div>
-            <input type="hidden" name="questions" id="questions-data">
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="graph-modal" class="hidden fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between mb-5">
-        <h3 class="font-semibold text-xl">Advanced Graph Builder</h3>
-        <button onclick="hideModal('graph-modal')" class="text-2xl hover:text-red-500">&times;</button>
+        <span class="font-bold text-xl tracking-tight hidden sm:block">Credity Creator</span>
       </div>
 
-      <div class="flex gap-4 mb-6 border-b pb-4">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="radio" name="graphDataType" value="category" checked onchange="switchGraphMode()" class="w-4 h-4">
-          <span class="text-sm font-medium">Standard (Bar, Pie)</span>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input type="radio" name="graphDataType" value="coordinate" onchange="switchGraphMode()" class="w-4 h-4">
-          <span class="text-sm font-medium">Mathematical (Lines, Parabolas)</span>
-        </label>
-      </div>
+      <div class="flex items-center gap-2 sm:gap-3 overflow-x-auto custom-scroll pb-1 sm:pb-0">
+        <button type="button" onclick="openCodeModal()" class="flex-shrink-0 px-4 py-2.5 text-sm font-semibold border border-slate-300 bg-white hover:bg-slate-50 rounded-xl flex items-center gap-x-2 transition-colors">
+          <i class="fa-solid fa-code text-slate-500"></i><span>Load JSON</span>
+        </button>
 
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="text-sm font-medium block mb-1">Graph Type</label>
-          <select id="graph-type" class="w-full border px-4 py-2 rounded-xl">
-            <option value="bar">Bar Chart</option>
-            <option value="pie">Pie Chart</option>
-            <option value="line">Line Chart</option>
-            <option value="scatter">Scatter Plot</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm font-medium block mb-1">Label / Title</label>
-          <input type="text" id="graph-label" value="Data Output" class="w-full border px-4 py-2 rounded-xl">
-        </div>
-      </div>
+        <button type="button" onclick="startPreviewMode()" class="flex-shrink-0 px-4 py-2.5 text-sm font-semibold border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl flex items-center gap-x-2 transition-colors">
+          <i class="fa-solid fa-play"></i><span>Preview Exam</span>
+        </button>
 
-      <div id="mode-category" class="space-y-4">
-        <div>
-          <label class="text-xs font-bold text-slate-500 block mb-1">CATEGORIES (Comma separated)</label>
-          <input type="text" id="graph-x-labels" value="A, B, C, D" class="w-full border px-4 py-2 rounded-xl text-sm">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500 block mb-1">VALUES (Comma separated)</label>
-          <input type="text" id="graph-data" value="10, 20, 30, 40" class="w-full border px-4 py-2 rounded-xl text-sm">
-        </div>
-      </div>
-
-      <div id="mode-coordinate" class="space-y-4 hidden">
-        <div>
-          <label class="text-xs font-bold text-slate-500 block mb-1">COORDINATE PAIRS (Format: x,y | x,y)</label>
-          <p class="text-[10px] text-slate-400 mb-2">Example for a parabola (y=x²): -2,4 | -1,1 | 0,0 | 1,1 | 2,4</p>
-          <textarea id="graph-coordinates" rows="3" class="w-full border px-4 py-2 rounded-xl text-sm code-editor" placeholder="-2,4 | -1,1 | 0,0 | 1,1 | 2,4"></textarea>
-        </div>
-      </div>
-
-      <div class="mt-4 border p-2 rounded-xl bg-slate-50">
-        <canvas id="graph-canvas" class="w-full h-48"></canvas>
-      </div>
-
-      <div class="flex gap-3 mt-5">
-        <button onclick="previewGraph()" class="flex-1 py-3 bg-slate-200 rounded-xl font-semibold hover:bg-slate-300">Test Render</button>
-        <button onclick="saveGraphToQuestion()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700">Attach to Question</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="code-modal" class="hidden fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl w-full max-w-3xl p-6">
-      <div class="flex justify-between mb-4">
-        <h3 class="font-semibold text-xl">Load Questions via JSON</h3>
-        <button onclick="hideModal('code-modal')" class="text-2xl hover:text-red-500">&times;</button>
-      </div>
-      <textarea id="json-code-input" class="w-full h-64 border rounded-xl p-4 text-sm code-editor bg-slate-900 text-green-400 focus:ring-2 focus:ring-blue-500" spellcheck="false">[]</textarea>
-      <div class="mt-4 flex justify-end gap-3">
-        <button onclick="hideModal('code-modal')" class="px-5 py-2.5 border rounded-xl font-semibold">Cancel</button>
-        <button onclick="loadFromCode()" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl font-semibold">Populate Builder</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="student-preview-overlay">
-    <div class="max-w-3xl mx-auto p-8 pt-12">
-      <div class="flex justify-between items-center mb-8 pb-4 border-b">
-        <div>
-          <span class="text-xs font-bold text-blue-600 tracking-wider bg-blue-100 px-3 py-1 rounded-full">PREVIEW MODE</span>
-          <h1 id="preview-test-title" class="text-3xl font-bold mt-3">Test Title</h1>
-        </div>
-        <button onclick="exitPreviewMode()" class="px-5 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-xl font-bold">
-          Exit Preview
+        <button type="button" onclick="saveAssessment()" class="flex-shrink-0 px-6 py-2.5 bg-slate-900 hover:bg-black text-white font-semibold rounded-xl text-sm flex items-center gap-x-2 shadow-md transition-transform active:scale-95">
+          <i class="fa-solid fa-cloud-arrow-up"></i><span>Save & Deploy</span>
         </button>
       </div>
-      
-      <div id="preview-questions-render" class="space-y-8">
+    </div>
+  </nav>
+
+  <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <form id="assessment-form" method="POST" action="/assessment">
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+        
+        <div class="xl:col-span-4 space-y-6">
+          
+          <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <div class="section-header font-bold text-slate-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-sliders"></i> Core Settings</div>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1.5">EXAM TITLE</label>
+                <input type="text" name="title" id="assessment-title" placeholder="e.g. Calculus Midterm..." class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="text-xs font-bold text-slate-600 block mb-1.5">TIME / QUESTION (s)</label>
+                  <input type="number" name="timePerQuestion" value="120" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-slate-600 block mb-1.5">ATTACH CREDENTIAL</label>
+                  <select name="attachedCredentialTemplateId" class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">No Credential</option>
+                    <% if (typeof templates !== 'undefined') { %>
+                      <% templates.forEach(t => { %>
+                        <option value="<%= t.templateId %>"><%= t.title %> (<%= t.type %>)</option>
+                      <% }) %>
+                    <% } %>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <div class="section-header font-bold text-slate-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-clock"></i> Scheduling</div>
+            
+            <label class="flex items-center gap-3 p-3 border border-blue-200 bg-blue-50 rounded-xl cursor-pointer mb-4">
+              <input type="checkbox" name="isOpen" id="is-open-exam" value="true" checked onchange="toggleTimeInputs()" class="w-5 h-5 text-blue-600 rounded">
+              <div>
+                <div class="font-bold text-sm text-blue-900">Open Exam</div>
+                <div class="text-xs text-blue-700">Students can take this at any time</div>
+              </div>
+            </label>
+
+            <div id="time-inputs" class="space-y-4 opacity-50 pointer-events-none transition-opacity">
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1.5">START WINDOW</label>
+                <input type="datetime-local" name="examStartTime" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-600 block mb-1.5">END WINDOW</label>
+                <input type="datetime-local" name="examEndTime" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <div class="section-header font-bold text-slate-400 mb-4 flex items-center gap-2"><i class="fa-solid fa-toolbox"></i> Allowed Tools</div>
+            
+            <div class="space-y-3">
+              <label class="flex items-center justify-between p-3 border border-slate-100 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100">
+                <span class="text-sm font-semibold text-slate-700">Standard Calculator</span>
+                <input type="checkbox" name="calculatorEnabled" value="true" checked class="w-5 h-5 text-blue-600 rounded">
+              </label>
+              <label class="flex items-center justify-between p-3 border border-slate-100 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100">
+                <span class="text-sm font-semibold text-slate-700">Graphing Calculator</span>
+                <input type="checkbox" name="graphingCalcEnabled" value="true" class="w-5 h-5 text-blue-600 rounded">
+              </label>
+            </div>
+          </div>
+
         </div>
+
+        <div class="xl:col-span-8">
+          <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <div>
+              <h2 class="text-2xl font-bold">Assessment Builder</h2>
+              <p class="text-sm text-slate-500">Design your questions and attach custom graphics.</p>
+            </div>
+            <button type="button" onclick="addBlankQuestion()" class="flex items-center gap-x-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+              <i class="fa-solid fa-plus"></i><span>Add Question</span>
+            </button>
+          </div>
+          
+          <div id="questions-container" class="space-y-6"></div>
+          
+          <input type="hidden" name="questions" id="questions-data">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="graph-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-2xl flex flex-col max-h-[90vh] shadow-2xl">
+      
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-xl text-slate-800"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i> Graph & Math Plotter</h3>
+        <button type="button" onclick="hideModal('graph-modal')" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-full hover:bg-slate-200"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll flex-1">
+        
+        <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
+          <button type="button" id="tab-data-graph" onclick="switchGraphMode('data')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm text-blue-600">Standard Data (Bar/Pie)</button>
+          <button type="button" id="tab-math-graph" onclick="switchGraphMode('math')" class="flex-1 py-2 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700">Math Function (Parabola/Sin)</button>
+        </div>
+
+        <div id="graph-data-inputs" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-500 block mb-1">Chart Type</label>
+              <select id="graph-type" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm">
+                <option value="bar">Bar Chart</option><option value="line">Line Chart</option>
+                <option value="pie">Pie Chart</option><option value="doughnut">Doughnut</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-500 block mb-1">Dataset Label</label>
+              <input type="text" id="graph-label" value="Growth" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">X-Axis Labels (Comma separated)</label>
+            <input type="text" id="graph-x-labels" value="Q1, Q2, Q3, Q4" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 block mb-1">Y-Axis Values (Comma separated)</label>
+            <input type="text" id="graph-data" value="10, 25, 45, 80" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm">
+          </div>
+        </div>
+
+        <div id="graph-math-inputs" class="space-y-4 hidden bg-blue-50 border border-blue-100 p-4 rounded-2xl">
+          <div>
+            <label class="text-xs font-bold text-blue-800 block mb-1">Equation Type</label>
+            <select id="math-func-type" onchange="updateMathParams()" class="w-full border border-blue-200 px-4 py-2.5 rounded-xl text-sm bg-white">
+              <option value="quadratic">Quadratic / Parabola (ax² + bx + c)</option>
+              <option value="sine">Sine Wave (a * sin(bx))</option>
+              <option value="cosine">Cosine Wave (a * cos(bx))</option>
+              <option value="linear">Linear (mx + b)</option>
+            </select>
+          </div>
+          
+          <div id="math-params-container" class="grid grid-cols-3 gap-3">
+            </div>
+
+          <div class="grid grid-cols-2 gap-4 pt-2 border-t border-blue-200">
+            <div>
+              <label class="text-xs font-bold text-blue-800 block mb-1">X-Min</label>
+              <input type="number" id="math-xmin" value="-10" class="w-full border px-3 py-2 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-blue-800 block mb-1">X-Max</label>
+              <input type="number" id="math-xmax" value="10" class="w-full border px-3 py-2 rounded-xl text-sm">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 border border-slate-200 rounded-2xl p-2 bg-slate-50 h-64">
+          <canvas id="graph-canvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <div class="p-6 border-t border-slate-100 bg-slate-50 rounded-b-3xl flex gap-3">
+        <button type="button" onclick="previewGraph()" class="flex-1 py-3 bg-white border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-colors">Refresh Preview</button>
+        <button type="button" onclick="saveGraphToQuestion()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-md">Attach to Question</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="preview-modal" class="hidden fixed inset-0 bg-white z-[1000] flex flex-col">
+    <div class="bg-slate-900 text-white p-4 flex justify-between items-center shadow-md">
+      <div class="flex items-center gap-3">
+        <div class="bg-red-500 w-3 h-3 rounded-full animate-pulse"></div>
+        <span class="font-bold tracking-widest text-sm uppercase">Student Preview Mode</span>
+      </div>
+      <button type="button" onclick="hideModal('preview-modal')" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors">Exit Preview</button>
+    </div>
+    
+    <div class="flex-1 bg-slate-50 p-6 overflow-y-auto">
+      <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm mb-6">
+          <h1 id="preview-exam-title" class="text-3xl font-bold mb-2">Exam Title</h1>
+          <div class="w-full bg-slate-100 h-2 rounded-full mb-6 mt-4">
+            <div id="preview-progress" class="bg-blue-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+          </div>
+          
+          <div id="preview-question-stage"></div>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <button type="button" id="prev-btn" onclick="navPreview(-1)" class="px-6 py-3 font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30"><i class="fa-solid fa-arrow-left mr-2"></i> Previous</button>
+          <span id="preview-counter" class="text-sm font-bold text-slate-400">Question 1 of X</span>
+          <button type="button" id="next-btn" onclick="navPreview(1)" class="px-6 py-3 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md">Next <i class="fa-solid fa-arrow-right ml-2"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="code-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-3xl flex flex-col shadow-2xl">
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-xl"><i class="fa-solid fa-code text-slate-500 mr-2"></i> JSON Compiler</h3>
+        <button type="button" onclick="hideModal('code-modal')" class="text-xl text-slate-400 hover:text-slate-800"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6">
+        <textarea id="json-code-input" class="w-full h-64 border rounded-xl p-4 text-sm code-editor bg-slate-900 text-green-400 focus:outline-none" spellcheck="false">[
+  {
+    "type": "mcq",
+    "text": "Identify the function plotted below.",
+    "options": ["y = x^2", "y = sin(x)", "y = 2x", "y = x^3"],
+    "graphData": { "mode": "math", "type": "quadratic", "a": 1, "b": 0, "c": 0, "xmin": -5, "xmax": 5 }
+  }
+]</textarea>
+        <div class="mt-5 flex justify-end gap-3">
+          <button type="button" onclick="loadFromCode()" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 w-full sm:w-auto">Compile JSON Questions</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    // System Variables
     let questionCount = 0;
     let currentGraphQuestionId = null;
     let chartInstance = null;
     let questionGraphDataMap = {}; 
+    let activeGraphMode = 'data'; // 'data' or 'math'
 
-    // UI Toggles
-    function toggleScheduleFields() {
-      const isOpen = document.getElementById('isOpenExam').checked;
-      document.getElementById('schedule-fields').classList.toggle('hidden', isOpen);
+    // Preview Variables
+    let previewQuestions = [];
+    let currentPreviewIndex = 0;
+
+    // --- UI Logic ---
+    function toggleTimeInputs() {
+      const isOpen = document.getElementById('is-open-exam').checked;
+      const timeInputs = document.getElementById('time-inputs');
+      if (isOpen) {
+        timeInputs.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        timeInputs.classList.remove('opacity-50', 'pointer-events-none');
+      }
     }
-    
+
     function openCodeModal() { document.getElementById('code-modal').classList.remove('hidden'); }
     function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    // JSON Loader
+    // --- Question Logic ---
     function loadFromCode() {
       try {
         const jsonText = document.getElementById('json-code-input').value;
         const questionsArr = JSON.parse(jsonText);
+        
         document.getElementById('questions-container').innerHTML = '';
         questionCount = 0;
         questionGraphDataMap = {};
+
         questionsArr.forEach(q => addQuestion(q));
         hideModal('code-modal');
-      } catch (err) {
-        alert("Invalid JSON format.");
-      }
+      } catch (err) { alert("Invalid JSON array."); }
     }
 
-    function addBlankQuestion() {
-      addQuestion({ type: 'mcq', text: '', options: ['', '', '', ''], imageUrl: null });
-    }
+    function addBlankQuestion() { addQuestion({ type: 'mcq', text: '', options: ['', '', '', ''], imageUrl: null }); }
 
     function addQuestion(data) {
       questionCount++;
       const qId = `q-${questionCount}`;
 
-      let imageHtml = data.imageUrl ? `<img src="${data.imageUrl}" class="mt-3 rounded-xl max-h-40 border">` : '';
+      let imageHtml = data.imageUrl ? `<img src="${data.imageUrl}" class="mt-3 rounded-xl max-h-40 border border-slate-200">` : '';
       let graphHtml = '';
 
       if (data.graphData) {
         questionGraphDataMap[qId] = data.graphData;
-        graphHtml = `<div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 font-semibold"><i class="fa-solid fa-chart-line mr-2"></i>Graph Attached: ${data.graphData.label}</div>`;
+        const label = data.graphData.mode === 'math' ? `Math Plot (${data.graphData.type})` : data.graphData.label;
+        graphHtml = `<div class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-semibold flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> Graph Attached: ${label}</div>`;
       }
 
       const html = `
-        <div id="${qId}" class="question-block bg-white border border-slate-200 rounded-3xl p-5 relative">
+        <div id="${qId}" class="question-block bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 relative shadow-sm hover:shadow-md transition-shadow">
           <input type="hidden" class="q-id" value="${qId}">
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-3">
-              <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg">Q${questionCount}</span>
-              <select class="q-type text-sm border px-3 py-1 rounded-lg" onchange="updateAnswerArea('${qId}')">
+          
+          <div class="flex justify-between items-center mb-5 pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-x-3">
+              <span class="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-700 text-sm font-bold rounded-full">${questionCount}</span>
+              <select class="q-type text-sm font-semibold text-slate-700 border-0 bg-slate-50 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-blue-500" onchange="updateAnswerArea('${qId}')">
                 <option value="mcq" ${data.type === 'mcq' ? 'selected' : ''}>Multiple Choice</option>
-                <option value="frq" ${data.type === 'frq' ? 'selected' : ''}>Written Response</option>
+                <option value="frq" ${data.type === 'frq' ? 'selected' : ''}>Free Response</option>
               </select>
             </div>
-            <button type="button" onclick="deleteQuestion('${qId}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" onclick="deleteQuestion('${qId}')" class="text-slate-400 hover:text-red-500 transition-colors p-2"><i class="fa-solid fa-trash"></i></button>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <textarea class="q-text w-full border rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Write question...">${data.text || ''}</textarea>
-              <input type="text" class="q-image w-full border px-3 py-2 mt-2 rounded-lg text-xs" placeholder="Image URL (Optional)" value="${data.imageUrl || ''}" onchange="updateImagePreview('${qId}')">
+              <label class="text-xs font-bold text-slate-500 block mb-2">QUESTION PROMPT</label>
+              <textarea class="q-text w-full border border-slate-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" rows="3" placeholder="Type question here...">${data.text || ''}</textarea>
+              
+              <div class="mt-4 flex gap-2">
+                <button type="button" onclick="openGraphBuilder('${qId}')" class="flex-1 py-2 text-xs font-bold border border-blue-200 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"><i class="fa-solid fa-chart-line mr-1"></i> Data / Math Graph</button>
+              </div>
+              
               <div id="${qId}-img-preview">${imageHtml}</div>
               <div id="${qId}-graph-preview">${graphHtml}</div>
             </div>
+
             <div>
               <div id="${qId}-answer-area"></div>
-              <button type="button" onclick="openGraphBuilder('${qId}')" class="mt-3 w-full text-xs py-2 border rounded-lg hover:bg-slate-50 font-semibold text-slate-600 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-chart-pie"></i> Attach Data Graph
-              </button>
             </div>
           </div>
         </div>
@@ -306,204 +365,239 @@
     function renderAnswerArea(qId, data) {
       const type = document.querySelector(`#${qId} .q-type`).value;
       const container = document.getElementById(`${qId}-answer-area`);
+
       if (type === 'mcq') {
         const ops = data.options || ['', '', '', ''];
         container.innerHTML = `
-          <div class="space-y-2 q-options">
-            <input type="text" placeholder="Option A" value="${ops[0] || ''}" class="w-full border px-3 py-2 rounded-lg text-sm">
-            <input type="text" placeholder="Option B" value="${ops[1] || ''}" class="w-full border px-3 py-2 rounded-lg text-sm">
-            <input type="text" placeholder="Option C" value="${ops[2] || ''}" class="w-full border px-3 py-2 rounded-lg text-sm">
-            <input type="text" placeholder="Option D" value="${ops[3] || ''}" class="w-full border px-3 py-2 rounded-lg text-sm">
+          <label class="text-xs font-bold text-slate-500 block mb-2">MULTIPLE CHOICE OPTIONS</label>
+          <div class="space-y-2.5 q-options">
+            <div class="flex items-center gap-3"><div class="w-6 text-center font-bold text-slate-400">A</div><input type="text" value="${ops[0] || ''}" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></div>
+            <div class="flex items-center gap-3"><div class="w-6 text-center font-bold text-slate-400">B</div><input type="text" value="${ops[1] || ''}" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></div>
+            <div class="flex items-center gap-3"><div class="w-6 text-center font-bold text-slate-400">C</div><input type="text" value="${ops[2] || ''}" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></div>
+            <div class="flex items-center gap-3"><div class="w-6 text-center font-bold text-slate-400">D</div><input type="text" value="${ops[3] || ''}" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></div>
           </div>
         `;
       } else {
-        container.innerHTML = `<textarea rows="4" class="q-expected w-full border px-3 py-2 rounded-lg text-sm" placeholder="Expected answer key...">${data.expectedAnswer || ''}</textarea>`;
+        container.innerHTML = `
+          <label class="text-xs font-bold text-slate-500 block mb-2">EXPECTED ANSWER KEY</label>
+          <textarea rows="5" class="q-expected w-full border border-slate-200 px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Keywords or concepts required...">${data.expectedAnswer || ''}</textarea>
+        `;
       }
     }
 
     function updateAnswerArea(qId) { renderAnswerArea(qId, {}); }
-    function updateImagePreview(qId) {
-      const url = document.querySelector(`#${qId} .q-image`).value;
-      document.getElementById(`${qId}-img-preview`).innerHTML = url ? `<img src="${url}" class="mt-3 rounded-xl max-h-40 border">` : '';
-    }
-    function deleteQuestion(qId) {
-      document.getElementById(qId).remove();
-      delete questionGraphDataMap[qId];
-    }
+    function deleteQuestion(qId) { document.getElementById(qId).remove(); delete questionGraphDataMap[qId]; }
 
-    // ================= GRAPH BUILDER LOGIC =================
-    function switchGraphMode() {
-      const mode = document.querySelector('input[name="graphDataType"]:checked').value;
-      document.getElementById('mode-category').classList.toggle('hidden', mode === 'coordinate');
-      document.getElementById('mode-coordinate').classList.toggle('hidden', mode === 'category');
-      
-      // Auto-switch chart type for better UX
-      if(mode === 'coordinate') document.getElementById('graph-type').value = 'line';
-    }
-
+    // --- GRAPH BUILDER (Data + Math) ---
     function openGraphBuilder(qId) {
       currentGraphQuestionId = qId;
       document.getElementById('graph-modal').classList.remove('hidden');
+      switchGraphMode('math'); // default to the cool new math one
+      updateMathParams();
+    }
+
+    function switchGraphMode(mode) {
+      activeGraphMode = mode;
+      document.getElementById('graph-data-inputs').classList.toggle('hidden', mode !== 'data');
+      document.getElementById('graph-math-inputs').classList.toggle('hidden', mode !== 'math');
+      
+      document.getElementById('tab-data-graph').className = mode === 'data' 
+        ? 'flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm text-blue-600'
+        : 'flex-1 py-2 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700';
+        
+      document.getElementById('tab-math-graph').className = mode === 'math' 
+        ? 'flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm text-blue-600'
+        : 'flex-1 py-2 text-sm font-medium rounded-lg text-slate-500 hover:text-slate-700';
+      
       previewGraph();
     }
 
-    function previewGraph() {
-      const type = document.getElementById('graph-type').value;
-      const label = document.getElementById('graph-label').value;
-      const mode = document.querySelector('input[name="graphDataType"]:checked').value;
+    function updateMathParams() {
+      const type = document.getElementById('math-func-type').value;
+      const container = document.getElementById('math-params-container');
+      let html = '';
       
-      let configData = {};
-      let chartOptions = { responsive: true, maintainAspectRatio: false };
-
-      if (mode === 'category') {
-        const labels = document.getElementById('graph-x-labels').value.split(',').map(s => s.trim());
-        const data = document.getElementById('graph-data').value.split(',').map(s => Number(s.trim()));
-        configData = {
-          labels: labels,
-          datasets: [{ label, data, backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b'] }]
-        };
-      } else {
-        // Mathematical / Coordinate Parsing
-        const rawCoords = document.getElementById('graph-coordinates').value.split('|');
-        const dataPoints = rawCoords.map(pair => {
-          const [x, y] = pair.split(',').map(n => Number(n.trim()));
-          return { x, y };
-        }).filter(p => !isNaN(p.x) && !isNaN(p.y));
-
-        configData = {
-          datasets: [{ 
-            label, 
-            data: dataPoints, 
-            borderColor: '#3b82f6', 
-            backgroundColor: '#3b82f6',
-            tension: 0.4, // Smooth lines for parabolas
-            showLine: type === 'line' 
-          }]
-        };
-        
-        chartOptions.scales = {
-          x: { type: 'linear', position: 'bottom' }
-        };
+      if (type === 'quadratic') {
+        html = `
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">a (x²)</label><input type="number" id="math-a" value="1" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">b (x)</label><input type="number" id="math-b" value="0" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">c (constant)</label><input type="number" id="math-c" value="0" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+        `;
+      } else if (type === 'sine' || type === 'cosine') {
+        html = `
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">Amplitude (a)</label><input type="number" id="math-a" value="1" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">Frequency (b)</label><input type="number" id="math-b" value="1" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+        `;
+      } else if (type === 'linear') {
+        html = `
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">Slope (m)</label><input type="number" id="math-a" value="1" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+          <div><label class="text-[10px] font-bold text-slate-500 block mb-1">Y-Int (b)</label><input type="number" id="math-b" value="0" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+        `;
       }
+      container.innerHTML = html;
+    }
 
+    function previewGraph() {
       const ctx = document.getElementById('graph-canvas');
       if (chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(ctx, { type: type, data: configData, options: chartOptions });
+
+      if (activeGraphMode === 'data') {
+        const type = document.getElementById('graph-type').value;
+        const label = document.getElementById('graph-label').value;
+        const labels = document.getElementById('graph-x-labels').value.split(',').map(s => s.trim());
+        const data = document.getElementById('graph-data').value.split(',').map(s => Number(s.trim()));
+        
+        chartInstance = new Chart(ctx, {
+          type: type,
+          data: { labels, datasets: [{ label, data, backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b'], borderWidth: 1 }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      } else {
+        // Render Math Equation via Chart.js Line (Scatter interpolation)
+        const type = document.getElementById('math-func-type').value;
+        const xMin = Number(document.getElementById('math-xmin').value) || -10;
+        const xMax = Number(document.getElementById('math-xmax').value) || 10;
+        
+        const a = Number(document.getElementById('math-a') ? document.getElementById('math-a').value : 1);
+        const b = Number(document.getElementById('math-b') ? document.getElementById('math-b').value : 0);
+        const c = Number(document.getElementById('math-c') ? document.getElementById('math-c').value : 0);
+
+        const dataPoints = [];
+        const step = (xMax - xMin) / 100; // Smooth curve
+
+        for (let x = xMin; x <= xMax; x += step) {
+          let y = 0;
+          if (type === 'quadratic') y = (a * x * x) + (b * x) + c;
+          else if (type === 'sine') y = a * Math.sin(b * x);
+          else if (type === 'cosine') y = a * Math.cos(b * x);
+          else if (type === 'linear') y = (a * x) + b;
+          dataPoints.push({ x: x, y: y });
+        }
+
+        chartInstance = new Chart(ctx, {
+          type: 'scatter',
+          data: { datasets: [{ label: `y = f(x)`, data: dataPoints, borderColor: '#2563eb', backgroundColor: '#3b82f6', showLine: true, pointRadius: 0, borderWidth: 3 }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { x: { type: 'linear', position: 'bottom', grid: {color: '#e2e8f0'} }, y: { grid: {color: '#e2e8f0'} } } }
+        });
+      }
     }
 
     function saveGraphToQuestion() {
       if (!currentGraphQuestionId) return;
-      const mode = document.querySelector('input[name="graphDataType"]:checked').value;
-      
-      let graphData = {
-        type: document.getElementById('graph-type').value,
-        label: document.getElementById('graph-label').value,
-        mode: mode
-      };
+      let graphData = { mode: activeGraphMode };
 
-      if (mode === 'category') {
-        graphData.labels = document.getElementById('graph-x-labels').value.split(',').map(s => s.trim());
-        graphData.data = document.getElementById('graph-data').value.split(',').map(s => Number(s.trim()));
+      if (activeGraphMode === 'data') {
+        graphData = { ...graphData, type: document.getElementById('graph-type').value, label: document.getElementById('graph-label').value, labels: document.getElementById('graph-x-labels').value.split(','), data: document.getElementById('graph-data').value.split(',') };
       } else {
-        graphData.rawCoords = document.getElementById('graph-coordinates').value;
+        graphData = { 
+          ...graphData, type: document.getElementById('math-func-type').value, xmin: document.getElementById('math-xmin').value, xmax: document.getElementById('math-xmax').value,
+          a: document.getElementById('math-a') ? document.getElementById('math-a').value : null,
+          b: document.getElementById('math-b') ? document.getElementById('math-b').value : null,
+          c: document.getElementById('math-c') ? document.getElementById('math-c').value : null
+        };
       }
 
       questionGraphDataMap[currentGraphQuestionId] = graphData;
-      document.getElementById(`${currentGraphQuestionId}-graph-preview`).innerHTML = `<div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700 font-semibold"><i class="fa-solid fa-chart-line mr-2"></i>Graph Attached: ${graphData.label}</div>`;
+      const preview = document.getElementById(`${currentGraphQuestionId}-graph-preview`);
+      const dispLabel = activeGraphMode === 'data' ? graphData.label : `Math Plot (${graphData.type})`;
+      preview.innerHTML = `<div class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 font-semibold flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> Graph Attached: ${dispLabel}</div>`;
       hideModal('graph-modal');
     }
 
-    // ================= EXTRACT DATA =================
-    function compileQuestionsData() {
+    // --- PARSE AND SAVE ---
+    function compileQuestions() {
       const blocks = document.querySelectorAll('.question-block');
       const finalQuestions = [];
       blocks.forEach(block => {
         const qId = block.querySelector('.q-id').value;
         const type = block.querySelector('.q-type').value;
-        let qObj = { 
-          type, 
-          text: block.querySelector('.q-text').value, 
-          imageUrl: block.querySelector('.q-image').value 
-        };
+        const text = block.querySelector('.q-text').value;
+        let qObj = { type, text };
+        
         if (questionGraphDataMap[qId]) qObj.graphData = questionGraphDataMap[qId];
-        if (type === 'mcq') qObj.options = Array.from(block.querySelectorAll('.q-options input')).map(i => i.value);
+
+        if (type === 'mcq') {
+          const optInputs = block.querySelectorAll('.q-options input');
+          qObj.options = Array.from(optInputs).map(inp => inp.value);
+        } else {
+          qObj.expectedAnswer = block.querySelector('.q-expected').value;
+        }
         finalQuestions.push(qObj);
       });
       return finalQuestions;
     }
 
-    // ================= FULL SCREEN PREVIEW =================
-    function startPreviewMode() {
-      const overlay = document.getElementById('student-preview-overlay');
-      const title = document.getElementById('assessment-title').value || "Untitled Assessment";
-      document.getElementById('preview-test-title').innerText = title;
-      
-      const qs = compileQuestionsData();
-      const renderArea = document.getElementById('preview-questions-render');
-      renderArea.innerHTML = '';
-
-      qs.forEach((q, index) => {
-        let optionsHtml = '';
-        if (q.type === 'mcq') {
-          q.options.forEach(opt => {
-            if(opt) optionsHtml += `<label class="block p-4 border rounded-xl hover:bg-slate-50 cursor-pointer mb-2"><input type="radio" name="pq${index}" class="mr-3">${opt}</label>`;
-          });
-        } else {
-          optionsHtml = `<textarea rows="4" class="w-full border p-4 rounded-xl" placeholder="Student will type here..."></textarea>`;
-        }
-
-        let mediaHtml = q.imageUrl ? `<img src="${q.imageUrl}" class="mt-4 rounded-xl max-h-64 border">` : '';
-        if (q.graphData) {
-          mediaHtml += `<div class="mt-4 p-4 border rounded-xl bg-white"><canvas id="preview-canvas-${index}" height="200"></canvas></div>`;
-        }
-
-        renderArea.innerHTML += `
-          <div class="bg-white p-6 border rounded-2xl shadow-sm">
-            <h3 class="font-semibold text-lg"><span class="text-slate-400 mr-2">${index+1}.</span> ${q.text || '[Blank Question]'}</h3>
-            ${mediaHtml}
-            <div class="mt-6">${optionsHtml}</div>
-          </div>
-        `;
-      });
-
-      overlay.classList.add('active');
-
-      // Request Fullscreen for authenticity
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(err => console.log("Fullscreen denied by browser."));
-      }
-
-      // Render any charts in the preview
-      qs.forEach((q, index) => {
-        if (q.graphData) {
-          const ctx = document.getElementById(`preview-canvas-${index}`);
-          let config = {};
-          if(q.graphData.mode === 'category') {
-             config = { labels: q.graphData.labels, datasets: [{ label: q.graphData.label, data: q.graphData.data, backgroundColor: '#3b82f6' }] };
-          } else {
-             const pts = q.graphData.rawCoords.split('|').map(p => { const [x,y]=p.split(',').map(Number); return {x,y}; });
-             config = { datasets: [{ label: q.graphData.label, data: pts, borderColor: '#3b82f6', tension: 0.4 }] };
-          }
-          new Chart(ctx, { type: q.graphData.type, data: config, options: { responsive: true, maintainAspectRatio: false } });
-        }
-      });
-    }
-
-    function exitPreviewMode() {
-      document.getElementById('student-preview-overlay').classList.remove('active');
-      if (document.fullscreenElement) document.exitFullscreen();
-    }
-
-    // ================= SAVE TO BACKEND =================
     function saveAssessment() {
       const title = document.getElementById('assessment-title').value;
-      if (!title) return alert("Please enter an exam title.");
-      
-      document.getElementById('questions-data').value = JSON.stringify(compileQuestionsData());
+      if (!title) return alert("Please enter an Exam Title before saving.");
+
+      document.getElementById('questions-data').value = JSON.stringify(compileQuestions());
       document.getElementById('assessment-form').submit();
     }
 
-    window.onload = () => { addBlankQuestion(); toggleScheduleFields(); }
+    // --- FULL SCREEN PREVIEW MODE ---
+    function startPreviewMode() {
+      previewQuestions = compileQuestions();
+      if(previewQuestions.length === 0) return alert("Add at least one question to preview.");
+      
+      document.getElementById('preview-exam-title').innerText = document.getElementById('assessment-title').value || "Untitled Exam";
+      document.getElementById('preview-modal').classList.remove('hidden');
+      currentPreviewIndex = 0;
+      renderPreviewQuestion();
+    }
+
+    function navPreview(dir) {
+      currentPreviewIndex += dir;
+      renderPreviewQuestion();
+    }
+
+    function renderPreviewQuestion() {
+      const q = previewQuestions[currentPreviewIndex];
+      const stage = document.getElementById('preview-question-stage');
+      const counter = document.getElementById('preview-counter');
+      const progress = document.getElementById('preview-progress');
+      
+      document.getElementById('prev-btn').disabled = currentPreviewIndex === 0;
+      const nextBtn = document.getElementById('next-btn');
+      
+      if(currentPreviewIndex === previewQuestions.length - 1) {
+        nextBtn.innerHTML = `Submit Exam <i class="fa-solid fa-check ml-2"></i>`;
+        nextBtn.className = "px-6 py-3 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md";
+      } else {
+        nextBtn.innerHTML = `Next <i class="fa-solid fa-arrow-right ml-2"></i>`;
+        nextBtn.className = "px-6 py-3 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md";
+      }
+
+      counter.innerText = `Question ${currentPreviewIndex + 1} of ${previewQuestions.length}`;
+      progress.style.width = `${((currentPreviewIndex + 1) / previewQuestions.length) * 100}%`;
+
+      let graphHtml = '';
+      if (q.graphData) {
+        // In a real scenario, this would initialize another Chart.js instance on the fly.
+        graphHtml = `<div class="w-full h-64 bg-slate-100 border border-slate-300 rounded-2xl flex items-center justify-center text-slate-400 mt-4"><i class="fa-solid fa-chart-pie text-4xl mr-3"></i> [Interactive Graph Plotted Here]</div>`;
+      }
+
+      let answerHtml = '';
+      if (q.type === 'mcq') {
+        answerHtml = q.options.map((opt, i) => `
+          <label class="flex items-center gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">
+            <input type="radio" name="preview_ans" class="w-5 h-5 text-blue-600">
+            <span class="font-medium text-slate-700">${opt || `Option ${i+1}`}</span>
+          </label>
+        `).join('');
+      } else {
+        answerHtml = `<textarea rows="6" class="w-full border border-slate-200 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500" placeholder="Type your answer here..."></textarea>`;
+      }
+
+      stage.innerHTML = `
+        <p class="text-xl font-medium text-slate-800 mb-6">${q.text || 'No prompt provided.'}</p>
+        ${graphHtml}
+        <div class="mt-8 space-y-3">${answerHtml}</div>
+      `;
+    }
+
+    // Init
+    window.onload = () => { addBlankQuestion(); toggleTimeInputs(); }
   </script>
 </body>
 </html>
