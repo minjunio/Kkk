@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard • Credity.ink</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', system_ui, sans-serif; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .modern-gradient { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .spotless-card { transition: all .3s cubic-bezier(.4,0,.2,1); }
+    .spotless-card:hover { transform: translateY(-3px); }
+    .nav-active { color: #6366f1; font-weight: 600; }
+    .badge { transition: transform .2s ease; }
+    .badge:hover { transform: scale(1.03); }
+    .section-header { font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-white">
+  <!-- Top Nav -->
+  <nav class="border-b border-white/10 bg-zinc-950/90 backdrop-blur-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-x-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center">
+          <span class="font-bold text-xl">C</span>
+        </div>
+        <span class="font-semibold text-xl tracking-tight">Credity</span>
+      </div>
+      
+      <div class="flex items-center gap-x-3 text-sm">
+        <div class="px-4 py-1.5 bg-white/5 rounded-3xl flex items-center gap-x-2 text-xs">
+          <i class="fa-solid fa-user text-emerald-400"></i>
+          <span><%= user.name %></span>
+        </div>
+        <a href="/logout" class="px-5 py-1.5 hover:bg-white/5 transition-colors rounded-3xl border border-white/20 text-xs">Log out</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-8 pt-10 pb-20">
+    <!-- Header -->
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <div class="text-sm text-emerald-400 font-medium tracking-widest">STUDENT PORTAL</div>
+        <h1 class="text-5xl font-semibold tracking-tighter">Welcome back, <%= user.name.split(' ')[0] %>.</h1>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-white/50">YOUR PROGRESS</div>
+        <div class="text-3xl font-semibold"><%= badges.length %> <span class="text-sm font-normal text-white/50">badges earned</span></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+      <div class="glass p-6 rounded-3xl">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="text-xs uppercase tracking-widest text-white/60">Badges Earned</div>
+            <div class="text-5xl font-semibold mt-1"><%= badges.length %></div>
+          </div>
+          <i class="fa-solid fa-award text-4xl text-indigo-400/70"></i>
+        </div>
+      </div>
+      <div class="glass p-6 rounded-3xl">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="text-xs uppercase tracking-widest text-white/60">Events Participated</div>
+            <div class="text-5xl font-semibold mt-1"><%= events.length %></div>
+          </div>
+          <i class="fa-solid fa-calendar-check text-4xl text-violet-400/70"></i>
+        </div>
+      </div>
+      <div class="glass p-6 rounded-3xl">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="text-xs uppercase tracking-widest text-white/60">Verified Credentials</div>
+            <div class="text-5xl font-semibold mt-1"><%= badges.length %></div>
+          </div>
+          <i class="fa-solid fa-qrcode text-4xl text-emerald-400/70"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Special Events -->
+    <div class="mb-12">
+      <div class="flex items-center justify-between mb-5 px-1">
+        <div class="section-header">Special Events</div>
+        <span class="text-xs px-4 py-1 bg-white/5 rounded-3xl">Featured this month</span>
+      </div>
+      
+      <% if (events.length > 0) { %>
+        <div class="grid md:grid-cols-2 gap-5">
+          <% events.forEach(event => { %>
+            <div class="glass p-6 rounded-3xl spotless-card border border-white/10">
+              <div class="flex justify-between">
+                <div>
+                  <div class="font-semibold text-xl"><%= event.title %></div>
+                  <div class="text-white/60 text-sm mt-1"><%= event.description %></div>
+                </div>
+                <% if (event.specialBadgeId) { %>
+                  <div class="text-xs px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-black font-medium rounded-2xl h-fit">SPECIAL BADGE</div>
+                <% } %>
+              </div>
+              <div class="mt-5 flex items-center text-xs text-white/50">
+                <i class="fa-regular fa-calendar mr-2"></i> <%= event.date %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="glass p-8 rounded-3xl text-center text-white/60">No special events right now. Check back soon!</div>
+      <% } %>
+    </div>
+
+    <!-- My Badges -->
+    <div>
+      <div class="flex items-center justify-between mb-5 px-1">
+        <div class="section-header">My Verified Badges</div>
+      </div>
+      
+      <% if (badges.length > 0) { %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <% badges.forEach(badge => { %>
+            <div class="glass rounded-3xl overflow-hidden spotless-card border border-white/10">
+              <div class="p-5 pb-4 bg-zinc-900/50">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold"><%= badge.title || 'Skill Badge' %></div>
+                    <div class="text-xs text-white/60 mt-px"><%= badge.issuedDate %></div>
+                  </div>
+                  <div class="px-3 py-1 text-[10px] font-medium rounded-2xl bg-white/10">VERIFIED</div>
+                </div>
+              </div>
+              <div class="p-6 pt-4">
+                <div class="flex gap-x-4 items-start">
+                  <div class="flex-1">
+                    <div class="text-xs text-white/50 mb-1">ISSUED BY</div>
+                    <div class="font-medium"><%= badge.createdBy || 'School Admin' %></div>
+                  </div>
+                  <div>
+                    <img src="<%= badge.qrCode %>" alt="QR Code" class="w-16 h-16 rounded-xl border border-white/10">
+                  </div>
+                </div>
+                
+                <div class="mt-6 pt-5 border-t border-white/10 flex gap-x-3">
+                  <button onclick="window.location.href='/verify/<%= badge.badgeId %>'" 
+                          class="flex-1 py-2.5 text-xs font-medium border border-white/30 hover:bg-white/5 transition-colors rounded-3xl">
+                    VERIFY
+                  </button>
+                  <button class="flex-1 py-2.5 text-xs font-medium bg-white text-zinc-950 hover:bg-white/90 transition-colors rounded-3xl">
+                    SHARE
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="glass p-12 rounded-3xl text-center">
+          <i class="fa-solid fa-award text-5xl text-white/20 mb-6"></i>
+          <div class="font-semibold">No badges yet</div>
+          <p class="text-sm text-white/60 mt-1">Complete tests and participate in events to earn verified credentials.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>
