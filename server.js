@@ -11,9 +11,11 @@ const PORT = process.env.PORT || 3000;
 
 // ==================== APP CONFIG ====================
 app.set('trust proxy', 1);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -29,7 +31,7 @@ app.use(session({
   }
 }));
 
-// ==================== DATABASE / PERSISTENCE ====================
+// ==================== DATABASE ====================
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'credity-db.json');
 
@@ -43,17 +45,45 @@ let issuedCredentials = [];
 let events = [];
 let tests = [];
 let networkLogs = [];
-let studentKeys = [];
+let classes = [];
 let classEnrollments = [];
 let submissions = [];
 
 function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+function normalizeAccessKey(key) {
+  return String(key || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+function migrateOldKeysToClasses(oldKeys) {
+  if (!Array.isArray(oldKeys)) return [];
+
+  return oldKeys.map(k => ({
+    id: k.id,
+    teacherId: k.teacherId,
+    teacherName: k.teacherName || '',
+    className: k.className || 'Untitled Class',
+    key: k.key,
+    normalizedKey: k.normalizedKey || normalizeAccessKey(k.key),
+    active: k.active !== false,
+    assignedTestIds: k.testId ? [Number(k.testId)] : [],
+    announcements: Array.isArray(k.announcements) ? k.announcements : [],
+    usageCount: Number(k.usageCount || 0),
+    createdAt: k.createdAt || new Date().toISOString()
+  }));
 }
 
 function saveDB() {
   try {
     ensureDataDir();
+
     const db = {
       users,
       credentialTemplates,
@@ -61,10 +91,12 @@ function saveDB() {
       events,
       tests,
       networkLogs,
-      studentKeys,
+      classes,
+      studentKeys: classes,
       classEnrollments,
       submissions
     };
+
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
   } catch (err) {
     console.error('DB save error:', err.message);
@@ -74,6 +106,7 @@ function saveDB() {
 function loadDB() {
   try {
     ensureDataDir();
+
     if (!fs.existsSync(DB_FILE)) {
       saveDB();
       return;
@@ -87,9 +120,16 @@ function loadDB() {
     events = Array.isArray(db.events) ? db.events : [];
     tests = Array.isArray(db.tests) ? db.tests : [];
     networkLogs = Array.isArray(db.networkLogs) ? db.networkLogs : [];
-    studentKeys = Array.isArray(db.studentKeys) ? db.studentKeys : [];
+    classes = Array.isArray(db.classes) ? db.classes : migrateOldKeysToClasses(db.studentKeys);
     classEnrollments = Array.isArray(db.classEnrollments) ? db.classEnrollments : [];
     submissions = Array.isArray(db.submissions) ? db.submissions : [];
+
+    classes.forEach(c => {
+      if (!Array.isArray(c.assignedTestIds)) c.assignedTestIds = [];
+      if (!Array.isArray(c.announcements)) c.announcements = [];
+      if (!c.normalizedKey) c.normalizedKey = normalizeAccessKey(c.key);
+      c.usageCount = Number(c.usageCount || 0);
+    });
   } catch (err) {
     console.error('DB load error:', err.message);
   }
@@ -98,9 +138,6 @@ function loadDB() {
 loadDB();
 
 // ==================== MAILER ====================
-// Put these in Render environment variables:
-// GMAIL_USER=credifysupport@gmail.com
-// GMAIL_APP_PASSWORD=your-new-google-app-password
 const GMAIL_USER = process.env.GMAIL_USER || '';
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || '';
 
@@ -126,12 +163,7 @@ function nextId(arr, field = 'id') {
 
 function currentUser(req) {
   if (!req.session.user) return null;
-  return users.find(u => u.id === req.session.user.id) || req.session.user;
-}
-
-function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/');
-  next();
+  return users.find(u => Number(u.id) === Number(req.session.user.id)) || req.session.user;
 }
 
 function requireTeacher(req, res, next) {
@@ -145,7 +177,23 @@ function requireStudent(req, res, next) {
 }
 
 function isAdminUser(user) {
-  return user && (user.email === 'admin' || user.id === 0);
+  return user && (user.email === 'admin' || Number(user.id) === 0);
+}
+
+function generateClassKey() {
+  let key;
+  let normalized;
+
+  do {
+    const a = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const b = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const c = crypto.randomBytes(2).toString('hex').toUpperCase();
+
+    key = `CRED-${a}-${b}-${c}`;
+    normalized = normalizeAccessKey(key);
+  } while (classes.some(k => k.normalizedKey === normalized));
+
+  return { key, normalized };
 }
 
 function escapeHtml(value) {
@@ -173,30 +221,8 @@ async function generateQR(text) {
 }
 
 function generateCredentialHash(userId, assessmentId) {
-  const raw = `${userId}-${assessmentId}-${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
+  const raw = `${userId}-${assessmentId || 'standalone'}-${Date.now()}-${crypto.randomBytes(16).toString('hex')}`;
   return crypto.createHash('sha256').update(raw).digest('hex').substring(0, 24);
-}
-
-function normalizeAccessKey(key) {
-  return String(key || '')
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
-}
-
-function generateStudentAccessKey() {
-  let key;
-  let normalized;
-
-  do {
-    const part1 = crypto.randomBytes(2).toString('hex').toUpperCase();
-    const part2 = crypto.randomBytes(2).toString('hex').toUpperCase();
-    const part3 = crypto.randomBytes(2).toString('hex').toUpperCase();
-    key = `CRED-${part1}-${part2}-${part3}`;
-    normalized = normalizeAccessKey(key);
-  } while (studentKeys.some(k => k.normalizedKey === normalized));
-
-  return { key, normalized };
 }
 
 async function sendEmail(to, subject, html) {
@@ -218,32 +244,32 @@ function parseQuestions(raw) {
   try {
     const parsed = JSON.parse(raw || '[]');
     return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
+  } catch {
     return [];
   }
 }
 
 function collectLogoUrls(bodyValue) {
-  const raw = bodyValue;
-  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
-  return list
-    .map(x => String(x || '').trim())
-    .filter(Boolean)
-    .slice(0, 3);
+  const list = Array.isArray(bodyValue) ? bodyValue : bodyValue ? [bodyValue] : [];
+  return list.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3);
 }
 
 function teacherOwnsTest(teacherId, testId) {
   return tests.find(t => Number(t.id) === Number(testId) && Number(t.teacherId) === Number(teacherId));
 }
 
-function teacherOwnsBadge(teacherId, badgeId) {
+function teacherOwnsClass(teacherId, classId) {
+  return classes.find(c => Number(c.id) === Number(classId) && Number(c.teacherId) === Number(teacherId));
+}
+
+function teacherOwnsCredential(teacherId, credentialId) {
   return credentialTemplates.find(b =>
-    Number(b.id) === Number(badgeId) &&
+    Number(b.id) === Number(credentialId) &&
     Number(b.teacherId) === Number(teacherId)
   );
 }
 
-function latestTeacherBadge(teacherId) {
+function latestTeacherCredential(teacherId) {
   return [...credentialTemplates]
     .reverse()
     .find(b => Number(b.teacherId) === Number(teacherId));
@@ -252,12 +278,16 @@ function latestTeacherBadge(teacherId) {
 function studentHasAccessToTest(userId, test) {
   if (!test) return false;
 
-  // Old/demo tests stay open unless a key was generated for them.
   if (!test.requiresKey) return true;
 
-  return classEnrollments.some(e =>
-    Number(e.userId) === Number(userId) &&
-    Number(e.testId) === Number(test.id)
+  const studentClassIds = classEnrollments
+    .filter(e => Number(e.userId) === Number(userId))
+    .map(e => Number(e.classId));
+
+  return classes.some(c =>
+    studentClassIds.includes(Number(c.id)) &&
+    Array.isArray(c.assignedTestIds) &&
+    c.assignedTestIds.map(Number).includes(Number(test.id))
   );
 }
 
@@ -273,14 +303,14 @@ function mapIssuedCredentialForStudent(credential) {
   };
 }
 
-function makeConfirmationPage(title, message, buttons = []) {
+function makePage(title, message, buttons = []) {
   const buttonHtml = buttons.map(btn => {
-    return `<a href="${escapeHtml(btn.href)}" style="display:inline-block;margin:8px;padding:12px 18px;border-radius:999px;background:${btn.primary ? '#fff' : 'rgba(255,255,255,.08)'};color:${btn.primary ? '#09090b' : '#fff'};text-decoration:none;font-weight:700;font-size:13px;border:1px solid rgba(255,255,255,.15)">${escapeHtml(btn.label)}</a>`;
+    return `<a href="${escapeHtml(btn.href)}" style="display:inline-block;margin:8px;padding:12px 18px;border-radius:12px;background:${btn.primary ? '#ffffff' : 'rgba(255,255,255,.08)'};color:${btn.primary ? '#09090b' : '#ffffff'};text-decoration:none;font-weight:500;font-size:13px;border:1px solid rgba(255,255,255,.15)">${escapeHtml(btn.label)}</a>`;
   }).join('');
 
   return `
     <!DOCTYPE html>
-    <html lang="en">
+    <html>
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -291,47 +321,48 @@ function makeConfirmationPage(title, message, buttons = []) {
           min-height: 100vh;
           background: #09090b;
           color: white;
-          font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          font-family: Inter, system-ui, sans-serif;
           display: grid;
           place-items: center;
           padding: 24px;
         }
         .card {
-          max-width: 620px;
+          max-width: 650px;
           width: 100%;
           border: 1px solid rgba(255,255,255,.12);
-          background: rgba(255,255,255,.05);
-          border-radius: 32px;
+          background: #111113;
+          border-radius: 22px;
           padding: 34px;
-          box-shadow: 0 30px 100px rgba(0,0,0,.35);
+          box-shadow: 0 20px 70px rgba(0,0,0,.35);
         }
         .eyebrow {
           color: #34d399;
           font-size: 12px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          font-weight: 800;
+          font-weight: 600;
           margin-bottom: 10px;
         }
         h1 {
           margin: 0 0 12px;
-          font-size: 34px;
+          font-size: 32px;
           letter-spacing: -0.04em;
+          font-weight: 650;
         }
         p {
-          color: rgba(255,255,255,.68);
+          color: rgba(255,255,255,.72);
           line-height: 1.6;
         }
         code {
           display: block;
           margin: 18px 0;
           padding: 18px;
-          border-radius: 20px;
+          border-radius: 14px;
           background: #18181b;
           border: 1px solid rgba(255,255,255,.12);
           color: #a7f3d0;
-          font-size: 22px;
-          font-weight: 900;
+          font-size: 21px;
+          font-weight: 650;
           letter-spacing: .08em;
           text-align: center;
         }
@@ -349,7 +380,7 @@ function makeConfirmationPage(title, message, buttons = []) {
   `;
 }
 
-// ==================== AUTH ROUTES ====================
+// ==================== AUTH ====================
 app.get('/', (req, res) => {
   if (req.session.user) {
     return res.redirect(req.session.user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
@@ -372,12 +403,12 @@ app.post('/login', (req, res) => {
     u.role === role
   );
 
-  if (user) {
-    req.session.user = user;
-    return res.redirect(user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
+  if (!user) {
+    return res.render('index', { error: 'Invalid credentials.' });
   }
 
-  res.render('index', { error: 'Invalid credentials.' });
+  req.session.user = user;
+  res.redirect(user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
 });
 
 app.post('/signup', async (req, res) => {
@@ -418,9 +449,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
-  });
+  req.session.destroy(() => res.redirect('/'));
 });
 
 // ==================== DASHBOARDS ====================
@@ -431,7 +460,9 @@ app.get('/student-dashboard', requireStudent, (req, res) => {
     .filter(c => Number(c.userId) === Number(user.id))
     .map(mapIssuedCredentialForStudent);
 
-  const studentEnrollments = classEnrollments.filter(e => Number(e.userId) === Number(user.id));
+  const enrollments = classEnrollments.filter(e => Number(e.userId) === Number(user.id));
+  const enrolledClassIds = enrollments.map(e => Number(e.classId));
+  const studentClasses = classes.filter(c => enrolledClassIds.includes(Number(c.id)));
 
   const visibleTests = tests
     .filter(t => studentHasAccessToTest(user.id, t))
@@ -448,22 +479,32 @@ app.get('/student-dashboard', requireStudent, (req, res) => {
       return { ...t, countdown };
     });
 
-  const classEventCards = studentEnrollments.map(e => ({
-    id: `class-${e.id}`,
-    title: `Unlocked: ${e.testTitle || 'Assessment'}`,
-    description: `Class group: ${e.className}. Test link: /take-test/${e.testId}`,
-    date: new Date(e.joinedAt).toLocaleDateString(),
-    specialBadgeId: null
-  }));
+  const classAnnouncementCards = [];
+
+  studentClasses.forEach(c => {
+    if (Array.isArray(c.announcements)) {
+      c.announcements.forEach(a => {
+        classAnnouncementCards.push({
+          id: `class-${c.id}-announcement-${a.id}`,
+          title: a.title || `Announcement for ${c.className}`,
+          description: a.description || '',
+          date: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '',
+          specialBadgeId: a.specialBadgeId || null,
+          className: c.className
+        });
+      });
+    }
+  });
 
   res.render('student-dashboard', {
     user,
     badges: userCredentials,
     issuedCredentials: userCredentials,
-    events: [...classEventCards, ...events],
+    events: [...classAnnouncementCards, ...events],
     tests: visibleTests,
     upcomingExams: visibleTests,
-    enrollments: studentEnrollments
+    enrollments,
+    classes: studentClasses
   });
 });
 
@@ -473,47 +514,263 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
   const teacherTests = tests.filter(t => Number(t.teacherId) === Number(user.id));
   const teacherBadges = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
   const teacherEvents = events.filter(e => !e.teacherId || Number(e.teacherId) === Number(user.id));
-  const teacherKeys = studentKeys.filter(k => Number(k.teacherId) === Number(user.id));
+  const teacherClasses = classes.filter(c => Number(c.teacherId) === Number(user.id));
 
   res.render('teacher-dashboard', {
     user,
     badges: teacherBadges,
     tests: teacherTests,
     events: teacherEvents,
-    studentKeys: teacherKeys
+    classes: teacherClasses,
+    studentKeys: teacherClasses
   });
 });
 
 app.get('/admin', requireTeacher, (req, res) => {
   const user = currentUser(req);
 
-  const teacherTests = isAdminUser(user)
-    ? tests
-    : tests.filter(t => Number(t.teacherId) === Number(user.id));
-
-  const teacherBadges = isAdminUser(user)
-    ? credentialTemplates
-    : credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
+  const visibleTests = isAdminUser(user) ? tests : tests.filter(t => Number(t.teacherId) === Number(user.id));
+  const visibleBadges = isAdminUser(user) ? credentialTemplates : credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
+  const visibleClasses = isAdminUser(user) ? classes : classes.filter(c => Number(c.teacherId) === Number(user.id));
 
   res.render('admin', {
     user,
-    badges: teacherBadges,
-    tests: teacherTests,
+    badges: visibleBadges,
+    tests: visibleTests,
     issuedBadges: issuedCredentials,
     users,
-    studentKeys,
+    classes: visibleClasses,
+    studentKeys: visibleClasses,
     classEnrollments,
     events
   });
 });
 
-// ==================== BADGE / CREDENTIAL CREATION ====================
+// ==================== CLASSES ====================
+app.post('/generate-student-key', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  const className = String(req.body.className || '').trim();
+
+  if (!className) {
+    return res.status(400).send('Class name is required.');
+  }
+
+  const { key, normalized } = generateClassKey();
+
+  const classRecord = {
+    id: nextId(classes),
+    teacherId: user.id,
+    teacherName: user.name,
+    className,
+    key,
+    normalizedKey: normalized,
+    active: true,
+    assignedTestIds: [],
+    announcements: [],
+    usageCount: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  const optionalTestId = req.body.testId ? parseInt(req.body.testId) : null;
+
+  if (optionalTestId) {
+    const test = teacherOwnsTest(user.id, optionalTestId);
+
+    if (test) {
+      classRecord.assignedTestIds.push(test.id);
+      test.requiresKey = true;
+    }
+  }
+
+  classes.push(classRecord);
+  saveDB();
+
+  res.send(makePage(
+    'Class Key Generated',
+    `Share this key with your students. They will join <strong>${escapeHtml(className)}</strong>. You can assign assessments and announcements to this class later. <code>${escapeHtml(key)}</code>`,
+    [
+      { label: 'Back to Teacher Dashboard', href: '/teacher-dashboard#classes', primary: true }
+    ]
+  ));
+});
+
+app.post('/join-class', requireStudent, async (req, res) => {
+  const user = currentUser(req);
+  const inputKey = normalizeAccessKey(req.body.studentKey);
+
+  const classRecord = classes.find(c =>
+    c.normalizedKey === inputKey &&
+    c.active !== false
+  );
+
+  if (!classRecord) {
+    return res.status(404).send(makePage(
+      'Invalid Class Key',
+      'That class key does not exist or is no longer active. Check the key from your teacher and try again.',
+      [
+        { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
+      ]
+    ));
+  }
+
+  const existing = classEnrollments.find(e =>
+    Number(e.userId) === Number(user.id) &&
+    Number(e.classId) === Number(classRecord.id)
+  );
+
+  if (!existing) {
+    classEnrollments.push({
+      id: nextId(classEnrollments),
+      userId: user.id,
+      studentName: user.name,
+      studentEmail: user.email,
+      teacherId: classRecord.teacherId,
+      classId: classRecord.id,
+      key: classRecord.key,
+      className: classRecord.className,
+      joinedAt: new Date().toISOString()
+    });
+
+    classRecord.usageCount = Number(classRecord.usageCount || 0) + 1;
+    saveDB();
+
+    await sendEmail(
+      user.email,
+      `Joined ${classRecord.className}`,
+      `<p>Hello ${escapeHtml(user.name)}, you joined <strong>${escapeHtml(classRecord.className)}</strong>.</p>`
+    );
+  }
+
+  res.send(makePage(
+    'Class Joined',
+    `You are now enrolled in <strong>${escapeHtml(classRecord.className)}</strong>. Any assessments or announcements assigned by your teacher will appear on your dashboard.`,
+    [
+      { label: 'Back to Dashboard', href: '/student-dashboard', primary: true }
+    ]
+  ));
+});
+
+app.post('/assign-class-test', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+
+  const classId = parseInt(req.body.classId);
+  const testId = parseInt(req.body.testId);
+
+  const classRecord = teacherOwnsClass(user.id, classId);
+  const test = teacherOwnsTest(user.id, testId);
+
+  if (!classRecord || !test) {
+    return res.status(403).send('Invalid class or assessment.');
+  }
+
+  if (!Array.isArray(classRecord.assignedTestIds)) {
+    classRecord.assignedTestIds = [];
+  }
+
+  if (!classRecord.assignedTestIds.map(Number).includes(Number(test.id))) {
+    classRecord.assignedTestIds.push(test.id);
+  }
+
+  test.requiresKey = true;
+
+  if (!Array.isArray(test.classIds)) {
+    test.classIds = [];
+  }
+
+  if (!test.classIds.map(Number).includes(Number(classRecord.id))) {
+    test.classIds.push(classRecord.id);
+  }
+
+  saveDB();
+  res.redirect('/teacher-dashboard#classes');
+});
+
+app.post('/unassign-class-test', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+
+  const classId = parseInt(req.body.classId);
+  const testId = parseInt(req.body.testId);
+
+  const classRecord = teacherOwnsClass(user.id, classId);
+
+  if (!classRecord) {
+    return res.status(403).send('Invalid class.');
+  }
+
+  classRecord.assignedTestIds = (classRecord.assignedTestIds || [])
+    .filter(id => Number(id) !== Number(testId));
+
+  const test = teacherOwnsTest(user.id, testId);
+
+  if (test && Array.isArray(test.classIds)) {
+    test.classIds = test.classIds.filter(id => Number(id) !== Number(classId));
+  }
+
+  const stillAssignedSomewhere = classes.some(c =>
+    Array.isArray(c.assignedTestIds) &&
+    c.assignedTestIds.map(Number).includes(Number(testId))
+  );
+
+  if (test && !stillAssignedSomewhere) {
+    test.requiresKey = false;
+  }
+
+  saveDB();
+  res.redirect('/teacher-dashboard#classes');
+});
+
+app.post('/class-announcement', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+
+  const classId = parseInt(req.body.classId);
+  const classRecord = teacherOwnsClass(user.id, classId);
+
+  if (!classRecord) {
+    return res.status(403).send('Invalid class.');
+  }
+
+  if (!Array.isArray(classRecord.announcements)) {
+    classRecord.announcements = [];
+  }
+
+  classRecord.announcements.push({
+    id: nextId(classRecord.announcements),
+    title: req.body.title || 'Class Announcement',
+    description: req.body.description || '',
+    specialBadgeId: req.body.specialBadgeId ? parseInt(req.body.specialBadgeId) : null,
+    createdBy: user.name,
+    createdAt: new Date().toISOString()
+  });
+
+  saveDB();
+  res.redirect('/teacher-dashboard#classes');
+});
+
+app.get('/api/student-keys', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+
+  const visibleClasses = isAdminUser(user)
+    ? classes
+    : classes.filter(c => Number(c.teacherId) === Number(user.id));
+
+  res.json({
+    ok: true,
+    classes: visibleClasses,
+    keys: visibleClasses
+  });
+});
+
+// ==================== CREDENTIALS ====================
 function createCredentialTemplate(req, res) {
   const user = currentUser(req);
 
   const assessmentId = req.body.assessmentId
     ? parseInt(req.body.assessmentId)
     : null;
+
+  if (assessmentId && !teacherOwnsTest(user.id, assessmentId)) {
+    return res.status(403).send('You can only link credentials to your own assessments.');
+  }
 
   const templateId = nextId(credentialTemplates, 'templateId');
   const logos = collectLogoUrls(req.body.logoUrl);
@@ -524,14 +781,16 @@ function createCredentialTemplate(req, res) {
     teacherId: user.id,
     type: req.body.type || 'badge',
     assessmentId,
-    title: req.body.title || 'Skill Badge',
-    designColor: req.body.designColor || '#6366f1',
+    title: req.body.title || 'Skill Credential',
+    designColor: req.body.designColor || '#2563eb',
     description: req.body.description || '',
     signature: req.body.signature || user.name,
     badgeIcon: req.body.badgeIcon || '',
+    badgeShape: req.body.badgeShape || '',
+    templateStyle: req.body.templateStyle || '',
     logos,
     logoUrl: logos[0] || '',
-    useQR: req.body.useQR !== 'false',
+    useQR: true,
     createdBy: user.name,
     createdAt: new Date().toISOString()
   };
@@ -557,15 +816,41 @@ app.post('/create-credential', requireTeacher, createCredentialTemplate);
 app.post('/post-event', requireTeacher, (req, res) => {
   const user = currentUser(req);
 
+  const classId = req.body.classId ? parseInt(req.body.classId) : null;
+
+  if (classId) {
+    const classRecord = teacherOwnsClass(user.id, classId);
+
+    if (!classRecord) {
+      return res.status(403).send('Invalid class.');
+    }
+
+    if (!Array.isArray(classRecord.announcements)) {
+      classRecord.announcements = [];
+    }
+
+    classRecord.announcements.push({
+      id: nextId(classRecord.announcements),
+      title: req.body.title || 'Class Announcement',
+      description: req.body.description || '',
+      specialBadgeId: req.body.specialBadgeId ? parseInt(req.body.specialBadgeId) : null,
+      createdBy: user.name,
+      createdAt: new Date().toISOString()
+    });
+
+    saveDB();
+    return res.redirect('/teacher-dashboard#classes');
+  }
+
   const specialBadgeId = req.body.specialBadgeId
     ? parseInt(req.body.specialBadgeId)
     : null;
 
-  if (specialBadgeId && !teacherOwnsBadge(user.id, specialBadgeId)) {
-    return res.status(403).send('You can only attach your own badges.');
+  if (specialBadgeId && !teacherOwnsCredential(user.id, specialBadgeId)) {
+    return res.status(403).send('You can only attach your own credentials.');
   }
 
-  const newEvent = {
+  events.push({
     id: nextId(events),
     teacherId: user.id,
     title: req.body.title || 'Special Event',
@@ -574,15 +859,26 @@ app.post('/post-event', requireTeacher, (req, res) => {
     date: new Date().toLocaleDateString(),
     createdBy: user.name,
     createdAt: new Date().toISOString()
-  };
+  });
 
-  events.push(newEvent);
   saveDB();
-
   res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard');
 });
 
-// ==================== TEST CREATION ====================
+// ==================== ASSESSMENT CREATION ====================
+app.get('/assessment', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+
+  const teacherTemplates = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
+  const teacherClasses = classes.filter(c => Number(c.teacherId) === Number(user.id));
+
+  res.render('assessment', {
+    templates: teacherTemplates,
+    classes: teacherClasses,
+    user
+  });
+});
+
 function createTestFromBody(req, res) {
   const user = currentUser(req);
   const questions = parseQuestions(req.body.questions);
@@ -595,10 +891,16 @@ function createTestFromBody(req, res) {
   let attachedCredentialTemplateId = null;
 
   if (requestedTemplateId) {
-    const ownedTemplate = teacherOwnsBadge(user.id, requestedTemplateId);
-    if (ownedTemplate) attachedCredentialTemplateId = ownedTemplate.templateId;
+    const ownedTemplate = credentialTemplates.find(t =>
+      Number(t.templateId) === Number(requestedTemplateId) &&
+      Number(t.teacherId) === Number(user.id)
+    );
+
+    if (ownedTemplate) {
+      attachedCredentialTemplateId = ownedTemplate.templateId;
+    }
   } else {
-    const latest = latestTeacherBadge(user.id);
+    const latest = latestTeacherCredential(user.id);
     if (latest) attachedCredentialTemplateId = latest.templateId;
   }
 
@@ -621,7 +923,7 @@ function createTestFromBody(req, res) {
     teacherTimezone: req.body.teacherTimezone || 'Asia/Dubai',
 
     requiresKey: false,
-    classKeyIds: [],
+    classIds: [],
 
     showResultsAfterReview: req.body.showResultsAfterReview === 'true',
     networkLoggingEnabled: true,
@@ -630,167 +932,31 @@ function createTestFromBody(req, res) {
   };
 
   tests.push(newTest);
-  saveDB();
 
-  if (newTest.examStartTime && !newTest.isOpen) {
-    console.log(`[SCHEDULED] Exam "${newTest.title}" starts at ${newTest.examStartTime} (${newTest.teacherTimezone})`);
+  const classId = req.body.classId ? parseInt(req.body.classId) : null;
+
+  if (classId) {
+    const classRecord = teacherOwnsClass(user.id, classId);
+
+    if (classRecord) {
+      if (!Array.isArray(classRecord.assignedTestIds)) classRecord.assignedTestIds = [];
+
+      if (!classRecord.assignedTestIds.map(Number).includes(Number(newTest.id))) {
+        classRecord.assignedTestIds.push(newTest.id);
+      }
+
+      newTest.requiresKey = true;
+      newTest.classIds = [classRecord.id];
+    }
   }
+
+  saveDB();
 
   res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard');
 }
 
-app.get('/assessment', requireTeacher, (req, res) => {
-  const user = currentUser(req);
-  const teacherTemplates = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
-
-  res.render('assessment', {
-    templates: teacherTemplates,
-    user
-  });
-});
-
 app.post('/assessment', requireTeacher, createTestFromBody);
 app.post('/create-test', requireTeacher, createTestFromBody);
-
-// ==================== STUDENT / CLASS KEYS ====================
-app.post('/generate-student-key', requireTeacher, (req, res) => {
-  const user = currentUser(req);
-
-  const className = String(req.body.className || '').trim();
-  const testId = parseInt(req.body.testId);
-
-  if (!className) {
-    return res.status(400).send('Class name is required.');
-  }
-
-  const test = teacherOwnsTest(user.id, testId);
-  if (!test) {
-    return res.status(403).send('Invalid test selected.');
-  }
-
-  const { key, normalized } = generateStudentAccessKey();
-
-  const keyRecord = {
-    id: nextId(studentKeys),
-    key,
-    normalizedKey: normalized,
-    teacherId: user.id,
-    teacherName: user.name,
-    className,
-    testId: test.id,
-    testTitle: test.title,
-    active: true,
-    usageCount: 0,
-    maxUses: null,
-    createdAt: new Date().toISOString()
-  };
-
-  studentKeys.push(keyRecord);
-
-  test.requiresKey = true;
-  if (!Array.isArray(test.classKeyIds)) test.classKeyIds = [];
-  test.classKeyIds.push(keyRecord.id);
-
-  if (!test.attachedCredentialTemplateId) {
-    const latest = latestTeacherBadge(user.id);
-    if (latest) test.attachedCredentialTemplateId = latest.templateId;
-  }
-
-  saveDB();
-
-  res.send(makeConfirmationPage(
-    'Student Key Generated',
-    `Share this key with your students. When they paste it in their dashboard, they will be enrolled into <strong>${escapeHtml(className)}</strong> and assigned <strong>${escapeHtml(test.title)}</strong>. <code>${escapeHtml(key)}</code>`,
-    [
-      { label: 'Back to Teacher Dashboard', href: '/teacher-dashboard', primary: true },
-      { label: 'Open Test', href: `/take-test/${test.id}`, primary: false }
-    ]
-  ));
-});
-
-app.post('/join-class', requireStudent, async (req, res) => {
-  const user = currentUser(req);
-  const inputKey = normalizeAccessKey(req.body.studentKey);
-
-  const keyRecord = studentKeys.find(k =>
-    k.normalizedKey === inputKey &&
-    k.active !== false
-  );
-
-  if (!keyRecord) {
-    return res.status(404).send(makeConfirmationPage(
-      'Invalid Student Key',
-      'That key does not exist or is no longer active. Check the key from your teacher and try again.',
-      [
-        { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
-      ]
-    ));
-  }
-
-  const test = tests.find(t => Number(t.id) === Number(keyRecord.testId));
-  if (!test) {
-    return res.status(404).send(makeConfirmationPage(
-      'Assigned Test Missing',
-      'This key exists, but the assessment connected to it could not be found.',
-      [
-        { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
-      ]
-    ));
-  }
-
-  const existing = classEnrollments.find(e =>
-    Number(e.userId) === Number(user.id) &&
-    Number(e.studentKeyId) === Number(keyRecord.id)
-  );
-
-  if (!existing) {
-    classEnrollments.push({
-      id: nextId(classEnrollments),
-      userId: user.id,
-      studentName: user.name,
-      studentEmail: user.email,
-      teacherId: keyRecord.teacherId,
-      studentKeyId: keyRecord.id,
-      key: keyRecord.key,
-      className: keyRecord.className,
-      testId: keyRecord.testId,
-      testTitle: keyRecord.testTitle,
-      joinedAt: new Date().toISOString()
-    });
-
-    keyRecord.usageCount = Number(keyRecord.usageCount || 0) + 1;
-    saveDB();
-
-    await sendEmail(
-      user.email,
-      `Joined ${keyRecord.className}`,
-      `<p>Hello ${escapeHtml(user.name)}, you joined <strong>${escapeHtml(keyRecord.className)}</strong>.</p><p>Your assigned test is: <strong>${escapeHtml(test.title)}</strong>.</p>`
-    );
-  }
-
-  res.send(makeConfirmationPage(
-    'Class Joined',
-    `You are now enrolled in <strong>${escapeHtml(keyRecord.className)}</strong>. Your assigned assessment is <strong>${escapeHtml(test.title)}</strong>.`,
-    [
-      { label: 'Start Assessment', href: `/take-test/${test.id}`, primary: true },
-      { label: 'Back to Dashboard', href: '/student-dashboard', primary: false }
-    ]
-  ));
-});
-
-// Optional JSON route so teacher/admin can inspect generated keys.
-app.get('/api/student-keys', requireTeacher, (req, res) => {
-  const user = currentUser(req);
-
-  const visibleKeys = isAdminUser(user)
-    ? studentKeys
-    : studentKeys.filter(k => Number(k.teacherId) === Number(user.id));
-
-  res.json({
-    ok: true,
-    keys: visibleKeys
-  });
-});
 
 // ==================== TAKE TEST ====================
 app.get('/take-test/:id', requireStudent, (req, res) => {
@@ -800,9 +966,9 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
   if (!test) return res.redirect('/student-dashboard');
 
   if (!studentHasAccessToTest(user.id, test)) {
-    return res.status(403).send(makeConfirmationPage(
-      'Access Key Required',
-      'This assessment is locked to a class key. Paste your student access key from your teacher in the Student Dashboard first.',
+    return res.status(403).send(makePage(
+      'Class Access Required',
+      'This assessment belongs to a class. Join the class using your teacher key first.',
       [
         { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
       ]
@@ -813,7 +979,7 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
     const now = new Date().getTime();
 
     if (test.examStartTime && now < new Date(test.examStartTime).getTime()) {
-      return res.status(403).send(makeConfirmationPage(
+      return res.status(403).send(makePage(
         'Exam Not Started',
         'Please return to your dashboard and wait for the start time.',
         [
@@ -823,7 +989,7 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
     }
 
     if (test.examEndTime && now > new Date(test.examEndTime).getTime()) {
-      return res.status(403).send(makeConfirmationPage(
+      return res.status(403).send(makePage(
         'Exam Window Closed',
         'The time window for this assessment has passed.',
         [
@@ -837,10 +1003,7 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
   req.session.currentTestId = test.id;
   req.session.examStartTime = Date.now();
 
-  res.render('take-test', {
-    user,
-    test
-  });
+  res.render('take-test', { user, test });
 });
 
 // ==================== SUBMIT TEST ====================
@@ -883,11 +1046,10 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
     if (template && !alreadyIssued) {
       const issuedId = nextId(issuedCredentials, 'issuedId');
       const verifyHash = generateCredentialHash(user.id, testId);
-      const verifyRoute = `/verify/${verifyHash}`;
-      const shareLink = absoluteUrl(req, verifyRoute);
+      const shareLink = absoluteUrl(req, `/verify/${verifyHash}`);
       const qrCode = await generateQR(shareLink);
 
-      const newCred = {
+      issuedCredentials.push({
         ...template,
         id: issuedId,
         issuedId,
@@ -905,9 +1067,7 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
         status: 'passed',
         score,
         submittedAt: new Date().toISOString()
-      };
-
-      issuedCredentials.push(newCred);
+      });
 
       await sendEmail(user.email, `Your Results - ${test.title}`, `
         <h2>Congratulations ${escapeHtml(user.name)}!</h2>
@@ -933,11 +1093,10 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
   req.session.currentTestId = null;
 
   saveDB();
-
   res.redirect('/student-dashboard');
 });
 
-// ==================== VERIFICATION & LOGS ====================
+// ==================== VERIFY / LOGS ====================
 app.get('/verify/:hash', (req, res) => {
   const cred = issuedCredentials.find(c =>
     c.verifyHash === req.params.hash ||
@@ -962,20 +1121,18 @@ app.get('/network-logs/:testId', requireTeacher, (req, res) => {
     return res.status(403).json({ error: 'Unauthorized access to these logs.' });
   }
 
-  const logs = networkLogs.filter(l => Number(l.testId) === Number(req.params.testId));
-  res.json(logs);
+  res.json(networkLogs.filter(l => Number(l.testId) === Number(req.params.testId)));
 });
 
-// ==================== BASIC API HEALTH ====================
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     app: 'Credity',
     users: users.length,
-    badges: credentialTemplates.length,
+    credentials: credentialTemplates.length,
     issuedCredentials: issuedCredentials.length,
     tests: tests.length,
-    studentKeys: studentKeys.length,
+    classes: classes.length,
     enrollments: classEnrollments.length
   });
 });
