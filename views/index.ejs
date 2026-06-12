@@ -8,54 +8,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     body { font-family: 'Inter', system_ui, sans-serif; }
-    
-    .blue-cloudy-bg { 
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%); 
-      position: relative; overflow: hidden; 
-    }
-    .blue-cloudy-bg::before { 
-      content: ''; position: absolute; inset: 0; 
-      background: radial-gradient(circle at 20% 30%, rgba(147,197,253,0.15) 0%, transparent 50%), 
-                  radial-gradient(circle at 80% 70%, rgba(147,197,253,0.12) 0%, transparent 60%); 
-      animation: cloudDrift 25s ease infinite; 
-    }
+    .blue-cloudy-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%); position: relative; overflow: hidden; }
+    .blue-cloudy-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 30%, rgba(147,197,253,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(147,197,253,0.12) 0%, transparent 60%); animation: cloudDrift 25s ease infinite; }
     @keyframes cloudDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-10px)} }
-
     .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.15); }
-    .premium-card { transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
-    .premium-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4); }
     .modern-input { background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.2); }
     .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
     .tab-active { background: rgba(255,255,255,0.1); border-bottom: 3px solid #3b82f6; }
     .cloud-text { background: linear-gradient(90deg,#bae6fd,#dbeafe,#bae6fd); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation: cloudShimmer 3s ease infinite; }
     .spotless-btn { transition: all 0.3s cubic-bezier(0.23,1.0,0.32,1); }
     .spotless-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3); }
-
-    /* Clean Professional Light Mode */
     .light-mode { background: #f8fafc; color: #0f172a; }
-    .light-mode .glass { 
-      background: white; 
-      border: 1px solid #e2e8f0; 
-      color: #0f172a; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .light-mode .blue-cloudy-bg { 
-      background: linear-gradient(135deg, #f1f5f9 0%, #e0f2fe 50%, #bae6fd 100%); 
-    }
-    .light-mode .modern-input { 
-      background: white; 
-      border: 1px solid #cbd5e1; 
-      color: #0f172a; 
-    }
-    .light-mode .tab-active { 
-      background: #e0f2fe; 
-      border-bottom-color: #0284c8; 
-    }
-    .light-mode .cloud-text {
-      background: linear-gradient(90deg, #0e7490, #0369a1, #0e7490);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    .light-mode .glass { background: white; border: 1px solid #e2e8f0; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .light-mode .blue-cloudy-bg { background: linear-gradient(135deg, #f1f5f9 0%, #e0f2fe 50%, #bae6fd 100%); }
+    .light-mode .modern-input { background: white; border: 1px solid #cbd5e1; color: #0f172a; }
+    .light-mode .tab-active { background: #e0f2fe; border-bottom-color: #0284c8; }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
@@ -129,7 +96,7 @@
       </div>
     </div>
 
-    <!-- Teacher/Admin Login -->
+    <!-- Teacher Login -->
     <div id="teacher-form" class="max-w-md mx-auto hidden">
       <div class="glass p-8 rounded-3xl">
         <h3 class="font-semibold text-2xl mb-6">Teacher / Admin Login</h3>
@@ -143,7 +110,7 @@
         </form>
         
         <div class="mt-4 text-center">
-          <div onclick="promptAdminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block font-medium">Admin Access</div>
+          <div onclick="showAdminModal()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block font-medium">Admin Access</div>
         </div>
         
         <div class="mt-5 text-center text-xs text-white/60">New teacher? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
@@ -181,6 +148,33 @@
         </div>
         <button type="submit" class="mt-6 w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl">Create account</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Clean Admin Login Modal -->
+  <div id="admin-modal" onclick="if (event.target.id === 'admin-modal') hideAdminModal()" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[100]">
+    <div onclick="event.stopImmediatePropagation()" class="glass max-w-sm w-full mx-4 p-8 rounded-3xl">
+      <h3 class="text-2xl font-semibold mb-1">Admin Login</h3>
+      <p class="text-white/60 text-sm mb-6">Enter admin credentials</p>
+      
+      <form action="/login" method="POST">
+        <input type="hidden" name="role" value="teacher">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs text-white/60 block mb-1">USERNAME</label>
+            <input type="text" name="email" value="admin" class="modern-input w-full px-4 py-3 rounded-2xl text-sm" required>
+          </div>
+          <div>
+            <label class="text-xs text-white/60 block mb-1">PASSWORD</label>
+            <input type="password" name="password" placeholder="Enter password" class="modern-input w-full px-4 py-3 rounded-2xl text-sm" required>
+          </div>
+        </div>
+        <button type="submit" class="mt-6 w-full py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl hover:bg-white/90">Login as Admin</button>
+      </form>
+      
+      <div class="mt-4 text-center">
+        <div onclick="hideAdminModal()" class="text-xs text-white/50 cursor-pointer hover:text-white/80">Cancel</div>
+      </div>
     </div>
   </div>
 
@@ -223,38 +217,14 @@
       document.getElementById('signup-modal').classList.remove('flex');
     }
     
-    // New Admin Prompt Function
-    function promptAdminLogin() {
-      const username = prompt("Enter admin username:");
-      if (!username) return;
-      
-      const password = prompt("Enter admin password:");
-      if (!password) return;
-      
-      if (username === 'admin' && password === 'monterysasd') {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/login';
-        
-        const fields = [
-          { name: 'email', value: username },
-          { name: 'password', value: password },
-          { name: 'role', value: 'teacher' }
-        ];
-        
-        fields.forEach(field => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = field.name;
-          input.value = field.value;
-          form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        alert("Invalid admin credentials");
-      }
+    function showAdminModal() {
+      document.getElementById('admin-modal').classList.remove('hidden');
+      document.getElementById('admin-modal').classList.add('flex');
+    }
+    
+    function hideAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+      document.getElementById('admin-modal').classList.remove('flex');
     }
     
     window.onload = function() {
