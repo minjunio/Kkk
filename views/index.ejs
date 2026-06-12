@@ -87,7 +87,7 @@
         <form action="/login" method="POST">
           <input type="hidden" name="role" value="student">
           <div class="space-y-4">
-            <input type="text" name="email" placeholder="Username or email" value="student@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="email" name="email" placeholder="Email address" value="student@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
             <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           </div>
           <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in</button>
@@ -96,21 +96,23 @@
       </div>
     </div>
 
-    <!-- Teacher Login -->
+    <!-- Teacher/Admin Login -->
     <div id="teacher-form" class="max-w-md mx-auto hidden">
       <div class="glass p-8 rounded-3xl">
         <h3 class="font-semibold text-2xl mb-6">Teacher / Admin Login</h3>
         <form action="/login" method="POST">
           <input type="hidden" name="role" value="teacher">
           <div class="space-y-4">
-            <input type="text" name="email" placeholder="Username or email" value="teacher@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="email" name="email" placeholder="Email address" value="teacher@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
             <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           </div>
           <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in</button>
         </form>
+        
         <div class="mt-4 text-center">
-          <div onclick="adminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block">Admin access</div>
+          <div onclick="adminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block font-medium">Admin Quick Access</div>
         </div>
+        
         <div class="mt-5 text-center text-xs text-white/60">New teacher? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
       </div>
     </div>
@@ -138,7 +140,7 @@
       <form action="/signup" method="POST">
         <div class="space-y-4">
           <input type="text" name="name" placeholder="Full name" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
-          <input type="text" name="email" placeholder="Username or email" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+          <input type="email" name="email" placeholder="Email address" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           <input type="password" name="password" placeholder="Password" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           <select name="role" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm">
             <option value="student">Student</option>
@@ -174,17 +176,31 @@
       document.getElementById('signup-modal').classList.add('hidden');
       document.getElementById('signup-modal').classList.remove('flex');
     }
+    
+    // Reliable Admin Login Function
     function adminLogin() {
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/login';
-      const email = document.createElement('input'); email.name = 'email'; email.value = 'admin';
-      const pass = document.createElement('input'); pass.name = 'password'; pass.value = 'monterysasd';
-      const role = document.createElement('input'); role.name = 'role'; role.value = 'teacher';
-      form.append(email, pass, role);
-      document.body.append(form);
+      
+      const fields = [
+        { name: 'email', value: 'admin' },
+        { name: 'password', value: 'monterysasd' },
+        { name: 'role', value: 'teacher' }
+      ];
+      
+      fields.forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field.name;
+        input.value = field.value;
+        form.appendChild(input);
+      });
+      
+      document.body.appendChild(form);
       form.submit();
     }
+    
     window.onload = function() {
       document.getElementById('student-form').classList.remove('hidden');
       document.getElementById('teacher-form').classList.add('hidden');
