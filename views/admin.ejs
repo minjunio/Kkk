@@ -12,24 +12,19 @@
     .section-header { font-size: 1.5rem; font-weight: 700; letter-spacing: -.025em; }
     .modern-input { background: white; border: 1px solid #cbd5e1; }
     .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
-    .logo-option { transition: all 0.2s ease; cursor: pointer; border: 2px solid transparent; }
-    .logo-option:hover { transform: scale(1.05); }
-    .logo-option.selected { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     .certificate-preview {
       background: white;
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
       font-family: 'Georgia', serif;
+      border: 14px solid #1e40af;
       transition: all 0.3s ease;
     }
     .template-btn { transition: all 0.2s ease; }
     .template-btn:hover { transform: translateY(-2px); }
-    @media (max-width: 768px) {
-      .certificate-preview { min-height: 260px; font-size: 0.85rem; }
-    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-  <!-- Top Nav -->
+  <!-- Top Navigation -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-x-3">
@@ -57,24 +52,32 @@
 
     <!-- Certificate Editor -->
     <div id="certificates-tab" class="tab-content">
-      <div class="grid lg:grid-cols-2 gap-8">
+      <div class="grid lg:grid-cols-5 gap-8">
         
-        <!-- Form -->
-        <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200">
+        <!-- Controls -->
+        <div class="lg:col-span-3 glass p-6 sm:p-8 rounded-3xl border border-slate-200">
           <div class="section-header mb-6">Certificate Editor</div>
 
           <form action="/create-badge" method="POST">
             <div class="space-y-5">
-              <div>
-                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">TITLE</label>
-                <input type="text" id="cert-title" name="title" value="Certificate of Achievement" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium" required>
+              <!-- Title + Name -->
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">TITLE</label>
+                  <input type="text" id="cert-title" name="title" value="Certificate of Achievement" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium" required>
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">RECIPIENT NAME</label>
+                  <input type="text" id="cert-name" value="Alex Rivera" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium">
+                </div>
               </div>
 
               <div>
                 <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">DESCRIPTION</label>
-                <textarea id="cert-desc" name="description" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl h-20">For outstanding academic performance and dedication.</textarea>
+                <textarea id="cert-desc" name="description" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl h-20">has successfully completed the Advanced Program with distinction.</textarea>
               </div>
 
+              <!-- Colors -->
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">PRIMARY COLOR</label>
@@ -90,48 +93,87 @@
               <div>
                 <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-3">TEMPLATES</label>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  <button type="button" onclick="applyTemplate('classic')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Classic</button>
-                  <button type="button" onclick="applyTemplate('modern')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Modern</button>
-                  <button type="button" onclick="applyTemplate('academic')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Academic</button>
-                  <button type="button" onclick="applyTemplate('elegant')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Elegant</button>
-                  <button type="button" onclick="applyTemplate('minimal')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Minimal</button>
-                  <button type="button" onclick="applyTemplate('prestigious')" class="template-btn px-3 py-2 text-sm border border-slate-300 rounded-2xl">Prestigious</button>
+                  <button type="button" onclick="applyTemplate('classic')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Classic Academic</button>
+                  <button type="button" onclick="applyTemplate('modern')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Modern Tech</button>
+                  <button type="button" onclick="applyTemplate('elegant')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Elegant Gold</button>
+                  <button type="button" onclick="applyTemplate('minimal')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Minimal Clean</button>
+                  <button type="button" onclick="applyTemplate('prestigious')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Prestigious</button>
+                  <button type="button" onclick="applyTemplate('corporate')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Corporate</button>
                 </div>
               </div>
 
               <!-- Logos -->
               <div>
-                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-3">CHOOSE LOGO (90+ options)</label>
-                <div class="max-h-52 overflow-y-auto border border-slate-200 rounded-2xl p-4 mb-3">
-                  <div class="grid grid-cols-4 sm:grid-cols-6 gap-3" id="logo-grid"></div>
+                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">LOGOS (Add multiple)</label>
+                
+                <div class="flex gap-2 mb-3">
+                  <select id="logo-select" class="modern-input flex-1 px-4 py-3 rounded-2xl text-sm">
+                    <option value="https://via.placeholder.com/100x100/1e40af/ffffff?text=UNI">University Logo</option>
+                    <option value="https://via.placeholder.com/100x100/0f172a/ffffff?text=TECH">Tech Company</option>
+                    <option value="https://via.placeholder.com/100x100/166534/ffffff?text=SCI">Science Institute</option>
+                    <option value="https://via.placeholder.com/100x100/854d0e/ffffff?text=BIZ">Business School</option>
+                    <option value="https://via.placeholder.com/100x100/9f1239/ffffff?text=HEALTH">Health Academy</option>
+                    <option value="https://via.placeholder.com/100x100/1e3a8a/ffffff?text=ENG">Engineering</option>
+                    <option value="https://via.placeholder.com/100x100/334155/ffffff?text=LAW">Law Faculty</option>
+                    <option value="https://via.placeholder.com/100x100/0f766e/ffffff?text=DESIGN">Design School</option>
+                  </select>
+                  <button type="button" onclick="addSelectedLogo()" class="px-5 py-3 bg-blue-600 text-white text-sm rounded-2xl">Add</button>
                 </div>
+
+                <!-- Selected Logos -->
+                <div id="selected-logos" class="flex flex-wrap gap-2 min-h-[50px] mb-3"></div>
+
                 <div class="flex gap-2">
-                  <input type="text" id="custom-logo" placeholder="Custom logo URL" class="modern-input flex-1 px-4 py-2 rounded-2xl text-sm">
-                  <button type="button" onclick="addCustomLogo()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-2xl">Add</button>
+                  <input type="text" id="custom-logo-url" placeholder="Custom logo URL" class="modern-input flex-1 px-4 py-2 rounded-2xl text-sm">
+                  <button type="button" onclick="addCustomLogo()" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-2xl">Add Custom</button>
+                </div>
+              </div>
+
+              <!-- Signature + Expiry -->
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">SIGNATURE NAME</label>
+                  <input type="text" id="signature-name" value="Dr. Sarah Chen" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
+                </div>
+                <div>
+                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">EXPIRATION DATE</label>
+                  <input type="date" id="expiry-date" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
                 </div>
               </div>
             </div>
 
-            <input type="hidden" id="selected-logo" name="logoUrl" value="https://via.placeholder.com/100x100/1e40af/ffffff?text=LOGO">
-            <button type="submit" class="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-3xl">Create Certificate</button>
+            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-3xl text-lg">Create & Issue Certificate</button>
           </form>
         </div>
 
         <!-- Live Preview -->
-        <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200">
-          <div class="section-header mb-4">Live Preview</div>
-          <div id="certificate-preview" 
-               class="certificate-preview mx-auto w-full max-w-[380px] aspect-[1.414] p-6 sm:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden border-[12px]"
-               style="border-color: #1e40af; background: white;">
-            <div id="preview-content">
-              <div class="text-xl sm:text-2xl font-bold mb-1" id="preview-title">Certificate of Achievement</div>
-              <div class="text-xs sm:text-sm mb-5 text-slate-600" id="preview-desc">For outstanding academic performance and dedication.</div>
-              <div class="w-14 h-14 mx-auto mb-5" id="preview-logo">
-                <img src="https://via.placeholder.com/100x100/1e40af/ffffff?text=LOGO" class="w-full h-full rounded-full" alt="Logo">
+        <div class="lg:col-span-2">
+          <div class="sticky top-6">
+            <div class="section-header mb-4">Live Preview</div>
+            <div id="certificate-preview" 
+                 class="certificate-preview mx-auto w-full max-w-[420px] aspect-[1.414] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden border-[14px]"
+                 style="border-color: #1e40af; background: white;">
+              
+              <div class="text-center">
+                <div class="text-sm tracking-[3px] text-slate-500 mb-1">THIS IS TO CERTIFY THAT</div>
+                <div class="text-2xl font-bold mb-4" id="preview-name">Alex Rivera</div>
+                
+                <div class="text-base leading-relaxed mb-6 px-4" id="preview-desc">
+                  has successfully completed the Advanced Program with distinction.
+                </div>
+
+                <div id="preview-logos" class="flex justify-center gap-4 mb-8 min-h-[50px]"></div>
+
+                <div class="text-sm">on this day</div>
+                <div class="font-semibold mt-0.5" id="preview-date"></div>
+
+                <div class="mt-10 pt-4 border-t border-slate-300 w-48 mx-auto">
+                  <div class="text-sm font-medium" id="preview-signature">Dr. Sarah Chen</div>
+                  <div class="text-xs text-slate-500">Director of Academics</div>
+                </div>
+
+                <div class="absolute bottom-4 right-4 text-[10px] text-slate-400" id="preview-expiry"></div>
               </div>
-              <div class="text-xs">Presented to</div>
-              <div class="text-lg font-semibold my-0.5">Student Name</div>
-              <div class="text-xs text-slate-500">on this day</div>
             </div>
           </div>
         </div>
@@ -140,25 +182,17 @@
 
     <!-- Badge Editor -->
     <div id="badges-tab" class="tab-content hidden">
-      <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200">
+      <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200 max-w-2xl">
         <div class="section-header mb-6">Badge Editor</div>
         <form action="/create-badge" method="POST">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-5">
-              <input type="text" name="title" placeholder="Badge Title" class="modern-input w-full px-4 py-3 rounded-2xl" required>
-              <textarea name="description" placeholder="Description" class="modern-input w-full px-4 py-3 rounded-2xl h-24"></textarea>
-              <select name="type" class="modern-input w-full px-4 py-3 rounded-2xl">
-                <option value="badge">Standard Badge</option>
-                <option value="premium">Premium Badge</option>
-                <option value="gold">Gold Badge</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-xs font-semibold text-slate-600 block mb-3">CHOOSE LOGO</label>
-              <div class="max-h-64 overflow-y-auto border border-slate-200 rounded-2xl p-4">
-                <div class="grid grid-cols-4 sm:grid-cols-5 gap-3" id="badge-logo-grid"></div>
-              </div>
-            </div>
+          <div class="space-y-5">
+            <input type="text" name="title" placeholder="Badge Title" class="modern-input w-full px-4 py-3 rounded-2xl" required>
+            <textarea name="description" placeholder="Description" class="modern-input w-full px-4 py-3 rounded-2xl h-24"></textarea>
+            <select name="type" class="modern-input w-full px-4 py-3 rounded-2xl">
+              <option value="badge">Standard Badge</option>
+              <option value="premium">Premium Badge</option>
+              <option value="gold">Gold Badge</option>
+            </select>
           </div>
           <button type="submit" class="mt-6 w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl">Create Badge</button>
         </form>
@@ -186,7 +220,7 @@
   </div>
 
   <script>
-    let selectedLogoUrl = 'https://via.placeholder.com/100x100/1e40af/ffffff?text=LOGO';
+    let selectedLogos = [];
 
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -195,52 +229,38 @@
       document.getElementById('tab-' + tab).classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
     }
 
-    function populateLogos() {
-      const grid = document.getElementById('logo-grid');
-      const badgeGrid = document.getElementById('badge-logo-grid');
-      const cats = ['Uni','Tech','Biz','Edu','Sci','Health','Fin','Eng','Design','Law'];
-      let html = '';
-      for (let i = 1; i <= 96; i++) {
-        const cat = cats[(i-1) % cats.length];
-        html += `<div onclick="selectLogo(this, 'https://via.placeholder.com/80x80/1e40af/ffffff?text=\( {cat}')" class="logo-option border border-slate-200 p-1.5 rounded-2xl text-center"><img src="https://via.placeholder.com/80x80/1e40af/ffffff?text= \){cat}" class="w-9 h-9 mx-auto rounded-lg"></div>`;
-      }
-      if (grid) grid.innerHTML = html;
-      if (badgeGrid) badgeGrid.innerHTML = html;
-    }
-
-    function selectLogo(element, url) {
-      document.querySelectorAll('#logo-grid .logo-option').forEach(el => el.classList.remove('selected'));
-      element.classList.add('selected');
-      selectedLogoUrl = url;
-      document.getElementById('selected-logo').value = url;
-      updatePreview();
-    }
-
-    function addCustomLogo() {
-      const url = document.getElementById('custom-logo').value.trim();
-      if (!url) return;
-      const grid = document.getElementById('logo-grid');
-      const div = document.createElement('div');
-      div.className = 'logo-option border border-blue-500 p-1.5 rounded-2xl text-center selected';
-      div.innerHTML = `<img src="${url}" class="w-9 h-9 mx-auto rounded-lg">`;
-      div.onclick = () => { selectedLogoUrl = url; document.getElementById('selected-logo').value = url; updatePreview(); };
-      grid.appendChild(div);
-      document.getElementById('custom-logo').value = '';
-    }
-
     function updatePreview() {
       const preview = document.getElementById('certificate-preview');
-      const title = document.getElementById('cert-title').value || 'Certificate of Achievement';
+      const name = document.getElementById('cert-name').value || 'Student Name';
       const desc = document.getElementById('cert-desc').value || '';
       const color = document.getElementById('cert-color').value;
       const accent = document.getElementById('cert-accent').value;
+      const signature = document.getElementById('signature-name').value || '';
+      const expiry = document.getElementById('expiry-date').value;
 
       preview.style.borderColor = color;
-      document.getElementById('preview-title').innerText = title;
+
+      document.getElementById('preview-name').innerText = name;
       document.getElementById('preview-desc').innerText = desc;
-      
-      const logoEl = document.getElementById('preview-logo');
-      if (logoEl) logoEl.innerHTML = `<img src="${selectedLogoUrl}" class="w-14 h-14 mx-auto rounded-full" style="border: 3px solid ${accent}">`;
+      document.getElementById('preview-signature').innerText = signature || 'Director';
+
+      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('preview-date').innerText = today;
+
+      // Logos
+      const logosContainer = document.getElementById('preview-logos');
+      logosContainer.innerHTML = '';
+      selectedLogos.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-9 h-9 rounded-full border-2 object-cover';
+        img.style.borderColor = accent;
+        logosContainer.appendChild(img);
+      });
+
+      // Expiry
+      const expiryEl = document.getElementById('preview-expiry');
+      expiryEl.innerText = expiry ? 'Valid until: ' + new Date(expiry).toLocaleDateString() : '';
     }
 
     function applyTemplate(type) {
@@ -249,38 +269,85 @@
       const color = document.getElementById('cert-color');
       const accent = document.getElementById('cert-accent');
 
-      if (type === 'classic') { title.value = 'Certificate of Achievement'; desc.value = 'For outstanding academic performance.'; color.value = '#1e40af'; accent.value = '#3b82f6'; }
-      else if (type === 'modern') { title.value = 'Digital Excellence Award'; desc.value = 'Recognizing innovation in technology.'; color.value = '#0f172a'; accent.value = '#06b67f'; }
-      else if (type === 'academic') { title.value = 'Academic Distinction'; desc.value = 'Awarded for exceptional scholarly achievement.'; color.value = '#1e3a8a'; accent.value = '#c2410f'; }
-      else if (type === 'elegant') { title.value = 'Certificate of Merit'; desc.value = 'In recognition of distinguished excellence.'; color.value = '#334155'; accent.value = '#854d0e'; }
-      else if (type === 'minimal') { title.value = 'Completion Certificate'; desc.value = 'Successfully completed the program.'; color.value = '#0f172a'; accent.value = '#64748b'; }
-      else if (type === 'prestigious') { title.value = 'Presidential Award'; desc.value = 'For extraordinary contribution and leadership.'; color.value = '#450a0a'; accent.value = '#b91c1c'; }
+      if (type === 'classic') {
+        title.value = 'Certificate of Achievement';
+        desc.value = 'has successfully completed the Advanced Program with distinction.';
+        color.value = '#1e40af';
+        accent.value = '#3b82f6';
+      } else if (type === 'modern') {
+        title.value = 'Digital Excellence Award';
+        desc.value = 'in recognition of outstanding innovation in technology.';
+        color.value = '#0f172a';
+        accent.value = '#06b67f';
+      } else if (type === 'elegant') {
+        title.value = 'Certificate of Merit';
+        desc.value = 'for distinguished service and exceptional achievement.';
+        color.value = '#334155';
+        accent.value = '#854d0e';
+      } else if (type === 'minimal') {
+        title.value = 'Program Completion Certificate';
+        desc.value = 'has successfully fulfilled all requirements.';
+        color.value = '#0f172a';
+        accent.value = '#64748b';
+      } else if (type === 'prestigious') {
+        title.value = 'Presidential Leadership Award';
+        desc.value = 'for extraordinary contribution and visionary leadership.';
+        color.value = '#450a0a';
+        accent.value = '#b91c1c';
+      } else if (type === 'corporate') {
+        title.value = 'Corporate Excellence Certificate';
+        desc.value = 'in recognition of outstanding professional performance.';
+        color.value = '#1e3a8a';
+        accent.value = '#c2410f';
+      }
 
       updatePreview();
     }
 
-    function initLogos() {
-      populateLogos();
-      setTimeout(() => {
-        const first = document.querySelector('#logo-grid .logo-option');
-        if (first) {
-          first.classList.add('selected');
-          selectedLogoUrl = first.querySelector('img').src;
-        }
-      }, 400);
+    function addSelectedLogo() {
+      const select = document.getElementById('logo-select');
+      const url = select.value;
+      if (!url || selectedLogos.includes(url)) return;
+
+      selectedLogos.push(url);
+      renderSelectedLogos();
+      updatePreview();
     }
 
-    function initPreview() {
-      setTimeout(updatePreview, 600);
-      ['cert-title','cert-desc','cert-color','cert-accent'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updatePreview);
+    function addCustomLogo() {
+      const url = document.getElementById('custom-logo-url').value.trim();
+      if (!url || selectedLogos.includes(url)) return;
+
+      selectedLogos.push(url);
+      renderSelectedLogos();
+      updatePreview();
+      document.getElementById('custom-logo-url').value = '';
+    }
+
+    function renderSelectedLogos() {
+      const container = document.getElementById('selected-logos');
+      container.innerHTML = '';
+
+      selectedLogos.forEach((url, index) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-2xl text-sm';
+        div.innerHTML = `
+          <img src="${url}" class="w-6 h-6 rounded-full" alt="Logo">
+          <span class="text-xs">Logo ${index + 1}</span>
+          <button type="button" onclick="removeLogo(${index})" class="ml-1 text-red-500">×</button>
+        `;
+        container.appendChild(div);
       });
     }
 
+    function removeLogo(index) {
+      selectedLogos.splice(index, 1);
+      renderSelectedLogos();
+      updatePreview();
+    }
+
     function initAdmin() {
-      initLogos();
-      initPreview();
+      updatePreview();
       document.getElementById('certificates-tab').classList.remove('hidden');
       document.getElementById('tab-certificates').classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
     }
