@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Assessment • Credity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', system_ui, sans-serif; }
+    .section-header { font-size: 12px; letter-spacing: 1px; }
+    /* Ensure long text wraps nicely */
+    textarea { resize: vertical; }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-screen-2xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-x-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center">
+          <span class="text-white font-bold text-xl">C</span>
+        </div>
+        <span class="font-semibold text-2xl tracking-tight">Credity</span>
+      </div>
+
+      <div class="flex items-center gap-x-2 md:gap-x-3">
+        <button onclick="openBulkLoadModal()" 
+                class="px-4 py-2 text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-2xl flex items-center gap-x-2 transition-colors">
+          <i class="fa-solid fa-code"></i>
+          <span class="hidden md:inline">Bulk Load JSON</span>
+        </button>
+
+        <button onclick="previewAssessment()" 
+                class="px-5 py-2 text-sm font-semibold border border-slate-300 hover:bg-slate-50 rounded-2xl flex items-center gap-x-2 transition-colors">
+          <i class="fa-solid fa-eye"></i>
+          <span>Preview</span>
+        </button>
+
+        <button onclick="saveAssessment()" 
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl text-sm flex items-center gap-x-2 shadow-md transition-all">
+          <i class="fa-solid fa-save"></i>
+          <span>Save Exam</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-screen-2xl mx-auto px-5 md:px-8 py-8">
+    
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">Create Assessment</h1>
+      <p class="text-slate-500 mt-2">Build rich exams with editable graphs, JSON loading, and proctoring.</p>
+    </div>
+
+    <form id="assessment-form" method="POST" action="/create-test" class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+      
+      <div class="xl:col-span-4 space-y-6">
+        
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+          <div class="section-header font-bold text-slate-400 mb-4 uppercase">Basic Settings</div>
+          
+          <div class="space-y-5">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 tracking-wider block mb-2">TITLE</label>
+              <input type="text" name="title" id="assessment-title" value="Midterm Exam - AI Fundamentals" 
+                     class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-base focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-semibold text-slate-600 tracking-wider block mb-2">DEFAULT TYPE</label>
+                <select name="questionType" id="default-question-type" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                  <option value="mcq">Multiple Choice</option>
+                  <option value="frq">Free Response</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-slate-600 tracking-wider block mb-2">TIME / QST (SEC)</label>
+                <input type="number" name="timePerQuestion" id="time-value" value="60" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+          <div class="section-header font-bold text-slate-400 mb-4 uppercase">Review Details</div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 tracking-wider block mb-1.5">TOPICS COVERED</label>
+              <textarea name="topics" id="topics" rows="2" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <input type="hidden" name="questions" id="questions-data-input">
+      </div>
+
+      <div class="xl:col-span-8">
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-semibold text-slate-800">Questions</h2>
+          <button type="button" onclick="addQuestion()" 
+                  class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-2xl hover:bg-slate-800 transition-colors shadow-md">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Question</span>
+          </button>
+        </div>
+
+        <div id="questions-container" class="space-y-6"></div>
+      </div>
+    </form>
+  </div>
+
+  <div id="graph-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[999] items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-2xl p-7 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center mb-5 border-b pb-4">
+        <h3 class="font-bold text-xl text-slate-800">Graph Generator</h3>
+        <button onclick="hideGraphModal()" class="text-2xl text-slate-400 hover:text-slate-600">&times;</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 overflow-y-auto pr-2">
+        <div>
+          <label class="text-xs font-bold text-slate-500 block mb-2">GRAPH TYPE</label>
+          <select id="graph-type" onchange="generateGraph()" class="w-full border border-slate-200 px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <option value="bar">Bar Chart</option>
+            <option value="line">Line Chart</option>
+            <option value="pie">Pie Chart</option>
+            <option value="doughnut">Doughnut Chart</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 block mb-2">DATASET LABEL</label>
+          <input type="text" id="graph-dataset-label" value="Student Performance" oninput="generateGraph()" class="w-full border border-slate-200 px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs font-bold text-slate-500 block mb-2">X-AXIS LABELS (Comma separated)</label>
+          <input type="text" id="graph-labels" value="Q1, Q2, Q3, Q4" oninput="generateGraph()" class="w-full border border-slate-200 px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs font-bold text-slate-500 block mb-2">DATA VALUES (Comma separated numbers)</label>
+          <input type="text" id="graph-data" value="85, 92, 78, 95" oninput="generateGraph()" class="w-full border border-slate-200 px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+      </div>
+
+      <div class="w-full h-64 border border-slate-200 rounded-2xl p-4 mb-6 flex justify-center bg-slate-50">
+        <canvas id="graph-canvas"></canvas>
+      </div>
+
+      <div class="flex gap-3 mt-auto">
+        <button type="button" onclick="useGraphInQuestion()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-semibold transition-colors">
+          Attach to Question
+        </button>
+        <button type="button" onclick="hideGraphModal()" class="flex-1 py-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-2xl font-semibold transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bulk-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[999] items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-2xl p-7 shadow-2xl">
+      <div class="flex justify-between items-center mb-5 border-b pb-4">
+        <h3 class="font-bold text-xl text-slate-800">Load Questions via Code</h3>
+        <button onclick="closeBulkLoadModal()" class="text-2xl text-slate-400 hover:text-slate-600">&times;</button>
+      </div>
+      
+      <p class="text-sm text-slate-500 mb-4">Paste your JSON array below. It supports multiple choice and free response, including image URLs.</p>
+      
+      <textarea id="json-input" rows="10" class="w-full border border-slate-200 rounded-2xl p-4 text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50" placeholder='[
+  {
+    "type": "mcq",
+    "question": "Identify the structure in the image.",
+    "imageUrl": "https://example.com/cell.jpg",
+    "options": ["Nucleus", "Ribosome", "Mitochondria", "Golgi"]
+  }
+]'></textarea>
+
+      <div class="flex gap-3 mt-5">
+        <button type="button" onclick="processJSON()" class="flex-1 py-3 bg-slate-900 hover:bg-black text-white rounded-2xl font-semibold transition-colors">
+          Load All Questions
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let questionCount = 0;
+    let currentGraphQuestionId = null;
+    let chartInstance = null;
+
+    // Structure defining a question
+    function addQuestion(prefillData = null) {
+      questionCount++;
+      const qId = `q-${questionCount}`;
+      const type = prefillData?.type || document.getElementById('default-question-type').value;
+      const questionText = prefillData?.question || '';
+      const imageUrl = prefillData?.imageUrl || '';
+
+      const html = `
+        <div id="${qId}" class="question-block bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex justify-between items-center mb-5">
+            <div class="flex items-center gap-x-3">
+              <span class="px-3.5 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl tracking-wide">Q${questionCount}</span>
+              <select id="${qId}-type" onchange="updateAnswerArea('${qId}')" class="q-type text-sm border border-slate-200 px-3 py-1.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                <option value="mcq" ${type === 'mcq' ? 'selected' : ''}>Multiple Choice</option>
+                <option value="frq" ${type === 'frq' ? 'selected' : ''}>Free Response</option>
+              </select>
+            </div>
+            <button type="button" onclick="deleteQuestion('${qId}')" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+              <i class="fa-solid fa-trash text-sm"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col gap-4">
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-2">QUESTION PROMPT</label>
+                <textarea id="${qId}-text" rows="3" class="q-text w-full border border-slate-200 rounded-2xl p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your question here...">${questionText}</textarea>
+              </div>
+              
+              <div>
+                <label class="text-xs font-bold text-slate-500 block mb-2 flex justify-between items-center">
+                  <span>ATTACHED IMAGE / GRAPH URL</span>
+                  <button type="button" onclick="openGraphBuilder('${qId}')" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                    <i class="fa-solid fa-chart-pie"></i> Generate
+                  </button>
+                </label>
+                <input type="text" id="${qId}-image" value="${imageUrl}" oninput="previewImage('${qId}')" class="q-image w-full border border-slate-200 rounded-2xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://... or base64">
+                <img id="${qId}-img-preview" src="${imageUrl}" class="mt-3 rounded-xl border border-slate-200 max-h-40 object-contain ${imageUrl ? '' : 'hidden'}" alt="Preview">
+              </div>
+            </div>
+
+            <div class="flex flex-col h-full">
+              <div id="${qId}-answer-area" class="flex-1"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
+      updateAnswerArea(qId, prefillData?.options);
+    }
+
+    // Handles the right side answer fields dynamically
+    function updateAnswerArea(qId, prefillOptions = null) {
+      const type = document.getElementById(`${qId}-type`).value;
+      const container = document.getElementById(`${qId}-answer-area`);
+      
+      let optA = prefillOptions?.[0] || '';
+      let optB = prefillOptions?.[1] || '';
+      let optC = prefillOptions?.[2] || '';
+      let optD = prefillOptions?.[3] || '';
+
+      if (type === 'mcq') {
+        container.innerHTML = `
+          <label class="text-xs font-bold text-slate-500 block mb-2">OPTIONS</label>
+          <div class="space-y-3 q-options">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg text-xs font-bold">A</span>
+              <input type="text" value="${optA}" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Option A">
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg text-xs font-bold">B</span>
+              <input type="text" value="${optB}" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Option B">
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg text-xs font-bold">C</span>
+              <input type="text" value="${optC}" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Option C">
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg text-xs font-bold">D</span>
+              <input type="text" value="${optD}" class="w-full border border-slate-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Option D">
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <label class="text-xs font-bold text-slate-500 block mb-2">GRADING RUBRIC / EXPECTED</label>
+          <textarea rows="6" class="q-rubric w-full border border-slate-200 px-4 py-3 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Describe the key points required for full marks...">${prefillOptions ? prefillOptions.join('\n') : ''}</textarea>
+        `;
+      }
+    }
+
+    function deleteQuestion(qId) {
+      document.getElementById(qId).remove();
+    }
+
+    function previewImage(qId) {
+      const url = document.getElementById(`${qId}-image`).value;
+      const img = document.getElementById(`${qId}-img-preview`);
+      if(url) {
+        img.src = url;
+        img.classList.remove('hidden');
+      } else {
+        img.classList.add('hidden');
+      }
+    }
+
+    // ================== GRAPH BUILDER ==================
+    function openGraphBuilder(qId) {
+      currentGraphQuestionId = qId;
+      document.getElementById('graph-modal').classList.remove('hidden');
+      document.getElementById('graph-modal').classList.add('flex');
+      // Delay generating so canvas has dimensions
+      setTimeout(generateGraph, 50);
+    }
+
+    function hideGraphModal() {
+      document.getElementById('graph-modal').classList.add('hidden');
+      document.getElementById('graph-modal').classList.remove('flex');
+      if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+      }
+    }
+
+    function generateGraph() {
+      const type = document.getElementById('graph-type').value;
+      const label = document.getElementById('graph-dataset-label').value || 'Data';
+      const labelsInput = document.getElementById('graph-labels').value;
+      const dataInput = document.getElementById('graph-data').value;
+
+      const labels = labelsInput.split(',').map(s => s.trim());
+      const data = dataInput.split(',').map(s => Number(s.trim()) || 0);
+
+      const ctx = document.getElementById('graph-canvas');
+      if (chartInstance) chartInstance.destroy();
+
+      // Fun color palette
+      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+      chartInstance = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{
+            label: label,
+            data: data,
+            backgroundColor: type === 'line' ? 'rgba(59, 130, 246, 0.2)' : colors.slice(0, data.length),
+            borderColor: type === 'line' ? '#3b82f6' : colors.slice(0, data.length),
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false // Turn off animation so Base64 export is instant
+        }
+      });
+    }
+
+    function useGraphInQuestion() {
+      if (!currentGraphQuestionId || !chartInstance) return;
+      
+      // Convert canvas to image base64
+      const canvas = document.getElementById('graph-canvas');
+      const base64Img = canvas.toDataURL('image/png');
+      
+      // Inject into the question's image input
+      const input = document.getElementById(`${currentGraphQuestionId}-image`);
+      input.value = base64Img;
+      previewImage(currentGraphQuestionId);
+      
+      hideGraphModal();
+    }
+
+    // ================== BULK LOAD JSON ==================
+    function openBulkLoadModal() {
+      document.getElementById('bulk-modal').classList.remove('hidden');
+      document.getElementById('bulk-modal').classList.add('flex');
+    }
+
+    function closeBulkLoadModal() {
+      document.getElementById('bulk-modal').classList.add('hidden');
+      document.getElementById('bulk-modal').classList.remove('flex');
+    }
+
+    function processJSON() {
+      try {
+        const raw = document.getElementById('json-input').value;
+        const data = JSON.parse(raw);
+        
+        if(!Array.isArray(data)) throw new Error("JSON must be an array of objects");
+
+        // Clear existing to avoid mixups, or append (currently appending)
+        data.forEach(q => {
+          addQuestion({
+            type: q.type || 'mcq',
+            question: q.question || '',
+            imageUrl: q.imageUrl || '',
+            options: q.options || []
+          });
+        });
+
+        closeBulkLoadModal();
+        document.getElementById('json-input').value = ''; // clear
+      } catch(err) {
+        alert("Invalid JSON format. Please check the structure.\nError: " + err.message);
+      }
+    }
+
+    // ================== SAVE & SUBMIT ==================
+    function serializeQuestions() {
+      const questionBlocks = document.querySelectorAll('.question-block');
+      const data = [];
+
+      questionBlocks.forEach(block => {
+        const type = block.querySelector('.q-type').value;
+        const text = block.querySelector('.q-text').value;
+        const image = block.querySelector('.q-image').value;
+        
+        let options = [];
+        if(type === 'mcq') {
+          const inputs = block.querySelectorAll('.q-options input');
+          inputs.forEach(inp => options.push(inp.value));
+        } else {
+          options.push(block.querySelector('.q-rubric').value);
+        }
+
+        data.push({ type, question: text, imageUrl: image, options });
+      });
+
+      return JSON.stringify(data);
+    }
+
+    function saveAssessment() {
+      const title = document.getElementById('assessment-title').value;
+      if (!title) return alert("Please enter a title.");
+
+      // Dump compiled questions into hidden input before submitting form to Node backend
+      const jsonStr = serializeQuestions();
+      document.getElementById('questions-data-input').value = jsonStr;
+
+      // Submit the form
+      document.getElementById('assessment-form').submit();
+    }
+
+    function previewAssessment() {
+      alert("Previewing Data Structure:\n" + serializeQuestions());
+    }
+
+    // Init with 1 empty question
+    window.onload = function() {
+      addQuestion();
+    }
+  </script>
+</body>
+</html>
