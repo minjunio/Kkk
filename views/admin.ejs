@@ -17,10 +17,8 @@
     .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
-    /* Signature Font */
     .font-signature { font-family: 'Pinyon Script', cursive; }
 
-    /* Draggable Logo */
     .draggable-logo {
       position: absolute;
       cursor: grab;
@@ -31,7 +29,6 @@
     .draggable-logo:active { cursor: grabbing; }
     .draggable-logo img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
 
-    /* Container Scaling */
     .cert-container { container-type: inline-size; perspective: 1000px; }
     .certificate-preview {
       background: white;
@@ -44,9 +41,7 @@
       flex-direction: column;
     }
 
-    /* =========================================================
-       20 MASTER-CRAFTED TEMPLATES
-       ========================================================= */
+    /* 20 Professional Templates */
     .tpl-1-degree { font-family: 'Cinzel', serif; border: 2cqw solid #1e293b; outline: 0.5cqw solid #1e293b; outline-offset: -1cqw; background: #fffdf8; background-image: radial-gradient(circle, rgba(0,0,0,0.02) 0%, transparent 100%); }
     .tpl-1-degree .cert-title { font-size: 4.5cqi; color: #1e293b; font-weight: 700; border-bottom: 2px solid #cbd5e1; padding-bottom: 1.5cqw; display: inline-block; }
     
@@ -93,13 +88,13 @@
     .tpl-19-medical { font-family: 'Inter', sans-serif; border-left: 6cqw solid #0369a1; background: #f0f9ff; }
     .tpl-20-future { font-family: 'Montserrat', sans-serif; background: #ffffff; box-shadow: inset 0 0 0 0.5cqw currentColor, inset 0 0 0 1cqw #fff, inset 0 0 0 1.5cqw currentColor; }
 
-    /* Badge Editor Shapes */
     .shape-circle { border-radius: 50%; }
     .shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
     .shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
     .shape-octagon { clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); }
     .shape-pentagon { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
     .shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+    .shape-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -123,46 +118,50 @@
   </nav>
 
   <div class="max-w-[90rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
-    
-    <!-- HERO / MAIN CREATE ASSESSMENT SECTION (Restored at top) -->
+
+    <!-- PROMINENT CREATE ASSESSMENT SECTION (Top Hero) -->
     <div class="mb-10">
-      <div class="glass rounded-3xl p-8 md:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 border border-blue-100 bg-gradient-to-br from-white via-blue-50/40 to-white">
-        <div class="max-w-xl">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold tracking-[1.5px] mb-4">
-            <i class="fa-solid fa-rocket"></i>
-            <span>QUICK ACTIONS</span>
+      <div class="glass rounded-3xl p-8 md:p-10 border border-blue-100 bg-gradient-to-br from-white via-blue-50/30 to-white flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div class="max-w-2xl">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold tracking-[2px] rounded-full flex items-center gap-2">
+              <i class="fa-solid fa-rocket"></i>
+              <span>MAIN ACTION</span>
+            </div>
           </div>
-          <h1 class="text-4xl font-bold tracking-tighter text-slate-900 leading-none">Create Assessment</h1>
-          <p class="mt-3 text-lg text-slate-600">Build secure proctored exams and instantly link beautiful, verifiable credentials to them.</p>
+          <h1 class="text-4xl md:text-5xl font-bold tracking-tighter text-slate-900 leading-none">Create Assessment</h1>
+          <p class="mt-4 text-xl text-slate-600">Build secure proctored exams and instantly generate beautiful, blockchain-verifiable credentials.</p>
           
-          <div class="flex items-center gap-4 mt-6">
+          <div class="mt-8 flex flex-wrap gap-4">
             <a href="/make-test" 
-               class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-lg rounded-2xl shadow-xl shadow-blue-600/30 transition-all hover:-translate-y-0.5">
-              <i class="fa-solid fa-plus text-xl"></i>
+               class="inline-flex items-center justify-center gap-3 px-10 py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-lg rounded-2xl shadow-xl shadow-blue-600/40 transition-all hover:-translate-y-0.5">
+              <i class="fa-solid fa-plus text-2xl"></i>
               <span>Create New Assessment</span>
             </a>
-            <a href="#certificates-tab" 
-               onclick="document.getElementById('tab-certificates').click(); window.scrollTo({top: 400, behavior:'smooth'})"
-               class="inline-flex items-center justify-center gap-2 px-6 py-4 border border-slate-300 hover:bg-white text-slate-700 font-semibold rounded-2xl transition-all">
-              <span>Design Credentials</span>
-            </a>
+            <button onclick="document.getElementById('tab-certificates').click(); window.scrollTo({top: 520, behavior:'smooth'})"
+                    class="inline-flex items-center justify-center gap-3 px-8 py-4 border-2 border-slate-300 hover:bg-white text-slate-700 font-semibold text-lg rounded-2xl transition-all">
+              Design Credentials First
+            </button>
           </div>
         </div>
         
-        <div class="hidden lg:block">
-          <div class="flex items-center gap-3 text-sm">
-            <div class="flex -space-x-2">
-              <div class="w-8 h-8 bg-emerald-500 rounded-full ring-2 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-xs"></i></div>
-              <div class="w-8 h-8 bg-blue-500 rounded-full ring-2 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-xs"></i></div>
-              <div class="w-8 h-8 bg-violet-500 rounded-full ring-2 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-xs"></i></div>
+        <div class="hidden xl:block">
+          <div class="flex items-center gap-4 text-sm">
+            <div class="flex -space-x-3">
+              <div class="w-9 h-9 bg-emerald-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white"></i></div>
+              <div class="w-9 h-9 bg-blue-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white"></i></div>
+              <div class="w-9 h-9 bg-violet-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white"></i></div>
             </div>
-            <div class="text-slate-500 text-sm font-medium">1,284 credentials issued this month</div>
+            <div>
+              <div class="font-bold text-emerald-600">2,847 credentials issued</div>
+              <div class="text-xs text-slate-500">this month • 100% verified</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Page Header -->
+    <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
       <div>
         <h2 class="text-3xl font-bold tracking-tight text-slate-900">Credential Architecture</h2>
@@ -194,13 +193,13 @@
                   <option value="<%= t.id %>"><%= t.title %></option>
                 <% }) %>
               <% } else { %>
-                <option value="1">Introduction to AI & Data Science</option>
+                <option value="1">Introduction to AI &amp; Data Science</option>
                 <option value="2">Advanced Cybersecurity Protocol</option>
               <% } %>
             </select>
           </div>
 
-          <!-- Live Preview Data Editors -->
+          <!-- Live Preview Inputs -->
           <div class="grid md:grid-cols-3 gap-4 p-4 border border-slate-200 rounded-2xl bg-slate-50">
             <div>
               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Preview Student</label>
@@ -232,40 +231,31 @@
             <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</textarea>
           </div>
 
-          <!-- Templates (20) -->
+          <!-- Templates -->
           <div>
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Master Templates (20)</label>
-            <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x">
-              <!-- JS Injected -->
-            </div>
+            <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x"></div>
           </div>
 
-          <!-- Logo Management System -->
+          <!-- Logo Engine -->
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-4">
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">AI & Tech Logo Engine</label>
-              <span class="text-[10px] text-purple-600 font-bold bg-purple-100 px-2 py-1 rounded uppercase tracking-wider">Drag to position • Only loaded logos appear</span>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Multi-Logo Engine</label>
+              <span class="text-[10px] text-emerald-600 font-bold bg-emerald-100 px-3 py-1 rounded-full">Only successfully loaded logos are added</span>
             </div>
             
-            <!-- Custom Logo Input -->
             <div class="flex gap-2 mb-4">
-              <input type="text" id="custom-logo-input" placeholder="Paste custom SVG or PNG URL..." class="modern-input flex-1 px-4 py-2 rounded-xl text-sm">
-              <button type="button" onclick="addCustomLogo()" class="px-5 py-2 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800">Add</button>
+              <input type="text" id="custom-logo-input" placeholder="Paste any logo URL (PNG, SVG, JPG)..." class="modern-input flex-1 px-4 py-2.5 rounded-xl text-sm">
+              <button type="button" onclick="addCustomLogo()" class="px-6 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">Add Custom Logo</button>
             </div>
 
-            <!-- Active Logos on Document -->
             <div class="mb-4">
-              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Active Logos on Document</label>
-              <div id="active-logos-list" class="flex flex-wrap gap-2 empty:hidden bg-white p-3 rounded-xl border border-slate-200">
-                <!-- JS Injected Active Badges -->
-              </div>
+              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Active Logos on Certificate</label>
+              <div id="active-logos-list" class="flex flex-wrap gap-2 empty:hidden bg-white p-3 rounded-xl border border-slate-200 min-h-[44px]"></div>
             </div>
 
-            <!-- 40 Pre-loaded Professional AI/Tech Logos -->
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Technology Logos (40) — Click to add (only loads if successful)</label>
-            <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-40 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl">
-              <!-- JS Injected -->
-            </div>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Reliable Tech &amp; Institution Logos (40)</label>
+            <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-44 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl"></div>
           </div>
 
           <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-lg shadow-lg transition-all hover:-translate-y-0.5">Generate Secure Credential</button>
@@ -276,120 +266,66 @@
           <div class="sticky top-24">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-sm font-bold text-slate-400 uppercase">Live Preview</h3>
-              <span class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold bg-emerald-100 px-3 py-1 rounded-full">Anti-Forge Active</span>
+              <span class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold bg-emerald-100 px-3 py-1 rounded-full">Anti-Forge Wave Active</span>
             </div>
             
             <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center" style="border-color: #1e293b; outline-color: #1e293b;">
               
-              <!-- =========================================================
-                   IMPROVED ANTI-FORGE WATERMARK 
-                   8 stacked small waves, repeated across entire page (diagonal)
-                   ========================================================= -->
-              <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden" style="opacity: 0.065;">
-                <!-- Rotated repeating security pattern -->
-                <div class="absolute w-[170%] h-[170%] -left-[35%] -top-[35%]" 
-                     style="transform: rotate(-18deg);">
-                  
-                  <!-- Wave Block 1 -->
-                  <div class="font-mono text-[0.95cqi] font-extrabold tracking-[0.6em] text-slate-900/95 leading-[1.15] flex flex-col items-center text-center mb-[4.5cqi] select-none">
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                  </div>
-                  
-                  <!-- Wave Block 2 -->
-                  <div class="font-mono text-[0.95cqi] font-extrabold tracking-[0.6em] text-slate-900/95 leading-[1.15] flex flex-col items-center text-center mb-[4.5cqi] select-none">
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                  </div>
-                  
-                  <!-- Wave Block 3 -->
-                  <div class="font-mono text-[0.95cqi] font-extrabold tracking-[0.6em] text-slate-900/95 leading-[1.15] flex flex-col items-center text-center mb-[4.5cqi] select-none">
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                  </div>
-                  
-                  <!-- Wave Block 4 -->
-                  <div class="font-mono text-[0.95cqi] font-extrabold tracking-[0.6em] text-slate-900/95 leading-[1.15] flex flex-col items-center text-center mb-[4.5cqi] select-none">
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                  </div>
-                  
-                  <!-- Wave Block 5 -->
-                  <div class="font-mono text-[0.95cqi] font-extrabold tracking-[0.6em] text-slate-900/95 leading-[1.15] flex flex-col items-center text-center mb-[4.5cqi] select-none">
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                    <span>VERIFIABLE ON CREDITY.INK</span>
-                  </div>
-                </div>
-              </div>
+              <!-- ANTI-FORGE WAVY SVG (Exactly like your attached file + 8 layers) -->
+              <svg class="absolute inset-0 w-full h-full opacity-[0.06] pointer-events-none z-0" viewBox="0 0 1000 1414" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                  <path id="wave1" d="M-120 80 Q 220 20, 520 85 T 1120 75" />
+                  <path id="wave2" d="M-120 220 Q 220 160, 520 225 T 1120 215" />
+                  <path id="wave3" d="M-120 360 Q 220 300, 520 365 T 1120 355" />
+                  <path id="wave4" d="M-120 500 Q 220 440, 520 505 T 1120 495" />
+                  <path id="wave5" d="M-120 640 Q 220 580, 520 645 T 1120 635" />
+                  <path id="wave6" d="M-120 780 Q 220 720, 520 785 T 1120 775" />
+                  <path id="wave7" d="M-120 920 Q 220 860, 520 925 T 1120 915" />
+                  <path id="wave8" d="M-120 1060 Q 220 1000, 520 1065 T 1120 1055" />
+                </defs>
+                <g font-family="monospace" font-size="11" font-weight="700" fill="#0f172a" letter-spacing="3.5">
+                  <text><textPath href="#wave1" startOffset="0%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave2" startOffset="8%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave3" startOffset="3%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave4" startOffset="12%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave5" startOffset="5%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave6" startOffset="15%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave7" startOffset="0%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                  <text><textPath href="#wave8" startOffset="10%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
+                </g>
+              </svg>
 
               <!-- Logos Container -->
-              <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none">
-                <!-- Draggable logos injected here via JS -->
-              </div>
+              <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none"></div>
 
               <!-- Main Content -->
-              <div class="w-full relative z-10 mt-[8%]">
-                <div class="text-[1.8cqi] tracking-[0.25em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">The Board of Trustees certifies that</div>
-                <div id="preview-student" class="text-[5cqi] font-bold text-slate-800 leading-tight cert-text-color mt-[3%]">Alex Rivera</div>
+              <div class="w-full relative z-10 mt-[7%]">
+                <div class="text-[1.7cqi] tracking-[0.3em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">The Board of Trustees certifies that</div>
+                <div id="preview-student" class="text-[5.2cqi] font-bold text-slate-900 leading-none cert-text-color mt-[2%]">Alex Rivera</div>
               </div>
 
-              <div class="px-[8%] my-[6%] relative z-10 w-full flex-grow">
+              <div class="px-[7%] my-[5%] relative z-10 w-full flex-grow">
                 <div id="preview-title" class="cert-title mb-[4%] drop-shadow-sm">Master of Science</div>
-                <div id="preview-desc" class="text-[1.8cqi] text-slate-600 cert-text-color leading-relaxed">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</div>
+                <div id="preview-desc" class="text-[1.65cqi] text-slate-600 cert-text-color leading-relaxed">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</div>
               </div>
 
-              <!-- Footer with Signatures (Left) & QR (Strictly Bottom Right) -->
-              <div class="w-full flex justify-between items-end mt-auto pt-[4%] relative z-10">
-                
-                <!-- Left/Center Details -->
-                <div class="flex gap-8 items-end">
-                  <div class="text-center border-t border-slate-400 pt-[2%] min-w-[15cqi]">
-                    <div id="preview-signature" class="font-signature text-[4cqi] text-slate-800 cert-text-color leading-none mb-1">Dr. Admin</div>
-                    <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Authorized Signatory</div>
+              <!-- Footer -->
+              <div class="w-full flex justify-between items-end mt-auto pt-[3%] relative z-10">
+                <div class="flex gap-7 items-end">
+                  <div class="text-center border-t border-slate-400 pt-[3%] min-w-[14cqi]">
+                    <div id="preview-signature" class="font-signature text-[4.2cqi] text-slate-800 cert-text-color leading-none mb-1">Dr. Admin</div>
+                    <div class="text-[0.95cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Authorized Signatory</div>
                   </div>
-
-                  <div class="text-center border-t border-slate-400 pt-[2%] min-w-[15cqi]">
-                    <div id="preview-date-display" class="text-[1.5cqi] font-bold text-slate-800 cert-text-color leading-none mb-2 mt-2">Date</div>
-                    <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Issue Date</div>
+                  <div class="text-center border-t border-slate-400 pt-[3%] min-w-[14cqi]">
+                    <div id="preview-date-display" class="text-[1.6cqi] font-bold text-slate-800 cert-text-color leading-none mb-1.5 mt-1.5">Date</div>
+                    <div class="text-[0.95cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Issue Date</div>
                   </div>
                 </div>
 
-                <!-- Anchored QR Bottom Right -->
                 <div class="text-center flex flex-col items-end">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://credity.ink/verify/id" class="w-[7cqi] h-[7cqi] mb-1.5 p-0.5 bg-white border border-slate-200 shadow-sm">
-                  <div class="text-[1cqi] text-slate-500 uppercase cert-text-color font-bold tracking-widest">Verify</div>
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=https://credity.ink/verify/id" class="w-[7.5cqi] h-[7.5cqi] mb-1 p-0.5 bg-white border border-slate-200 shadow-sm">
+                  <div class="text-[0.95cqi] text-slate-500 uppercase cert-text-color font-bold tracking-widest">Verify</div>
                 </div>
-                
               </div>
             </div>
           </div>
@@ -408,7 +344,7 @@
             <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment</label>
             <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium border-blue-200" required>
               <option value="">-- Select Assessment --</option>
-              <option value="1">Introduction to AI & Data Science</option>
+              <option value="1">Introduction to AI &amp; Data Science</option>
             </select>
           </div>
 
@@ -424,7 +360,7 @@
                 <option value="shape-shield">Shield</option>
                 <option value="shape-hexagon">Hexagon</option>
                 <option value="shape-circle">Circle</option>
-                <option value="shape-pentagon">Pentagon</option>
+                <option value="shape-star">Starburst</option>
                 <option value="shape-octagon">Octagon</option>
                 <option value="shape-diamond">Diamond</option>
               </select>
@@ -444,37 +380,34 @@
               <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-bolt text-xl"></i></button>
               <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-brain text-xl"></i></button>
               <button type="button" onclick="setBadgeIcon('fa-check-double')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-check-double text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-database')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-database text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-network-wired')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-network-wired text-xl"></i></button>
             </div>
           </div>
 
           <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-black text-white font-semibold rounded-xl">Mint Secure Badge</button>
         </div>
 
-        <!-- Live Preview -->
+        <!-- Badge Preview -->
         <div class="md:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-12 border border-slate-200 shadow-inner overflow-hidden relative">
-          <div class="absolute inset-0" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <div class="absolute inset-0" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 22px 22px;"></div>
           
           <div class="text-center w-full relative z-10 flex flex-col items-center">
-            
-            <div id="preview-badge-text" class="text-xl font-bold tracking-widest uppercase text-slate-900 mb-6 drop-shadow-sm">Certified Engineer</div>
+            <div id="preview-badge-text" class="text-xl font-bold tracking-widest uppercase text-slate-900 mb-7 drop-shadow-sm">Certified Engineer</div>
 
-            <div class="badge-preview-container relative w-48 h-48 mb-8">
+            <div class="badge-preview-container relative w-52 h-52 mb-8">
               <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-xl flex flex-col justify-center items-center" style="background: linear-gradient(135deg, #0f172a, #334155);">
                 <div class="absolute inset-1.5 border-[3px] border-white/20" id="preview-badge-inner" style="clip-path: inherit;"></div>
                 <div class="absolute inset-3 border border-white/10" id="preview-badge-inner2" style="clip-path: inherit;"></div>
                 
-                <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.5rem] text-white mb-2 drop-shadow-md z-20"></i>
+                <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.6rem] text-white mb-3 drop-shadow-md z-20"></i>
                 
-                <div class="mt-2 bg-white p-1 rounded z-20 shadow-md">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=Verify" class="w-8 h-8">
+                <div class="mt-1 bg-white p-1.5 rounded z-20 shadow-md">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&amp;data=Verify" class="w-9 h-9">
                 </div>
               </div>
             </div>
 
             <div class="text-[11px] text-slate-500 font-mono tracking-widest uppercase opacity-80 flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check-circle text-blue-500"></i> credity.ink
+              <i class="fa-solid fa-check-circle text-emerald-500"></i> credity.ink
             </div>
           </div>
         </div>
@@ -486,7 +419,7 @@
       <div class="glass rounded-3xl overflow-hidden border border-slate-200">
         <div class="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
           <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
-          <div class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider">Status: Online</div>
+          <div class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold uppercase tracking-wider">Status: Online</div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -530,7 +463,6 @@
   </div>
 
   <script>
-    // --- 1. Templates Setup (20 Distinct Styles) ---
     const templates = [
       { id: '1-degree', name: 'Master\'s Degree' }, { id: '2-university', name: 'University Seal' },
       { id: '3-corporate', name: 'Corporate Award' }, { id: '4-tech', name: 'Grid Technology' },
@@ -544,25 +476,57 @@
       { id: '19-medical', name: 'Clinical Medical' }, { id: '20-future', name: 'Future Frame' }
     ];
 
-    // --- 2. Reliable Logos (40 AI & Tech Logos via SimpleIcons CDN) ---
-    const techSlugs = [
-      'openai', 'tensorflow', 'pytorch', 'keras', 'scikitlearn', 'pandas', 'numpy', 'python', 
-      'jupyter', 'huggingface', 'meta', 'ibm', 'nvidia', 'intel', 'amd', 'linux', 'ubuntu', 
-      'docker', 'kubernetes', 'git', 'github', 'gitlab', 'react', 'nodedotjs', 'javascript', 
-      'typescript', 'html5', 'css3', 'mongodb', 'postgresql', 'redis', 'amazon', 'apple', 
-      'android', 'ios', 'firebase', 'amazonwebservices', 'googlecloud', 'microsoftazure', 'cloudflare'
+    // Reliable logos (Devicon + stable sources)
+    const presetLogos = [
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/gitlab/gitlab-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apple/apple-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-plain.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nvidia/nvidia-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/intel/intel-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amd/amd-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/huggingface/huggingface-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/keras/keras-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pandas/pandas-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/numpy/numpy-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/jupyter/jupyter-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/meta/meta-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ibm/ibm-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ethereum/ethereum-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bitcoin/bitcoin-original.svg'
     ];
-    
-    const presetLogos = techSlugs.map(slug => `https://cdn.simpleicons.org/${slug}/0f172a`);
 
     let currentTemplate = 'tpl-1-degree';
-    let activeLogos = []; 
+    let activeLogos = [];
 
     function init() {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('cert-date').value = today;
-      
-      // Render Templates
+
+      // Templates
       const templateGrid = document.getElementById('template-grid');
       templates.forEach(t => {
         const btn = document.createElement('button');
@@ -573,12 +537,12 @@
         templateGrid.appendChild(btn);
       });
 
-      // Render 40 Tech Logos (with safe loading)
+      // Logo grid (reliable sources)
       const logoGrid = document.getElementById('logo-grid');
       presetLogos.forEach(url => {
         const img = document.createElement('img');
         img.src = url;
-        img.className = 'w-10 h-10 p-2 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
+        img.className = 'w-9 h-9 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
         img.onclick = () => addLogoToDoc(url);
         logoGrid.appendChild(img);
       });
@@ -586,8 +550,7 @@
       updateCert();
     }
 
-    // --- 3. Multi-Logo Engine (ONLY shows logos that successfully load) ---
-    
+    // === ROBUST LOGO LOADING (only adds logos that successfully load) ===
     function addCustomLogo() {
       const url = document.getElementById('custom-logo-input').value.trim();
       if (url) {
@@ -598,35 +561,33 @@
 
     function addLogoToDoc(url) {
       const id = 'logo_' + Date.now();
-      
       const wrapper = document.createElement('div');
       wrapper.id = id;
-      wrapper.className = 'draggable-logo w-[8cqi] h-[8cqi] pointer-events-auto';
+      wrapper.className = 'draggable-logo w-[8.5cqi] h-[8.5cqi] pointer-events-auto';
       wrapper.style.left = '8%';
       wrapper.style.top = '8%';
-      
+
       const img = document.createElement('img');
       img.src = url;
       img.style.width = '100%';
       img.style.height = '100%';
       img.style.objectFit = 'contain';
-      
-      // Only add to document if image loads successfully
-      img.onload = function() {
+
+      img.onload = () => {
+        // Only add if it actually loaded
         const boundary = document.getElementById('drag-boundary');
         boundary.appendChild(wrapper);
         wrapper.appendChild(img);
         makeDraggable(wrapper);
-        
+
         const newLogo = { id, url };
         activeLogos.push(newLogo);
         renderActiveLogosList();
       };
-      
-      img.onerror = function() {
-        // Logo failed to load — do NOT display it
-        console.warn('Logo failed to load and was not added:', url);
-        // Silently discard — no error avatar, no entry in active list
+
+      img.onerror = () => {
+        // Failed to load — do not display anything
+        console.warn('Logo failed to load (not added):', url);
       };
     }
 
@@ -659,11 +620,9 @@
       function dragMouseDown(e) {
         e.preventDefault();
         if (e.type === 'touchstart') {
-          pos3 = e.touches[0].clientX;
-          pos4 = e.touches[0].clientY;
+          pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
         } else {
-          pos3 = e.clientX;
-          pos4 = e.clientY;
+          pos3 = e.clientX; pos4 = e.clientY;
         }
         document.onmouseup = closeDragElement;
         document.ontouchend = closeDragElement;
@@ -675,55 +634,44 @@
         e.preventDefault();
         let clientX, clientY;
         if (e.type === 'touchmove') {
-          clientX = e.touches[0].clientX;
-          clientY = e.touches[0].clientY;
+          clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
         } else {
-          clientX = e.clientX;
-          clientY = e.clientY;
+          clientX = e.clientX; clientY = e.clientY;
         }
-        
-        pos1 = pos3 - clientX;
-        pos2 = pos4 - clientY;
-        pos3 = clientX;
-        pos4 = clientY;
-        
+        pos1 = pos3 - clientX; pos2 = pos4 - clientY; pos3 = clientX; pos4 = clientY;
+
         const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
         let newTop = ((elmnt.offsetTop - pos2) / boundary.height) * 100;
         let newLeft = ((elmnt.offsetLeft - pos1) / boundary.width) * 100;
-        
-        newTop = Math.max(0, Math.min(newTop, 90));
-        newLeft = Math.max(0, Math.min(newLeft, 90));
+
+        newTop = Math.max(0, Math.min(newTop, 92));
+        newLeft = Math.max(0, Math.min(newLeft, 92));
 
         elmnt.style.top = newTop + "%";
         elmnt.style.left = newLeft + "%";
       }
 
       function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-        document.ontouchend = null;
-        document.ontouchmove = null;
+        document.onmouseup = null; document.onmousemove = null;
+        document.ontouchend = null; document.ontouchmove = null;
       }
     }
 
-    // --- 4. Certificate Updates ---
     function setTemplate(id) {
       const preview = document.getElementById('cert-preview');
       preview.classList.remove(currentTemplate);
       currentTemplate = `tpl-${id}`;
       preview.classList.add(currentTemplate);
-      
+
       const darkThemes = ['tpl-8-dark', 'tpl-10-cyber', 'tpl-18-neon'];
       const textElements = document.querySelectorAll('.cert-text-color');
-      
+
       if (darkThemes.includes(currentTemplate)) {
         textElements.forEach(el => el.style.color = '#f8fafc');
         document.getElementById('preview-title').style.color = '#ffffff';
-        document.querySelector('.absolute.inset-0.flex').style.color = '#ffffff';
       } else {
         textElements.forEach(el => el.style.color = '');
-        document.querySelector('.absolute.inset-0.flex').style.color = '#0f172a';
-        updateCert(); 
+        updateCert();
       }
     }
 
@@ -737,15 +685,15 @@
 
       const titleEl = document.getElementById('preview-title');
       titleEl.innerText = title;
-      
+
       if (!['tpl-8-dark', 'tpl-10-cyber', 'tpl-18-neon'].includes(currentTemplate)) {
         titleEl.style.color = color;
       }
-      
+
       const preview = document.getElementById('cert-preview');
       preview.style.borderColor = color;
       preview.style.outlineColor = color;
-      
+
       document.getElementById('preview-desc').innerText = desc;
       document.getElementById('preview-student').innerText = student || '[Student Name]';
       document.getElementById('preview-signature').innerText = signature || 'Authorized Signature';
@@ -755,32 +703,31 @@
       }
     }
 
-    // --- 5. Badge Editor Logic ---
     function setBadgeIcon(iconClass) {
       document.getElementById('selected-badge-icon').value = iconClass;
-      document.getElementById('preview-badge-icon').className = `fa-solid ${iconClass} text-[3.5rem] text-white mb-2 drop-shadow-md z-20`;
+      document.getElementById('preview-badge-icon').className = `fa-solid ${iconClass} text-[3.6rem] text-white mb-3 drop-shadow-md z-20`;
     }
 
     function updateBadge() {
       const title = document.getElementById('badge-title').value;
       const shape = document.getElementById('badge-shape').value;
       const hexColor = document.getElementById('badge-color').value;
-      
+
       document.getElementById('preview-badge-text').innerText = title || 'Badge Title';
-      
+
       const base = document.getElementById('preview-badge-base');
       base.className = `badge-base ${shape} w-full h-full shadow-xl flex flex-col justify-center items-center`;
-      base.style.background = `linear-gradient(135deg, ${hexColor}, ${adjustColor(hexColor, -50)})`;
+      base.style.background = `linear-gradient(135deg, ${hexColor}, ${adjustColor(hexColor, -55)})`;
     }
 
     function adjustColor(color, amount) {
       return '#' + color.replace(/^#/, '').replace(/../g, c => ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).substr(-2));
     }
 
-    // --- 6. Navigation ---
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(tab + '-tab').classList.remove('hidden');
+
       document.querySelectorAll('.tab-btn').forEach(el => {
         el.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
         el.classList.add('text-slate-500');
