@@ -3,85 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Credity • Verify Skills</title>
+  <title>Credity • Verify Skills. Impossible to Fake.</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+    
     body { font-family: 'Inter', system_ui, sans-serif; }
-    .blue-cloudy-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%); position: relative; overflow: hidden; }
-    .blue-cloudy-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 30%, rgba(147,197,253,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(147,197,253,0.12) 0%, transparent 60%); animation: cloudDrift 25s ease infinite; }
-    @keyframes cloudDrift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-10px)} }
-    .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.15); }
-    .premium-card { transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
-    .premium-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4); }
-    .modern-input { background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.2); }
-    .modern-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.1); outline: none; }
-    .tab-active { background: rgba(255,255,255,0.1); border-bottom: 3px solid #60a5fa; }
-    .cloud-text { background: linear-gradient(90deg,#bae6fd,#dbeafe,#bae6fd); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation: cloudShimmer 3s ease infinite; }
-    .spotless-btn { transition: all 0.3s cubic-bezier(0.23,1.0,0.32,1); }
-    .spotless-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3); }
-    .light-mode { background: #f8fafc; color: #0f172a; }
-    .light-mode .glass { background: rgba(255,255,255,0.95); border: 1px solid #e2e8f0; color: #0f172a; }
-    .light-mode .blue-cloudy-bg { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #bae6fd 100%); }
-    .light-mode .modern-input { background: white; border: 1px solid #cbd5e1; color: #0f172a; }
-    .light-mode .tab-active { background: #e0f2fe; border-bottom-color: #0284c8; }
-    .section-header { font-size: 2.75rem; line-height: 1.1; font-weight: 700; letter-spacing: -.04em; }
+    
+    .professional-blue {
+      background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+    }
+    
+    .glass {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid #e2e8f0;
+    }
+    
+    .premium-card {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .premium-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    
+    .modern-input {
+      background: white;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s ease;
+    }
+    
+    .modern-input:focus {
+      border-color: #0284c8;
+      box-shadow: 0 0 0 3px rgba(2, 132, 200, 0.1);
+      outline: none;
+    }
+    
+    .tab-active {
+      background: #e0f2fe;
+      border-bottom: 3px solid #0284c8;
+      color: #0e7490;
+    }
+    
+    .section-header {
+      font-size: 2.75rem;
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -.04em;
+    }
+    
+    .nav-fixed {
+      padding-top: 5rem;
+    }
+    
+    .dark-mode {
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    
+    .dark-mode .glass {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #f1f5f9;
+    }
+    
+    .dark-mode .modern-input {
+      background: #1e2937;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+    }
+    
+    .dark-mode .tab-active {
+      background: rgba(255,255,255,0.1);
+      border-bottom-color: #38bdf8;
+    }
   </style>
 </head>
-<body class="bg-zinc-950 text-white">
+<body class="professional-blue text-slate-900">
   <!-- Navbar -->
-  <nav class="border-b border-white/10 bg-zinc-950/95 backdrop-blur-2xl fixed w-full z-50">
+  <nav class="border-b border-slate-200 bg-white/95 backdrop-blur-2xl fixed w-full z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
       <!-- Custom Logo -->
       <div class="flex items-center gap-x-3">
-        <div class="w-9 h-9 bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
+        <div class="w-9 h-9 bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
           <span class="text-white font-bold text-2xl tracking-[-2px]">C</span>
         </div>
-        <span class="font-semibold text-2xl tracking-tighter">Credity<span class="text-xs font-mono text-sky-400/70">.ink</span></span>
+        <span class="font-semibold text-2xl tracking-tighter text-slate-900">Credity</span>
+        <span class="text-xs font-mono text-sky-600/70">.ink</span>
       </div>
+      
       <div class="flex items-center gap-x-4">
-        <button onclick="toggleTheme()" id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-2xl border border-white/20 hover:bg-white/5 transition-all">
-          <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
+        <button onclick="toggleTheme()" id="theme-toggle" 
+                class="w-9 h-9 flex items-center justify-center rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all">
+          <i class="fa-solid fa-sun text-lg text-sky-600" id="theme-icon"></i>
         </button>
-        <a href="#features" class="hidden md:block text-sm hover:text-sky-300 transition-colors">Features</a>
-        <a href="#security" class="hidden md:block text-sm hover:text-sky-300 transition-colors">Security</a>
-        <button onclick="showLoginModal()" class="px-6 py-2.5 text-sm font-medium hover:bg-white/5 transition-all rounded-3xl border border-white/20">Log in</button>
-        <button onclick="showSignupModal()" class="px-6 py-2.5 text-sm font-semibold bg-white text-zinc-950 hover:bg-white/90 transition-all rounded-3xl hidden md:block">Get started free</button>
+        
+        <a href="#features" class="hidden md:block text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
+        <a href="#security" class="hidden md:block text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Security</a>
+        
+        <button onclick="showLoginModal()" 
+                class="px-6 py-2.5 text-sm font-medium border border-slate-300 hover:bg-slate-100 transition-all rounded-3xl">
+          Log in
+        </button>
+        <button onclick="showSignupModal()" 
+                class="px-6 py-2.5 text-sm font-semibold bg-slate-900 text-white hover:bg-black transition-all rounded-3xl hidden md:block">
+          Get started free
+        </button>
       </div>
     </div>
   </nav>
 
   <!-- Hero -->
-  <div class="blue-cloudy-bg pt-20 pb-16 min-h-[92vh] flex items-center relative">
-    <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
-      <div class="inline-flex items-center gap-x-2 px-5 py-1.5 rounded-3xl bg-white/10 border border-white/20 mb-8 text-sm backdrop-blur-xl">
-        <div class="w-2 h-2 bg-sky-400 rounded-full animate-pulse"></div>
-        <span class="font-medium tracking-wider">AI-POWERED • ANTI-CHEAT SECURE</span>
+  <div class="pt-20 pb-16 professional-blue">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <div class="inline-flex items-center gap-x-2 px-5 py-1.5 rounded-3xl bg-white border border-slate-200 mb-8 text-sm shadow-sm">
+        <div class="w-2 h-2 bg-sky-500 rounded-full animate-pulse"></div>
+        <span class="font-medium tracking-wider text-slate-700">AI-POWERED • ANTI-CHEAT SECURE</span>
       </div>
-      <h1 class="text-7xl md:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6">Verify skills.<br><span class="cloud-text">Impossible to fake.</span></h1>
-      <p class="max-w-lg mx-auto text-2xl text-sky-100/90 mb-10">The most beautiful and secure platform for schools and educators to issue verifiable skill badges and certificates.</p>
+      
+      <h1 class="text-7xl md:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6 text-slate-900">
+        Verify skills.<br>
+        <span class="text-sky-700">Impossible to fake.</span>
+      </h1>
+      
+      <p class="max-w-lg mx-auto text-2xl text-slate-600 mb-10">
+        The most professional and secure platform for schools to issue beautiful, verifiable skill badges and certificates.
+      </p>
+      
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <button onclick="showSignupModal()" class="px-10 py-4 text-lg font-semibold bg-white text-zinc-950 hover:bg-white/95 transition-all rounded-3xl flex items-center justify-center gap-x-3 shadow-xl spotless-btn">Start free <i class="fa-solid fa-arrow-right ml-1"></i></button>
-        <button onclick="document.getElementById('security').scrollIntoView({behavior:'smooth'})" class="px-8 py-4 text-lg font-medium border border-white/30 hover:bg-white/5 transition-all rounded-3xl flex items-center gap-x-3">See anti-cheat tech</button>
+        <button onclick="showSignupModal()" 
+                class="px-10 py-4 text-lg font-semibold bg-slate-900 text-white hover:bg-black transition-all rounded-3xl flex items-center justify-center gap-x-3 shadow-lg">
+          Start free <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+        <button onclick="document.getElementById('security').scrollIntoView({behavior:'smooth'})" 
+                class="px-8 py-4 text-lg font-medium border border-slate-300 hover:bg-white transition-all rounded-3xl flex items-center gap-x-3">
+          See security features
+        </button>
       </div>
-      <div class="mt-12 text-xs tracking-[3px] text-sky-300/60">TRUSTED BY 240+ SCHOOLS • 42K+ VERIFIED BADGES</div>
+      
+      <div class="mt-12 text-xs tracking-[3px] text-slate-500">TRUSTED BY 240+ SCHOOLS • 42K+ VERIFIED BADGES</div>
     </div>
   </div>
 
   <!-- Trust -->
-  <div class="max-w-5xl mx-auto px-6 -mt-6 pb-16 relative z-20">
-    <div class="flex justify-center items-center gap-x-10 opacity-70 text-sm font-medium"><div>Stanford</div><div>NYU</div><div>EdTech Alliance</div><div>Pearson</div></div>
+  <div class="max-w-5xl mx-auto px-6 pb-16">
+    <div class="flex justify-center items-center gap-x-10 opacity-70 text-sm font-medium text-slate-600">
+      <div>Stanford</div><div>NYU</div><div>EdTech Alliance</div><div>Pearson</div>
+    </div>
   </div>
 
   <!-- Login Section -->
   <div id="login-section" class="max-w-4xl mx-auto px-6 py-12">
     <div class="text-center mb-10">
-      <h2 class="text-4xl font-semibold tracking-tight">Sign in to your account</h2>
-      <p class="text-sky-200/70 mt-2">Students • Teachers • Admins</p>
+      <h2 class="text-4xl font-semibold tracking-tight text-slate-900">Sign in to your account</h2>
+      <p class="text-slate-600 mt-2">Students • Teachers • School Admins</p>
     </div>
+
+    <!-- Role Tabs -->
     <div class="flex justify-center mb-8">
-      <div class="inline-flex bg-white/5 p-1 rounded-3xl border border-white/10">
+      <div class="inline-flex bg-white border border-slate-200 p-1 rounded-3xl">
         <button onclick="switchTab('student')" id="tab-student" class="px-8 py-2.5 rounded-3xl font-medium tab-active">Student</button>
         <button onclick="switchTab('teacher')" id="tab-teacher" class="px-8 py-2.5 rounded-3xl font-medium">Teacher / Admin</button>
       </div>
@@ -89,110 +172,148 @@
 
     <!-- Student Login -->
     <div id="student-form" class="max-w-md mx-auto">
-      <div class="glass p-8 rounded-3xl">
-        <h3 class="font-semibold text-2xl mb-6">Student Login</h3>
+      <div class="glass p-8 rounded-3xl shadow-sm">
+        <h3 class="font-semibold text-2xl mb-6 text-slate-900">Student Login</h3>
         <form action="/login" method="POST">
           <input type="hidden" name="role" value="student">
           <div class="space-y-4">
-            <input type="email" name="email" value="student@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
-            <input type="password" name="password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="text" name="email" placeholder="Username or Email" value="student@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           </div>
-          <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in as Student</button>
+          <button type="submit" class="mt-6 w-full py-4 bg-sky-600 hover:bg-sky-700 transition-all font-semibold text-white rounded-3xl">Sign in as Student</button>
         </form>
-        <div class="mt-5 text-center text-xs text-white/60">New student? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
+        <div class="mt-5 text-center text-xs text-slate-500">
+          New student? <span onclick="showSignupModal()" class="text-sky-600 cursor-pointer font-medium">Create account</span>
+        </div>
       </div>
     </div>
 
     <!-- Teacher/Admin Login -->
     <div id="teacher-form" class="max-w-md mx-auto hidden">
-      <div class="glass p-8 rounded-3xl">
-        <h3 class="font-semibold text-2xl mb-6">Teacher / Admin Login</h3>
+      <div class="glass p-8 rounded-3xl shadow-sm">
+        <h3 class="font-semibold text-2xl mb-6 text-slate-900">Teacher / Admin Login</h3>
         <form action="/login" method="POST">
           <input type="hidden" name="role" value="teacher">
           <div class="space-y-4">
-            <input type="email" name="email" value="teacher@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
-            <input type="password" name="password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="text" name="email" placeholder="Username or Email" value="teacher@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           </div>
-          <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in as Teacher</button>
+          <button type="submit" class="mt-6 w-full py-4 bg-sky-600 hover:bg-sky-700 transition-all font-semibold text-white rounded-3xl">Sign in as Teacher</button>
         </form>
+        
         <div class="mt-4 text-center">
-          <div onclick="adminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block">Admin access → admin / monterysasd</div>
+          <div onclick="adminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-slate-100 hover:bg-slate-200 transition-colors rounded-2xl inline-block text-slate-600">
+            Admin access available
+          </div>
         </div>
-        <div class="mt-5 text-center text-xs text-white/60">New teacher? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
+        
+        <div class="mt-5 text-center text-xs text-slate-500">
+          New teacher? <span onclick="showSignupModal()" class="text-sky-600 cursor-pointer font-medium">Create account</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Detailed Features -->
-  <div id="features" class="max-w-6xl mx-auto px-6 py-16 border-t border-white/10">
+  <!-- Features -->
+  <div id="features" class="max-w-6xl mx-auto px-6 py-16 border-t border-slate-200">
     <div class="text-center mb-14">
-      <div class="text-sky-400 text-sm font-medium tracking-[3px] mb-3">EVERYTHING YOU NEED</div>
-      <h2 class="section-header">Beautiful credentials.<br>Zero friction.</h2>
+      <div class="text-sky-600 text-sm font-medium tracking-[3px] mb-3">PROFESSIONAL TOOLS</div>
+      <h2 class="section-header text-slate-900">Everything you need.<br>Nothing you don't.</h2>
     </div>
+    
     <div class="grid md:grid-cols-3 gap-5">
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-magic text-4xl text-sky-400 mb-6"></i><h3 class="font-semibold text-2xl mb-3">AI Assessment Builder</h3><p class="text-sky-100/70">Generate MCQ + FRQ questions with timers, images, and auto-marking in seconds.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-palette text-4xl text-sky-400 mb-6"></i><h3 class="font-semibold text-2xl mb-3">Modern Design Studio</h3><p class="text-sky-100/70">Create stunning badges and certificates with multiple logos, signatures, colors, and live QR codes.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-qrcode text-4xl text-sky-400 mb-6"></i><h3 class="font-semibold text-2xl mb-3">Instant Verification</h3><p class="text-sky-100/70">Every credential has a unique QR that links to a public verification page.</p></div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-magic text-4xl text-sky-600 mb-6"></i>
+        <h3 class="font-semibold text-2xl mb-3 text-slate-900">AI Assessment Builder</h3>
+        <p class="text-slate-600">Create MCQ and FRQ tests with timers, images, and instant auto-marking in seconds.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-palette text-4xl text-sky-600 mb-6"></i>
+        <h3 class="font-semibold text-2xl mb-3 text-slate-900">Modern Design Studio</h3>
+        <p class="text-slate-600">Design beautiful badges and certificates with multiple logos, signatures, and live QR verification.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-qrcode text-4xl text-sky-600 mb-6"></i>
+        <h3 class="font-semibold text-2xl mb-3 text-slate-900">Instant Verification</h3>
+        <p class="text-slate-600">Every credential has a unique verifiable QR code that works on any device.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Anti-Cheat Security (Detailed) -->
-  <div id="security" class="max-w-6xl mx-auto px-6 py-16 border-t border-white/10">
+  <!-- Security -->
+  <div id="security" class="max-w-6xl mx-auto px-6 py-16 border-t border-slate-200">
     <div class="text-center mb-14">
-      <div class="inline-block px-4 py-1 rounded-3xl bg-red-500/10 text-red-400 text-xs font-medium tracking-widest mb-3">IMPOSSIBLE TO CHEAT</div>
-      <h2 class="section-header">Assessment security<br>that actually works.</h2>
-      <p class="max-w-md mx-auto text-sky-100/70 mt-4">Enterprise-grade anti-cheat technology trusted by schools worldwide.</p>
+      <div class="inline-block px-4 py-1 rounded-3xl bg-red-100 text-red-600 text-xs font-medium tracking-widest mb-3">IMPOSSIBLE TO CHEAT</div>
+      <h2 class="section-header text-slate-900">Enterprise-grade<br>assessment security.</h2>
     </div>
+    
     <div class="grid md:grid-cols-3 gap-5">
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-desktop text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Full-Screen Lockdown Mode</h3><p class="text-sky-100/70 text-sm">Forces full-screen kiosk mode. Exiting triggers automatic submission and flags the attempt.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-eye text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Tab &amp; Focus Detection</h3><p class="text-sky-100/70 text-sm">Real-time monitoring of tab switches, window focus loss, or screen sharing. Every violation is logged.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-copy text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Clipboard &amp; Right-Click Lock</h3><p class="text-sky-100/70 text-sm">Complete disable of copy/paste, right-click, print screen, and keyboard shortcuts during assessment.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-random text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Randomized &amp; AI-Generated Questions</h3><p class="text-sky-100/70 text-sm">Every student gets unique question order and answer shuffling. AI generates fresh variants.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-video text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Optional AI Webcam Monitoring</h3><p class="text-sky-100/70 text-sm">Eye-tracking, face detection, and behavior analysis. Flags suspicious activity in real time.</p></div>
-      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-clock text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Smart Per-Question Timers + Auto-Submit</h3><p class="text-sky-100/70 text-sm">Configurable time limits per question. Auto-submits when time expires.</p></div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-desktop text-4xl text-red-500 mb-6"></i>
+        <h3 class="font-semibold text-xl mb-2 text-slate-900">Full-Screen Lockdown</h3>
+        <p class="text-slate-600 text-sm">Forces full-screen mode. Exiting the test triggers automatic submission.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-eye text-4xl text-red-500 mb-6"></i>
+        <h3 class="font-semibold text-xl mb-2 text-slate-900">Tab &amp; Focus Detection</h3>
+        <p class="text-slate-600 text-sm">Real-time detection of tab switching or focus loss with detailed logging.</p>
+      </div>
+      <div class="glass p-8 rounded-3xl premium-card">
+        <i class="fa-solid fa-copy text-4xl text-red-500 mb-6"></i>
+        <h3 class="font-semibold text-xl mb-2 text-slate-900">Clipboard Protection</h3>
+        <p class="text-slate-600 text-sm">Complete disable of copy/paste, right-click, and print screen during assessments.</p>
+      </div>
     </div>
-  </div>
-
-  <!-- How it Works -->
-  <div class="max-w-5xl mx-auto px-6 py-16 border-t border-white/10">
-    <div class="text-center mb-12"><h2 class="section-header">Three simple steps to verified skills</h2></div>
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="text-center"><div class="mx-auto w-12 h-12 bg-sky-500/10 text-sky-400 rounded-2xl flex items-center justify-center mb-5 text-2xl font-bold">1</div><div class="font-semibold text-xl mb-2">Create</div><p class="text-sky-100/70 text-sm">Teachers build assessments or design badges using our modern studio in minutes.</p></div>
-      <div class="text-center"><div class="mx-auto w-12 h-12 bg-sky-500/10 text-sky-400 rounded-2xl flex items-center justify-center mb-5 text-2xl font-bold">2</div><div class="font-semibold text-xl mb-2">Issue</div><p class="text-sky-100/70 text-sm">Post special events or award verified credentials directly to students with one click.</p></div>
-      <div class="text-center"><div class="mx-auto w-12 h-12 bg-sky-500/10 text-sky-400 rounded-2xl flex items-center justify-center mb-5 text-2xl font-bold">3</div><div class="font-semibold text-xl mb-2">Verify</div><p class="text-sky-100/70 text-sm">Students receive shareable links and QR codes. Employers validate instantly.</p></div>
-    </div>
-  </div>
-
-  <!-- Final CTA -->
-  <div class="max-w-4xl mx-auto px-6 py-20 text-center border-t border-white/10">
-    <h3 class="text-4xl font-semibold tracking-tight mb-3">Ready to modernize how your school issues credentials?</h3>
-    <p class="text-sky-200/70 mb-8">Join hundreds of forward-thinking schools using Credity.ink</p>
-    <button onclick="showSignupModal()" class="px-10 py-4 bg-white text-zinc-950 font-semibold text-lg rounded-3xl spotless-btn">Create your free account</button>
   </div>
 
   <script>
-    let isLight = false;
+    let isDark = false;
+    
     function toggleTheme() {
-      isLight = !isLight;
-      const body = document.body; const icon = document.getElementById('theme-icon');
-      if (isLight) { body.classList.add('light-mode'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); } 
-      else { body.classList.remove('light-mode'); icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+      isDark = !isDark;
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      
+      if (isDark) {
+        body.classList.add('dark-mode');
+        body.classList.remove('professional-blue');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('professional-blue');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
     }
+    
     function switchTab(role) {
       document.getElementById('student-form').classList.toggle('hidden', role !== 'student');
       document.getElementById('teacher-form').classList.toggle('hidden', role !== 'teacher');
       document.getElementById('tab-student').classList.toggle('tab-active', role === 'student');
       document.getElementById('tab-teacher').classList.toggle('tab-active', role === 'teacher');
     }
-    function showLoginModal() { document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' }); }
-    function showSignupModal() { alert('Sign-up modal would open here with separate Student and Teacher forms.'); }
+    
+    function showLoginModal() {
+      document.getElementById('login-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function showSignupModal() {
+      alert('Sign-up modal opens here with separate Student and Teacher forms.');
+    }
+    
     function adminLogin() {
-      const form = document.createElement('form'); form.method = 'POST'; form.action = '/login';
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/login';
       const email = document.createElement('input'); email.name = 'email'; email.value = 'admin';
       const pass = document.createElement('input'); pass.name = 'password'; pass.value = 'monterysasd';
       const role = document.createElement('input'); role.name = 'role'; role.value = 'teacher';
-      form.append(email, pass, role); document.body.append(form); form.submit();
+      form.append(email, pass, role);
+      document.body.append(form);
+      form.submit();
     }
+    
     window.onload = function() {
       document.getElementById('student-form').classList.remove('hidden');
       document.getElementById('teacher-form').classList.add('hidden');
