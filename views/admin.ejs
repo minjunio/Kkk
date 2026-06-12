@@ -41,73 +41,32 @@
       flex-direction: column;
     }
 
-    /* ================= ENHANCED tpl-1-degree (Premium) ================= */
-    .tpl-1-degree {
-      font-family: 'Cinzel', serif;
-      border: 2.5cqw solid #1e293b;
-      outline: 0.6cqw solid #1e293b;
-      outline-offset: -1.2cqw;
-      background: linear-gradient(#fffdf8, #fefaf0);
-      box-shadow: inset 0 0 0 1.5cqw #f8f1e3,
-                  inset 0 0 90px rgba(180, 83, 9, 0.07);
-      position: relative;
-    }
-    .tpl-1-degree::before {
-      content: '';
-      position: absolute;
-      inset: 1.6cqw;
-      border: 0.45cqw solid #1e293b;
-      opacity: 0.12;
-      pointer-events: none;
-    }
-    .tpl-1-degree .cert-title {
-      font-size: 4.6cqi;
-      color: #1e293b;
-      font-weight: 700;
-      border-bottom: 2.5px solid #b45309;
-      padding-bottom: 1.8cqw;
-      display: inline-block;
-      letter-spacing: 0.02em;
-    }
-
-    /* Other clean templates */
+    /* Templates Styles */
+    .tpl-1-degree { font-family: 'Cinzel', serif; border: 2.5cqw solid #1e293b; outline: 0.6cqw solid #1e293b; outline-offset: -1.2cqw; background: linear-gradient(#fffdf8, #fefaf0); box-shadow: inset 0 0 0 1.5cqw #f8f1e3, inset 0 0 90px rgba(180, 83, 9, 0.07); position: relative; }
+    .tpl-1-degree::before { content: ''; position: absolute; inset: 1.6cqw; border: 0.45cqw solid #1e293b; opacity: 0.12; pointer-events: none; }
+    .tpl-1-degree .cert-title { font-size: 4.6cqi; color: #1e293b; font-weight: 700; border-bottom: 2.5px solid #b45309; padding-bottom: 1.8cqw; display: inline-block; letter-spacing: 0.02em; }
     .tpl-2-university { font-family: 'Playfair Display', serif; border: 3cqw solid #1e293b; background: #ffffff; position: relative; }
     .tpl-2-university::before { content:''; position:absolute; inset: 1.8cqw; border: 0.35cqw solid #1e293b; opacity: 0.15; pointer-events: none; }
     .tpl-2-university .cert-title { font-size: 4cqi; text-transform: uppercase; letter-spacing: 0.25em; color: #1e293b; }
-
     .tpl-3-corporate { font-family: 'Montserrat', sans-serif; border-top: 5.5cqw solid #1e293b; border-bottom: 1.8cqw solid #1e293b; background: #ffffff; }
     .tpl-3-corporate .cert-title { font-size: 3.6cqi; font-weight: 800; letter-spacing: 0.12em; color: #1e293b; }
-
-    .tpl-4-tech { 
-      font-family: 'Space Grotesk', sans-serif; 
-      border: 0.6cqw solid #1e293b; 
-      background: #ffffff; 
-      background-image: linear-gradient(rgba(15,23,42,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.035) 1px, transparent 1px);
-      background-size: 3.8cqw 3.8cqw;
-    }
+    .tpl-4-tech { font-family: 'Space Grotesk', sans-serif; border: 0.6cqw solid #1e293b; background: #ffffff; background-image: linear-gradient(rgba(15,23,42,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.035) 1px, transparent 1px); background-size: 3.8cqw 3.8cqw; }
     .tpl-4-tech .cert-title { font-size: 3.5cqi; text-transform: uppercase; color: #1e293b; letter-spacing: 0.1em; }
-
     .tpl-5-scholar { font-family: 'Cinzel', serif; border: 1.6cqw solid #b45309; background: linear-gradient(135deg, #fffbeb, #fef3c7); position: relative; }
     .tpl-5-scholar::after { content:''; position:absolute; inset: 0.6cqw; border: 0.35cqw solid #b45309; pointer-events: none; }
     .tpl-5-scholar .cert-title { font-size: 4.1cqi; color: #92400e; }
-
     .tpl-6-minimal { font-family: 'Inter', sans-serif; border-left: 6.5cqw solid #1e293b; background: #f8fafc; }
     .tpl-6-minimal .cert-title { font-size: 3.6cqi; font-weight: 700; text-align: left; color: #1e293b; }
-
     .tpl-7-exec { font-family: 'Playfair Display', serif; border: 0.25cqw solid #64748b; background: #ffffff; box-shadow: inset 0 0 0 2.2cqw #f1f5f9; }
     .tpl-7-exec .cert-title { font-size: 3.9cqi; font-style: italic; color: #1e293b; }
-
     .tpl-8-dark { font-family: 'Space Grotesk', sans-serif; border: 0.55cqw solid #334155; background: radial-gradient(circle at 50% 0%, #1e293b, #0f172a); color: #f8fafc !important; }
     .tpl-8-dark .draggable-logo { mix-blend-mode: normal; filter: drop-shadow(0 0 6px rgba(255,255,255,0.6)); } 
     .tpl-8-dark .cert-title { font-size: 3.5cqi; color: #fff; }
-
     .tpl-9-honors { font-family: 'Cinzel', serif; border: 1.1cqw double #9f1239; outline: 2.2cqw solid #fff1f2; outline-offset: -3.2cqw; background: #ffffff; }
     .tpl-9-honors .cert-title { font-size: 4.1cqi; color: #9f1239; }
-
     .tpl-10-cyber { font-family: 'Space Grotesk', sans-serif; border-right: 3.2cqw solid #10b981; border-left: 3.2cqw solid #10b981; background: #000000; color: #10b981 !important; }
     .tpl-10-cyber .draggable-logo { mix-blend-mode: normal; filter: drop-shadow(0 0 6px #10b981); }
     .tpl-10-cyber .cert-title { font-size: 3.1cqi; letter-spacing: 0.35em; }
-
     .tpl-11-artdeco { font-family: 'Montserrat', sans-serif; border: 1.1cqw solid #1e293b; background: #fafaf9; outline: 0.25cqw solid #1e293b; outline-offset: -1.6cqw; }
     .tpl-12-startup { font-family: 'Inter', sans-serif; border-radius: 4.5cqw; border: 0.9cqw solid #1e293b; background: #ffffff; box-shadow: inset 0 0 3.5cqw rgba(0,0,0,0.06); }
     .tpl-13-classic { font-family: 'Playfair Display', serif; border: 2.2cqw solid #1e293b; background: #fefce8; }
@@ -131,7 +90,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-  <!-- Navigation -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-[90rem] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-x-3">
@@ -141,7 +99,7 @@
         <span class="font-bold text-xl tracking-tight">Credity Admin</span>
       </div>
       <div class="flex items-center gap-4">
-        <a href="/make-test" class="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
+        <a href="/assessment" class="hidden sm:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
           <i class="fa-solid fa-plus"></i> <span class="hidden md:inline">Create Assessment</span>
         </a>
         <a href="/logout" class="px-5 py-2.5 text-sm font-medium border border-slate-200 rounded-xl hover:bg-slate-50">Logout</a>
@@ -151,7 +109,6 @@
 
   <div class="max-w-[90rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
 
-    <!-- PROMINENT CREATE ASSESSMENT SECTION -->
     <div class="mb-10">
       <div class="glass rounded-3xl p-8 md:p-10 border border-blue-100 bg-gradient-to-br from-white via-blue-50/30 to-white flex flex-col lg:flex-row items-center justify-between gap-8">
         <div class="max-w-2xl">
@@ -163,7 +120,7 @@
           <p class="mt-4 text-xl text-slate-600">Build secure proctored exams and instantly link them to beautiful, verifiable credentials.</p>
           
           <div class="mt-8 flex flex-wrap gap-4">
-            <a href="/make-test" 
+            <a href="/assessment" 
                class="inline-flex items-center justify-center gap-3 px-9 py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-lg rounded-xl shadow-xl shadow-blue-600/40 transition-all active:scale-[0.985]">
               <i class="fa-solid fa-plus text-xl"></i>
               <span>Create New Assessment</span>
@@ -191,7 +148,6 @@
       </div>
     </div>
 
-    <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
       <div>
         <h2 class="text-3xl font-bold tracking-tight text-slate-900">Credential Architecture</h2>
@@ -199,21 +155,17 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="flex border-b border-slate-200 mb-8 overflow-x-auto custom-scroll">
       <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="tab-certificates">Certificate Engine</button>
       <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-badges">Badge Creator</button>
       <button onclick="showTab('overview')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-overview">System Overview</button>
     </div>
 
-    <!-- ================= CERTIFICATE EDITOR ================= -->
     <div id="certificates-tab" class="tab-content">
       <form action="/create-credential" method="POST" class="flex flex-col xl:flex-row gap-8">
         <input type="hidden" name="type" value="certificate">
         
-        <!-- Controls -->
         <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-6">
-          
           <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
             <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment</label>
             <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium border-blue-200 bg-white" required>
@@ -224,12 +176,10 @@
                 <% }) %>
               <% } else { %>
                 <option value="1">Introduction to AI &amp; Data Science</option>
-                <option value="2">Advanced Cybersecurity Protocol</option>
               <% } %>
             </select>
           </div>
 
-          <!-- Live Preview Inputs -->
           <div class="grid md:grid-cols-3 gap-4 p-4 border border-slate-200 rounded-2xl bg-slate-50">
             <div>
               <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Preview Student</label>
@@ -261,110 +211,56 @@
             <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</textarea>
           </div>
 
-          <!-- Templates -->
           <div>
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Master Templates (20)</label>
             <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x"></div>
           </div>
 
-          <!-- Logo Engine -->
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-4">
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Multi-Logo Engine</label>
-              <span class="text-[10px] text-emerald-600 font-bold bg-emerald-100 px-3 py-1 rounded-lg">Only loaded logos appear</span>
             </div>
-            
             <div class="flex flex-col sm:flex-row gap-2 mb-4">
-              <input type="text" id="custom-logo-input" placeholder="Paste logo URL (PNG / SVG / JPG)..." 
-                     class="modern-input flex-1 px-4 py-2.5 rounded-xl text-sm">
-              <button type="button" onclick="addCustomLogo()" 
-                      class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.985] whitespace-nowrap">
-                Add Custom Logo
-              </button>
+              <input type="text" id="custom-logo-input" placeholder="Paste logo URL..." class="modern-input flex-1 px-4 py-2.5 rounded-xl text-sm">
+              <button type="button" onclick="addCustomLogo()" class="px-5 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl">Add Custom Logo</button>
             </div>
-
             <div class="mb-4">
               <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Active Logos on Certificate</label>
               <div id="active-logos-list" class="flex flex-wrap gap-2 empty:hidden bg-white p-3 rounded-xl border border-slate-200 min-h-[44px]"></div>
             </div>
-
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Reliable Tech Logos (40)</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Reliable Tech Logos</label>
             <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-44 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl"></div>
           </div>
 
-          <button type="submit" 
-                  class="w-full py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl text-lg shadow-lg transition-all active:scale-[0.985]">
-            Generate Secure Credential
-          </button>
+          <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-lg shadow-lg">Generate Secure Credential</button>
         </div>
 
-        <!-- Live Preview -->
         <div class="xl:w-2/5 cert-container">
           <div class="sticky top-24">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-sm font-bold text-slate-400 uppercase">Live Preview</h3>
-              <span class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold bg-emerald-100 px-3 py-1 rounded-lg">Anti-Forge Active</span>
             </div>
-            
-            <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center" style="border-color: #1e293b; outline-color: #1e293b;">
-              
-              <!-- TIGHT ANTI-FORGE WAVES -->
-              <svg class="absolute inset-0 w-full h-full opacity-[0.065] pointer-events-none z-0" viewBox="0 0 1000 1414" preserveAspectRatio="xMidYMid slice">
-                <defs>
-                  <path id="w1" d="M-80 470 Q 180 438, 500 475 T 1080 465" />
-                  <path id="w2" d="M-80 492 Q 180 460, 500 497 T 1080 487" />
-                  <path id="w3" d="M-80 514 Q 180 482, 500 519 T 1080 509" />
-                  <path id="w4" d="M-80 536 Q 180 504, 500 541 T 1080 531" />
-                  <path id="w5" d="M-80 558 Q 180 526, 500 563 T 1080 553" />
-                  <path id="w6" d="M-80 580 Q 180 548, 500 585 T 1080 575" />
-                  <path id="w7" d="M-80 602 Q 180 570, 500 607 T 1080 597" />
-                  <path id="w8" d="M-80 624 Q 180 592, 500 629 T 1080 619" />
-                </defs>
-                <g font-family="monospace" font-size="10.5" font-weight="700" fill="#0f172a" letter-spacing="3">
-                  <text><textPath href="#w1" startOffset="0%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w2" startOffset="6%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w3" startOffset="2%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w4" startOffset="9%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w5" startOffset="4%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w6" startOffset="11%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w7" startOffset="1%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                  <text><textPath href="#w8" startOffset="7%">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK</textPath></text>
-                </g>
-              </svg>
-
-              <!-- Logos Container -->
+            <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center">
               <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none"></div>
-
-              <!-- Main Content -->
               <div class="w-full relative z-10 mt-[7%]">
                 <div class="text-[1.65cqi] tracking-[0.3em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">The Board of Trustees certifies that</div>
                 <div id="preview-student" class="text-[5.1cqi] font-bold text-slate-900 leading-none cert-text-color mt-[2%]">Alex Rivera</div>
               </div>
-
               <div class="px-[7%] my-[5%] relative z-10 w-full flex-grow">
                 <div id="preview-title" class="cert-title mb-[4%] drop-shadow-sm">Master of Science</div>
-                <div id="preview-desc" class="text-[1.6cqi] text-slate-600 cert-text-color leading-relaxed">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</div>
+                <div id="preview-desc" class="text-[1.6cqi] text-slate-600 cert-text-color leading-relaxed">has fulfilled all requirements and is hereby admitted to the degree.</div>
               </div>
-
-              <!-- Footer - Perfectly Fitted & Neat -->
               <div class="w-full flex justify-between items-end mt-auto pt-1 pb-1 relative z-10">
-                
-                <!-- Left: Signature -->
                 <div class="text-center border-t border-slate-400 pt-2 min-w-[13cqi]">
                   <div id="preview-signature" class="font-signature text-[3.9cqi] text-slate-800 cert-text-color leading-none mb-0.5">Dr. Admin</div>
                   <div class="text-[0.85cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Authorized Signatory</div>
                 </div>
-
-                <!-- Center: Date -->
                 <div class="text-center border-t border-slate-400 pt-2 min-w-[13cqi]">
                   <div id="preview-date-display" class="text-[1.45cqi] font-bold text-slate-800 cert-text-color leading-none mb-1 mt-1">Date</div>
                   <div class="text-[0.85cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Issue Date</div>
                 </div>
-
-                <!-- Right: QR + Verify (Perfectly Aligned & Fitted) -->
                 <div class="flex flex-col items-center">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&amp;data=https://credity.ink/verify/id" 
-                       class="w-[6.6cqi] h-[6.6cqi] mb-0.5 p-0.5 bg-white border border-slate-200 shadow-sm">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&amp;data=Verify" class="w-[6.6cqi] h-[6.6cqi] mb-0.5 p-0.5 bg-white border border-slate-200 shadow-sm">
                   <div class="text-[0.82cqi] text-slate-500 uppercase cert-text-color font-bold tracking-widest">Verify</div>
                 </div>
               </div>
@@ -374,7 +270,6 @@
       </form>
     </div>
 
-    <!-- ================= BADGE EDITOR ================= -->
     <div id="badges-tab" class="tab-content hidden">
       <form action="/create-credential" method="POST" class="flex flex-col md:flex-row gap-8">
         <input type="hidden" name="type" value="badge">
@@ -398,12 +293,9 @@
             <div>
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Shape Geometry</label>
               <select id="badge-shape" onchange="updateBadge()" class="modern-input w-full px-4 py-3 rounded-xl">
-                <option value="shape-shield">Shield (Default Badge)</option>
+                <option value="shape-shield">Shield</option>
                 <option value="shape-hexagon">Hexagon</option>
-                <option value="shape-star">Starburst</option>
                 <option value="shape-circle">Circle</option>
-                <option value="shape-octagon">Octagon</option>
-                <option value="shape-diamond">Diamond</option>
               </select>
             </div>
             <div>
@@ -415,51 +307,31 @@
           <div>
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Vector Icon</label>
             <div class="grid grid-cols-6 gap-2">
-              <button type="button" onclick="setBadgeIcon('fa-shield-halved')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-shield-halved text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-award')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-award text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-code')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-code text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-bolt text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-brain text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-check-double')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200 active:bg-slate-300"><i class="fa-solid fa-check-double text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-shield-halved')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-shield-halved text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-award')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-award text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-code')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-code text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-bolt text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-brain text-xl"></i></button>
             </div>
           </div>
 
-          <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-black active:bg-zinc-950 text-white font-semibold rounded-xl transition-all active:scale-[0.985]">Mint Secure Badge</button>
+          <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-black text-white font-semibold rounded-xl">Mint Secure Badge</button>
         </div>
 
-        <!-- Enhanced Badge Preview -->
         <div class="md:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-10 md:p-14 border border-slate-200 shadow-inner overflow-hidden relative">
           <div class="absolute inset-0" style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 24px 24px; opacity: 0.6;"></div>
-          
           <div class="text-center w-full relative z-10 flex flex-col items-center">
             <div id="preview-badge-text" class="text-[15px] font-bold tracking-[3px] uppercase text-slate-900 mb-7 drop-shadow-sm">Certified Engineer</div>
-
             <div class="badge-preview-container relative w-56 h-56 mb-8">
-              <div id="preview-badge-base" 
-                   class="badge-base shape-shield w-full h-full shadow-2xl flex flex-col justify-center items-center relative"
-                   style="background: linear-gradient(145deg, #0f172a, #1e2937); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.45), inset 0 0 0 1px rgba(255,255,255,0.2);">
-                
-                <div class="absolute inset-[6px] border border-white/25" id="preview-badge-inner" style="clip-path: inherit; border-radius: inherit;"></div>
-                <div class="absolute inset-[13px] border border-white/10" id="preview-badge-inner2" style="clip-path: inherit; border-radius: inherit;"></div>
-                
+              <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-2xl flex flex-col justify-center items-center relative" style="background: linear-gradient(145deg, #0f172a, #1e2937);">
                 <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.9rem] text-white mb-3 drop-shadow-xl z-20"></i>
-                
-                <div class="mt-1 bg-white p-1.5 rounded-lg z-20 shadow-md border border-slate-200">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&amp;data=Verify" class="w-9 h-9">
-                </div>
               </div>
-            </div>
-
-            <div class="text-[10px] text-slate-500 font-mono tracking-[2px] uppercase opacity-75 flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check-circle text-emerald-500"></i> 
-              <span>CREDITY.INK • VERIFIED BADGE</span>
             </div>
           </div>
         </div>
       </form>
     </div>
 
-    <!-- ================= SYSTEM OVERVIEW ================= -->
     <div id="overview-tab" class="tab-content hidden">
       <div class="glass rounded-3xl overflow-hidden border border-slate-200">
         <div class="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
@@ -492,13 +364,6 @@
                     </td>
                   </tr>
                 <% }) %>
-              <% } else { %>
-                <tr class="hover:bg-slate-50">
-                  <td class="p-5 font-mono text-sm text-slate-500">#00001</td>
-                  <td class="p-5 font-semibold text-slate-800">Ms. Johnson</td>
-                  <td class="p-5 text-slate-600">teacher@school.com</td>
-                  <td class="p-5"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold uppercase">Teacher</span></td>
-                </tr>
               <% } %>
             </tbody>
           </table>
@@ -511,56 +376,14 @@
     const templates = [
       { id: '1-degree', name: 'Master\'s Degree' }, { id: '2-university', name: 'University Seal' },
       { id: '3-corporate', name: 'Corporate Award' }, { id: '4-tech', name: 'Grid Technology' },
-      { id: '5-scholar', name: 'Gold Scholar' }, { id: '6-minimal', name: 'Minimal Block' },
-      { id: '7-exec', name: 'Executive Padding' }, { id: '8-dark', name: 'Dark Mode AI' },
-      { id: '9-honors', name: 'Crimson Honors' }, { id: '10-cyber', name: 'Cyber Security' },
-      { id: '11-artdeco', name: 'Art Deco' }, { id: '12-startup', name: 'Startup Rounded' },
-      { id: '13-classic', name: 'Classic Parchment' }, { id: '14-geo', name: 'Geometric Pattern' },
-      { id: '15-eco', name: 'Eco Nature Block' }, { id: '16-vintage', name: 'Vintage Groove' },
-      { id: '17-angle', name: 'Executive Angle' }, { id: '18-neon', name: 'Neon Glow' },
-      { id: '19-medical', name: 'Clinical Medical' }, { id: '20-future', name: 'Future Frame' }
+      { id: '5-scholar', name: 'Gold Scholar' }, { id: '6-minimal', name: 'Minimal Block' }
     ];
 
     const presetLogos = [
       'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
       'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
       'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/gitlab/gitlab-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apple/apple-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-plain.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nvidia/nvidia-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/intel/intel-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amd/amd-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/huggingface/huggingface-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/keras/keras-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pandas/pandas-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/numpy/numpy-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/jupyter/jupyter-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/meta/meta-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ibm/ibm-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ethereum/ethereum-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bitcoin/bitcoin-original.svg'
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg'
     ];
 
     let currentTemplate = 'tpl-1-degree';
@@ -574,7 +397,7 @@
       templates.forEach(t => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-600 focus:bg-blue-50 focus:text-blue-700 transition-all active:scale-[0.985]';
+        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500';
         btn.innerText = t.name;
         btn.onclick = () => setTemplate(t.id);
         templateGrid.appendChild(btn);
@@ -584,7 +407,7 @@
       presetLogos.forEach(url => {
         const img = document.createElement('img');
         img.src = url;
-        img.className = 'w-9 h-9 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
+        img.className = 'w-9 h-9 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain';
         img.onclick = () => addLogoToDoc(url);
         logoGrid.appendChild(img);
       });
@@ -622,10 +445,6 @@
         activeLogos.push({ id, url });
         renderActiveLogosList();
       };
-
-      img.onerror = () => {
-        console.warn('Logo failed to load (not displayed):', url);
-      };
     }
 
     function removeLogo(id) {
@@ -643,7 +462,7 @@
         badge.className = 'flex items-center gap-2 bg-slate-100 pl-2 pr-1 py-1 rounded-lg text-xs font-semibold border border-slate-200';
         badge.innerHTML = `
           <img src="${logo.url}" class="w-4 h-4 object-contain"> Logo ${index + 1}
-          <button type="button" onclick="removeLogo('${logo.id}')" class="text-red-500 hover:bg-red-100 p-1 rounded"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" onclick="removeLogo('${logo.id}')" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>
         `;
         list.appendChild(badge);
       });
@@ -652,37 +471,23 @@
     function makeDraggable(elmnt) {
       let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
       elmnt.onmousedown = dragMouseDown;
-      elmnt.ontouchstart = dragMouseDown;
-
       function dragMouseDown(e) {
         e.preventDefault();
-        if (e.type === 'touchstart') { pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY; } 
-        else { pos3 = e.clientX; pos4 = e.clientY; }
+        pos3 = e.clientX; pos4 = e.clientY;
         document.onmouseup = closeDragElement;
-        document.ontouchend = closeDragElement;
         document.onmousemove = elementDrag;
-        document.ontouchmove = elementDrag;
       }
-
       function elementDrag(e) {
         e.preventDefault();
-        let clientX, clientY;
-        if (e.type === 'touchmove') { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
-        else { clientX = e.clientX; clientY = e.clientY; }
-        pos1 = pos3 - clientX; pos2 = pos4 - clientY; pos3 = clientX; pos4 = clientY;
-
+        pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
         const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
         let newTop = ((elmnt.offsetTop - pos2) / boundary.height) * 100;
         let newLeft = ((elmnt.offsetLeft - pos1) / boundary.width) * 100;
-        newTop = Math.max(0, Math.min(newTop, 92));
-        newLeft = Math.max(0, Math.min(newLeft, 92));
-        elmnt.style.top = newTop + "%";
-        elmnt.style.left = newLeft + "%";
+        elmnt.style.top = Math.max(0, Math.min(newTop, 92)) + "%";
+        elmnt.style.left = Math.max(0, Math.min(newLeft, 92)) + "%";
       }
-
       function closeDragElement() {
         document.onmouseup = null; document.onmousemove = null;
-        document.ontouchend = null; document.ontouchmove = null;
       }
     }
 
@@ -691,17 +496,7 @@
       preview.classList.remove(currentTemplate);
       currentTemplate = `tpl-${id}`;
       preview.classList.add(currentTemplate);
-
-      const darkThemes = ['tpl-8-dark', 'tpl-10-cyber', 'tpl-18-neon'];
-      const textElements = document.querySelectorAll('.cert-text-color');
-
-      if (darkThemes.includes(currentTemplate)) {
-        textElements.forEach(el => el.style.color = '#f8fafc');
-        document.getElementById('preview-title').style.color = '#ffffff';
-      } else {
-        textElements.forEach(el => el.style.color = '');
-        updateCert();
-      }
+      updateCert();
     }
 
     function updateCert() {
@@ -712,24 +507,13 @@
       const signature = document.getElementById('cert-signature').value;
       const dateVal = document.getElementById('cert-date').value;
 
-      const titleEl = document.getElementById('preview-title');
-      titleEl.innerText = title;
-
-      if (!['tpl-8-dark', 'tpl-10-cyber', 'tpl-18-neon'].includes(currentTemplate)) {
-        titleEl.style.color = color;
-      }
-
-      const preview = document.getElementById('cert-preview');
-      preview.style.borderColor = color;
-      preview.style.outlineColor = color;
-
+      document.getElementById('preview-title').innerText = title;
+      document.getElementById('cert-preview').style.borderColor = color;
+      document.getElementById('cert-preview').style.outlineColor = color;
       document.getElementById('preview-desc').innerText = desc;
       document.getElementById('preview-student').innerText = student || '[Student Name]';
       document.getElementById('preview-signature').innerText = signature || 'Authorized Signature';
-
-      if (dateVal) {
-        document.getElementById('preview-date-display').innerText = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      }
+      if (dateVal) document.getElementById('preview-date-display').innerText = new Date(dateVal).toLocaleDateString();
     }
 
     function setBadgeIcon(iconClass) {
@@ -743,20 +527,14 @@
       const hexColor = document.getElementById('badge-color').value;
 
       document.getElementById('preview-badge-text').innerText = title || 'Badge Title';
-
       const base = document.getElementById('preview-badge-base');
       base.className = `badge-base ${shape} w-full h-full shadow-2xl flex flex-col justify-center items-center relative`;
-      base.style.background = `linear-gradient(145deg, ${hexColor}, ${adjustColor(hexColor, -60)})`;
-    }
-
-    function adjustColor(color, amount) {
-      return '#' + color.replace(/^#/, '').replace(/../g, c => ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).substr(-2));
+      base.style.background = `linear-gradient(145deg, ${hexColor}, #0f172a)`;
     }
 
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(tab + '-tab').classList.remove('hidden');
-
       document.querySelectorAll('.tab-btn').forEach(el => {
         el.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
         el.classList.add('text-slate-500');
