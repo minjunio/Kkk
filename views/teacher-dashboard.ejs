@@ -17,10 +17,12 @@
     .design-option.active { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
     .form-input { background: #18181b; border: 1px solid #27272a; }
     .form-input:focus { border-color: #6366f1; outline: none; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #18181b; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
-  <!-- Top Nav -->
   <nav class="border-b border-white/10 bg-zinc-950/90 backdrop-blur-xl sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
       <div class="flex items-center gap-x-3">
@@ -41,16 +43,14 @@
   </nav>
 
   <div class="max-w-7xl mx-auto px-8 pt-10 pb-20">
-    <!-- Header -->
-    <div class="flex items-end justify-between mb-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
       <div>
         <div class="text-sm text-indigo-400 font-medium tracking-widest">TEACHER ADMIN PORTAL</div>
-        <h1 class="text-5xl font-semibold tracking-tighter">Hello, <%= user.name.split(' ')[0] %>.</h1>
+        <h1 class="text-4xl md:text-5xl font-semibold tracking-tighter">Hello, <%= user.name.split(' ')[0] %>.</h1>
       </div>
-      <div class="text-right text-xs text-white/60">Manage credentials • Issue badges • Create tests</div>
+      <div class="text-xs text-white/60 bg-white/5 px-4 py-2 rounded-2xl w-fit">Manage credentials • Issue badges • Create tests</div>
     </div>
 
-    <!-- Quick Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
       <div class="glass p-5 rounded-3xl">
         <div class="text-xs text-white/60">TOTAL BADGES CREATED</div>
@@ -70,18 +70,16 @@
       </div>
     </div>
 
-    <!-- Main Content Grid -->
     <div class="grid lg:grid-cols-12 gap-6">
       
-      <!-- Create Badge / Certificate -->
       <div class="lg:col-span-7 glass rounded-3xl p-8">
         <div class="flex items-center justify-between mb-6">
-          <div class="section-header">Create Badge or Certificate</div>
+          <div class="section-header text-lg md:text-xl">Create Badge or Certificate</div>
           <div class="text-xs px-3 py-1 bg-white/10 rounded-3xl">Modern Studio</div>
         </div>
         
         <form action="/create-badge" method="POST" class="space-y-5">
-          <div class="grid grid-cols-2 gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label class="block text-xs text-white/60 mb-1.5">TYPE</label>
               <select name="type" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
@@ -100,11 +98,9 @@
             <textarea name="description" rows="2" class="form-input w-full rounded-2xl px-4 py-3 text-sm">Completed rigorous training in Python, data structures, and AI fundamentals.</textarea>
           </div>
           
-          <!-- Design Options -->
           <div>
             <label class="block text-xs text-white/60 mb-2">DESIGN STUDIO</label>
-            <div class="grid grid-cols-2 gap-4">
-              <!-- Color -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div class="text-[10px] mb-1 text-white/60">PRIMARY COLOR</div>
                 <div class="flex gap-2">
@@ -113,7 +109,6 @@
                 </div>
               </div>
               
-              <!-- Logos -->
               <div>
                 <div class="text-[10px] mb-1 text-white/60">LOGOS (UP TO 3)</div>
                 <div class="flex gap-2">
@@ -124,7 +119,7 @@
             </div>
           </div>
           
-          <div class="grid grid-cols-2 gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <label class="block text-xs text-white/60 mb-1.5">SIGNATURE</label>
               <input type="text" name="signature" value="<%= user.name %>" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
@@ -138,35 +133,57 @@
             </div>
           </div>
           
-          <button type="submit" class="w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl mt-2 hover:bg-white/90">Create &amp; Publish Badge</button>
+          <button type="submit" class="w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl mt-2 hover:bg-white/90 transition-all">Create &amp; Publish Badge</button>
         </form>
       </div>
 
-      <!-- Post Special Event -->
-      <div class="lg:col-span-5 glass rounded-3xl p-8">
-        <div class="section-header mb-5">Post Special Event</div>
-        <form action="/post-event" method="POST" class="space-y-4">
-          <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="form-input w-full rounded-2xl px-5 py-3 text-sm" required>
-          <textarea name="description" placeholder="Complete 3 skill badges to earn exclusive recognition" class="form-input w-full rounded-2xl px-5 py-3 text-sm h-20"></textarea>
+      <div class="lg:col-span-5 space-y-6">
+        <div class="glass rounded-3xl p-8">
+          <div class="section-header mb-5 text-lg md:text-xl">Post Special Event</div>
+          <form action="/post-event" method="POST" class="space-y-4">
+            <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="form-input w-full rounded-2xl px-5 py-3 text-sm" required>
+            <textarea name="description" placeholder="Complete 3 skill badges to earn exclusive recognition" class="form-input w-full rounded-2xl px-5 py-3 text-sm h-20"></textarea>
+            
+            <div>
+              <label class="text-xs text-white/60 mb-1 block">ATTACH SPECIAL BADGE (OPTIONAL)</label>
+              <select name="specialBadgeId" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
+                <option value="">None</option>
+                <% badges.forEach(b => { %>
+                  <option value="<%= b.id %>"><%= b.title %></option>
+                <% }) %>
+              </select>
+            </div>
+            
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-3xl hover:opacity-90 transition-opacity">Publish Event</button>
+          </form>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+          <div class="section-header mb-3 text-lg md:text-xl">Generate Student/Class Key</div>
+          <p class="text-xs text-white/50 mb-5">Create categorized entry keys for specific student groups or classes so they can load designated tasks and earn group-specific badges.</p>
           
-          <div>
-            <label class="text-xs text-white/60 mb-1 block">ATTACH SPECIAL BADGE (OPTIONAL)</label>
-            <select name="specialBadgeId" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
-              <option value="">None</option>
-              <% badges.forEach(b => { %>
-                <option value="<%= b.id %>"><%= b.title %></option>
-              <% }) %>
-            </select>
-          </div>
-          
-          <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-3xl">Publish Event</button>
-        </form>
+          <form action="/generate-student-key" method="POST" class="space-y-4">
+            <div>
+              <label class="block text-[10px] text-white/60 mb-1.5">CLASS / GROUP NAME</label>
+              <input type="text" name="className" placeholder="e.g. Fall 2026 - Section A" class="form-input w-full rounded-2xl px-4 py-2.5 text-sm" required>
+            </div>
+            <div>
+              <label class="block text-[10px] text-white/60 mb-1.5">LINK TO TEST / TASK</label>
+              <select name="testId" class="form-input w-full rounded-2xl px-4 py-2.5 text-sm" required>
+                <option value="">Select an assessment...</option>
+                <% tests.forEach(t => { %>
+                  <option value="<%= t.id %>"><%= t.title %></option>
+                <% }) %>
+              </select>
+            </div>
+            <button type="submit" class="w-full py-3 bg-white/10 border border-white/20 hover:bg-white/20 font-medium text-xs rounded-2xl transition-colors">Generate Unique Class Key</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Create Test -->
       <div class="lg:col-span-12 glass rounded-3xl p-8">
-        <div class="flex items-center justify-between mb-5">
-          <div class="section-header">Create Assessment / Test</div>
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+          <div class="section-header text-lg md:text-xl">Create Assessment / Test</div>
           <span class="text-xs px-4 py-1 rounded-3xl bg-white/10">AI-ready templates</span>
         </div>
         
@@ -177,27 +194,25 @@
           
           <div class="mb-5">
             <label class="text-xs tracking-widest text-white/60 block mb-2">QUESTIONS (JSON format for demo)</label>
-            <textarea name="questions" rows="7" class="form-input w-full font-mono text-xs p-5 rounded-3xl" placeholder='[{"q":"What is a variable?","type":"mcq","options":["A container","A function"],"timer":45,"image":"https://picsum.photos/300/150"}]'>[{"q":"What is a variable in programming?","type":"mcq","options":["A container for data","A type of loop","A function call","A comment"],"timer":60},{"q":"Explain the difference between == and === in JavaScript.","type":"frq","timer":120}]</textarea>
+            <textarea name="questions" rows="7" class="form-input w-full font-mono text-xs p-5 rounded-3xl custom-scroll" placeholder='[{"q":"What is a variable?","type":"mcq","options":["A container","A function"],"timer":45,"image":"https://picsum.photos/300/150"}]'>[{"q":"What is a variable in programming?","type":"mcq","options":["A container for data","A type of loop","A function call","A comment"],"timer":60},{"q":"Explain the difference between == and === in JavaScript.","type":"frq","timer":120}]</textarea>
           </div>
           
-          <div class="flex items-center gap-x-3">
-            <button type="submit" class="flex-1 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl">Create Test</button>
-            <button type="button" onclick="previewTest()" class="px-8 py-3.5 border border-white/30 hover:bg-white/5 rounded-3xl text-sm">Preview</button>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button type="submit" class="w-full sm:flex-1 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl">Create Test</button>
+            <button type="button" onclick="previewTest()" class="w-full sm:w-auto px-8 py-3.5 border border-white/30 hover:bg-white/5 rounded-3xl text-sm">Preview</button>
           </div>
         </form>
       </div>
       
     </div>
 
-    <!-- Existing Items -->
     <div class="mt-16 grid lg:grid-cols-2 gap-7">
-      <!-- Badges Created -->
       <div>
         <div class="px-1 flex justify-between items-center mb-4">
           <div class="font-semibold">Badges &amp; Certificates Created</div>
         </div>
         <% if (badges.length > 0) { %>
-          <div class="space-y-3">
+          <div class="space-y-3 max-h-80 overflow-y-auto custom-scroll pr-1">
             <% badges.forEach(b => { %>
               <div class="glass p-4 rounded-3xl flex justify-between items-center text-sm">
                 <div>
@@ -215,13 +230,12 @@
         <% } %>
       </div>
       
-      <!-- Tests Created -->
       <div>
         <div class="px-1 flex justify-between items-center mb-4">
           <div class="font-semibold">Tests Created</div>
         </div>
         <% if (tests.length > 0) { %>
-          <div class="space-y-3">
+          <div class="space-y-3 max-h-80 overflow-y-auto custom-scroll pr-1">
             <% tests.forEach(t => { %>
               <div class="glass p-4 rounded-3xl flex justify-between items-center">
                 <div>
@@ -253,12 +267,6 @@
     function previewTest() {
       alert('Preview mode: In a real app this would open a live test preview modal with timer, MCQ and FRQ.');
     }
-    
-    // Tailwind init
-    function init() {
-      // Any additional JS
-    }
-    window.onload = init;
   </script>
 </body>
 </html>
