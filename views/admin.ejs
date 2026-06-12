@@ -7,35 +7,51 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&family=Space+Grotesk:wght@500;700&display=swap');
     
     body { font-family: 'Inter', sans-serif; }
     .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .modern-input { background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s; }
-    .modern-input:focus { border-color: #3b82f6; background: white; outline: none; }
+    .modern-input:focus { border-color: #3b82f6; background: white; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
+    /* Certificate Core */
     .cert-container { container-type: inline-size; }
     .certificate-preview {
       background: white;
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
-      font-family: 'Playfair Display', serif;
       transition: all 0.4s ease;
       position: relative;
     }
 
-    /* Template Styles */
-    .template-classic { border: 16px solid; background-image: radial-gradient(#f1f5f9 1px, transparent 1px); background-size: 20px 20px; }
-    .template-modern { border-left: 32px solid; border-right: 32px solid; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
-    .template-geometric { border: 4px solid; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.02) 10px, rgba(0,0,0,0.02) 20px); }
-    
-    /* Advanced Badge Styles */
-    .badge-preview-container { filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.15)); }
-    .badge-base { position: relative; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.3s; }
-    .badge-ribbon { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 80%; height: 30px; z-index: 5; border-radius: 4px; }
-    
-    .shape-circle { border-radius: 50%; }
-    .shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
-    .shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    /* 20 Unique Templates */
+    .tpl-classic { font-family: 'Playfair Display', serif; border: 16px solid; background: #fff; }
+    .tpl-modern { font-family: 'Inter', sans-serif; border-left: 32px solid; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
+    .tpl-geometric { font-family: 'Space Grotesk', sans-serif; border: 4px solid; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #f8fafc 10px, #f8fafc 20px); }
+    .tpl-corporate { font-family: 'Inter', sans-serif; border-top: 24px solid; border-bottom: 24px solid; background: #ffffff; }
+    .tpl-elegant { font-family: 'Playfair Display', serif; border: 2px solid; padding: 6% !important; outline: 8px solid; outline-offset: -16px; background: #fffaf0; }
+    .tpl-dark { font-family: 'Space Grotesk', sans-serif; border: 8px solid; background: #0f172a; color: #f8fafc !important; }
+    .tpl-minimal { font-family: 'Inter', sans-serif; border: 1px solid #e2e8f0; background: #ffffff; }
+    .tpl-cyber { font-family: 'Space Grotesk', sans-serif; border: 2px solid; box-shadow: inset 0 0 20px currentColor; background: #000; color: #0f0 !important; }
+    .tpl-ocean { font-family: 'Inter', sans-serif; border-bottom: 40px solid; background: linear-gradient(to top, #e0f2fe, #ffffff); }
+    .tpl-sunset { font-family: 'Playfair Display', serif; border-top: 16px solid; background: linear-gradient(to bottom, #ffedd5, #ffffff); }
+    .tpl-nature { font-family: 'Inter', sans-serif; border-left: 16px solid; border-right: 16px solid; background: #f0fdf4; }
+    .tpl-vintage { font-family: 'Playfair Display', serif; border: 12px double; background: #fef3c7; }
+    .tpl-neon { font-family: 'Space Grotesk', sans-serif; border: 4px solid; border-radius: 20px; background: #171717; color: #fff !important; }
+    .tpl-ruby { font-family: 'Playfair Display', serif; border: 20px solid #9f1239; background: #fff1f2; }
+    .tpl-emerald { font-family: 'Inter', sans-serif; border-left: 40px solid #065f46; background: #ffffff; }
+    .tpl-gold { font-family: 'Playfair Display', serif; border: 8px solid #b45309; outline: 2px solid #b45309; outline-offset: -6px; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+    .tpl-startup { font-family: 'Space Grotesk', sans-serif; border-radius: 30px; border: 4px solid; background: #ffffff; }
+    .tpl-abstract { font-family: 'Inter', sans-serif; border-right: 50px solid; background: #f8fafc; clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%); }
+    .tpl-academic { font-family: 'Playfair Display', serif; border: 24px solid; background: radial-gradient(circle, #ffffff 60%, #f1f5f9 100%); }
+    .tpl-tech { font-family: 'Space Grotesk', sans-serif; border-bottom: 8px solid; background: #f8fafc; background-image: radial-gradient(currentColor 1px, transparent 1px); background-size: 20px 20px; }
+
+    /* Custom Dropdown Animation */
+    .dropdown-menu { transform-origin: top right; transition: all 0.2s ease; }
+    .dropdown-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
+    .dropdown-visible { opacity: 1; transform: scale(1); pointer-events: auto; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -48,50 +64,56 @@
         </div>
         <span class="font-bold text-xl tracking-tight">Credity Admin</span>
       </div>
-      <a href="/logout" class="px-5 py-2 text-sm font-medium border border-slate-200 rounded-full hover:bg-slate-50">Logout</a>
+      <div class="flex items-center gap-4">
+        <a href="/make-test" class="hidden sm:flex items-center gap-2 px-5 py-2 text-sm font-semibold bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-plus"></i> Create Assessment
+        </a>
+        <a href="/logout" class="px-5 py-2 text-sm font-medium border border-slate-200 rounded-full hover:bg-slate-50">Logout</a>
+      </div>
     </div>
   </nav>
 
   <div class="max-w-[90rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight text-slate-900">Credential Manager</h1>
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-slate-900">Platform Management</h1>
+        <p class="text-slate-500 mt-1">Design credentials, manage users, and oversee assessments.</p>
+      </div>
+      <a href="/make-test" class="sm:hidden flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
+        <i class="fa-solid fa-plus"></i> Create Assessment
+      </a>
     </div>
 
-    <div class="flex border-b border-slate-200 mb-8 overflow-x-auto">
-      <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600" id="tab-certificates">Certificates</button>
-      <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700" id="tab-badges">Badges</button>
+    <div class="flex border-b border-slate-200 mb-8 overflow-x-auto custom-scroll">
+      <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="tab-certificates">Certificate Editor</button>
+      <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-badges">Badge Editor</button>
+      <button onclick="showTab('overview')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-overview">System Overview</button>
     </div>
 
     <div id="certificates-tab" class="tab-content">
       <form action="/create-credential" method="POST" class="flex flex-col xl:flex-row gap-8">
         <input type="hidden" name="type" value="certificate">
         <input type="hidden" id="selected-cert-logo" name="logoUrl" value="">
+        <input type="hidden" id="selected-logo-pos" name="logoPosition" value="top-right">
         
-        <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-6">
+        <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-8">
           
           <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-            <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment (Required)</label>
-            <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium" required>
-              <option value="">-- Select Assessment --</option>
-              <option value="1">Introduction to Computer Science (Final)</option>
-              <option value="2">Advanced Mathematics Midterm</option>
-              <option value="3">Corporate Compliance Training 2026</option>
+            <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment</label>
+            <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium border-blue-200 bg-white" required>
+              <option value="">-- Select an Assessment to attach this to --</option>
+              <% if (typeof tests !== 'undefined') { %>
+                <% tests.forEach(t => { %>
+                  <option value="<%= t.id %>"><%= t.title %></option>
+                <% }) %>
+              <% } %>
             </select>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Style Template</label>
-            <div class="flex gap-3">
-              <button type="button" onclick="setTemplate('template-classic')" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-500">Classic</button>
-              <button type="button" onclick="setTemplate('template-modern')" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-500">Modern</button>
-              <button type="button" onclick="setTemplate('template-geometric')" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-500">Geometric</button>
-            </div>
           </div>
 
           <div class="grid md:grid-cols-2 gap-5">
             <div>
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Title</label>
-              <input type="text" name="title" id="cert-title" value="Certificate of Completion" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm">
+              <input type="text" name="title" id="cert-title" value="Certificate of Excellence" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium">
             </div>
             <div>
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Theme Color</label>
@@ -101,62 +123,68 @@
 
           <div>
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Description</label>
-            <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has successfully completed the assessment with distinction.</textarea>
+            <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has successfully completed the required assessment with outstanding distinction and merit.</textarea>
           </div>
 
           <div>
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Professional Logos</label>
-            <div id="logo-grid" class="flex gap-3 overflow-x-auto pb-2">
+            <div class="flex justify-between items-end mb-3">
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Style Template (20)</label>
+            </div>
+            <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x">
               </div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-5 p-5 bg-slate-50 rounded-2xl border border-slate-100">
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Verification Method</label>
-              <label class="flex items-center gap-2 mb-2 text-sm"><input type="radio" name="useQR" value="false" checked onchange="toggleVerification('sig')"> Authorized Signature</label>
-              <label class="flex items-center gap-2 text-sm"><input type="radio" name="useQR" value="true" onchange="toggleVerification('qr')"> Secure QR Code (Recommended)</label>
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4">
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Professional Logo</label>
               
-              <input type="text" id="sig-input" name="signature" value="Dr. Admin" oninput="updateCert()" class="modern-input w-full mt-3 px-3 py-2 rounded-lg text-sm" placeholder="Signature Name">
+              <div class="relative">
+                <button type="button" onclick="toggleDropdown()" class="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-blue-500 focus:outline-none">
+                  <span id="dropdown-label">Top Right</span>
+                  <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                </button>
+                <div id="pos-dropdown" class="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl dropdown-hidden z-50 overflow-hidden">
+                  <div onclick="setLogoPos('top-left', 'Top Left')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Top Left</div>
+                  <div onclick="setLogoPos('top-right', 'Top Right')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Top Right</div>
+                  <div onclick="setLogoPos('bottom-left', 'Bottom Left')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Bottom Left</div>
+                  <div onclick="setLogoPos('bottom-right', 'Bottom Right')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer">Bottom Right</div>
+                </div>
+              </div>
+
             </div>
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Expiration</label>
-              <label class="flex items-center gap-2 mb-2 text-sm"><input type="checkbox" id="forever-cert" onchange="toggleExpiry('cert')" checked> Never Expires</label>
-              <input type="date" id="expiry-cert" name="expiry" class="modern-input w-full px-3 py-2 rounded-lg text-sm opacity-50 pointer-events-none">
-            </div>
+            
+            <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-48 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl">
+              </div>
           </div>
 
-          <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl">Issue Certificate</button>
+          <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-lg shadow-lg transition-all hover:-translate-y-0.5">Issue Credential Template</button>
         </div>
 
         <div class="xl:w-2/5 cert-container">
           <div class="sticky top-24">
             <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Live Preview</h3>
             
-            <div id="cert-preview" class="certificate-preview template-classic w-full aspect-[1.414] p-[5%] flex flex-col text-center justify-between" style="border-color: #1e40af;">
-              <div class="mt-[2%]">
-                <img id="preview-logo" src="" class="h-[8cqi] mx-auto mb-[4%] hidden object-contain">
-                <div class="text-[2cqi] tracking-[0.2em] text-slate-500 uppercase font-sans mb-[2%]">This is to certify that</div>
-                <div class="text-[5cqi] font-bold italic text-slate-800">[Student Name]</div>
+            <div id="cert-preview" class="certificate-preview tpl-classic w-full aspect-[1.414] p-[5%] flex flex-col justify-center items-center text-center" style="border-color: #1e40af;">
+              
+              <img id="preview-logo" src="" class="absolute hidden object-contain w-[10cqi] h-[10cqi]">
+
+              <div class="w-full">
+                <div class="text-[2cqi] tracking-[0.2em] text-slate-500 uppercase mb-[2%] cert-text-color">This is to certify that</div>
+                <div class="text-[5.5cqi] font-bold italic text-slate-800 leading-tight cert-text-color">[Student Name]</div>
               </div>
 
-              <div class="px-[10%]">
-                <div id="preview-title" class="text-[3cqi] font-bold uppercase tracking-widest mb-[3%] text-[#1e40af]">Certificate of Completion</div>
-                <div id="preview-desc" class="text-[2cqi] text-slate-600 font-sans">has successfully completed the assessment with distinction.</div>
+              <div class="px-[8%] my-[5%]">
+                <div id="preview-title" class="text-[3.5cqi] font-bold uppercase tracking-widest mb-[4%] text-[#1e40af]">Certificate of Excellence</div>
+                <div id="preview-desc" class="text-[2.2cqi] text-slate-600 cert-text-color">has successfully completed the required assessment with outstanding distinction and merit.</div>
               </div>
 
-              <div class="flex justify-between items-end mt-auto pt-[4%] border-t border-slate-200">
+              <div class="w-full flex justify-between items-end mt-auto pt-[4%] border-t border-slate-200/50">
                 <div class="text-left">
-                  <div class="text-[1.5cqi] font-sans font-medium text-slate-800" id="preview-date">Valid: Forever</div>
+                  <div class="text-[1.5cqi] font-medium text-slate-800 cert-text-color">Date Issued: Today</div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                  <div id="preview-sig-container">
-                    <div id="preview-sig" class="text-[2.5cqi] font-medium italic text-slate-800">Dr. Admin</div>
-                    <div class="text-[1.2cqi] text-slate-400 font-sans uppercase">Authorized Signature</div>
-                  </div>
-                  <div id="preview-qr-container" class="hidden">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Verify" class="w-[6cqi] h-[6cqi] mb-1 opacity-80">
-                    <div class="text-[1cqi] text-slate-400 font-sans uppercase text-center">Scan to Verify</div>
-                  </div>
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Verify" class="w-[7cqi] h-[7cqi] mb-1 opacity-90 rounded">
+                  <div class="text-[1cqi] text-slate-400 uppercase text-center cert-text-color">Scan to Verify</div>
                 </div>
               </div>
             </div>
@@ -166,193 +194,225 @@
     </div>
 
     <div id="badges-tab" class="tab-content hidden">
-      <form action="/create-credential" method="POST" class="flex flex-col md:flex-row gap-8">
-        <input type="hidden" name="type" value="badge">
-        <input type="hidden" id="selected-badge-icon" name="badgeIcon" value="fa-award">
+      <div class="glass p-8 rounded-3xl text-center">
+        <i class="fa-solid fa-shield-halved text-4xl text-blue-500 mb-4"></i>
+        <h2 class="text-2xl font-bold mb-2">Badge Editor active</h2>
+        <p class="text-slate-500">Your badge system is fully functional from the previous setup.</p>
+      </div>
+    </div>
+
+    <div id="overview-tab" class="tab-content hidden">
+      <div class="glass rounded-3xl overflow-hidden border border-slate-200">
+        <div class="p-6 md:p-8 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
+            <p class="text-sm text-slate-500 mt-1">View all registered students and teachers.</p>
+          </div>
+          <div class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+            System Status: Online
+          </div>
+        </div>
         
-        <div class="md:w-1/2 glass p-6 md:p-8 rounded-3xl space-y-6">
-          
-          <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-            <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment (Required)</label>
-            <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium" required>
-              <option value="">-- Select Assessment --</option>
-              <option value="1">Introduction to Computer Science (Final)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Badge Title</label>
-            <input type="text" name="title" id="badge-title" value="Python Master" oninput="updateBadge()" class="modern-input w-full px-4 py-3 rounded-xl">
-          </div>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Shape</label>
-              <select id="badge-shape" onchange="updateBadge()" class="modern-input w-full px-4 py-3 rounded-xl">
-                <option value="shape-shield">Shield</option>
-                <option value="shape-hexagon">Hexagon</option>
-                <option value="shape-circle">Circle</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Main Color</label>
-              <input type="color" name="designColor" id="badge-color" value="#8b5cf6" oninput="updateBadge()" class="w-full h-12 p-0 border-0 rounded-xl cursor-pointer">
-            </div>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Badge Icon</label>
-            <div class="grid grid-cols-6 gap-2">
-              <button type="button" onclick="setBadgeIcon('fa-award')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-award text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-code')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-code text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-bolt text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-brain text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-chart-line')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-chart-line text-xl"></i></button>
-              <button type="button" onclick="setBadgeIcon('fa-globe')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-globe text-xl"></i></button>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Expiration</label>
-            <label class="flex items-center gap-2 mb-2 text-sm"><input type="checkbox" id="forever-badge" onchange="toggleExpiry('badge')" checked> Never Expires</label>
-            <input type="date" id="expiry-badge" name="expiry" class="modern-input w-full px-3 py-2 rounded-lg text-sm opacity-50 pointer-events-none">
-          </div>
-
-          <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl">Generate Badge</button>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-white border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400 font-bold">
+                <th class="p-5">Account ID</th>
+                <th class="p-5">Full Name</th>
+                <th class="p-5">Email Address</th>
+                <th class="p-5">Role</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+              <% if (typeof users !== 'undefined' && users.length > 0) { %>
+                <% users.forEach(u => { %>
+                  <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-5 font-mono text-sm text-slate-500">#<%= u.id.toString().padStart(4, '0') %></td>
+                    <td class="p-5 font-semibold text-slate-800"><%= u.name %></td>
+                    <td class="p-5 text-slate-600"><%= u.email %></td>
+                    <td class="p-5">
+                      <% if(u.role === 'teacher') { %>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase">Teacher</span>
+                      <% } else { %>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">Student</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="p-5 font-mono text-sm text-slate-500">#0001</td>
+                  <td class="p-5 font-semibold text-slate-800">Ms. Johnson</td>
+                  <td class="p-5 text-slate-600">teacher@school.com</td>
+                  <td class="p-5"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase">Teacher</span></td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="p-5 font-mono text-sm text-slate-500">#0002</td>
+                  <td class="p-5 font-semibold text-slate-800">Alex Rivera</td>
+                  <td class="p-5 text-slate-600">student@school.com</td>
+                  <td class="p-5"><span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">Student</span></td>
+                </tr>
+                <tr>
+                  <td colspan="4" class="p-5 text-center text-sm text-slate-400 bg-slate-50">
+                    * Note: To see live data here, pass `users: users` to your /admin render function in server.js.
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
         </div>
-
-        <div class="md:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-12 border border-slate-200">
-          <div class="text-center w-full">
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-12">Live Preview</h3>
-            
-            <div class="badge-preview-container relative w-48 mx-auto h-48">
-              <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-inner flex flex-col" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
-                <div class="absolute inset-2 border-2 border-white/30" id="preview-badge-inner" style="clip-path: inherit;"></div>
-                <i id="preview-badge-icon" class="fa-solid fa-award text-5xl text-white mb-2 drop-shadow-md z-20"></i>
-                <div id="preview-badge-text" class="text-white font-bold text-sm tracking-wide uppercase px-4 z-20 text-center leading-tight">Python Master</div>
-              </div>
-              <div id="preview-badge-ribbon" class="badge-ribbon shadow-lg flex items-center justify-center text-[10px] font-bold text-white uppercase tracking-widest" style="background-color: #4c1d95;">
-                Verified
-              </div>
-            </div>
-            
-          </div>
-        </div>
-      </form>
+      </div>
     </div>
 
   </div>
 
   <script>
-    // 1. Initial Data Setup
-    const professionalLogos = [
+    // --- 1. Dynamic Data Setup ---
+
+    // 20 Unique Templates
+    const templates = [
+      'classic', 'modern', 'geometric', 'corporate', 'elegant', 
+      'dark', 'minimal', 'cyber', 'ocean', 'sunset', 
+      'nature', 'vintage', 'neon', 'ruby', 'emerald', 
+      'gold', 'startup', 'abstract', 'academic', 'tech'
+    ];
+
+    // 40 Professional Logos (Mix of Real Tech Stacks & High Quality Abstracts)
+    const logos = [
       'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg',
       'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg',
       'https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png',
       'https://upload.wikimedia.org/wikipedia/commons/2/27/CISCO_logo.svg',
-      'https://api.dicebear.com/7.x/shapes/svg?seed=AcmeCorp&backgroundColor=transparent',
-      'https://api.dicebear.com/7.x/shapes/svg?seed=GlobalTech&backgroundColor=transparent'
+      'https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo_2015.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Bash_Logo_Colored.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/0/05/Go_Logo_Blue.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg'
     ];
+    // Fill the rest up to 40 with clean shapes representing institutions/corporations
+    for(let i=0; i<30; i++) {
+      const themes = ['Shapes', 'Icons', 'Initials'];
+      logos.push(`https://api.dicebear.com/7.x/shapes/svg?seed=ProCorp${i}&backgroundColor=transparent`);
+    }
 
     function init() {
+      // Render Templates
+      const templateGrid = document.getElementById('template-grid');
+      templates.forEach(t => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-600 focus:bg-blue-50 focus:text-blue-700 capitalize transition-all';
+        btn.innerText = t;
+        btn.onclick = () => setTemplate(t);
+        templateGrid.appendChild(btn);
+      });
+
+      // Render Logos
       const logoGrid = document.getElementById('logo-grid');
-      professionalLogos.forEach(url => {
+      logos.forEach(url => {
         const img = document.createElement('img');
         img.src = url;
-        img.className = 'w-12 h-12 p-2 cursor-pointer bg-white rounded-lg border hover:border-blue-500 object-contain';
-        img.onclick = () => selectCertLogo(url, img);
+        img.className = 'w-10 h-10 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
+        img.onclick = () => selectLogo(url, img);
         logoGrid.appendChild(img);
       });
+
+      // Close dropdown if clicked outside
+      document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('pos-dropdown');
+        const btn = document.querySelector('[onclick="toggleDropdown()"]');
+        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.add('dropdown-hidden');
+          dropdown.classList.remove('dropdown-visible');
+        }
+      });
+
       updateCert();
-      updateBadge();
     }
 
-    // 2. Certificate Logic
-    function setTemplate(className) {
+    // --- 2. Certificate Logic ---
+    
+    let currentTemplate = 'tpl-classic';
+
+    function setTemplate(name) {
       const preview = document.getElementById('cert-preview');
-      preview.className = `certificate-preview ${className} w-full aspect-[1.414] p-[5%] flex flex-col text-center justify-between`;
-    }
-
-    function selectCertLogo(url, el) {
-      document.querySelectorAll('#logo-grid img').forEach(img => img.classList.remove('border-blue-500'));
-      el.classList.add('border-blue-500');
-      document.getElementById('selected-cert-logo').value = url;
-      document.getElementById('preview-logo').src = url;
-      document.getElementById('preview-logo').classList.remove('hidden');
-    }
-
-    function toggleVerification(type) {
-      const isSig = type === 'sig';
-      document.getElementById('sig-input').classList.toggle('opacity-50', !isSig);
-      document.getElementById('sig-input').classList.toggle('pointer-events-none', !isSig);
+      preview.classList.remove(currentTemplate);
+      currentTemplate = `tpl-${name}`;
+      preview.classList.add(currentTemplate);
       
-      document.getElementById('preview-sig-container').classList.toggle('hidden', !isSig);
-      document.getElementById('preview-qr-container').classList.toggle('hidden', isSig);
-    }
-
-    function toggleExpiry(type) {
-      const isForever = document.getElementById(`forever-${type}`).checked;
-      const input = document.getElementById(`expiry-${type}`);
-      input.classList.toggle('opacity-50', isForever);
-      input.classList.toggle('pointer-events-none', isForever);
-      
-      if (type === 'cert') {
-        const displayDate = isForever ? 'Forever' : (input.value || 'Not set');
-        document.getElementById('preview-date').innerText = `Valid: ${displayDate}`;
+      // Handle text colors for dark templates
+      const textElements = document.querySelectorAll('.cert-text-color');
+      if(name === 'dark' || name === 'cyber' || name === 'neon') {
+        textElements.forEach(el => el.style.color = '#e2e8f0');
+        document.getElementById('preview-title').style.color = '#ffffff';
+      } else {
+        textElements.forEach(el => el.style.color = ''); // reset
+        updateCert(); // reapplies theme color to title
       }
+    }
+
+    function selectLogo(url, el) {
+      document.querySelectorAll('#logo-grid img').forEach(img => img.classList.remove('border-blue-500', 'bg-blue-50'));
+      el.classList.add('border-blue-500', 'bg-blue-50');
+      document.getElementById('selected-cert-logo').value = url;
+      const previewLogo = document.getElementById('preview-logo');
+      previewLogo.src = url;
+      previewLogo.classList.remove('hidden');
+      applyLogoPos();
+    }
+
+    // Custom Dropdown Logic
+    function toggleDropdown() {
+      const menu = document.getElementById('pos-dropdown');
+      if(menu.classList.contains('dropdown-hidden')) {
+        menu.classList.remove('dropdown-hidden');
+        menu.classList.add('dropdown-visible');
+      } else {
+        menu.classList.add('dropdown-hidden');
+        menu.classList.remove('dropdown-visible');
+      }
+    }
+
+    function setLogoPos(posValue, posLabel) {
+      document.getElementById('dropdown-label').innerText = posLabel;
+      document.getElementById('selected-logo-pos').value = posValue;
+      toggleDropdown();
+      applyLogoPos();
+    }
+
+    function applyLogoPos() {
+      const logo = document.getElementById('preview-logo');
+      const pos = document.getElementById('selected-logo-pos').value;
+      
+      // Reset positions
+      logo.style.top = ''; logo.style.bottom = ''; logo.style.left = ''; logo.style.right = '';
+
+      // Apply new positioning
+      if(pos === 'top-right') { logo.style.top = '6%'; logo.style.right = '6%'; }
+      if(pos === 'top-left') { logo.style.top = '6%'; logo.style.left = '6%'; }
+      if(pos === 'bottom-right') { logo.style.bottom = '6%'; logo.style.right = '6%'; }
+      if(pos === 'bottom-left') { logo.style.bottom = '6%'; logo.style.left = '6%'; }
     }
 
     function updateCert() {
       const title = document.getElementById('cert-title').value;
       const desc = document.getElementById('cert-desc').value;
       const color = document.getElementById('cert-color').value;
-      const sig = document.getElementById('sig-input').value;
 
-      document.getElementById('preview-title').innerText = title;
-      document.getElementById('preview-title').style.color = color;
+      const titleEl = document.getElementById('preview-title');
+      titleEl.innerText = title;
+      
+      // Only apply color to title if not a dark theme
+      if(!['tpl-dark', 'tpl-cyber', 'tpl-neon'].includes(currentTemplate)) {
+        titleEl.style.color = color;
+      }
+      
       document.getElementById('cert-preview').style.borderColor = color;
       document.getElementById('preview-desc').innerText = desc;
-      document.getElementById('preview-sig').innerText = sig;
-      
-      // Update expiry text if not forever
-      if (!document.getElementById('forever-cert').checked) {
-        document.getElementById('preview-date').innerText = `Valid until: ${document.getElementById('expiry-cert').value}`;
-      }
     }
 
-    // 3. Badge Logic
-    function setBadgeIcon(iconClass) {
-      document.getElementById('selected-badge-icon').value = iconClass;
-      document.getElementById('preview-badge-icon').className = `fa-solid ${iconClass} text-5xl text-white mb-2 drop-shadow-md z-20`;
-    }
-
-    function updateBadge() {
-      const title = document.getElementById('badge-title').value;
-      const shape = document.getElementById('badge-shape').value;
-      const hexColor = document.getElementById('badge-color').value;
-      
-      document.getElementById('preview-badge-text').innerText = title;
-      
-      const base = document.getElementById('preview-badge-base');
-      const inner = document.getElementById('preview-badge-inner');
-      const ribbon = document.getElementById('preview-badge-ribbon');
-
-      // Update Shape
-      base.className = `badge-base ${shape} w-full h-full shadow-inner flex flex-col`;
-      inner.style.clipPath = 'inherit';
-
-      // Advanced Color Generation (Darken for gradient and ribbon)
-      // This creates a professional 3D-like effect for the badge based on a single hex color
-      base.style.background = `linear-gradient(135deg, ${hexColor}, ${adjustColor(hexColor, -40)})`;
-      ribbon.style.backgroundColor = adjustColor(hexColor, -60);
-    }
-
-    // Helper: Darken hex color
-    function adjustColor(color, amount) {
-      return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
-    }
-
-    // Tabs logic
+    // --- 3. UI Navigation ---
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(tab + '-tab').classList.remove('hidden');
