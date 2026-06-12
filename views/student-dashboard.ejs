@@ -23,40 +23,40 @@
     }
 
     .panel {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
     }
 
     .panel-strong {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #dbe1ea;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .045);
     }
 
     .input {
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #d8dee8;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      transition: border-color .18s ease, box-shadow .18s ease;
     }
 
     .input:focus {
       border-color: #2563eb;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
     }
 
     .btn {
       font-weight: 500;
       border-radius: 12px;
-      transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+      transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
     }
 
     .btn:active { transform: translateY(1px); }
 
     .btn-primary {
       background: #1d4ed8;
-      color: #ffffff;
+      color: #fff;
       border: 1px solid #1d4ed8;
     }
 
@@ -67,7 +67,7 @@
 
     .btn-dark {
       background: #111827;
-      color: #ffffff;
+      color: #fff;
       border: 1px solid #111827;
     }
 
@@ -77,7 +77,7 @@
     }
 
     .btn-light {
-      background: #ffffff;
+      background: #fff;
       color: #111827;
       border: 1px solid #d8dee8;
     }
@@ -89,13 +89,55 @@
 
     .btn-green {
       background: #059669;
-      color: #ffffff;
+      color: #fff;
       border: 1px solid #059669;
     }
 
     .btn-green:hover {
       background: #047857;
       border-color: #047857;
+    }
+
+    .side-link {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all .16s ease;
+    }
+
+    .side-link:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .side-link.active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .class-link.active,
+    .task-link.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
+
+    .explore-button {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 28px rgba(37,99,235,.25);
+    }
+
+    .explore-button:hover {
+      filter: brightness(.96);
     }
 
     .custom-scroll::-webkit-scrollbar {
@@ -113,31 +155,15 @@
       border-radius: 999px;
     }
 
-    .tab-btn {
-      font-weight: 500;
-      color: #64748b;
-      border-bottom: 2px solid transparent;
-      transition: all 0.16s ease;
-    }
-
-    .tab-btn:hover { color: #0f172a; }
-
-    .tab-active {
-      color: #1d4ed8;
-      border-bottom-color: #1d4ed8;
-      font-weight: 600;
-    }
-
     .badge-card {
       background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 32%),
-        #ffffff;
+        radial-gradient(circle at top left, rgba(37, 99, 235, .08), transparent 32%),
+        #fff;
     }
 
     .task-stripe-open { border-left: 4px solid #059669; }
     .task-stripe-scheduled { border-left: 4px solid #2563eb; }
     .task-stripe-closed { border-left: 4px solid #ef4444; }
-    .task-stripe-normal { border-left: 4px solid #94a3b8; }
   </style>
 </head>
 
@@ -168,29 +194,16 @@
 
     function formatDate(value) {
       if (!value) return 'No date set';
-
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return String(value);
-
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function formatDateTime(value) {
       if (!value) return 'Not scheduled';
-
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return String(value);
-
-      return date.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit'
-      });
+      return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     }
 
     function taskClassNames(task) {
@@ -203,7 +216,6 @@
         .filter(cls => {
           const classId = Number(cls.id);
           const assignedIds = Array.isArray(cls.assignedTestIds) ? cls.assignedTestIds.map(Number) : [];
-
           return assignedIds.includes(taskId) || directClassIds.includes(classId);
         })
         .map(cls => cls.className)
@@ -213,37 +225,31 @@
       return names;
     }
 
+    function classTasks(cls) {
+      if (Array.isArray(cls.assignedTests)) return cls.assignedTests;
+      return safeTests.filter(t => {
+        const testId = Number(t.id);
+        const assignedIds = Array.isArray(cls.assignedTestIds) ? cls.assignedTestIds.map(Number) : [];
+        const classIds = Array.isArray(t.classIds) ? t.classIds.map(Number) : [];
+        return assignedIds.includes(testId) || classIds.includes(Number(cls.id));
+      });
+    }
+
     function taskStatus(task) {
       const now = Date.now();
-
       const isOpen = task.isOpen === true || task.isOpen === 'true' || (!task.examStartTime && !task.examEndTime);
       const startMs = task.examStartTime ? new Date(task.examStartTime).getTime() : null;
       const endMs = task.examEndTime ? new Date(task.examEndTime).getTime() : null;
 
       if (endMs && now > endMs) {
-        return {
-          label: 'Closed',
-          stripe: 'task-stripe-closed',
-          icon: 'fa-lock',
-          canStart: false
-        };
+        return { label: 'Closed', stripe: 'task-stripe-closed', icon: 'fa-lock', canStart: false };
       }
 
       if (!isOpen && startMs && now < startMs) {
-        return {
-          label: 'Scheduled',
-          stripe: 'task-stripe-scheduled',
-          icon: 'fa-clock',
-          canStart: false
-        };
+        return { label: 'Scheduled', stripe: 'task-stripe-scheduled', icon: 'fa-clock', canStart: false };
       }
 
-      return {
-        label: 'Open',
-        stripe: 'task-stripe-open',
-        icon: 'fa-play',
-        canStart: true
-      };
+      return { label: 'Open', stripe: 'task-stripe-open', icon: 'fa-play', canStart: true };
     }
 
     const openTasks = safeTests.filter(t => taskStatus(t).label === 'Open');
@@ -251,353 +257,281 @@
     const closedTasks = safeTests.filter(t => taskStatus(t).label === 'Closed');
   %>
 
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-[92rem] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-          <span class="text-white font-semibold text-xl">C</span>
-        </div>
-
-        <div>
-          <div class="font-semibold text-xl tracking-tight leading-none">Credity</div>
-          <div class="text-[11px] text-slate-500 font-medium uppercase tracking-wider">Student Portal</div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg">
-          <i class="fa-solid fa-user text-blue-600"></i>
-          <span class="text-sm font-medium"><%= studentName %></span>
-        </div>
-
-        <a href="/logout" class="btn btn-light px-5 py-2.5 text-sm">
-          Logout
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="max-w-[92rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
-    <section class="mb-8">
-      <div class="panel-strong rounded-2xl p-6 md:p-9">
-        <div class="grid xl:grid-cols-12 gap-8 items-center">
-          <div class="xl:col-span-7">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium tracking-[1.5px] rounded-lg border border-blue-100 mb-5">
-              <i class="fa-solid fa-list-check"></i>
-              <span>STUDENT TASK CENTER</span>
-            </div>
-
-            <h1 class="text-4xl md:text-6xl font-semibold tracking-tighter text-slate-950 leading-none">
-              Welcome back, <%= firstName %>.
-            </h1>
-
-            <p class="mt-5 text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed">
-              View your assigned tasks, joined classes, class announcements, and verified badges.
-            </p>
-
-            <div class="mt-8 flex flex-wrap gap-3">
-              <button onclick="showTab('tasks'); scrollToWorkspace();" class="btn btn-primary inline-flex items-center justify-center gap-3 px-7 py-4">
-                <i class="fa-solid fa-clipboard-list"></i>
-                View My Tasks
-              </button>
-
-              <button onclick="showTab('classes'); scrollToWorkspace();" class="btn btn-light inline-flex items-center justify-center gap-3 px-7 py-4">
-                <i class="fa-solid fa-users-rectangle text-emerald-600"></i>
-                My Classes
-              </button>
-
-              <button onclick="showTab('badges'); scrollToWorkspace();" class="btn btn-light inline-flex items-center justify-center gap-3 px-7 py-4">
-                <i class="fa-solid fa-award text-blue-600"></i>
-                My Badges
-              </button>
-            </div>
+  <div class="min-h-screen flex">
+    <aside class="hidden xl:flex w-80 shrink-0 border-r border-slate-200 bg-white min-h-screen sticky top-0">
+      <div class="w-full h-screen overflow-y-auto custom-scroll p-5 flex flex-col">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-semibold text-xl">C</span>
           </div>
-
-          <div class="xl:col-span-5">
-            <div class="grid grid-cols-2 gap-4">
-              <div class="panel rounded-xl p-5">
-                <div class="w-10 h-10 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center mb-4 border border-blue-100">
-                  <i class="fa-solid fa-clipboard-list"></i>
-                </div>
-                <div class="text-4xl font-semibold"><%= safeTests.length %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Assigned Tasks</div>
-              </div>
-
-              <div class="panel rounded-xl p-5">
-                <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center mb-4 border border-emerald-100">
-                  <i class="fa-solid fa-play"></i>
-                </div>
-                <div class="text-4xl font-semibold"><%= openTasks.length %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Open Now</div>
-              </div>
-
-              <div class="panel rounded-xl p-5">
-                <div class="w-10 h-10 bg-violet-50 text-violet-700 rounded-lg flex items-center justify-center mb-4 border border-violet-100">
-                  <i class="fa-solid fa-users-rectangle"></i>
-                </div>
-                <div class="text-4xl font-semibold"><%= safeClasses.length || safeEnrollments.length %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Classes Joined</div>
-              </div>
-
-              <div class="panel rounded-xl p-5">
-                <div class="w-10 h-10 bg-amber-50 text-amber-700 rounded-lg flex items-center justify-center mb-4 border border-amber-100">
-                  <i class="fa-solid fa-award"></i>
-                </div>
-                <div class="text-4xl font-semibold"><%= safeBadges.length %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Badges Earned</div>
-              </div>
-            </div>
+          <div>
+            <div class="font-semibold text-xl leading-none">Credity</div>
+            <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1">Student Portal</div>
           </div>
         </div>
-      </div>
-    </section>
-    
-    <section id="workspace">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-        <div>
-          <h2 class="text-3xl font-semibold tracking-tight text-slate-950">Dashboard</h2>
-          <p class="text-slate-500 mt-1">Your assigned work, classes, updates, and credentials.</p>
+
+        <div class="panel rounded-xl p-4 mb-5">
+          <div class="text-sm font-semibold"><%= studentName %></div>
+          <div class="text-xs text-slate-500 mt-1">Student workspace</div>
         </div>
 
-        <form action="/join-class" method="POST" class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <input type="text" name="studentKey" placeholder="Enter class key" class="input px-4 py-3 rounded-lg text-sm w-full sm:w-72" required>
-          <button type="submit" class="btn btn-green px-5 py-3 text-sm">
-            Join Class
+        <nav class="space-y-1 mb-5">
+          <button class="side-link active" data-view-link="overview" onclick="showView('overview')">
+            <i class="fa-solid fa-gauge-high w-5"></i>
+            Overview
           </button>
-        </form>
-      </div>
+          <button class="side-link" data-view-link="tasks" onclick="showView('tasks')">
+            <i class="fa-solid fa-clipboard-list w-5"></i>
+            Task Bar
+          </button>
+          <button class="side-link" data-view-link="classes" onclick="showView('classes')">
+            <i class="fa-solid fa-users-rectangle w-5"></i>
+            Classes
+          </button>
+          <button class="side-link" data-view-link="announcements" onclick="showView('announcements')">
+            <i class="fa-solid fa-bullhorn w-5"></i>
+            Announcements
+          </button>
+          <button class="side-link" data-view-link="badges" onclick="showView('badges')">
+            <i class="fa-solid fa-award w-5"></i>
+            Badges
+          </button>
+        </nav>
 
-      <div class="flex border-b border-slate-200 mb-8 overflow-x-auto custom-scroll">
-        <button onclick="showTab('tasks')" class="tab-btn tab-active px-6 py-3 whitespace-nowrap" id="tab-tasks">
-          <i class="fa-solid fa-clipboard-list mr-2"></i> My Tasks
+        <button onclick="showView('explore')" class="explore-button btn w-full py-4 mb-6 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-sparkles"></i>
+          Explore Skills
         </button>
 
-        <button onclick="showTab('classes')" class="tab-btn px-6 py-3 whitespace-nowrap" id="tab-classes">
-          <i class="fa-solid fa-users-rectangle mr-2"></i> My Classes
-        </button>
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">My Classes</div>
+            <span class="text-xs text-slate-400"><%= safeClasses.length %></span>
+          </div>
 
-        <button onclick="showTab('announcements')" class="tab-btn px-6 py-3 whitespace-nowrap" id="tab-announcements">
-          <i class="fa-solid fa-bullhorn mr-2"></i> Announcements
-        </button>
-
-        <button onclick="showTab('badges')" class="tab-btn px-6 py-3 whitespace-nowrap" id="tab-badges">
-          <i class="fa-solid fa-award mr-2"></i> Badges
-        </button>
-      </div>
-
-      <div id="tasks-tab" class="tab-content">
-        <% if (safeTests.length > 0) { %>
-          <div class="grid xl:grid-cols-12 gap-8">
-            <div class="xl:col-span-8 space-y-4">
-              <div class="flex items-center justify-between gap-3 mb-2">
-                <div>
-                  <h3 class="text-2xl font-semibold">Tasks set for you</h3>
-                  <p class="text-sm text-slate-500 mt-1">These assessments are assigned through your joined classes.</p>
-                </div>
+          <div class="space-y-2">
+            <% if (safeClasses.length > 0) { %>
+              <% safeClasses.forEach((cls, idx) => {
+                const cTasks = classTasks(cls);
+                const announcements = Array.isArray(cls.announcements) ? cls.announcements : [];
+              %>
+                <button
+                  type="button"
+                  class="class-link w-full text-left px-3 py-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition <%= idx === 0 ? 'active' : '' %>"
+                  data-class-button="<%= cls.id %>"
+                  onclick="selectClass('<%= cls.id %>')">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="text-sm font-medium truncate"><%= cls.className %></div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200"><%= cTasks.length %></span>
+                  </div>
+                  <div class="text-xs opacity-70 mt-1"><%= announcements.length %> announcements</div>
+                </button>
+              <% }) %>
+            <% } else { %>
+              <div class="text-sm text-slate-500 border border-dashed border-slate-300 rounded-xl p-4 text-center">
+                No classes joined
               </div>
+            <% } %>
+          </div>
+        </div>
 
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Task Bar</div>
+            <span class="text-xs text-slate-400"><%= safeTests.length %></span>
+          </div>
+
+          <div class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1">
+            <% if (safeTests.length > 0) { %>
               <% safeTests.forEach(task => {
                 const status = taskStatus(task);
-                const names = taskClassNames(task);
-                const questionsCount = Array.isArray(task.questions) ? task.questions.length : 0;
               %>
-                <div class="panel-strong rounded-2xl p-5 md:p-6 <%= status.stripe %>">
-                  <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
-                    <div class="min-w-0">
-                      <div class="flex flex-wrap items-center gap-2 mb-2">
-                        <% if (status.label === 'Open') { %>
-                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
-                            <i class="fa-solid <%= status.icon %>"></i>
-                            Open
-                          </span>
-                        <% } else if (status.label === 'Scheduled') { %>
-                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
-                            <i class="fa-solid <%= status.icon %>"></i>
-                            Scheduled
-                          </span>
-                        <% } else { %>
-                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-100 text-red-700 text-xs font-medium">
-                            <i class="fa-solid <%= status.icon %>"></i>
-                            Closed
-                          </span>
-                        <% } %>
-
-                        <% if (names.length > 0) { %>
-                          <% names.forEach(name => { %>
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium">
-                              <i class="fa-solid fa-users-rectangle"></i>
-                              <%= name %>
-                            </span>
-                          <% }) %>
-                        <% } else { %>
-                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium">
-                            <i class="fa-solid fa-layer-group"></i>
-                            Assigned
-                          </span>
-                        <% } %>
-                      </div>
-
-                      <h4 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-950">
-                        <%= task.title || 'Untitled Task' %>
-                      </h4>
-
-                      <div class="mt-3 grid sm:grid-cols-3 gap-3 text-sm">
-                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                          <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Questions</div>
-                          <div class="mt-1 font-medium text-slate-900"><%= questionsCount %></div>
-                        </div>
-
-                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                          <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Starts</div>
-                          <div class="mt-1 font-medium text-slate-900"><%= task.isOpen ? 'Open anytime' : formatDateTime(task.examStartTime) %></div>
-                        </div>
-
-                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                          <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Ends</div>
-                          <div class="mt-1 font-medium text-slate-900"><%= task.examEndTime ? formatDateTime(task.examEndTime) : 'No deadline' %></div>
-                        </div>
-                      </div>
-
-                      <% if (task.topics || task.resources) { %>
-                        <div class="mt-4 text-sm text-slate-600">
-                          <% if (task.topics) { %>
-                            <div><span class="font-medium text-slate-900">Topics:</span> <%= task.topics %></div>
-                          <% } %>
-                          <% if (task.resources) { %>
-                            <div class="mt-1"><span class="font-medium text-slate-900">Resources:</span> <%= task.resources %></div>
-                          <% } %>
-                        </div>
-                      <% } %>
-                    </div>
-
-                    <div class="lg:w-48 flex lg:flex-col gap-2">
-                      <% if (status.canStart) { %>
-                        <a href="/take-test/<%= task.id %>" class="btn btn-primary flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 text-sm">
-                          <i class="fa-solid fa-play"></i>
-                          Start
-                        </a>
-                      <% } else if (status.label === 'Scheduled') { %>
-                        <button type="button" disabled class="btn flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 text-sm bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed">
-                          <i class="fa-solid fa-clock"></i>
-                          Not open yet
-                        </button>
-                      <% } else { %>
-                        <button type="button" disabled class="btn flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 text-sm bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed">
-                          <i class="fa-solid fa-lock"></i>
-                          Closed
-                        </button>
-                      <% } %>
-
-                      <% if (status.label === 'Scheduled' && task.examStartTime) { %>
-                        <div class="text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded-lg p-3 text-center countdown" data-start="<%= task.examStartTime %>">
-                          Opens soon
-                        </div>
-                      <% } %>
-                    </div>
+                <button
+                  type="button"
+                  class="task-link w-full text-left px-3 py-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition"
+                  data-task-button="<%= task.id %>"
+                  onclick="selectTask('<%= task.id %>')">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="text-sm font-medium truncate"><%= task.title %></div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200"><%= status.label %></span>
                   </div>
-                </div>
+                  <div class="text-xs opacity-70 mt-1"><%= task.questions ? task.questions.length : 0 %> questions</div>
+                </button>
               <% }) %>
-            </div>
-
-            <div class="xl:col-span-4 space-y-5">
-              <div class="panel-strong rounded-2xl p-6">
-                <h3 class="text-xl font-semibold">Task summary</h3>
-
-                <div class="mt-5 space-y-3">
-                  <div class="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-                    <span class="text-sm font-medium text-emerald-800">Open now</span>
-                    <span class="text-lg font-semibold text-emerald-800"><%= openTasks.length %></span>
-                  </div>
-
-                  <div class="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                    <span class="text-sm font-medium text-blue-800">Scheduled</span>
-                    <span class="text-lg font-semibold text-blue-800"><%= scheduledTasks.length %></span>
-                  </div>
-
-                  <div class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg">
-                    <span class="text-sm font-medium text-red-800">Closed</span>
-                    <span class="text-lg font-semibold text-red-800"><%= closedTasks.length %></span>
-                  </div>
-                </div>
+            <% } else { %>
+              <div class="text-sm text-slate-500 border border-dashed border-slate-300 rounded-xl p-4 text-center">
+                No tasks yet
               </div>
+            <% } %>
+          </div>
+        </div>
 
-              <div class="panel rounded-2xl p-6">
-                <h3 class="text-xl font-semibold">Need new tasks?</h3>
-                <p class="text-sm text-slate-500 mt-2">
-                  Join a class using the key your teacher gave you. Any tests assigned to that class will appear here.
+        <form action="/join-class" method="POST" class="mt-auto space-y-2">
+          <input type="text" name="studentKey" placeholder="Enter class key" class="input w-full px-4 py-3 rounded-lg text-sm" required>
+          <button type="submit" class="btn btn-green w-full py-3 text-sm">
+            Join Class
+          </button>
+          <a href="/logout" class="btn btn-light w-full py-3 text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            Logout
+          </a>
+        </form>
+      </div>
+    </aside>
+
+    <main class="flex-1 min-w-0">
+      <nav class="xl:hidden bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-semibold text-xl">C</span>
+            </div>
+            <div>
+              <div class="font-semibold text-xl leading-none">Credity</div>
+              <div class="text-[11px] text-slate-500 uppercase tracking-wider mt-1">Student</div>
+            </div>
+          </div>
+          <a href="/logout" class="btn btn-light px-4 py-2 text-sm">Logout</a>
+        </div>
+      </nav>
+
+      <div class="max-w-[92rem] mx-auto px-4 sm:px-6 py-8">
+        <section class="view-panel" data-view-panel="overview">
+          <div class="panel-strong rounded-2xl p-6 md:p-9 mb-8">
+            <div class="grid xl:grid-cols-12 gap-8 items-center">
+              <div class="xl:col-span-7">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium tracking-[1.5px] rounded-lg border border-blue-100 mb-5">
+                  <i class="fa-solid fa-list-check"></i>
+                  <span>STUDENT TASK CENTER</span>
+                </div>
+
+                <h1 class="text-4xl md:text-6xl font-semibold tracking-tighter text-slate-950 leading-none">
+                  Welcome back, <%= firstName %>.
+                </h1>
+
+                <p class="mt-5 text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed">
+                  Use the side dashboard to click a class and see only that class’s tasks and announcements.
                 </p>
 
-                <form action="/join-class" method="POST" class="mt-5 space-y-3">
-                  <input type="text" name="studentKey" placeholder="CRED-XXXX-XXXX-XXXX" class="input w-full px-4 py-3 rounded-lg text-sm" required>
-                  <button type="submit" class="btn btn-green w-full py-3 text-sm">
-                    Join Class
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <button onclick="showView('tasks')" class="btn btn-primary inline-flex items-center justify-center gap-3 px-7 py-4">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    View Tasks
                   </button>
-                </form>
+
+                  <button onclick="showView('classes')" class="btn btn-light inline-flex items-center justify-center gap-3 px-7 py-4">
+                    <i class="fa-solid fa-users-rectangle text-emerald-600"></i>
+                    My Classes
+                  </button>
+
+                  <button onclick="showView('explore')" class="explore-button btn inline-flex items-center justify-center gap-3 px-7 py-4">
+                    <i class="fa-solid fa-sparkles"></i>
+                    Explore Skills
+                  </button>
+                </div>
+              </div>
+
+              <div class="xl:col-span-5">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="panel rounded-xl p-5">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center mb-4 border border-blue-100">
+                      <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                    <div class="text-4xl font-semibold"><%= safeTests.length %></div>
+                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Assigned Tasks</div>
+                  </div>
+
+                  <div class="panel rounded-xl p-5">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-700 rounded-lg flex items-center justify-center mb-4 border border-emerald-100">
+                      <i class="fa-solid fa-play"></i>
+                    </div>
+                    <div class="text-4xl font-semibold"><%= openTasks.length %></div>
+                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Open Now</div>
+                  </div>
+
+                  <div class="panel rounded-xl p-5">
+                    <div class="w-10 h-10 bg-violet-50 text-violet-700 rounded-lg flex items-center justify-center mb-4 border border-violet-100">
+                      <i class="fa-solid fa-users-rectangle"></i>
+                    </div>
+                    <div class="text-4xl font-semibold"><%= safeClasses.length || safeEnrollments.length %></div>
+                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Classes</div>
+                  </div>
+
+                  <div class="panel rounded-xl p-5">
+                    <div class="w-10 h-10 bg-amber-50 text-amber-700 rounded-lg flex items-center justify-center mb-4 border border-amber-100">
+                      <i class="fa-solid fa-award"></i>
+                    </div>
+                    <div class="text-4xl font-semibold"><%= safeBadges.length %></div>
+                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Badges</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        <% } else { %>
-          <div class="panel-strong rounded-2xl p-12 text-center">
-            <i class="fa-solid fa-clipboard-list text-5xl text-slate-300 mb-5"></i>
-            <div class="text-2xl font-semibold">No tasks assigned yet</div>
-            <p class="text-slate-500 mt-2 max-w-xl mx-auto">
-              Join a class with your teacher’s class key. When your teacher assigns assessments, they will appear here.
-            </p>
 
-            <form action="/join-class" method="POST" class="mt-7 flex flex-col sm:flex-row gap-2 max-w-xl mx-auto">
-              <input type="text" name="studentKey" placeholder="Enter class key" class="input flex-1 px-4 py-3 rounded-lg text-sm" required>
-              <button type="submit" class="btn btn-green px-5 py-3 text-sm">
-                Join Class
-              </button>
-            </form>
-          </div>
-        <% } %>
-      </div>
-
-      <div id="classes-tab" class="tab-content hidden">
-        <div class="grid xl:grid-cols-12 gap-8">
-          <div class="xl:col-span-4 panel-strong rounded-2xl p-6 md:p-8 h-fit">
-            <h3 class="text-2xl font-semibold">Join a class</h3>
-            <p class="text-sm text-slate-500 mt-1 mb-6">
-              Paste the class key your teacher gave you. Tasks assigned to that class will show in your dashboard.
-            </p>
-
-            <form action="/join-class" method="POST" class="space-y-4">
-              <div>
-                <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Class Key</label>
-                <input type="text" name="studentKey" placeholder="CRED-XXXX-XXXX-XXXX" class="input w-full px-4 py-3 rounded-lg text-sm" required>
-              </div>
-
-              <button type="submit" class="btn btn-green w-full py-4">
-                Join Class
-              </button>
-            </form>
-          </div>
-
-          <div class="xl:col-span-8 space-y-4">
-            <div>
-              <h3 class="text-2xl font-semibold">My classes</h3>
-              <p class="text-sm text-slate-500 mt-1">Classes you joined with teacher keys.</p>
-            </div>
-
+          <div class="grid xl:grid-cols-3 gap-5">
             <% if (safeClasses.length > 0) { %>
-              <div class="grid md:grid-cols-2 gap-4">
-                <% safeClasses.forEach(cls => {
-                  const assignedTasks = Array.isArray(cls.assignedTests)
-                    ? cls.assignedTests
-                    : safeTests.filter(t => {
-                        const testId = Number(t.id);
-                        const assignedIds = Array.isArray(cls.assignedTestIds) ? cls.assignedTestIds.map(Number) : [];
-                        const classIds = Array.isArray(t.classIds) ? t.classIds.map(Number) : [];
-                        return assignedIds.includes(testId) || classIds.includes(Number(cls.id));
-                      });
+              <% safeClasses.slice(0, 3).forEach(cls => {
+                const cTasks = classTasks(cls);
+              %>
+                <button onclick="selectClass('<%= cls.id %>')" class="panel-strong rounded-2xl p-5 text-left hover:border-blue-300 transition">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="text-lg font-semibold"><%= cls.className %></div>
+                      <div class="text-sm text-slate-500 mt-1">Teacher: <%= cls.teacherName || 'Teacher' %></div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3 mt-5">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="text-xs text-slate-500 uppercase tracking-wider">Tasks</div>
+                      <div class="text-2xl font-semibold mt-1"><%= cTasks.length %></div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="text-xs text-slate-500 uppercase tracking-wider">Updates</div>
+                      <div class="text-2xl font-semibold mt-1"><%= Array.isArray(cls.announcements) ? cls.announcements.length : 0 %></div>
+                    </div>
+                  </div>
+                </button>
+              <% }) %>
+            <% } else { %>
+              <div class="xl:col-span-3 panel-strong rounded-2xl p-10 text-center">
+                <i class="fa-solid fa-users-rectangle text-4xl text-slate-300 mb-4"></i>
+                <div class="text-xl font-semibold">Join your first class</div>
+                <p class="text-slate-500 mt-2">Enter the class key your teacher gave you from the side bar.</p>
+              </div>
+            <% } %>
+          </div>
+        </section>
 
+        <section class="view-panel hidden" data-view-panel="classes">
+          <div class="grid xl:grid-cols-12 gap-8">
+            <div class="xl:col-span-4 panel-strong rounded-2xl p-6 md:p-8 h-fit">
+              <h3 class="text-2xl font-semibold">Join a class</h3>
+              <p class="text-sm text-slate-500 mt-1 mb-6">
+                Paste the class key your teacher gave you.
+              </p>
+
+              <form action="/join-class" method="POST" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Class Key</label>
+                  <input type="text" name="studentKey" placeholder="CRED-XXXX-XXXX-XXXX" class="input w-full px-4 py-3 rounded-lg text-sm" required>
+                </div>
+
+                <button type="submit" class="btn btn-green w-full py-4">Join Class</button>
+              </form>
+            </div>
+
+            <div class="xl:col-span-8 space-y-5">
+              <% if (safeClasses.length > 0) { %>
+                <% safeClasses.forEach((cls, idx) => {
+                  const assignedTasks = classTasks(cls);
                   const announcements = Array.isArray(cls.announcements) ? cls.announcements : [];
                 %>
-                  <div class="panel-strong rounded-2xl p-5">
+                  <div class="student-class-panel panel-strong rounded-2xl p-6 <%= idx === 0 ? '' : 'hidden' %>" data-class-panel="<%= cls.id %>">
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <h4 class="text-xl font-semibold"><%= cls.className %></h4>
+                        <h3 class="text-3xl font-semibold"><%= cls.className %></h3>
                         <p class="text-sm text-slate-500 mt-1">Teacher: <%= cls.teacherName || 'Teacher' %></p>
                       </div>
 
@@ -606,239 +540,505 @@
                       </span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 mt-5">
-                      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Tasks</div>
-                        <div class="text-2xl font-semibold mt-1"><%= assignedTasks.length %></div>
+                    <div class="grid md:grid-cols-2 gap-3 mt-6">
+                      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Class Tasks</div>
+                        <div class="text-3xl font-semibold mt-1"><%= assignedTasks.length %></div>
                       </div>
 
-                      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
                         <div class="text-xs text-slate-500 uppercase tracking-wider font-medium">Announcements</div>
-                        <div class="text-2xl font-semibold mt-1"><%= announcements.length %></div>
+                        <div class="text-3xl font-semibold mt-1"><%= announcements.length %></div>
                       </div>
                     </div>
 
-                    <% if (assignedTasks.length > 0) { %>
-                      <div class="mt-5">
-                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Assigned Tasks</div>
-                        <div class="space-y-2">
-                          <% assignedTasks.slice(0, 3).forEach(t => { %>
-                            <div class="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-lg p-3">
-                              <div class="text-sm font-medium truncate"><%= t.title %></div>
-                              <a href="/take-test/<%= t.id %>" class="text-xs font-medium text-blue-600 hover:text-blue-700">Open</a>
+                    <div class="mt-6">
+                      <div class="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 class="text-xl font-semibold">Tasks in this class</h4>
+                          <p class="text-sm text-slate-500">Only assignments from <%= cls.className %>.</p>
+                        </div>
+                      </div>
+
+                      <% if (assignedTasks.length > 0) { %>
+                        <div class="space-y-3">
+                          <% assignedTasks.forEach(task => {
+                            const status = taskStatus(task);
+                          %>
+                            <div class="panel rounded-xl p-4 <%= status.stripe %> task-card" data-task-card="<%= task.id %>">
+                              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <span class="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium">
+                                      <i class="fa-solid <%= status.icon %> mr-1"></i>
+                                      <%= status.label %>
+                                    </span>
+                                  </div>
+
+                                  <div class="text-lg font-semibold"><%= task.title %></div>
+                                  <div class="text-sm text-slate-500 mt-1">
+                                    <%= task.questions ? task.questions.length : 0 %> questions • Ends: <%= task.examEndTime ? formatDateTime(task.examEndTime) : 'No deadline' %>
+                                  </div>
+                                </div>
+
+                                <% if (status.canStart) { %>
+                                  <a href="/take-test/<%= task.id %>" class="btn btn-primary px-5 py-3 text-sm inline-flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-play"></i>
+                                    Start
+                                  </a>
+                                <% } else { %>
+                                  <button disabled class="btn bg-slate-100 text-slate-500 border border-slate-200 px-5 py-3 text-sm cursor-not-allowed">
+                                    <%= status.label %>
+                                  </button>
+                                <% } %>
+                              </div>
                             </div>
                           <% }) %>
                         </div>
-                      </div>
-                    <% } %>
-                  </div>
-                <% }) %>
-              </div>
-            <% } else if (safeEnrollments.length > 0) { %>
-              <div class="grid md:grid-cols-2 gap-4">
-                <% safeEnrollments.forEach(enrollment => { %>
-                  <div class="panel-strong rounded-2xl p-5">
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <h4 class="text-xl font-semibold"><%= enrollment.className || 'Joined Class' %></h4>
-                        <p class="text-sm text-slate-500 mt-1">Joined: <%= formatDate(enrollment.joinedAt) %></p>
-                      </div>
+                      <% } else { %>
+                        <div class="border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-500">
+                          <i class="fa-solid fa-clipboard-list text-3xl text-slate-300 mb-3"></i>
+                          <div class="font-medium text-slate-800">No tasks in this class yet</div>
+                          <p class="text-sm mt-1">Your teacher will assign tasks here.</p>
+                        </div>
+                      <% } %>
+                    </div>
 
-                      <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
-                        Joined
-                      </span>
+                    <div class="mt-6">
+                      <h4 class="text-xl font-semibold mb-3">Class announcements</h4>
+
+                      <% if (announcements.length > 0) { %>
+                        <div class="space-y-3">
+                          <% announcements.slice().reverse().forEach(a => { %>
+                            <div class="panel rounded-xl p-4">
+                              <div class="font-medium"><%= a.title %></div>
+                              <p class="text-sm text-slate-500 mt-1"><%= a.description || 'No description.' %></p>
+                            </div>
+                          <% }) %>
+                        </div>
+                      <% } else { %>
+                        <div class="border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-500">
+                          No class announcements yet.
+                        </div>
+                      <% } %>
                     </div>
                   </div>
                 <% }) %>
-              </div>
-            <% } else { %>
-              <div class="panel-strong rounded-2xl p-12 text-center">
-                <i class="fa-solid fa-users-rectangle text-5xl text-slate-300 mb-5"></i>
-                <div class="text-2xl font-semibold">You have not joined any classes yet</div>
-                <p class="text-slate-500 mt-2">Use your teacher’s class key to join.</p>
-              </div>
-            <% } %>
+              <% } else if (safeEnrollments.length > 0) { %>
+                <div class="grid md:grid-cols-2 gap-4">
+                  <% safeEnrollments.forEach(enrollment => { %>
+                    <div class="panel-strong rounded-2xl p-5">
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <h4 class="text-xl font-semibold"><%= enrollment.className || 'Joined Class' %></h4>
+                          <p class="text-sm text-slate-500 mt-1">Joined: <%= formatDate(enrollment.joinedAt) %></p>
+                        </div>
+
+                        <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
+                          Joined
+                        </span>
+                      </div>
+                    </div>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="panel-strong rounded-2xl p-12 text-center">
+                  <i class="fa-solid fa-users-rectangle text-5xl text-slate-300 mb-5"></i>
+                  <div class="text-2xl font-semibold">You have not joined any classes yet</div>
+                  <p class="text-slate-500 mt-2">Use your teacher’s class key to join.</p>
+                </div>
+              <% } %>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div id="announcements-tab" class="tab-content hidden">
-        <div class="grid xl:grid-cols-12 gap-8">
-          <div class="xl:col-span-8">
-            <h3 class="text-2xl font-semibold mb-5">Announcements</h3>
+        <section class="view-panel hidden" data-view-panel="tasks">
+          <% if (safeTests.length > 0) { %>
+            <div class="grid xl:grid-cols-12 gap-8">
+              <div class="xl:col-span-8 space-y-4">
+                <div>
+                  <h3 class="text-3xl font-semibold">Task Bar</h3>
+                  <p class="text-sm text-slate-500 mt-1">All tasks assigned to you across your joined classes.</p>
+                </div>
 
-            <% if (safeEvents.length > 0) { %>
-              <div class="space-y-4">
-                <% safeEvents.slice().reverse().forEach(event => { %>
-                  <div class="panel-strong rounded-2xl p-5 md:p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div>
+                <% safeTests.forEach(task => {
+                  const status = taskStatus(task);
+                  const names = taskClassNames(task);
+                  const questionsCount = Array.isArray(task.questions) ? task.questions.length : 0;
+                %>
+                  <div class="panel-strong rounded-2xl p-5 md:p-6 <%= status.stripe %> task-card" data-task-card="<%= task.id %>">
+                    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+                      <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2 mb-2">
-                          <% if (event.className) { %>
-                            <span class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
-                              <i class="fa-solid fa-users-rectangle mr-1"></i>
-                              <%= event.className %>
-                            </span>
-                          <% } else { %>
-                            <span class="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium">
-                              <i class="fa-solid fa-globe mr-1"></i>
-                              General
-                            </span>
-                          <% } %>
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium">
+                            <i class="fa-solid <%= status.icon %>"></i>
+                            <%= status.label %>
+                          </span>
 
-                          <% if (event.specialBadgeId) { %>
-                            <span class="px-3 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-medium">
-                              Special Badge
-                            </span>
+                          <% if (names.length > 0) { %>
+                            <% names.forEach(name => { %>
+                              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
+                                <i class="fa-solid fa-users-rectangle"></i>
+                                <%= name %>
+                              </span>
+                            <% }) %>
                           <% } %>
                         </div>
 
-                        <h4 class="text-xl font-semibold"><%= event.title || 'Announcement' %></h4>
-                        <p class="text-sm text-slate-600 mt-2 leading-relaxed"><%= event.description || 'No description.' %></p>
+                        <h4 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-950">
+                          <%= task.title || 'Untitled Task' %>
+                        </h4>
+
+                        <div class="mt-3 grid sm:grid-cols-3 gap-3 text-sm">
+                          <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Questions</div>
+                            <div class="mt-1 font-medium text-slate-900"><%= questionsCount %></div>
+                          </div>
+
+                          <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Starts</div>
+                            <div class="mt-1 font-medium text-slate-900"><%= task.isOpen ? 'Open anytime' : formatDateTime(task.examStartTime) %></div>
+                          </div>
+
+                          <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Ends</div>
+                            <div class="mt-1 font-medium text-slate-900"><%= task.examEndTime ? formatDateTime(task.examEndTime) : 'No deadline' %></div>
+                          </div>
+                        </div>
                       </div>
 
-                      <div class="text-xs text-slate-500 whitespace-nowrap">
-                        <i class="fa-regular fa-calendar mr-1"></i>
-                        <%= event.date || formatDate(event.createdAt) %>
+                      <div class="lg:w-48 flex lg:flex-col gap-2">
+                        <% if (status.canStart) { %>
+                          <a href="/take-test/<%= task.id %>" class="btn btn-primary flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 text-sm">
+                            <i class="fa-solid fa-play"></i>
+                            Start
+                          </a>
+                        <% } else { %>
+                          <button type="button" disabled class="btn flex-1 lg:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 text-sm bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed">
+                            <i class="fa-solid <%= status.icon %>"></i>
+                            <%= status.label %>
+                          </button>
+                        <% } %>
+
+                        <% if (status.label === 'Scheduled' && task.examStartTime) { %>
+                          <div class="text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded-lg p-3 text-center countdown" data-start="<%= task.examStartTime %>">
+                            Opens soon
+                          </div>
+                        <% } %>
                       </div>
                     </div>
                   </div>
                 <% }) %>
               </div>
-            <% } else { %>
-              <div class="panel-strong rounded-2xl p-12 text-center">
-                <i class="fa-solid fa-bullhorn text-5xl text-slate-300 mb-5"></i>
-                <div class="text-2xl font-semibold">No announcements yet</div>
-                <p class="text-slate-500 mt-2">Class and general announcements will appear here.</p>
-              </div>
-            <% } %>
-          </div>
 
-          <div class="xl:col-span-4 panel rounded-2xl p-6 h-fit">
-            <h3 class="text-xl font-semibold">Announcement types</h3>
+              <div class="xl:col-span-4 space-y-5">
+                <div class="panel-strong rounded-2xl p-6">
+                  <h3 class="text-xl font-semibold">Task summary</h3>
 
-            <div class="mt-5 space-y-3">
-              <div class="flex gap-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                <i class="fa-solid fa-users-rectangle text-blue-700 mt-0.5"></i>
-                <div>
-                  <div class="text-sm font-medium text-blue-900">Class announcements</div>
-                  <div class="text-xs text-blue-700 mt-1">Only students in that class can see them.</div>
+                  <div class="mt-5 space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
+                      <span class="text-sm font-medium text-emerald-800">Open now</span>
+                      <span class="text-lg font-semibold text-emerald-800"><%= openTasks.length %></span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                      <span class="text-sm font-medium text-blue-800">Scheduled</span>
+                      <span class="text-lg font-semibold text-blue-800"><%= scheduledTasks.length %></span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg">
+                      <span class="text-sm font-medium text-red-800">Closed</span>
+                      <span class="text-lg font-semibold text-red-800"><%= closedTasks.length %></span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          <% } else { %>
+            <div class="panel-strong rounded-2xl p-12 text-center">
+              <i class="fa-solid fa-clipboard-list text-5xl text-slate-300 mb-5"></i>
+              <div class="text-2xl font-semibold">No tasks assigned yet</div>
+              <p class="text-slate-500 mt-2 max-w-xl mx-auto">
+                Join a class with your teacher’s class key. When your teacher assigns assessments, they will appear here.
+              </p>
+            </div>
+          <% } %>
+        </section>
 
-              <div class="flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                <i class="fa-solid fa-globe text-slate-700 mt-0.5"></i>
-                <div>
-                  <div class="text-sm font-medium text-slate-900">General announcements</div>
-                  <div class="text-xs text-slate-600 mt-1">Shown as general portal updates.</div>
+        <section class="view-panel hidden" data-view-panel="explore">
+          <div class="panel-strong rounded-2xl p-6 md:p-9 mb-6" style="background: linear-gradient(135deg, #ffffff, #eff6ff);">
+            <div class="max-w-3xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium tracking-[1.5px] rounded-lg mb-5">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>EXPLORE SKILLS</span>
+              </div>
+
+              <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-slate-950">
+                Discover skills you can earn badges for.
+              </h2>
+
+              <p class="text-slate-600 text-lg mt-4">
+                Explore popular skill tracks and ask your teacher to assign matching tasks or badges.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-code"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Programming</h3>
+              <p class="text-sm text-slate-500 mt-2">Python, JavaScript, web development, and algorithms.</p>
+            </div>
+
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-brain"></i>
+              </div>
+              <h3 class="text-xl font-semibold">AI Skills</h3>
+              <p class="text-sm text-slate-500 mt-2">Prompting, machine learning basics, data labeling, and AI literacy.</p>
+            </div>
+
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Business</h3>
+              <p class="text-sm text-slate-500 mt-2">Marketing, entrepreneurship, finance basics, and sales.</p>
+            </div>
+
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-language"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Languages</h3>
+              <p class="text-sm text-slate-500 mt-2">English, Arabic, Korean, Japanese, and communication skills.</p>
+            </div>
+
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-700 border border-rose-100 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-palette"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Design</h3>
+              <p class="text-sm text-slate-500 mt-2">UI design, branding, presentation design, and creative tools.</p>
+            </div>
+
+            <div class="panel rounded-2xl p-6">
+              <div class="w-11 h-11 rounded-xl bg-slate-50 text-slate-700 border border-slate-200 flex items-center justify-center mb-4">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <h3 class="text-xl font-semibold">Cyber Safety</h3>
+              <p class="text-sm text-slate-500 mt-2">Online safety, privacy, basic security, and responsible tech use.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel hidden" data-view-panel="announcements">
+          <div class="grid xl:grid-cols-12 gap-8">
+            <div class="xl:col-span-8">
+              <h3 class="text-2xl font-semibold mb-5">Announcements</h3>
+
+              <% if (safeEvents.length > 0) { %>
+                <div class="space-y-4">
+                  <% safeEvents.slice().reverse().forEach(event => { %>
+                    <div class="panel-strong rounded-2xl p-5 md:p-6">
+                      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div>
+                          <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <% if (event.className) { %>
+                              <span class="px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
+                                <i class="fa-solid fa-users-rectangle mr-1"></i>
+                                <%= event.className %>
+                              </span>
+                            <% } else { %>
+                              <span class="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium">
+                                <i class="fa-solid fa-globe mr-1"></i>
+                                General
+                              </span>
+                            <% } %>
+
+                            <% if (event.specialBadgeId) { %>
+                              <span class="px-3 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-medium">
+                                Special Badge
+                              </span>
+                            <% } %>
+                          </div>
+
+                          <h4 class="text-xl font-semibold"><%= event.title || 'Announcement' %></h4>
+                          <p class="text-sm text-slate-600 mt-2 leading-relaxed"><%= event.description || 'No description.' %></p>
+                        </div>
+
+                        <div class="text-xs text-slate-500 whitespace-nowrap">
+                          <i class="fa-regular fa-calendar mr-1"></i>
+                          <%= event.date || formatDate(event.createdAt) %>
+                        </div>
+                      </div>
+                    </div>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="panel-strong rounded-2xl p-12 text-center">
+                  <i class="fa-solid fa-bullhorn text-5xl text-slate-300 mb-5"></i>
+                  <div class="text-2xl font-semibold">No announcements yet</div>
+                  <p class="text-slate-500 mt-2">Class and general announcements will appear here.</p>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="xl:col-span-4 panel rounded-2xl p-6 h-fit">
+              <h3 class="text-xl font-semibold">Announcement types</h3>
+
+              <div class="mt-5 space-y-3">
+                <div class="flex gap-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                  <i class="fa-solid fa-users-rectangle text-blue-700 mt-0.5"></i>
+                  <div>
+                    <div class="text-sm font-medium text-blue-900">Class announcements</div>
+                    <div class="text-xs text-blue-700 mt-1">Only students in that class can see them.</div>
+                  </div>
+                </div>
+
+                <div class="flex gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                  <i class="fa-solid fa-globe text-slate-700 mt-0.5"></i>
+                  <div>
+                    <div class="text-sm font-medium text-slate-900">General announcements</div>
+                    <div class="text-xs text-slate-600 mt-1">Shown as general portal updates.</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div id="badges-tab" class="tab-content hidden">
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-          <div>
-            <h3 class="text-2xl font-semibold">My verified badges</h3>
-            <p class="text-sm text-slate-500 mt-1">Credentials you earned from completed assessments.</p>
+        <section class="view-panel hidden" data-view-panel="badges">
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+            <div>
+              <h3 class="text-2xl font-semibold">My verified badges</h3>
+              <p class="text-sm text-slate-500 mt-1">Credentials you earned from completed assessments.</p>
+            </div>
           </div>
-        </div>
 
-        <% if (safeBadges.length > 0) { %>
-          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-            <% safeBadges.slice().reverse().forEach(badge => {
-              const verifyId = badge.badgeId || badge.verifyHash || badge.id || badge.issuedId;
-              const verifyLink = verifyId ? `/verify/${verifyId}` : '#';
-            %>
-              <div class="badge-card panel-strong rounded-2xl overflow-hidden">
-                <div class="p-5 border-b border-slate-200 bg-white">
-                  <div class="flex items-start justify-between gap-3">
-                    <div>
-                      <div class="text-lg font-semibold text-slate-950"><%= badge.title || 'Skill Badge' %></div>
-                      <div class="text-xs text-slate-500 mt-1">
-                        Issued <%= badge.issuedDate || badge.issueDate || formatDate(badge.createdAt) %>
+          <% if (safeBadges.length > 0) { %>
+            <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+              <% safeBadges.slice().reverse().forEach(badge => {
+                const verifyId = badge.badgeId || badge.verifyHash || badge.id || badge.issuedId;
+                const verifyLink = verifyId ? `/verify/${verifyId}` : '#';
+              %>
+                <div class="badge-card panel-strong rounded-2xl overflow-hidden">
+                  <div class="p-5 border-b border-slate-200 bg-white">
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <div class="text-lg font-semibold text-slate-950"><%= badge.title || 'Skill Badge' %></div>
+                        <div class="text-xs text-slate-500 mt-1">
+                          Issued <%= badge.issuedDate || badge.issueDate || formatDate(badge.createdAt) %>
+                        </div>
                       </div>
+
+                      <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
+                        Verified
+                      </span>
                     </div>
-
-                    <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
-                      Verified
-                    </span>
                   </div>
-                </div>
 
-                <div class="p-5">
-                  <div class="flex gap-4 items-start">
-                    <div class="flex-1">
-                      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Issued By</div>
-                      <div class="mt-1 font-medium text-slate-900"><%= badge.createdBy || 'School Admin' %></div>
+                  <div class="p-5">
+                    <div class="flex gap-4 items-start">
+                      <div class="flex-1">
+                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Issued By</div>
+                        <div class="mt-1 font-medium text-slate-900"><%= badge.createdBy || 'School Admin' %></div>
 
-                      <% if (badge.score) { %>
-                        <div class="mt-4 text-xs font-medium text-slate-500 uppercase tracking-wider">Score</div>
-                        <div class="mt-1 text-2xl font-semibold text-slate-950"><%= badge.score %>%</div>
+                        <% if (badge.score) { %>
+                          <div class="mt-4 text-xs font-medium text-slate-500 uppercase tracking-wider">Score</div>
+                          <div class="mt-1 text-2xl font-semibold text-slate-950"><%= badge.score %>%</div>
+                        <% } %>
+                      </div>
+
+                      <% if (badge.qrCode) { %>
+                        <img src="<%= badge.qrCode %>" alt="QR Code" class="w-20 h-20 rounded-lg border border-slate-200 bg-white p-1">
+                      <% } else { %>
+                        <div class="w-20 h-20 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-slate-300">
+                          <i class="fa-solid fa-qrcode text-2xl"></i>
+                        </div>
                       <% } %>
                     </div>
 
-                    <% if (badge.qrCode) { %>
-                      <img src="<%= badge.qrCode %>" alt="QR Code" class="w-20 h-20 rounded-lg border border-slate-200 bg-white p-1">
-                    <% } else { %>
-                      <div class="w-20 h-20 rounded-lg border border-dashed border-slate-300 bg-slate-50 flex items-center justify-center text-slate-300">
-                        <i class="fa-solid fa-qrcode text-2xl"></i>
-                      </div>
-                    <% } %>
-                  </div>
+                    <div class="mt-6 pt-5 border-t border-slate-200 flex gap-2">
+                      <a href="<%= verifyLink %>" class="btn btn-light flex-1 py-2.5 text-xs text-center">
+                        Verify
+                      </a>
 
-                  <div class="mt-6 pt-5 border-t border-slate-200 flex gap-2">
-                    <a href="<%= verifyLink %>" class="btn btn-light flex-1 py-2.5 text-xs text-center">
-                      Verify
-                    </a>
-
-                    <button type="button" onclick="shareCredential('<%= verifyLink %>')" class="btn btn-dark flex-1 py-2.5 text-xs">
-                      Share
-                    </button>
+                      <button type="button" onclick="shareCredential('<%= verifyLink %>')" class="btn btn-dark flex-1 py-2.5 text-xs">
+                        Share
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            <% }) %>
-          </div>
-        <% } else { %>
-          <div class="panel-strong rounded-2xl p-12 text-center">
-            <i class="fa-solid fa-award text-5xl text-slate-300 mb-5"></i>
-            <div class="text-2xl font-semibold">No badges yet</div>
-            <p class="text-slate-500 mt-2 max-w-xl mx-auto">
-              Complete assigned assessments to earn verified credentials.
-            </p>
-          </div>
-        <% } %>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="panel-strong rounded-2xl p-12 text-center">
+              <i class="fa-solid fa-award text-5xl text-slate-300 mb-5"></i>
+              <div class="text-2xl font-semibold">No badges yet</div>
+              <p class="text-slate-500 mt-2 max-w-xl mx-auto">
+                Complete assigned assessments to earn verified credentials.
+              </p>
+            </div>
+          <% } %>
+        </section>
       </div>
-    </section>
-  </main>
+    </main>
+  </div>
 
   <script>
-    function scrollToWorkspace() {
-      document.getElementById('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function showView(view) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+      const panel = document.querySelector(`[data-view-panel="${view}"]`);
+      if (panel) panel.classList.remove('hidden');
+
+      document.querySelectorAll('[data-view-link]').forEach(el => el.classList.remove('active'));
+      const link = document.querySelector(`[data-view-link="${view}"]`);
+      if (link) link.classList.add('active');
+
+      history.replaceState(null, '', '#' + view);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(tab + '-tab').classList.remove('hidden');
+    function selectClass(classId) {
+      showView('classes');
 
-      document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('tab-active');
+      document.querySelectorAll('[data-class-button]').forEach(el => el.classList.remove('active'));
+      const btn = document.querySelector(`[data-class-button="${classId}"]`);
+      if (btn) btn.classList.add('active');
+
+      document.querySelectorAll('[data-class-panel]').forEach(el => el.classList.add('hidden'));
+      const panel = document.querySelector(`[data-class-panel="${classId}"]`);
+      if (panel) panel.classList.remove('hidden');
+    }
+
+    function selectTask(taskId) {
+      showView('tasks');
+
+      document.querySelectorAll('[data-task-button]').forEach(el => el.classList.remove('active'));
+      const btn = document.querySelector(`[data-task-button="${taskId}"]`);
+      if (btn) btn.classList.add('active');
+
+      document.querySelectorAll('[data-task-card]').forEach(el => {
+        el.style.outline = '';
+        el.style.outlineOffset = '';
       });
 
-      const activeBtn = document.getElementById('tab-' + tab);
-      activeBtn.classList.add('tab-active');
-
-      history.replaceState(null, '', '#' + tab);
+      const card = document.querySelector(`[data-task-card="${taskId}"]`);
+      if (card) {
+        card.style.outline = '3px solid rgba(37,99,235,.25)';
+        card.style.outlineOffset = '2px';
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
 
     function initDashboard() {
       const hash = window.location.hash.replace('#', '');
 
-      if (['tasks', 'classes', 'announcements', 'badges'].includes(hash)) {
-        showTab(hash);
+      if (['overview', 'tasks', 'classes', 'announcements', 'badges', 'explore'].includes(hash)) {
+        showView(hash);
       }
 
       updateCountdowns();
