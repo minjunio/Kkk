@@ -12,15 +12,15 @@ const PORT = process.env.PORT || 3000;
 // ==================== APP CONFIG ====================
 app.set('trust proxy', 1);
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'credity-secret-key-2026-change-this',
+  secret: process.env.SESSION_SECRET || 'credity-secret-key-change-this',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -36,8 +36,20 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'credity-db.json');
 
 let users = [
-  { id: 1, email: 'teacher@school.com', password: 'pass123', role: 'teacher', name: 'Ms. Johnson' },
-  { id: 2, email: 'student@school.com', password: 'pass123', role: 'student', name: 'Alex Rivera' }
+  {
+    id: 1,
+    email: 'teacher@school.com',
+    password: 'pass123',
+    role: 'teacher',
+    name: 'Ms. Johnson'
+  },
+  {
+    id: 2,
+    email: 'student@school.com',
+    password: 'pass123',
+    role: 'student',
+    name: 'Alex Rivera'
+  }
 ];
 
 let credentialTemplates = [];
@@ -120,19 +132,32 @@ function loadDB() {
     events = Array.isArray(db.events) ? db.events : [];
     tests = Array.isArray(db.tests) ? db.tests : [];
     networkLogs = Array.isArray(db.networkLogs) ? db.networkLogs : [];
-    classes = Array.isArray(db.classes) ? db.classes : migrateOldKeysToClasses(db.studentKeys);
     classEnrollments = Array.isArray(db.classEnrollments) ? db.classEnrollments : [];
     submissions = Array.isArray(db.submissions) ? db.submissions : [];
+
+    if (Array.isArray(db.classes) && db.classes.length > 0) {
+      classes = db.classes;
+    } else {
+      classes = migrateOldKeysToClasses(db.studentKeys);
+    }
 
     classes.forEach(c => {
       if (!Array.isArray(c.assignedTestIds)) c.assignedTestIds = [];
       if (!Array.isArray(c.announcements)) c.announcements = [];
       if (!c.normalizedKey) c.normalizedKey = normalizeAccessKey(c.key);
       c.usageCount = Number(c.usageCount || 0);
+      c.active = c.active !== false;
     });
 
     tests.forEach(t => {
       if (!Array.isArray(t.classIds)) t.classIds = [];
+      if (t.requiresKey === undefined) t.requiresKey = false;
+    });
+
+    credentialTemplates.forEach(t => {
+      if (!Array.isArray(t.logos)) {
+        t.logos = t.logoUrl ? [t.logoUrl] : [];
+      }
     });
   } catch (err) {
     console.error('DB load error:', err.message);
@@ -156,7 +181,7 @@ if (GMAIL_USER && GMAIL_APP_PASSWORD) {
     }
   });
 } else {
-  console.log('Mailer disabled: missing GMAIL_USER or GMAIL_APP_PASSWORD.');
+  console.log('Mailer disabled. Add GMAIL_USER and GMAIL_APP_PASSWORD env vars to enable email.');
 }
 
 // ==================== HELPERS ====================
@@ -170,13 +195,24 @@ function currentUser(req) {
   return users.find(u => Number(u.id) === Number(req.session.user.id)) || req.session.user;
 }
 
+function requireAuth(req, res, next) {
+  if (!req.session.user) return res.redirect('/');
+  next();
+}
+
 function requireTeacher(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
+  if (!req.session.user || req.session.user.role !== 'teacher') {
+    return res.redirect('/');
+  }
+
   next();
 }
 
 function requireStudent(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'student') return res.redirect('/');
+  if (!req.session.user || req.session.user.role !== 'student') {
+    return res.redirect('/');
+  }
+
   next();
 }
 
@@ -230,7 +266,7 @@ function generateCredentialHash(userId, assessmentId) {
 }
 
 async function sendEmail(to, subject, html) {
-  if (!transporter) return;
+  if (!transporter || !to) return;
 
   try {
     await transporter.sendMail({
@@ -255,15 +291,25 @@ function parseQuestions(raw) {
 
 function collectLogoUrls(bodyValue) {
   const list = Array.isArray(bodyValue) ? bodyValue : bodyValue ? [bodyValue] : [];
-  return list.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3);
+
+  return list
+    .map(x => String(x || '').trim())
+    .filter(Boolean)
+    .slice(0, 3);
 }
 
 function teacherOwnsTest(teacherId, testId) {
-  return tests.find(t => Number(t.id) === Number(testId) && Number(t.teacherId) === Number(teacherId));
+  return tests.find(t =>
+    Number(t.id) === Number(testId) &&
+    Number(t.teacherId) === Number(teacherId)
+  );
 }
 
 function teacherOwnsClass(teacherId, classId) {
-  return classes.find(c => Number(c.id) === Number(classId) && Number(c.teacherId) === Number(teacherId));
+  return classes.find(c =>
+    Number(c.id) === Number(classId) &&
+    Number(c.teacherId) === Number(teacherId)
+  );
 }
 
 function teacherOwnsCredential(teacherId, credentialId) {
@@ -279,27 +325,49 @@ function latestTeacherCredential(teacherId) {
     .find(b => Number(b.teacherId) === Number(teacherId));
 }
 
+function studentClassIds(userId) {
+  return classEnrollments
+    .filter(e => Number(e.userId) === Number(userId))
+    .map(e => Number(e.classId));
+}
+
 function studentHasAccessToTest(userId, test) {
   if (!test) return false;
 
   if (!test.requiresKey) return true;
 
-  const studentClassIds = classEnrollments
-    .filter(e => Number(e.userId) === Number(userId))
-    .map(e => Number(e.classId));
+  const joinedClassIds = studentClassIds(userId);
 
-  return classes.some(c =>
-    studentClassIds.includes(Number(c.id)) &&
-    Array.isArray(c.assignedTestIds) &&
-    c.assignedTestIds.map(Number).includes(Number(test.id))
-  );
+  return classes.some(c => {
+    const assignedIds = Array.isArray(c.assignedTestIds)
+      ? c.assignedTestIds.map(Number)
+      : [];
+
+    return joinedClassIds.includes(Number(c.id)) &&
+      assignedIds.includes(Number(test.id));
+  });
+}
+
+function classNamesForStudentTest(userId, test) {
+  const joinedClassIds = studentClassIds(userId);
+
+  return classes
+    .filter(c => {
+      const assignedIds = Array.isArray(c.assignedTestIds)
+        ? c.assignedTestIds.map(Number)
+        : [];
+
+      return joinedClassIds.includes(Number(c.id)) &&
+        assignedIds.includes(Number(test.id));
+    })
+    .map(c => c.className);
 }
 
 function mapIssuedCredentialForStudent(credential) {
   return {
     ...credential,
-    id: credential.issuedId,
-    badgeId: credential.verifyHash,
+    id: credential.issuedId || credential.id,
+    badgeId: credential.verifyHash || credential.badgeId,
     title: credential.title || 'Skill Badge',
     issuedDate: credential.issueDate || credential.issuedDate || '',
     createdBy: credential.createdBy || 'School Admin',
@@ -309,7 +377,12 @@ function mapIssuedCredentialForStudent(credential) {
 
 function makePage(title, message, buttons = []) {
   const buttonHtml = buttons.map(btn => {
-    return `<a href="${escapeHtml(btn.href)}" style="display:inline-block;margin:8px;padding:12px 18px;border-radius:12px;background:${btn.primary ? '#ffffff' : 'rgba(255,255,255,.08)'};color:${btn.primary ? '#09090b' : '#ffffff'};text-decoration:none;font-weight:500;font-size:13px;border:1px solid rgba(255,255,255,.15)">${escapeHtml(btn.label)}</a>`;
+    return `
+      <a href="${escapeHtml(btn.href)}"
+         style="display:inline-block;margin:8px;padding:12px 18px;border-radius:12px;background:${btn.primary ? '#ffffff' : 'rgba(255,255,255,.08)'};color:${btn.primary ? '#09090b' : '#ffffff'};text-decoration:none;font-weight:500;font-size:13px;border:1px solid rgba(255,255,255,.15)">
+        ${escapeHtml(btn.label)}
+      </a>
+    `;
   }).join('');
 
   return `
@@ -369,6 +442,7 @@ function makePage(title, message, buttons = []) {
           font-weight: 650;
           letter-spacing: .08em;
           text-align: center;
+          overflow-x: auto;
         }
       </style>
     </head>
@@ -384,172 +458,22 @@ function makePage(title, message, buttons = []) {
   `;
 }
 
-// ==================== AUTH ====================
-app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect(req.session.user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
-  }
+function getTeacherDashboardData(user) {
+  const teacherTests = isAdminUser(user)
+    ? tests
+    : tests.filter(t => Number(t.teacherId) === Number(user.id));
 
-  res.render('index', { error: null });
-});
+  const teacherBadges = isAdminUser(user)
+    ? credentialTemplates
+    : credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
 
-app.post('/login', (req, res) => {
-  const { email, password, role } = req.body;
+  const teacherEvents = isAdminUser(user)
+    ? events
+    : events.filter(e => !e.teacherId || Number(e.teacherId) === Number(user.id));
 
-  if (email === 'admin' && password === 'monterysasd') {
-    req.session.user = { id: 0, email: 'admin', role: 'teacher', name: 'Admin' };
-    return res.redirect('/admin');
-  }
-
-  const user = users.find(u =>
-    String(u.email).toLowerCase() === String(email || '').toLowerCase() &&
-    u.password === password &&
-    u.role === role
-  );
-
-  if (!user) {
-    return res.render('index', { error: 'Invalid credentials.' });
-  }
-
-  req.session.user = user;
-  res.redirect(user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
-});
-
-app.post('/signup', async (req, res) => {
-  const { name, email, password, role } = req.body;
-
-  if (!name || !email || !password || !role) {
-    return res.render('index', { error: 'Please fill all fields.' });
-  }
-
-  if (!['teacher', 'student'].includes(role)) {
-    return res.render('index', { error: 'Invalid role.' });
-  }
-
-  if (users.find(u => String(u.email).toLowerCase() === String(email).toLowerCase())) {
-    return res.render('index', { error: 'Email exists.' });
-  }
-
-  const newUser = {
-    id: nextId(users),
-    email: String(email).trim().toLowerCase(),
-    password,
-    role,
-    name: String(name).trim()
-  };
-
-  users.push(newUser);
-  saveDB();
-
-  req.session.user = newUser;
-
-  await sendEmail(
-    newUser.email,
-    'Welcome to Credity',
-    `<p>Hello ${escapeHtml(newUser.name)}, your account was created.</p>`
-  );
-
-  res.redirect(role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
-});
-
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
-});
-
-// ==================== STUDENT DASHBOARD ====================
-app.get('/student-dashboard', requireStudent, (req, res) => {
-  const user = currentUser(req);
-
-  const userCredentials = issuedCredentials
-    .filter(c => Number(c.userId) === Number(user.id))
-    .map(mapIssuedCredentialForStudent);
-
-  const enrollments = classEnrollments.filter(e => Number(e.userId) === Number(user.id));
-  const enrolledClassIds = enrollments.map(e => Number(e.classId));
-
-  const studentClasses = classes
-    .filter(c => enrolledClassIds.includes(Number(c.id)))
-    .map(cls => {
-      const assignedTestIds = Array.isArray(cls.assignedTestIds)
-        ? cls.assignedTestIds.map(Number)
-        : [];
-
-      const assignedTests = tests.filter(t => assignedTestIds.includes(Number(t.id)));
-
-      return {
-        ...cls,
-        assignedTests,
-        assignedTaskCount: assignedTests.length,
-        announcements: Array.isArray(cls.announcements) ? cls.announcements : []
-      };
-    });
-
-  const visibleTests = tests
-    .filter(t => studentHasAccessToTest(user.id, t))
-    .map(t => {
-      let countdown = 0;
-
-      if (t.examStartTime && !t.isOpen) {
-        const start = new Date(t.examStartTime);
-        const now = new Date();
-        const diff = start.getTime() - now.getTime();
-        countdown = diff > 0 ? Math.floor(diff / 1000) : 0;
-      }
-
-      const classNames = studentClasses
-        .filter(cls => {
-          const assignedIds = Array.isArray(cls.assignedTestIds)
-            ? cls.assignedTestIds.map(Number)
-            : [];
-
-          return assignedIds.includes(Number(t.id));
-        })
-        .map(cls => cls.className);
-
-      return {
-        ...t,
-        countdown,
-        classNames
-      };
-    });
-
-  const classAnnouncementCards = [];
-
-  studentClasses.forEach(c => {
-    if (Array.isArray(c.announcements)) {
-      c.announcements.forEach(a => {
-        classAnnouncementCards.push({
-          id: `class-${c.id}-announcement-${a.id}`,
-          title: a.title || `Announcement for ${c.className}`,
-          description: a.description || '',
-          date: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '',
-          specialBadgeId: a.specialBadgeId || null,
-          className: c.className
-        });
-      });
-    }
-  });
-
-  res.render('student-dashboard', {
-    user,
-    badges: userCredentials,
-    issuedCredentials: userCredentials,
-    events: [...classAnnouncementCards, ...events],
-    tests: visibleTests,
-    upcomingExams: visibleTests,
-    enrollments,
-    classes: studentClasses
-  });
-});
-
-// ==================== TEACHER DASHBOARD ====================
-app.get('/teacher-dashboard', requireTeacher, (req, res) => {
-  const user = currentUser(req);
-
-  const teacherTests = tests.filter(t => Number(t.teacherId) === Number(user.id));
-  const teacherBadges = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
-  const teacherEvents = events.filter(e => !e.teacherId || Number(e.teacherId) === Number(user.id));
-  const teacherClassesRaw = classes.filter(c => Number(c.teacherId) === Number(user.id));
+  const teacherClassesRaw = isAdminUser(user)
+    ? classes
+    : classes.filter(c => Number(c.teacherId) === Number(user.id));
 
   const teacherClasses = teacherClassesRaw.map(cls => {
     const assignedTestIds = Array.isArray(cls.assignedTestIds)
@@ -575,12 +499,13 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
 
           return {
             ...s,
-            testTitle: s.testTitle || (test ? test.title : 'Assessment'),
+            testTitle: s.testTitle || (test ? test.title : 'Assignment'),
             submittedAtFormatted: s.submittedAt
               ? new Date(s.submittedAt).toLocaleString()
               : ''
           };
-        });
+        })
+        .sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
 
       const completedTestIds = studentSubmissions.map(s => Number(s.testId));
       const pendingTests = assignedTests.filter(t => !completedTestIds.includes(Number(t.id)));
@@ -620,7 +545,7 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
           ...s,
           studentName: s.studentName || (enrollment ? enrollment.studentName : userRecord ? userRecord.name : 'Unknown Student'),
           studentEmail: s.studentEmail || (enrollment ? enrollment.studentEmail : userRecord ? userRecord.email : 'No email'),
-          testTitle: s.testTitle || (test ? test.title : 'Assessment'),
+          testTitle: s.testTitle || (test ? test.title : 'Assignment'),
           submittedAtFormatted: s.submittedAt
             ? new Date(s.submittedAt).toLocaleString()
             : ''
@@ -638,7 +563,7 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
     };
   });
 
-  res.render('teacher-dashboard', {
+  return {
     user,
     badges: teacherBadges,
     tests: teacherTests,
@@ -648,27 +573,231 @@ app.get('/teacher-dashboard', requireTeacher, (req, res) => {
     enrollments: classEnrollments,
     submissions,
     users
+  };
+}
+
+function gradeSubmission(test, body) {
+  if (body.score !== undefined && body.score !== '') {
+    const manualScore = parseInt(body.score);
+    return Number.isFinite(manualScore) ? Math.max(0, Math.min(100, manualScore)) : 85;
+  }
+
+  const questions = Array.isArray(test.questions) ? test.questions : [];
+  if (!questions.length) return 85;
+
+  let correct = 0;
+  let graded = 0;
+
+  questions.forEach((q, index) => {
+    const expected = String(
+      q.correctAnswer ??
+      q.answer ??
+      q.correct ??
+      ''
+    ).trim().toLowerCase();
+
+    if (!expected) return;
+
+    graded += 1;
+
+    const submitted = String(
+      body[`answer_${index}`] ??
+      body[`q_${index}`] ??
+      body[`question_${index}`] ??
+      ''
+    ).trim().toLowerCase();
+
+    if (submitted && submitted === expected) {
+      correct += 1;
+    }
   });
+
+  if (!graded) return 85;
+
+  return Math.round((correct / graded) * 100);
+}
+
+// ==================== AUTH ====================
+app.get('/', (req, res) => {
+  if (req.session.user) {
+    return res.redirect(req.session.user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
+  }
+
+  res.render('index', { error: null });
+});
+
+app.post('/login', (req, res) => {
+  const { email, password, role } = req.body;
+
+  if (email === 'admin' && password === 'monterysasd') {
+    req.session.user = {
+      id: 0,
+      email: 'admin',
+      role: 'teacher',
+      name: 'Admin'
+    };
+
+    return res.redirect('/admin');
+  }
+
+  const user = users.find(u =>
+    String(u.email).toLowerCase() === String(email || '').toLowerCase() &&
+    u.password === password &&
+    u.role === role
+  );
+
+  if (!user) {
+    return res.render('index', {
+      error: 'Invalid credentials.'
+    });
+  }
+
+  req.session.user = user;
+  res.redirect(user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
+});
+
+app.post('/signup', async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password || !role) {
+    return res.render('index', {
+      error: 'Please fill all fields.'
+    });
+  }
+
+  if (!['teacher', 'student'].includes(role)) {
+    return res.render('index', {
+      error: 'Invalid role.'
+    });
+  }
+
+  if (users.find(u => String(u.email).toLowerCase() === String(email).toLowerCase())) {
+    return res.render('index', {
+      error: 'Email already exists.'
+    });
+  }
+
+  const newUser = {
+    id: nextId(users),
+    email: String(email).trim().toLowerCase(),
+    password,
+    role,
+    name: String(name).trim()
+  };
+
+  users.push(newUser);
+  saveDB();
+
+  req.session.user = newUser;
+
+  await sendEmail(
+    newUser.email,
+    'Welcome to Credity',
+    `<p>Hello ${escapeHtml(newUser.name)}, your Credity account was created.</p>`
+  );
+
+  res.redirect(role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard');
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/'));
+});
+
+// ==================== STUDENT DASHBOARD ====================
+app.get('/student-dashboard', requireStudent, (req, res) => {
+  const user = currentUser(req);
+
+  const userCredentials = issuedCredentials
+    .filter(c => Number(c.userId) === Number(user.id))
+    .map(mapIssuedCredentialForStudent);
+
+  const enrollments = classEnrollments.filter(e => Number(e.userId) === Number(user.id));
+  const enrolledClassIds = enrollments.map(e => Number(e.classId));
+
+  const studentClasses = classes
+    .filter(c => enrolledClassIds.includes(Number(c.id)))
+    .map(cls => {
+      const assignedTestIds = Array.isArray(cls.assignedTestIds)
+        ? cls.assignedTestIds.map(Number)
+        : [];
+
+      const assignedTests = tests
+        .filter(t => assignedTestIds.includes(Number(t.id)))
+        .map(t => ({
+          ...t,
+          classNames: [cls.className]
+        }));
+
+      return {
+        ...cls,
+        assignedTests,
+        assignedTaskCount: assignedTests.length,
+        announcements: Array.isArray(cls.announcements) ? cls.announcements : []
+      };
+    });
+
+  const visibleTests = tests
+    .filter(t => studentHasAccessToTest(user.id, t))
+    .map(t => {
+      let countdown = 0;
+
+      if (t.examStartTime && !t.isOpen) {
+        const start = new Date(t.examStartTime);
+        const now = new Date();
+        const diff = start.getTime() - now.getTime();
+        countdown = diff > 0 ? Math.floor(diff / 1000) : 0;
+      }
+
+      return {
+        ...t,
+        countdown,
+        classNames: classNamesForStudentTest(user.id, t)
+      };
+    });
+
+  const classAnnouncementCards = [];
+
+  studentClasses.forEach(c => {
+    if (Array.isArray(c.announcements)) {
+      c.announcements.forEach(a => {
+        classAnnouncementCards.push({
+          id: `class-${c.id}-announcement-${a.id}`,
+          title: a.title || `Announcement for ${c.className}`,
+          description: a.description || '',
+          date: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '',
+          specialBadgeId: a.specialBadgeId || null,
+          className: c.className,
+          createdAt: a.createdAt
+        });
+      });
+    }
+  });
+
+  res.render('student-dashboard', {
+    user,
+    badges: userCredentials,
+    issuedCredentials: userCredentials,
+    events: [...classAnnouncementCards, ...events],
+    tests: visibleTests,
+    upcomingExams: visibleTests,
+    enrollments,
+    classes: studentClasses
+  });
+});
+
+// ==================== TEACHER DASHBOARD ====================
+app.get('/teacher-dashboard', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  res.render('teacher-dashboard', getTeacherDashboardData(user));
 });
 
 app.get('/admin', requireTeacher, (req, res) => {
   const user = currentUser(req);
 
-  const visibleTests = isAdminUser(user) ? tests : tests.filter(t => Number(t.teacherId) === Number(user.id));
-  const visibleBadges = isAdminUser(user) ? credentialTemplates : credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
-  const visibleClasses = isAdminUser(user) ? classes : classes.filter(c => Number(c.teacherId) === Number(user.id));
-
   res.render('admin', {
-    user,
-    badges: visibleBadges,
-    tests: visibleTests,
+    ...getTeacherDashboardData(user),
     issuedBadges: issuedCredentials,
-    users,
-    classes: visibleClasses,
-    studentKeys: visibleClasses,
-    classEnrollments,
-    events,
-    submissions
+    classEnrollments
   });
 });
 
@@ -707,6 +836,7 @@ app.post('/generate-student-key', requireTeacher, (req, res) => {
       test.requiresKey = true;
 
       if (!Array.isArray(test.classIds)) test.classIds = [];
+
       if (!test.classIds.map(Number).includes(Number(classRecord.id))) {
         test.classIds.push(classRecord.id);
       }
@@ -718,9 +848,13 @@ app.post('/generate-student-key', requireTeacher, (req, res) => {
 
   res.send(makePage(
     'Class Key Generated',
-    `Share this key with your students. They will join <strong>${escapeHtml(className)}</strong>. You can assign assessments and announcements to this class later. <code>${escapeHtml(key)}</code>`,
+    `Share this key with your students. They will join <strong>${escapeHtml(className)}</strong>. <code>${escapeHtml(key)}</code>`,
     [
-      { label: 'Back to Teacher Dashboard', href: '/teacher-dashboard#classes', primary: true }
+      {
+        label: 'Back to Teacher Dashboard',
+        href: '/teacher-dashboard#classes',
+        primary: true
+      }
     ]
   ));
 });
@@ -739,7 +873,11 @@ app.post('/join-class', requireStudent, async (req, res) => {
       'Invalid Class Key',
       'That class key does not exist or is no longer active. Check the key from your teacher and try again.',
       [
-        { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
+        {
+          label: 'Back to Student Dashboard',
+          href: '/student-dashboard',
+          primary: true
+        }
       ]
     ));
   }
@@ -774,9 +912,13 @@ app.post('/join-class', requireStudent, async (req, res) => {
 
   res.send(makePage(
     'Class Joined',
-    `You are now enrolled in <strong>${escapeHtml(classRecord.className)}</strong>. Any assessments or announcements assigned by your teacher will appear on your dashboard.`,
+    `You are now enrolled in <strong>${escapeHtml(classRecord.className)}</strong>. Assignments and announcements from your teacher will appear on your dashboard.`,
     [
-      { label: 'Back to Dashboard', href: '/student-dashboard#classes', primary: true }
+      {
+        label: 'Back to Dashboard',
+        href: '/student-dashboard#classes',
+        primary: true
+      }
     ]
   ));
 });
@@ -891,7 +1033,7 @@ app.get('/api/student-keys', requireTeacher, (req, res) => {
   });
 });
 
-// ==================== CREDENTIALS ====================
+// ==================== CREDENTIALS / BADGES / CERTIFICATES ====================
 function createCredentialTemplate(req, res) {
   const user = currentUser(req);
 
@@ -906,22 +1048,29 @@ function createCredentialTemplate(req, res) {
   const templateId = nextId(credentialTemplates, 'templateId');
   const logos = collectLogoUrls(req.body.logoUrl);
 
+  const type = req.body.type || 'badge';
+
   const newTemplate = {
     id: templateId,
     templateId,
     teacherId: user.id,
-    type: req.body.type || 'badge',
+    type,
     assessmentId,
-    title: req.body.title || 'Skill Credential',
+    title: req.body.title || (type === 'certificate' ? 'Certificate of Achievement' : 'Skill Badge'),
     designColor: req.body.designColor || '#2563eb',
     description: req.body.description || '',
     signature: req.body.signature || user.name,
-    badgeIcon: req.body.badgeIcon || '',
-    badgeShape: req.body.badgeShape || '',
-    templateStyle: req.body.templateStyle || '',
+
+    badgeIcon: req.body.badgeIcon || 'fa-award',
+    badgeShape: req.body.badgeShape || 'badge-preview-shape-shield',
+
+    templateStyle: req.body.templateStyle || 'tpl-1-degree',
+    antiForge: req.body.antiForge === 'true' || req.body.antiForge === true || type === 'certificate',
+
     logos,
     logoUrl: logos[0] || '',
     useQR: true,
+
     createdBy: user.name,
     createdAt: new Date().toISOString()
   };
@@ -930,6 +1079,7 @@ function createCredentialTemplate(req, res) {
 
   if (assessmentId) {
     const test = teacherOwnsTest(user.id, assessmentId);
+
     if (test) {
       test.attachedCredentialTemplateId = newTemplate.templateId;
     }
@@ -937,11 +1087,38 @@ function createCredentialTemplate(req, res) {
 
   saveDB();
 
-  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard');
+  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard#' + (type === 'certificate' ? 'credentials' : 'badges'));
 }
 
 app.post('/create-badge', requireTeacher, createCredentialTemplate);
 app.post('/create-credential', requireTeacher, createCredentialTemplate);
+
+app.post('/delete-credential', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  const templateId = parseInt(req.body.templateId || req.body.id);
+
+  const template = credentialTemplates.find(t =>
+    Number(t.templateId || t.id) === Number(templateId) &&
+    Number(t.teacherId) === Number(user.id)
+  );
+
+  if (!template) {
+    return res.status(403).send('Invalid credential.');
+  }
+
+  credentialTemplates = credentialTemplates.filter(t =>
+    Number(t.templateId || t.id) !== Number(templateId)
+  );
+
+  tests.forEach(test => {
+    if (Number(test.attachedCredentialTemplateId) === Number(templateId)) {
+      test.attachedCredentialTemplateId = null;
+    }
+  });
+
+  saveDB();
+  res.redirect('/teacher-dashboard#badges');
+});
 
 // ==================== EVENTS ====================
 app.post('/post-event', requireTeacher, (req, res) => {
@@ -993,19 +1170,25 @@ app.post('/post-event', requireTeacher, (req, res) => {
   });
 
   saveDB();
-  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard');
+  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard#announcements');
 });
 
 // ==================== ASSESSMENT CREATION ====================
 app.get('/assessment', requireTeacher, (req, res) => {
   const user = currentUser(req);
 
-  const teacherTemplates = credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
-  const teacherClasses = classes.filter(c => Number(c.teacherId) === Number(user.id));
+  const teacherTemplates = isAdminUser(user)
+    ? credentialTemplates
+    : credentialTemplates.filter(t => Number(t.teacherId) === Number(user.id));
+
+  const teacherClasses = isAdminUser(user)
+    ? classes
+    : classes.filter(c => Number(c.teacherId) === Number(user.id));
 
   res.render('assessment', {
     templates: teacherTemplates,
     classes: teacherClasses,
+    selectedClassId: req.query.classId ? parseInt(req.query.classId) : null,
     user
   });
 });
@@ -1038,7 +1221,9 @@ function createTestFromBody(req, res) {
   const newTest = {
     id: nextId(tests),
     teacherId: user.id,
-    title: req.body.title || 'Untitled Assessment',
+    teacherName: user.name,
+
+    title: req.body.title || 'Untitled Assignment',
     questions,
     questionType: req.body.questionType || 'mixed',
     timePerQuestion: parseInt(req.body.timePerQuestion) || 60,
@@ -1070,7 +1255,9 @@ function createTestFromBody(req, res) {
     const classRecord = teacherOwnsClass(user.id, classId);
 
     if (classRecord) {
-      if (!Array.isArray(classRecord.assignedTestIds)) classRecord.assignedTestIds = [];
+      if (!Array.isArray(classRecord.assignedTestIds)) {
+        classRecord.assignedTestIds = [];
+      }
 
       if (!classRecord.assignedTestIds.map(Number).includes(Number(newTest.id))) {
         classRecord.assignedTestIds.push(newTest.id);
@@ -1083,11 +1270,44 @@ function createTestFromBody(req, res) {
 
   saveDB();
 
-  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard');
+  res.redirect(isAdminUser(user) ? '/admin' : '/teacher-dashboard#tasks');
 }
 
 app.post('/assessment', requireTeacher, createTestFromBody);
 app.post('/create-test', requireTeacher, createTestFromBody);
+
+app.post('/delete-test', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  const testId = parseInt(req.body.testId);
+
+  const test = tests.find(t =>
+    Number(t.id) === Number(testId) &&
+    Number(t.teacherId) === Number(user.id)
+  );
+
+  if (!test) {
+    return res.status(403).send('Invalid assignment.');
+  }
+
+  tests = tests.filter(t => Number(t.id) !== Number(testId));
+
+  classes.forEach(cls => {
+    if (Number(cls.teacherId) === Number(user.id)) {
+      cls.assignedTestIds = Array.isArray(cls.assignedTestIds)
+        ? cls.assignedTestIds.filter(id => Number(id) !== Number(testId))
+        : [];
+    }
+  });
+
+  credentialTemplates.forEach(template => {
+    if (Number(template.assessmentId) === Number(testId)) {
+      template.assessmentId = null;
+    }
+  });
+
+  saveDB();
+  res.redirect('/teacher-dashboard#tasks');
+});
 
 // ==================== TAKE TEST ====================
 app.get('/take-test/:id', requireStudent, (req, res) => {
@@ -1099,32 +1319,44 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
   if (!studentHasAccessToTest(user.id, test)) {
     return res.status(403).send(makePage(
       'Class Access Required',
-      'This assessment belongs to a class. Join the class using your teacher key first.',
+      'This assignment belongs to a class. Join the class using your teacher key first.',
       [
-        { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
+        {
+          label: 'Back to Student Dashboard',
+          href: '/student-dashboard',
+          primary: true
+        }
       ]
     ));
   }
 
   if (!test.isOpen) {
-    const now = new Date().getTime();
+    const now = Date.now();
 
     if (test.examStartTime && now < new Date(test.examStartTime).getTime()) {
       return res.status(403).send(makePage(
-        'Exam Not Started',
+        'Assignment Not Started',
         'Please return to your dashboard and wait for the start time.',
         [
-          { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
+          {
+            label: 'Back to Student Dashboard',
+            href: '/student-dashboard',
+            primary: true
+          }
         ]
       ));
     }
 
     if (test.examEndTime && now > new Date(test.examEndTime).getTime()) {
       return res.status(403).send(makePage(
-        'Exam Window Closed',
-        'The time window for this assessment has passed.',
+        'Assignment Window Closed',
+        'The time window for this assignment has passed.',
         [
-          { label: 'Back to Student Dashboard', href: '/student-dashboard', primary: true }
+          {
+            label: 'Back to Student Dashboard',
+            href: '/student-dashboard',
+            primary: true
+          }
         ]
       ));
     }
@@ -1134,7 +1366,10 @@ app.get('/take-test/:id', requireStudent, (req, res) => {
   req.session.currentTestId = test.id;
   req.session.examStartTime = Date.now();
 
-  res.render('take-test', { user, test });
+  res.render('take-test', {
+    user,
+    test
+  });
 });
 
 // ==================== SUBMIT TEST ====================
@@ -1147,10 +1382,10 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
   if (!test) return res.redirect('/student-dashboard');
 
   if (!studentHasAccessToTest(user.id, test)) {
-    return res.status(403).send('You do not have access to this assessment.');
+    return res.status(403).send('You do not have access to this assignment.');
   }
 
-  const score = parseInt(req.body.score) || 85;
+  const score = gradeSubmission(test, req.body);
   const passed = score >= 70;
 
   const studentClassIdsForTest = classes
@@ -1206,11 +1441,13 @@ app.post('/submit-test/:id', requireStudent, async (req, res) => {
         verifyHash,
         shareLink,
         qrCode,
+
         testId,
         testTitle: test.title,
         userId: user.id,
         studentName: user.name,
         studentEmail: user.email,
+
         issueDate: new Date().toLocaleDateString(),
         issuedDate: new Date().toLocaleDateString(),
         status: 'passed',
@@ -1263,16 +1500,21 @@ app.get('/network-logs/:testId', requireTeacher, (req, res) => {
   const test = tests.find(t => Number(t.id) === Number(req.params.testId));
 
   if (!test) {
-    return res.status(404).json({ error: 'Test not found.' });
+    return res.status(404).json({
+      error: 'Assignment not found.'
+    });
   }
 
   if (!isAdminUser(user) && Number(test.teacherId) !== Number(user.id)) {
-    return res.status(403).json({ error: 'Unauthorized access to these logs.' });
+    return res.status(403).json({
+      error: 'Unauthorized access to these logs.'
+    });
   }
 
   res.json(networkLogs.filter(l => Number(l.testId) === Number(req.params.testId)));
 });
 
+// ==================== API ====================
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
@@ -1285,6 +1527,50 @@ app.get('/api/health', (req, res) => {
     enrollments: classEnrollments.length,
     submissions: submissions.length
   });
+});
+
+app.get('/api/me', requireAuth, (req, res) => {
+  res.json({
+    ok: true,
+    user: currentUser(req)
+  });
+});
+
+app.get('/api/classes', requireAuth, (req, res) => {
+  const user = currentUser(req);
+
+  if (user.role === 'teacher') {
+    const visibleClasses = isAdminUser(user)
+      ? classes
+      : classes.filter(c => Number(c.teacherId) === Number(user.id));
+
+    return res.json({
+      ok: true,
+      classes: visibleClasses
+    });
+  }
+
+  const joinedIds = studentClassIds(user.id);
+
+  res.json({
+    ok: true,
+    classes: classes.filter(c => joinedIds.includes(Number(c.id)))
+  });
+});
+
+// ==================== 404 ====================
+app.use((req, res) => {
+  res.status(404).send(makePage(
+    'Page Not Found',
+    'The page you are looking for does not exist.',
+    [
+      {
+        label: 'Home',
+        href: '/',
+        primary: true
+      }
+    ]
+  ));
 });
 
 // ==================== SERVER START ====================
