@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Credity • Verify Skills. Impossible to Fake.</title>
+  <title>Credity • Verify skills. Impossible to fake.</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
     body { font-family: 'Inter', system_ui, sans-serif; }
     .blue-cloudy-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e40af 100%); position: relative; overflow: hidden; }
     .blue-cloudy-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 30%, rgba(147,197,253,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(147,197,253,0.12) 0%, transparent 60%); animation: cloudDrift 25s ease infinite; }
@@ -16,40 +15,33 @@
     .premium-card { transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
     .premium-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4); }
     .modern-input { background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.2); }
-    .modern-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.1); outline: none; }
-    .tab-active { background: rgba(255,255,255,0.1); border-bottom: 3px solid #60a5fa; }
+    .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
+    .tab-active { background: rgba(255,255,255,0.1); border-bottom: 3px solid #3b82f6; }
     .cloud-text { background: linear-gradient(90deg,#bae6fd,#dbeafe,#bae6fd); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation: cloudShimmer 3s ease infinite; }
     .spotless-btn { transition: all 0.3s cubic-bezier(0.23,1.0,0.32,1); }
     .spotless-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3); }
-    .light-mode { background: #f1f5f9; color: #0f172a; }
-    .light-mode .glass { background: rgba(255,255,255,0.95); border: 1px solid #cbd5e1; color: #0f172a; }
+    .light-mode { background: #f8fafc; color: #0f172a; }
+    .light-mode .glass { background: rgba(255,255,255,0.95); border: 1px solid #e2e8f0; color: #0f172a; }
     .light-mode .blue-cloudy-bg { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #bae6fd 100%); }
-    .light-mode .modern-input { background: white; border: 1px solid #94a3b8; color: #0f172a; }
+    .light-mode .modern-input { background: white; border: 1px solid #cbd5e1; color: #0f172a; }
     .light-mode .tab-active { background: #e0f2fe; border-bottom-color: #0284c8; }
-    .section-header { font-size: 2.75rem; line-height: 1.1; font-weight: 700; letter-spacing: -.04em; }
-    .content-offset { padding-top: 80px; }
+    .section-header { font-size: 2.5rem; line-height: 1.1; font-weight: 700; letter-spacing: -.04em; }
   </style>
 </head>
 <body class="bg-zinc-950 text-white">
   <!-- Navbar -->
   <nav class="border-b border-white/10 bg-zinc-950/95 backdrop-blur-2xl fixed w-full z-50">
     <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-      <!-- Professional Custom Logo -->
       <div class="flex items-center gap-x-3">
-        <div class="flex items-center">
-          <div class="w-8 h-8 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center">
-            <span class="text-white font-bold text-xl tracking-tighter">C</span>
-          </div>
-          <span class="ml-2.5 font-semibold text-2xl tracking-tighter">Credity</span>
+        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+          <span class="text-white font-bold text-xl tracking-tighter">C</span>
         </div>
-        <span class="text-xs font-mono text-sky-400/70">.ink</span>
+        <span class="font-semibold text-2xl tracking-tighter">Credity</span>
       </div>
       <div class="flex items-center gap-x-4">
         <button onclick="toggleTheme()" id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-2xl border border-white/20 hover:bg-white/5 transition-all">
           <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
         </button>
-        <a href="#features" class="hidden md:block text-sm hover:text-sky-300 transition-colors">Features</a>
-        <a href="#security" class="hidden md:block text-sm hover:text-sky-300 transition-colors">Security</a>
         <button onclick="showLoginModal()" class="px-6 py-2.5 text-sm font-medium hover:bg-white/5 transition-all rounded-3xl border border-white/20">Log in</button>
         <button onclick="showSignupModal()" class="px-6 py-2.5 text-sm font-semibold bg-white text-zinc-950 hover:bg-white/90 transition-all rounded-3xl hidden md:block">Get started free</button>
       </div>
@@ -57,33 +49,33 @@
   </nav>
 
   <!-- Hero -->
-  <div class="blue-cloudy-bg pt-20 pb-16 min-h-[92vh] flex items-center relative">
+  <div class="blue-cloudy-bg pt-24 pb-16 min-h-[92vh] flex items-center relative">
     <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
       <div class="inline-flex items-center gap-x-2 px-5 py-1.5 rounded-3xl bg-white/10 border border-white/20 mb-8 text-sm backdrop-blur-xl">
         <div class="w-2 h-2 bg-sky-400 rounded-full animate-pulse"></div>
         <span class="font-medium tracking-wider">AI-POWERED • ANTI-CHEAT SECURE</span>
       </div>
-      <h1 class="text-7xl md:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6">Verify skills.<br><span class="cloud-text">Impossible to fake.</span></h1>
-      <p class="max-w-lg mx-auto text-2xl text-sky-100/90 mb-10">The most beautiful and secure platform for schools and educators to issue verifiable skill badges and certificates.</p>
+      <h1 class="text-7xl md:text-8xl font-semibold tracking-tighter leading-[0.95] mb-6">
+        Verify skills.<br>
+        <span class="cloud-text">Impossible to fake.</span>
+      </h1>
+      <p class="max-w-lg mx-auto text-2xl text-sky-100/90 mb-10">
+        The most beautiful and secure platform for schools and educators to issue verifiable skill badges and certificates.
+      </p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
         <button onclick="showSignupModal()" class="px-10 py-4 text-lg font-semibold bg-white text-zinc-950 hover:bg-white/95 transition-all rounded-3xl flex items-center justify-center gap-x-3 shadow-xl spotless-btn">Start free <i class="fa-solid fa-arrow-right ml-1"></i></button>
         <button onclick="document.getElementById('security').scrollIntoView({behavior:'smooth'})" class="px-8 py-4 text-lg font-medium border border-white/30 hover:bg-white/5 transition-all rounded-3xl flex items-center gap-x-3">See anti-cheat tech</button>
       </div>
-      <div class="mt-12 text-xs tracking-[3px] text-sky-300/60">TRUSTED BY 240+ SCHOOLS • 42K+ VERIFIED BADGES</div>
     </div>
   </div>
 
-  <!-- Trust -->
-  <div class="max-w-5xl mx-auto px-6 -mt-6 pb-16 relative z-20">
-    <div class="flex justify-center items-center gap-x-10 opacity-70 text-sm font-medium"><div>Stanford</div><div>NYU</div><div>EdTech Alliance</div><div>Pearson</div></div>
-  </div>
-
   <!-- Login Section -->
-  <div id="login-section" class="max-w-4xl mx-auto px-6 py-12 content-offset">
+  <div id="login-section" class="max-w-4xl mx-auto px-6 py-12">
     <div class="text-center mb-10">
       <h2 class="text-4xl font-semibold tracking-tight">Sign in to your account</h2>
       <p class="text-sky-200/70 mt-2">Students • Teachers • Admins</p>
     </div>
+
     <div class="flex justify-center mb-8">
       <div class="inline-flex bg-white/5 p-1 rounded-3xl border border-white/10">
         <button onclick="switchTab('student')" id="tab-student" class="px-8 py-2.5 rounded-3xl font-medium tab-active">Student</button>
@@ -101,6 +93,78 @@
             <input type="text" name="email" placeholder="Username or email" value="student@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
             <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
           </div>
-          <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in as Student</button>
+          <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in</button>
         </form>
-        <div class="mt-5 text-center text-xs text-white/60">New student? <span onclick="showSignupModal
+        <div class="mt-5 text-center text-xs text-white/60">New student? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
+      </div>
+    </div>
+
+    <!-- Teacher Login -->
+    <div id="teacher-form" class="max-w-md mx-auto hidden">
+      <div class="glass p-8 rounded-3xl">
+        <h3 class="font-semibold text-2xl mb-6">Teacher / Admin Login</h3>
+        <form action="/login" method="POST">
+          <input type="hidden" name="role" value="teacher">
+          <div class="space-y-4">
+            <input type="text" name="email" placeholder="Username or email" value="teacher@school.com" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+            <input type="password" name="password" placeholder="Password" value="pass123" class="modern-input w-full px-5 py-3.5 rounded-2xl text-sm" required>
+          </div>
+          <button type="submit" class="mt-6 w-full py-4 bg-sky-500 hover:bg-sky-600 transition-all font-semibold rounded-3xl">Sign in</button>
+        </form>
+        <div class="mt-4 text-center">
+          <div onclick="adminLogin()" class="cursor-pointer text-xs px-4 py-2 bg-white/5 hover:bg-white/10 transition-colors rounded-2xl inline-block">Admin access</div>
+        </div>
+        <div class="mt-5 text-center text-xs text-white/60">New teacher? <span onclick="showSignupModal()" class="text-sky-400 cursor-pointer font-medium">Create account</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anti-Cheat Section -->
+  <div id="security" class="max-w-6xl mx-auto px-6 py-16 border-t border-white/10">
+    <div class="text-center mb-14">
+      <div class="inline-block px-4 py-1 rounded-3xl bg-red-500/10 text-red-400 text-xs font-medium tracking-widest mb-3">IMPOSSIBLE TO CHEAT</div>
+      <h2 class="section-header">Assessment security that actually works.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-desktop text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Full-Screen Lockdown</h3><p class="text-sky-100/70 text-sm">Forces full-screen mode. Exiting triggers automatic submission.</p></div>
+      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-eye text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Tab &amp; Focus Detection</h3><p class="text-sky-100/70 text-sm">Real-time monitoring of tab switches and focus loss.</p></div>
+      <div class="glass p-8 rounded-3xl premium-card"><i class="fa-solid fa-copy text-4xl text-red-400 mb-6"></i><h3 class="font-semibold text-xl mb-2">Clipboard Lockdown</h3><p class="text-sky-100/70 text-sm">Copy, paste, right-click, and shortcuts completely disabled.</p></div>
+    </div>
+  </div>
+
+  <script>
+    let isLight = false;
+    function toggleTheme() {
+      isLight = !isLight;
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      if (isLight) { body.classList.add('light-mode'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); } 
+      else { body.classList.remove('light-mode'); icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+    }
+    function switchTab(role) {
+      document.getElementById('student-form').classList.toggle('hidden', role !== 'student');
+      document.getElementById('teacher-form').classList.toggle('hidden', role !== 'teacher');
+      document.getElementById('tab-student').classList.toggle('tab-active', role === 'student');
+      document.getElementById('tab-teacher').classList.toggle('tab-active', role === 'teacher');
+    }
+    function showLoginModal() { document.getElementById('login-section').scrollIntoView({ behavior: 'smooth' }); }
+    function showSignupModal() { alert('Sign-up modal would open here.'); }
+    function adminLogin() {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/login';
+      const email = document.createElement('input'); email.name = 'email'; email.value = 'admin';
+      const pass = document.createElement('input'); pass.name = 'password'; pass.value = 'monterysasd';
+      const role = document.createElement('input'); role.name = 'role'; role.value = 'teacher';
+      form.append(email, pass, role);
+      document.body.append(form);
+      form.submit();
+    }
+    window.onload = function() {
+      document.getElementById('student-form').classList.remove('hidden');
+      document.getElementById('teacher-form').classList.add('hidden');
+      document.getElementById('tab-student').classList.add('tab-active');
+    }
+  </script>
+</body>
+</html>
