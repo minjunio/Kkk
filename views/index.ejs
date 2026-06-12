@@ -1,180 +1,327 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>BlueCrypto Login</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credity.ink - Verify Skills, Earn Badges</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+    
     :root {
-      --bg1: #eaf8ff;
-      --bg2: #f8fcff;
-      --bg3: #d7efff;
-      --panel: rgba(255, 255, 255, 0.9);
-      --soft: #f0f7ff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --blue: #0284c7;
-      --blue2: #2563eb;
-      --cyan: #38bdf8;
-      --red: #e11d48;
-      --green: #16a34a;
-      --border: rgba(15, 23, 42, 0.08);
-      --shadow: 0 24px 64px rgba(37, 99, 235, 0.12);
-      --shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.05);
+      --primary: #6366f1;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, sans-serif; }
     
     body {
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.25), transparent 35%),
-        radial-gradient(circle at 90% 15%, rgba(37, 99, 235, 0.15), transparent 30%),
-        radial-gradient(circle at 50% 100%, rgba(14, 165, 233, 0.2), transparent 40%),
-        linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
+      font-family: 'Inter', system_ui, sans-serif;
     }
-
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 32px;
-      padding: 32px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
-    }
-
-    .header { text-align: center; margin-bottom: 24px; }
-    .logo {
-      width: 56px; height: 56px; margin: 0 auto 16px;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 20px; display: grid; place-items: center;
-      color: white; font-size: 1.5rem; font-weight: 900;
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
-    }
-    .title { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.04em; }
-    .subtitle { color: var(--muted); font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
-
-    .tabs {
-      display: flex; gap: 8px; background: var(--soft);
-      padding: 6px; border-radius: 20px; margin-bottom: 24px; border: 1px solid var(--border);
-    }
-    .tab {
-      flex: 1; min-height: 42px; border-radius: 14px; border: none;
-      background: transparent; color: var(--muted); font-weight: 800;
-      font-size: 0.85rem; cursor: pointer; transition: 0.2s;
-    }
-    .tab.active {
-      background: white; color: var(--blue2); box-shadow: var(--shadow-sm);
-    }
-
-    .panel { display: none; animation: fadeIn 0.3s ease; }
-    .panel.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em; }
     
-    .input {
-      width: 100%; min-height: 54px; padding: 0 16px; border-radius: 18px;
-      background: var(--soft); border: 1px solid var(--border);
-      font-size: 0.95rem; font-weight: 600; color: var(--text); outline: none; transition: 0.2s;
+    .heading-font {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-weight: 600;
     }
-    .input:focus { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
 
-    .btn {
-      width: 100%; min-height: 54px; border-radius: 18px; border: none;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      color: white; font-size: 0.95rem; font-weight: 800; cursor: pointer;
-      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2); transition: transform 0.1s;
+    .glass {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
     }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .alert {
-      padding: 12px 16px; border-radius: 16px; font-size: 0.85rem; font-weight: 700; margin-bottom: 20px;
+    .modern-gradient {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .alert.error { background: rgba(225, 29, 72, 0.08); color: var(--red); border: 1px solid rgba(225, 29, 72, 0.2); }
-    .alert.success { background: rgba(22, 163, 74, 0.08); color: var(--green); border: 1px solid rgba(22, 163, 74, 0.2); }
 
-    .footer-text { text-align: center; color: var(--muted); font-size: 0.75rem; font-weight: 600; margin-top: 20px; line-height: 1.5; }
+    .spotless-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .spotless-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    .nav-active {
+      color: #6366f1;
+      font-weight: 600;
+    }
+
+    .section-header {
+      font-size: 2.75rem;
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -.025em;
+    }
+
+    .subtle-grid {
+      background-image: 
+        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .animated-bg {
+      background: linear-gradient(-45deg, #6366f1, #a855f7, #6366f1, #a855f7);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .badge-preview {
+      transition: transform 0.3s ease;
+    }
+    
+    .badge-preview:hover {
+      transform: scale(1.02);
+    }
   </style>
 </head>
-<body>
-
-  <div class="card">
-    <div class="header">
-      <div class="logo">B</div>
-      <div class="title">BlueCrypto</div>
-      <div class="subtitle">Secure Web3 Access</div>
-    </div>
-
-    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
-    <% if (success) { %><div class="alert success"><%= success %></div><% } %>
-
-    <div class="tabs">
-      <button class="tab active" id="tab-user" onclick="switchTab('user')">User Login</button>
-      <button class="tab" id="tab-admin" onclick="switchTab('admin')">Staff Login</button>
-    </div>
-
-    <div class="panel active" id="panel-user">
-      <% if (!otpEmail) { %>
-        <form action="/send-otp" method="POST">
-          <div class="form-group">
-            <label>Email Address</label>
-            <input class="input" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />
-          </div>
-          <button class="btn" type="submit">Send Login Code</button>
-        </form>
-        <div class="footer-text">New wallets are generated automatically upon first login. Returning users will load their existing wallet.</div>
-      <% } else { %>
-        <form action="/verify-otp" method="POST">
-          <input type="hidden" name="email" value="<%= otpEmail %>" />
-          <div class="form-group">
-            <label>6-Digit Code for <%= otpEmail %></label>
-            <input class="input" type="text" name="otp" inputmode="numeric" maxlength="6" placeholder="123456" required autocomplete="one-time-code" autofocus />
-          </div>
-          <button class="btn" type="submit">Verify & Access Wallet</button>
-        </form>
-        <div class="footer-text">Check your inbox and spam folder for the code. It expires in 10 minutes.</div>
-      <% } %>
-    </div>
-
-    <div class="panel" id="panel-admin">
-      <form action="/staff-login" method="POST">
-        <div class="form-group">
-          <label>Username</label>
-          <input class="input" type="text" name="username" placeholder="admin" required autocomplete="username" />
+<body class="bg-zinc-950 text-white">
+  <!-- Navbar -->
+  <nav class="border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl fixed w-full z-50">
+    <div class="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-x-3">
+        <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center">
+          <span class="text-white font-bold text-2xl tracking-tighter">C</span>
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input class="input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+        <div>
+          <span class="font-semibold text-2xl tracking-tight">Credity</span>
+          <span class="text-xs font-mono text-white/40 align-super">.ink</span>
         </div>
-        <button class="btn" type="submit">Staff Login</button>
+      </div>
+      
+      <div class="flex items-center gap-x-8 text-sm">
+        <a href="#features" class="hover:text-white/80 transition-colors">Features</a>
+        <a href="#how" class="hover:text-white/80 transition-colors">How it works</a>
+        <div class="flex items-center gap-x-3">
+          <button onclick="showLoginModal()" 
+                  class="px-5 py-2 text-sm font-medium hover:bg-white/5 transition-colors rounded-3xl border border-white/20">
+            Log in
+          </button>
+          <button onclick="showSignupModal()" 
+                  class="px-5 py-2 text-sm font-medium bg-white text-zinc-950 hover:bg-white/90 transition-colors rounded-3xl">
+            Get started free
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="pt-20 pb-16 max-w-5xl mx-auto px-8 text-center relative">
+    <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl bg-white/5 border border-white/10 mb-8 text-sm">
+      <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+      <span class="font-medium">Now with AI-powered assessment builder</span>
+    </div>
+    
+    <h1 class="text-7xl font-semibold tracking-tighter leading-none mb-6">
+      Verify skills.<br>
+      <span class="modern-gradient">Earn what matters.</span>
+    </h1>
+    
+    <p class="max-w-md mx-auto text-xl text-white/70 mb-10">
+      The modern platform for schools and educators to issue beautiful, verifiable skill badges and certificates.
+    </p>
+    
+    <div class="flex items-center justify-center gap-x-4">
+      <button onclick="showSignupModal()" 
+              class="px-8 py-4 text-lg font-semibold bg-white text-zinc-950 hover:bg-white/90 transition-all rounded-3xl flex items-center gap-x-3 shadow-lg shadow-indigo-500/20">
+        Start for free <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <button onclick="document.getElementById('demo-video').scrollIntoView({ behavior: 'smooth' })" 
+              class="px-8 py-4 text-lg font-medium border border-white/30 hover:bg-white/5 transition-all rounded-3xl flex items-center gap-x-3">
+        <i class="fa-solid fa-play mr-2"></i> Watch 1:42 demo
+      </button>
+    </div>
+    
+    <div class="mt-16 flex justify-center gap-x-8 text-xs uppercase tracking-[2px] text-white/50">
+      <div>TRUSTED BY 240+ SCHOOLS</div>
+      <div>42,000+ BADGES ISSUED</div>
+    </div>
+  </div>
+
+  <!-- Trust bar -->
+  <div class="max-w-5xl mx-auto px-8 pb-16">
+    <div class="flex justify-center items-center gap-x-10 opacity-60">
+      <div class="font-semibold text-sm">Stanford</div>
+      <div class="font-semibold text-sm">NYU</div>
+      <div class="font-semibold text-sm">EdTech Alliance</div>
+      <div class="font-semibold text-sm">Pearson</div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div id="features" class="max-w-6xl mx-auto px-8 py-16">
+    <div class="text-center mb-14">
+      <span class="text-sm font-semibold tracking-[3px] text-indigo-400">POWERFUL &amp; SIMPLE</span>
+      <h2 class="text-5xl font-semibold tracking-tighter mt-3">Everything you need.<br>Nothing you don't.</h2>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="glass p-8 rounded-3xl">
+        <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6">
+          <i class="fa-solid fa-magic text-3xl"></i>
+        </div>
+        <h3 class="font-semibold text-2xl mb-3">AI Assessment Builder</h3>
+        <p class="text-white/70">Create beautiful MCQ + FRQ tests with timers, images, and instant auto-marking in seconds.</p>
+      </div>
+      
+      <div class="glass p-8 rounded-3xl">
+        <div class="w-12 h-12 bg-violet-500/10 text-violet-400 rounded-2xl flex items-center justify-center mb-6">
+          <i class="fa-solid fa-award text-3xl"></i>
+        </div>
+        <h3 class="font-semibold text-2xl mb-3">Modern Badge Studio</h3>
+        <p class="text-white/70">Design stunning certificates and skill badges with multiple logos, signatures, colors and live QR verification.</p>
+      </div>
+      
+      <div class="glass p-8 rounded-3xl">
+        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-6">
+          <i class="fa-solid fa-globe text-3xl"></i>
+        </div>
+        <h3 class="font-semibold text-2xl mb-3">Verifiable &amp; Shareable</h3>
+        <p class="text-white/70">Every badge has a unique verifiable QR. Students can showcase on LinkedIn instantly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div id="how" class="max-w-5xl mx-auto px-8 py-16 border-t border-white/10">
+    <div class="text-center mb-12">
+      <h2 class="text-5xl font-semibold tracking-tighter">Three steps to verified skills</h2>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="flex gap-5">
+        <div class="text-7xl font-bold text-white/10">01</div>
+        <div>
+          <div class="font-semibold text-xl mb-2">Create</div>
+          <p class="text-white/70">Teachers build tests or design beautiful badges in minutes using our modern studio.</p>
+        </div>
+      </div>
+      <div class="flex gap-5">
+        <div class="text-7xl font-bold text-white/10">02</div>
+        <div>
+          <div class="font-semibold text-xl mb-2">Issue</div>
+          <p class="text-white/70">Post special events or award certificates directly to students with one click.</p>
+        </div>
+      </div>
+      <div class="flex gap-5">
+        <div class="text-7xl font-bold text-white/10">03</div>
+        <div>
+          <div class="font-semibold text-xl mb-2">Verify</div>
+          <p class="text-white/70">Students receive instant shareable links and QR codes that employers can scan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer CTA -->
+  <div class="max-w-4xl mx-auto px-8 py-20 text-center border-t border-white/10">
+    <h3 class="text-4xl font-semibold tracking-tight mb-4">Ready to modernize credentials?</h3>
+    <p class="text-white/70 mb-8">Join hundreds of schools already using Credity.ink</p>
+    <button onclick="showSignupModal()" class="px-9 py-4 bg-white text-zinc-950 font-semibold text-lg rounded-3xl hover:bg-white/90 transition-all">
+      Create your free account
+    </button>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="login-modal" onclick="if (event.target.id === 'login-modal') hideModals()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center">
+    <div onclick="event.stopImmediatePropagation()" class="glass w-full max-w-md mx-4 p-8 rounded-3xl">
+      <h3 class="text-3xl font-semibold mb-1">Welcome back</h3>
+      <p class="text-white/60 mb-8">Sign in to your account</p>
+      
+      <form action="/login" method="POST">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">EMAIL</label>
+            <input type="email" name="email" value="teacher@school.com" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm focus:outline-none" required>
+          </div>
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">PASSWORD</label>
+            <input type="password" name="password" value="pass123" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm focus:outline-none" required>
+          </div>
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">ROLE</label>
+            <select name="role" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm">
+              <option value="teacher">Teacher / Admin</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit" class="mt-8 w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl">Sign in</button>
       </form>
-      <div class="footer-text">Staff logins automatically generate a fresh, temporary wallet session for testing purposes.</div>
+      
+      <div class="text-center mt-6 text-xs text-white/50">
+        Don't have an account? <span onclick="hideModals(); showSignupModal()" class="text-white cursor-pointer">Sign up</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div id="signup-modal" onclick="if (event.target.id === 'signup-modal') hideModals()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center">
+    <div onclick="event.stopImmediatePropagation()" class="glass w-full max-w-md mx-4 p-8 rounded-3xl">
+      <h3 class="text-3xl font-semibold mb-1">Create account</h3>
+      <p class="text-white/60 mb-8">Start issuing credentials in seconds</p>
+      
+      <form action="/signup" method="POST">
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">FULL NAME</label>
+            <input type="text" name="name" value="Alex Rivera" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm focus:outline-none" required>
+          </div>
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">EMAIL</label>
+            <input type="email" name="email" value="newuser@school.com" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm focus:outline-none" required>
+          </div>
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">PASSWORD</label>
+            <input type="password" name="password" value="pass123" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm focus:outline-none" required>
+          </div>
+          <div>
+            <label class="text-xs tracking-widest text-white/60 block mb-1.5">I AM A</label>
+            <select name="role" class="w-full bg-zinc-900 border border-white/20 rounded-2xl px-5 py-3 text-sm">
+              <option value="teacher">Teacher / School Admin</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit" class="mt-8 w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl">Create free account</button>
+      </form>
     </div>
   </div>
 
   <script>
-    function switchTab(target) {
-      document.getElementById('tab-user').classList.remove('active');
-      document.getElementById('tab-admin').classList.remove('active');
-      document.getElementById('panel-user').classList.remove('active');
-      document.getElementById('panel-admin').classList.remove('active');
-      
-      document.getElementById('tab-' + target).classList.add('active');
-      document.getElementById('panel-' + target).classList.add('active');
+    function showLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+      document.getElementById('login-modal').classList.add('flex');
     }
+    
+    function showSignupModal() {
+      document.getElementById('signup-modal').classList.remove('hidden');
+      document.getElementById('signup-modal').classList.add('flex');
+    }
+    
+    function hideModals() {
+      document.getElementById('login-modal').classList.add('hidden');
+      document.getElementById('login-modal').classList.remove('flex');
+      document.getElementById('signup-modal').classList.add('hidden');
+      document.getElementById('signup-modal').classList.remove('flex');
+    }
+    
+    // Tailwind script
+    function initTailwind() {
+      document.documentElement.style.setProperty('--accent', '#6366f1');
+    }
+    window.onload = initTailwind;
   </script>
 </body>
 </html>
