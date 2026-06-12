@@ -10,11 +10,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@500;700&family=Montserrat:wght@400;500;600;700&family=Pinyon+Script&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@500;700&family=Montserrat:wght@400;500;600;700&family=Pinyon+Script&display=swap');
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -54,9 +52,7 @@
       transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
     }
 
-    .btn:active {
-      transform: translateY(1px);
-    }
+    .btn:active { transform: translateY(1px); }
 
     .btn-primary {
       background: #1d4ed8;
@@ -135,9 +131,7 @@
       transition: all 0.16s ease;
     }
 
-    .tab-btn:hover {
-      color: #0f172a;
-    }
+    .tab-btn:hover { color: #0f172a; }
 
     .tab-active {
       color: #1d4ed8;
@@ -145,9 +139,7 @@
       font-weight: 600;
     }
 
-    .font-signature {
-      font-family: 'Pinyon Script', cursive;
-    }
+    .font-signature { font-family: 'Pinyon Script', cursive; }
 
     .cert-container {
       container-type: inline-size;
@@ -202,9 +194,7 @@
       pointer-events: auto;
     }
 
-    .draggable-logo:active {
-      cursor: grabbing;
-    }
+    .draggable-logo:active { cursor: grabbing; }
 
     .draggable-logo img {
       width: 100%;
@@ -315,7 +305,7 @@
 
     .tpl-6-minimal .cert-title {
       font-size: 3.6cqi;
-      font-weight: 650;
+      font-weight: 600;
       text-align: left;
       color: #1e293b;
     }
@@ -356,7 +346,15 @@
 
     const teacherName = user && user.name ? user.name : 'Teacher';
     const firstName = teacherName.split(' ')[0];
-    const totalStudents = safeClasses.reduce((sum, c) => sum + Number(c.usageCount || 0), 0);
+
+    const totalStudents = safeClasses.reduce((sum, c) => {
+      if (Array.isArray(c.students)) return sum + c.students.length;
+      return sum + Number(c.usageCount || 0);
+    }, 0);
+
+    const totalSubmissions = typeof submissions !== 'undefined' && Array.isArray(submissions)
+      ? submissions.length
+      : safeClasses.reduce((sum, c) => sum + Number(c.submissionCount || 0), 0);
   %>
 
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -390,13 +388,12 @@
   </nav>
 
   <main class="max-w-[92rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
-
     <section class="mb-8">
       <div class="panel-strong rounded-2xl p-6 md:p-9">
         <div class="grid xl:grid-cols-12 gap-8 items-center">
           <div class="xl:col-span-7">
             <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium tracking-[1.5px] rounded-lg border border-blue-100 mb-5">
-              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <i class="fa-solid fa-chart-simple"></i>
               <span>TEACHER ACTION CENTER</span>
             </div>
 
@@ -405,7 +402,7 @@
             </h1>
 
             <p class="mt-5 text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed">
-              Manage classes, create assessments, design credentials, and post announcements for your students.
+              Manage classes, assign assessments, view student names, emails, scores, submissions, and create verified credentials.
             </p>
 
             <div class="mt-8 flex flex-wrap gap-3">
@@ -446,18 +443,18 @@
 
               <div class="panel rounded-xl p-5">
                 <div class="w-10 h-10 bg-violet-50 text-violet-700 rounded-lg flex items-center justify-center mb-4 border border-violet-100">
-                  <i class="fa-solid fa-award"></i>
+                  <i class="fa-solid fa-user-group"></i>
                 </div>
-                <div class="text-4xl font-semibold"><%= safeBadges.length %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Credentials</div>
+                <div class="text-4xl font-semibold"><%= totalStudents %></div>
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Students</div>
               </div>
 
               <div class="panel rounded-xl p-5">
                 <div class="w-10 h-10 bg-amber-50 text-amber-700 rounded-lg flex items-center justify-center mb-4 border border-amber-100">
-                  <i class="fa-solid fa-user-check"></i>
+                  <i class="fa-solid fa-square-poll-vertical"></i>
                 </div>
-                <div class="text-4xl font-semibold"><%= totalStudents %></div>
-                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Joined</div>
+                <div class="text-4xl font-semibold"><%= totalSubmissions %></div>
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Submissions</div>
               </div>
             </div>
           </div>
@@ -469,7 +466,7 @@
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
         <div>
           <h2 class="text-3xl font-semibold tracking-tight text-slate-950">Dashboard</h2>
-          <p class="text-slate-500 mt-1">Class-first workflow: create class keys, assign tests, and post announcements.</p>
+          <p class="text-slate-500 mt-1">Class-first workflow with rosters, tasks, scores, and announcements.</p>
         </div>
       </div>
 
@@ -519,11 +516,12 @@
             </form>
 
             <div class="mt-6 p-5 bg-emerald-50 border border-emerald-100 rounded-xl">
-              <div class="font-semibold text-emerald-800">How it works</div>
+              <div class="font-semibold text-emerald-800">Teacher flow</div>
               <ol class="text-sm text-emerald-700 mt-2 space-y-1 list-decimal list-inside">
                 <li>Create a class key.</li>
-                <li>Students paste it in their dashboard.</li>
-                <li>You assign tests and announcements.</li>
+                <li>Students join with the key.</li>
+                <li>Assign assessments to the class.</li>
+                <li>View names, emails, scores, and completion.</li>
               </ol>
             </div>
           </div>
@@ -531,9 +529,15 @@
           <div class="xl:col-span-8 space-y-5">
             <% if (safeClasses.length > 0) { %>
               <% safeClasses.slice().reverse().forEach(cls => { 
-                const assignedTests = safeTests.filter(t => Array.isArray(cls.assignedTestIds) && cls.assignedTestIds.map(Number).includes(Number(t.id)));
+                const assignedTests = Array.isArray(cls.assignedTests)
+                  ? cls.assignedTests
+                  : safeTests.filter(t => Array.isArray(cls.assignedTestIds) && cls.assignedTestIds.map(Number).includes(Number(t.id)));
+
                 const classAnnouncements = Array.isArray(cls.announcements) ? cls.announcements : [];
+                const students = Array.isArray(cls.students) ? cls.students : [];
+                const results = Array.isArray(cls.results) ? cls.results : [];
               %>
+
                 <div class="panel-strong rounded-2xl p-6 md:p-7">
                   <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
                     <div>
@@ -545,7 +549,7 @@
                       </div>
 
                       <div class="text-sm text-slate-500 mt-1">
-                        <%= cls.usageCount || 0 %> students joined • <%= assignedTests.length %> tests assigned
+                        <%= students.length || cls.usageCount || 0 %> students joined • <%= assignedTests.length %> tests assigned • <%= results.length %> submissions
                       </div>
                     </div>
 
@@ -554,6 +558,23 @@
                       <button type="button" onclick="copyText('<%= cls.key %>')" class="btn btn-dark px-3 py-2 text-xs">
                         Copy
                       </button>
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-3 gap-3 mt-6">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                      <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Students</div>
+                      <div class="text-3xl font-semibold mt-1"><%= students.length || cls.usageCount || 0 %></div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                      <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Assigned Tests</div>
+                      <div class="text-3xl font-semibold mt-1"><%= assignedTests.length %></div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                      <div class="text-xs text-slate-500 font-medium uppercase tracking-wider">Submissions</div>
+                      <div class="text-3xl font-semibold mt-1"><%= results.length %></div>
                     </div>
                   </div>
 
@@ -650,6 +671,154 @@
                         <% } %>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="mt-6 bg-white border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+                      <div>
+                        <div class="font-semibold">Student Roster & Scores</div>
+                        <div class="text-xs text-slate-500 mt-1">Full name, email, completed tests, pending tasks, and scores.</div>
+                      </div>
+                    </div>
+
+                    <% if (students.length > 0) { %>
+                      <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full text-left text-sm">
+                          <thead>
+                            <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 bg-white">
+                              <th class="px-5 py-3 font-medium">Student</th>
+                              <th class="px-5 py-3 font-medium">Email</th>
+                              <th class="px-5 py-3 font-medium">Joined</th>
+                              <th class="px-5 py-3 font-medium">Completed</th>
+                              <th class="px-5 py-3 font-medium">Pending</th>
+                              <th class="px-5 py-3 font-medium">Average</th>
+                            </tr>
+                          </thead>
+
+                          <tbody class="divide-y divide-slate-100">
+                            <% students.forEach(student => { %>
+                              <tr class="hover:bg-slate-50">
+                                <td class="px-5 py-4">
+                                  <div class="font-medium text-slate-950"><%= student.fullName %></div>
+                                  <div class="text-xs text-slate-500">ID: <%= student.userId %></div>
+                                </td>
+
+                                <td class="px-5 py-4 text-slate-600">
+                                  <%= student.email %>
+                                </td>
+
+                                <td class="px-5 py-4 text-slate-600 whitespace-nowrap">
+                                  <%= student.joinedAtFormatted || '—' %>
+                                </td>
+
+                                <td class="px-5 py-4">
+                                  <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
+                                    <%= student.completedCount || 0 %>
+                                  </span>
+                                </td>
+
+                                <td class="px-5 py-4">
+                                  <span class="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-medium">
+                                    <%= student.pendingCount || 0 %>
+                                  </span>
+                                </td>
+
+                                <td class="px-5 py-4">
+                                  <% if (student.averageScore !== null && student.averageScore !== undefined) { %>
+                                    <span class="font-semibold text-slate-950"><%= student.averageScore %>%</span>
+                                  <% } else { %>
+                                    <span class="text-slate-400">No score</span>
+                                  <% } %>
+                                </td>
+                              </tr>
+
+                              <% if (student.submissions && student.submissions.length > 0) { %>
+                                <tr class="bg-slate-50">
+                                  <td colspan="6" class="px-5 py-4">
+                                    <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Scores</div>
+
+                                    <div class="grid md:grid-cols-2 gap-2">
+                                      <% student.submissions.forEach(submission => { %>
+                                        <div class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-3">
+                                          <div>
+                                            <div class="text-sm font-medium text-slate-900"><%= submission.testTitle %></div>
+                                            <div class="text-xs text-slate-500 mt-1"><%= submission.submittedAtFormatted || '' %></div>
+                                          </div>
+
+                                          <div class="text-right">
+                                            <div class="text-lg font-semibold <%= submission.passed ? 'text-emerald-700' : 'text-red-600' %>">
+                                              <%= submission.score %>%
+                                            </div>
+                                            <div class="text-[10px] uppercase tracking-wider text-slate-500">
+                                              <%= submission.passed ? 'Passed' : 'Failed' %>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <% }) %>
+                                    </div>
+                                  </td>
+                                </tr>
+                              <% } %>
+                            <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    <% } else { %>
+                      <div class="p-8 text-center text-slate-500">
+                        <i class="fa-solid fa-user-group text-3xl text-slate-300 mb-3"></i>
+                        <div class="font-medium text-slate-800">No students joined yet</div>
+                        <p class="text-sm mt-1">Copy the class key and send it to your students.</p>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <div class="mt-6 bg-white border border-slate-200 rounded-xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-slate-200 bg-slate-50">
+                      <div class="font-semibold">Recent Submissions</div>
+                      <div class="text-xs text-slate-500 mt-1">Latest scores submitted in this class.</div>
+                    </div>
+
+                    <% if (results.length > 0) { %>
+                      <div class="overflow-x-auto custom-scroll">
+                        <table class="w-full text-left text-sm">
+                          <thead>
+                            <tr class="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 bg-white">
+                              <th class="px-5 py-3 font-medium">Student</th>
+                              <th class="px-5 py-3 font-medium">Email</th>
+                              <th class="px-5 py-3 font-medium">Assessment</th>
+                              <th class="px-5 py-3 font-medium">Score</th>
+                              <th class="px-5 py-3 font-medium">Status</th>
+                              <th class="px-5 py-3 font-medium">Submitted</th>
+                            </tr>
+                          </thead>
+
+                          <tbody class="divide-y divide-slate-100">
+                            <% results.forEach(result => { %>
+                              <tr class="hover:bg-slate-50">
+                                <td class="px-5 py-4 font-medium text-slate-950"><%= result.studentName %></td>
+                                <td class="px-5 py-4 text-slate-600"><%= result.studentEmail %></td>
+                                <td class="px-5 py-4 text-slate-600"><%= result.testTitle %></td>
+                                <td class="px-5 py-4 font-semibold"><%= result.score %>%</td>
+                                <td class="px-5 py-4">
+                                  <% if (result.passed) { %>
+                                    <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">Passed</span>
+                                  <% } else { %>
+                                    <span class="px-2.5 py-1 rounded-full bg-red-50 border border-red-100 text-red-700 text-xs font-medium">Failed</span>
+                                  <% } %>
+                                </td>
+                                <td class="px-5 py-4 text-slate-500 whitespace-nowrap"><%= result.submittedAtFormatted || '—' %></td>
+                              </tr>
+                            <% }) %>
+                          </tbody>
+                        </table>
+                      </div>
+                    <% } else { %>
+                      <div class="p-8 text-center text-slate-500">
+                        <i class="fa-solid fa-chart-simple text-3xl text-slate-300 mb-3"></i>
+                        <div class="font-medium text-slate-800">No submissions yet</div>
+                        <p class="text-sm mt-1">Scores will appear here when students submit assigned assessments.</p>
+                      </div>
+                    <% } %>
                   </div>
                 </div>
               <% }) %>
@@ -1108,9 +1277,7 @@
       const activeBtn = document.getElementById('tab-' + tab);
       activeBtn.classList.add('tab-active');
 
-      if (tab === 'classes') {
-        history.replaceState(null, '', '#classes');
-      }
+      history.replaceState(null, '', '#' + tab);
     }
 
     function renderTemplateButtons() {
