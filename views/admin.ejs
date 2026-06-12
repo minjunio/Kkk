@@ -5,354 +5,395 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard • Credity</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    body { font-family: 'Inter', system_ui, sans-serif; }
-    .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .section-header { font-size: 1.5rem; font-weight: 700; letter-spacing: -.025em; }
-    .modern-input { background: white; border: 1px solid #cbd5e1; }
-    .modern-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
+    
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .modern-input { background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s; }
+    .modern-input:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
+    
+    /* Certificate Scaling Container */
+    .cert-container { container-type: inline-size; }
     .certificate-preview {
       background: white;
-      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-      font-family: 'Georgia', serif;
-      border: 14px solid #1e40af;
-      transition: all 0.3s ease;
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+      font-family: 'Playfair Display', serif;
+      transition: all 0.4s ease;
+      background-image: radial-gradient(#f1f5f9 1px, transparent 1px);
+      background-size: 20px 20px;
     }
-    .template-btn { transition: all 0.2s ease; }
-    .template-btn:hover { transform: translateY(-2px); }
+    
+    /* Custom Scrollbars */
+    .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    /* Badge Shapes */
+    .badge-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
+    .badge-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <!-- Top Navigation -->
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+<body class="bg-slate-50 text-slate-800">
+
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-[90rem] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-x-3">
-        <div class="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center">
-          <span class="text-white font-bold text-2xl tracking-tighter">C</span>
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <span class="text-white font-bold text-xl">C</span>
         </div>
-        <span class="font-semibold text-2xl tracking-tighter">Credity Admin</span>
+        <span class="font-bold text-xl tracking-tight">Credity</span>
       </div>
-      <a href="/logout" class="px-4 py-2 text-sm border border-slate-300 rounded-2xl hover:bg-slate-100">Logout</a>
+      <a href="#" class="px-5 py-2 text-sm font-medium border border-slate-200 rounded-full hover:bg-slate-50 transition-colors">Logout</a>
     </div>
   </nav>
 
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-12">
+  <div class="max-w-[90rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
     <div class="mb-8">
-      <div class="text-sm text-blue-600 font-medium tracking-widest">ADMIN CONTROL CENTER</div>
-      <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight">Platform Management</h1>
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">Platform Management</h1>
+      <p class="text-slate-500 mt-2">Design, issue, and manage digital credentials.</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="flex overflow-x-auto border-b border-slate-200 mb-6">
-      <button onclick="showTab('certificates')" class="tab-btn px-5 py-3 font-medium border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="tab-certificates">Certificate Editor</button>
-      <button onclick="showTab('badges')" class="tab-btn px-5 py-3 font-medium text-slate-600 whitespace-nowrap" id="tab-badges">Badge Editor</button>
-      <button onclick="showTab('assessments')" class="tab-btn px-5 py-3 font-medium text-slate-600 whitespace-nowrap" id="tab-assessments">Assessments</button>
+    <div class="flex overflow-x-auto border-b border-slate-200 mb-8 custom-scroll">
+      <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="tab-certificates">Certificate Editor</button>
+      <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-badges">Badge Editor</button>
     </div>
 
-    <!-- Certificate Editor -->
     <div id="certificates-tab" class="tab-content">
-      <div class="grid lg:grid-cols-5 gap-8">
+      <div class="flex flex-col xl:flex-row gap-8">
         
-        <!-- Controls -->
-        <div class="lg:col-span-3 glass p-6 sm:p-8 rounded-3xl border border-slate-200">
-          <div class="section-header mb-6">Certificate Editor</div>
+        <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl">
+          <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><span class="w-2 h-6 bg-blue-600 rounded-full block"></span> Design Certificate</h2>
 
-          <form action="/create-badge" method="POST">
-            <div class="space-y-5">
-              <!-- Title + Name -->
-              <div class="grid md:grid-cols-2 gap-5">
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">TITLE</label>
-                  <input type="text" id="cert-title" name="title" value="Certificate of Achievement" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium" required>
+          <div class="space-y-8">
+            <div>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Choose Template (20)</label>
+              <div id="template-grid" class="flex gap-3 overflow-x-auto pb-4 custom-scroll snap-x">
                 </div>
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">RECIPIENT NAME</label>
-                  <input type="text" id="cert-name" value="Alex Rivera" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-lg font-medium">
-                </div>
-              </div>
+            </div>
 
+            <div class="grid md:grid-cols-2 gap-5">
               <div>
-                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">DESCRIPTION</label>
-                <textarea id="cert-desc" name="description" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl h-20">has successfully completed the Advanced Program with distinction.</textarea>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Title</label>
+                <input type="text" id="cert-title" value="Certificate of Achievement" oninput="updateCertPreview()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium">
               </div>
-
-              <!-- Colors -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">PRIMARY COLOR</label>
-                  <input type="color" id="cert-color" name="designColor" value="#1e40af" oninput="updatePreview()" class="w-full h-11 p-1 border border-slate-300 rounded-2xl">
-                </div>
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">ACCENT COLOR</label>
-                  <input type="color" id="cert-accent" value="#3b82f6" oninput="updatePreview()" class="w-full h-11 p-1 border border-slate-300 rounded-2xl">
-                </div>
-              </div>
-
-              <!-- Templates -->
               <div>
-                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-3">TEMPLATES</label>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  <button type="button" onclick="applyTemplate('classic')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Classic Academic</button>
-                  <button type="button" onclick="applyTemplate('modern')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Modern Tech</button>
-                  <button type="button" onclick="applyTemplate('elegant')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Elegant Gold</button>
-                  <button type="button" onclick="applyTemplate('minimal')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Minimal Clean</button>
-                  <button type="button" onclick="applyTemplate('prestigious')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Prestigious</button>
-                  <button type="button" onclick="applyTemplate('corporate')" class="template-btn px-4 py-2 text-sm border border-slate-300 rounded-2xl">Corporate</button>
-                </div>
-              </div>
-
-              <!-- Logos -->
-              <div>
-                <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">LOGOS (Add multiple)</label>
-                
-                <div class="flex gap-2 mb-3">
-                  <select id="logo-select" class="modern-input flex-1 px-4 py-3 rounded-2xl text-sm">
-                    <option value="https://via.placeholder.com/100x100/1e40af/ffffff?text=UNI">University Logo</option>
-                    <option value="https://via.placeholder.com/100x100/0f172a/ffffff?text=TECH">Tech Company</option>
-                    <option value="https://via.placeholder.com/100x100/166534/ffffff?text=SCI">Science Institute</option>
-                    <option value="https://via.placeholder.com/100x100/854d0e/ffffff?text=BIZ">Business School</option>
-                    <option value="https://via.placeholder.com/100x100/9f1239/ffffff?text=HEALTH">Health Academy</option>
-                    <option value="https://via.placeholder.com/100x100/1e3a8a/ffffff?text=ENG">Engineering</option>
-                    <option value="https://via.placeholder.com/100x100/334155/ffffff?text=LAW">Law Faculty</option>
-                    <option value="https://via.placeholder.com/100x100/0f766e/ffffff?text=DESIGN">Design School</option>
-                  </select>
-                  <button type="button" onclick="addSelectedLogo()" class="px-5 py-3 bg-blue-600 text-white text-sm rounded-2xl">Add</button>
-                </div>
-
-                <!-- Selected Logos -->
-                <div id="selected-logos" class="flex flex-wrap gap-2 min-h-[50px] mb-3"></div>
-
-                <div class="flex gap-2">
-                  <input type="text" id="custom-logo-url" placeholder="Custom logo URL" class="modern-input flex-1 px-4 py-2 rounded-2xl text-sm">
-                  <button type="button" onclick="addCustomLogo()" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-2xl">Add Custom</button>
-                </div>
-              </div>
-
-              <!-- Signature + Expiry -->
-              <div class="grid md:grid-cols-2 gap-5">
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">SIGNATURE NAME</label>
-                  <input type="text" id="signature-name" value="Dr. Sarah Chen" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
-                </div>
-                <div>
-                  <label class="text-xs font-semibold text-slate-600 tracking-widest block mb-2">EXPIRATION DATE</label>
-                  <input type="date" id="expiry-date" oninput="updatePreview()" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
-                </div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Recipient Name</label>
+                <input type="text" id="cert-name" value="Alex Rivera" oninput="updateCertPreview()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium">
               </div>
             </div>
 
-            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-3xl text-lg">Create & Issue Certificate</button>
-          </form>
-        </div>
+            <div>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Description</label>
+              <textarea id="cert-desc" oninput="updateCertPreview()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has successfully completed the Advanced Program with distinction and honors.</textarea>
+            </div>
 
-        <!-- Live Preview -->
-        <div class="lg:col-span-2">
-          <div class="sticky top-6">
-            <div class="section-header mb-4">Live Preview</div>
-            <div id="certificate-preview" 
-                 class="certificate-preview mx-auto w-full max-w-[420px] aspect-[1.414] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden border-[14px]"
-                 style="border-color: #1e40af; background: white;">
+            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+              <div class="flex justify-between items-center mb-3">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Logos (Transparent)</label>
+                <select id="logo-align" onchange="updateCertPreview()" class="text-xs bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
+                  <option value="justify-center">Center</option>
+                  <option value="justify-start">Left</option>
+                  <option value="justify-end">Right</option>
+                </select>
+              </div>
               
-              <div class="text-center">
-                <div class="text-sm tracking-[3px] text-slate-500 mb-1">THIS IS TO CERTIFY THAT</div>
-                <div class="text-2xl font-bold mb-4" id="preview-name">Alex Rivera</div>
-                
-                <div class="text-base leading-relaxed mb-6 px-4" id="preview-desc">
-                  has successfully completed the Advanced Program with distinction.
+              <div id="selected-logos" class="flex flex-wrap gap-2 mb-4 empty:hidden"></div>
+
+              <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-40 overflow-y-auto custom-scroll p-2 bg-white rounded-xl border border-slate-200">
                 </div>
+            </div>
 
-                <div id="preview-logos" class="flex justify-center gap-4 mb-8 min-h-[50px]"></div>
-
-                <div class="text-sm">on this day</div>
-                <div class="font-semibold mt-0.5" id="preview-date"></div>
-
-                <div class="mt-10 pt-4 border-t border-slate-300 w-48 mx-auto">
-                  <div class="text-sm font-medium" id="preview-signature">Dr. Sarah Chen</div>
-                  <div class="text-xs text-slate-500">Director of Academics</div>
-                </div>
-
-                <div class="absolute bottom-4 right-4 text-[10px] text-slate-400" id="preview-expiry"></div>
+            <div class="grid md:grid-cols-3 gap-5">
+              <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Border Size</label>
+                <input type="range" id="cert-border-size" min="0" max="40" value="16" oninput="updateCertPreview()" class="w-full accent-blue-600 mt-2">
               </div>
+              <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Theme Color</label>
+                <input type="color" id="cert-color" value="#1e40af" oninput="updateCertPreview()" class="w-full h-10 p-0.5 border-0 rounded-lg cursor-pointer">
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Signature</label>
+                <input type="text" id="signature-name" value="Dr. Sarah Chen" oninput="updateCertPreview()" class="modern-input w-full px-4 py-2 rounded-xl text-sm">
+              </div>
+            </div>
+
+            <button class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl transition-all shadow-lg hover:shadow-xl">Generate Certificate</button>
+          </div>
+        </div>
+
+        <div class="xl:w-2/5 cert-container">
+          <div class="sticky top-24">
+            <div class="flex justify-between items-end mb-4">
+              <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Live Preview</h3>
+            </div>
+            
+            <div id="certificate-preview" class="certificate-preview w-full aspect-[1.414] p-[5%] flex flex-col relative overflow-hidden border-solid box-border text-center justify-between" style="border-width: 16px; border-color: #1e40af;">
+              
+              <div class="mt-[2%]">
+                <div id="preview-logos" class="flex gap-4 mb-[4%] w-full justify-center"></div>
+                <div class="text-[2cqi] tracking-[0.2em] text-slate-500 uppercase font-sans mb-[2%]">This is to certify that</div>
+                <div id="preview-name" class="text-[6cqi] font-bold italic text-slate-800 leading-tight">Alex Rivera</div>
+              </div>
+
+              <div class="px-[10%]">
+                <div id="preview-title" class="text-[3cqi] font-bold uppercase tracking-widest mb-[3%]">Certificate of Achievement</div>
+                <div id="preview-desc" class="text-[2.2cqi] leading-relaxed text-slate-600 font-sans">
+                  has successfully completed the Advanced Program with distinction and honors.
+                </div>
+              </div>
+
+              <div class="flex justify-between items-end mt-auto pt-[4%] border-t border-slate-200/50">
+                <div class="text-left">
+                  <div id="preview-date" class="text-[1.8cqi] font-sans font-medium text-slate-800"></div>
+                  <div class="text-[1.5cqi] text-slate-400 font-sans uppercase tracking-wider">Date Issued</div>
+                </div>
+                <div class="text-right">
+                  <div id="preview-signature" class="text-[2.5cqi] font-medium italic text-slate-800">Dr. Sarah Chen</div>
+                  <div class="text-[1.5cqi] text-slate-400 font-sans uppercase tracking-wider">Authorized Signature</div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Badge Editor -->
     <div id="badges-tab" class="tab-content hidden">
-      <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200 max-w-2xl">
-        <div class="section-header mb-6">Badge Editor</div>
-        <form action="/create-badge" method="POST">
-          <div class="space-y-5">
-            <input type="text" name="title" placeholder="Badge Title" class="modern-input w-full px-4 py-3 rounded-2xl" required>
-            <textarea name="description" placeholder="Description" class="modern-input w-full px-4 py-3 rounded-2xl h-24"></textarea>
-            <select name="type" class="modern-input w-full px-4 py-3 rounded-2xl">
-              <option value="badge">Standard Badge</option>
-              <option value="premium">Premium Badge</option>
-              <option value="gold">Gold Badge</option>
-            </select>
-          </div>
-          <button type="submit" class="mt-6 w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl">Create Badge</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Assessments -->
-    <div id="assessments-tab" class="tab-content hidden">
-      <div class="glass p-6 sm:p-8 rounded-3xl border border-slate-200">
-        <div class="section-header mb-6">Assessment Creator</div>
-        <form action="/create-test" method="POST">
-          <input type="text" name="title" value="New Assessment" class="modern-input w-full px-4 py-3 rounded-2xl mb-6" required>
-          <div class="mb-6">
-            <div class="flex justify-between mb-3">
-              <div class="font-medium">Questions</div>
-              <button type="button" onclick="addQuestion()" class="text-sm px-4 py-1.5 bg-blue-600 text-white rounded-2xl">+ Add Question</button>
+      <div class="flex flex-col md:flex-row gap-8">
+        
+        <div class="md:w-1/2 glass p-6 md:p-8 rounded-3xl">
+          <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><span class="w-2 h-6 bg-purple-600 rounded-full block"></span> Design Badge</h2>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Badge Title</label>
+              <input type="text" id="badge-title" value="Cloud Architect" oninput="updateBadgePreview()" class="modern-input w-full px-4 py-3 rounded-xl">
             </div>
-            <div id="questions-container" class="space-y-4"></div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Shape</label>
+                <select id="badge-shape" onchange="updateBadgePreview()" class="modern-input w-full px-4 py-3 rounded-xl">
+                  <option value="circle">Circular</option>
+                  <option value="shield">Shield</option>
+                  <option value="star">Starburst</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Color</label>
+                <input type="color" id="badge-color" value="#8b5cf6" oninput="updateBadgePreview()" class="w-full h-12 p-0 border-0 rounded-xl cursor-pointer">
+              </div>
+            </div>
+
+            <button class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-2xl transition-all">Create Badge</button>
           </div>
-          <button type="submit" class="w-full py-4 bg-blue-600 text-white font-semibold rounded-3xl">Create Assessment</button>
-        </form>
+        </div>
+
+        <div class="md:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-12 border-2 border-dashed border-slate-300">
+          <div class="text-center">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-8">Live Preview</h3>
+            
+            <div id="badge-preview-container" class="relative w-48 h-48 mx-auto flex items-center justify-center shadow-2xl transition-all duration-300 rounded-full bg-purple-600 text-white">
+              <div class="absolute inset-2 border-2 border-white/30 rounded-inherit"></div>
+              <div class="z-10 px-4 text-center">
+                <div class="text-3xl mb-2 opacity-90">🏆</div>
+                <div id="preview-badge-title" class="font-bold text-sm tracking-wide uppercase leading-tight shadow-sm">Cloud Architect</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 
   <script>
-    let selectedLogos = [];
+    // --- 1. Dynamic Data Setup ---
 
-    function showTab(tab) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(tab + '-tab').classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600'));
-      document.getElementById('tab-' + tab).classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
-    }
+    // Generate 50 unique logos using DiceBear Initials (Transparent SVG)
+    const predefinedLogos = Array.from({length: 50}, (_, i) => {
+      const themes = ['Tech', 'Uni', 'Bio', 'Art', 'Law', 'Med', 'Eco', 'Fin', 'Dev', 'Ops'];
+      const seed = themes[i % themes.length] + i;
+      return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=transparent&textColor=000000`;
+    });
 
-    function updatePreview() {
-      const preview = document.getElementById('certificate-preview');
-      const name = document.getElementById('cert-name').value || 'Student Name';
-      const desc = document.getElementById('cert-desc').value || '';
-      const color = document.getElementById('cert-color').value;
-      const accent = document.getElementById('cert-accent').value;
-      const signature = document.getElementById('signature-name').value || '';
-      const expiry = document.getElementById('expiry-date').value;
+    let selectedLogos = [predefinedLogos[0]];
 
-      preview.style.borderColor = color;
+    // 20 Certificate Templates
+    const templates = [
+      { name: 'Classic', color: '#1e40af', title: 'Certificate of Achievement', desc: 'has successfully completed the program.' },
+      { name: 'Modern', color: '#0f172a', title: 'Digital Excellence', desc: 'in recognition of outstanding tech innovation.' },
+      { name: 'Gold', color: '#b45309', title: 'Award of Excellence', desc: 'for distinguished service and merit.' },
+      { name: 'Minimal', color: '#64748b', title: 'Completion Certificate', desc: 'has fulfilled all necessary requirements.' },
+      { name: 'Cyber', color: '#06b6d4', title: 'Cyber Security Protocol', desc: 'certified in advanced network defense.' },
+      { name: 'Forest', color: '#15803d', title: 'Sustainability Award', desc: 'for contributions to environmental science.' },
+      { name: 'Royal', color: '#6d28d9', title: 'Presidential Honors', desc: 'awarded for exceptional leadership.' },
+      { name: 'Crimson', color: '#be123c', title: 'Academic Distinction', desc: 'graduated with top honors.' },
+      { name: 'Corporate', color: '#334155', title: 'Professional Milestone', desc: 'recognizing 5 years of dedicated service.' },
+      { name: 'Startup', color: '#f97316', title: 'Innovation Grant', desc: 'winner of the annual startup pitch.' },
+      { name: 'Medical', color: '#0369a1', title: 'Clinical Residency', desc: 'completed rigorous medical training.' },
+      { name: 'Arts', color: '#db2777', title: 'Creative Fellowship', desc: 'awarded for exceptional artistic portfolio.' },
+      { name: 'Engineering', color: '#4338ca', title: 'Structural Mastery', desc: 'certified civil engineering module.' },
+      { name: 'Finance', color: '#047857', title: 'Financial Analyst', desc: 'passed the rigorous board examination.' },
+      { name: 'Law', color: '#78350f', title: 'Juris Doctor', desc: 'admitted to the state bar association.' },
+      { name: 'Aviation', color: '#0284c7', title: 'Pilot Certification', desc: 'cleared for commercial flight operations.' },
+      { name: 'Culinary', color: '#9f1239', title: 'Master Chef', desc: 'demonstrated elite gastronomic skills.' },
+      { name: 'Sports', color: '#ea580c', title: 'Athletic Champion', desc: 'first place in the regional tournament.' },
+      { name: 'Volunteer', color: '#14b8a6', title: 'Community Hero', desc: 'for 500+ hours of selfless service.' },
+      { name: 'Dark Mode', color: '#000000', title: 'Elite Hacker', desc: 'root access granted. simulation complete.' }
+    ];
 
-      document.getElementById('preview-name').innerText = name;
-      document.getElementById('preview-desc').innerText = desc;
-      document.getElementById('preview-signature').innerText = signature || 'Director';
+    // --- 2. UI Initialization ---
 
-      const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      document.getElementById('preview-date').innerText = today;
-
-      // Logos
-      const logosContainer = document.getElementById('preview-logos');
-      logosContainer.innerHTML = '';
-      selectedLogos.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.className = 'w-9 h-9 rounded-full border-2 object-cover';
-        img.style.borderColor = accent;
-        logosContainer.appendChild(img);
+    function init() {
+      // Render 20 Templates
+      const templateGrid = document.getElementById('template-grid');
+      templates.forEach((t, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'snap-start flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all cursor-pointer';
+        btn.style.borderColor = t.color;
+        btn.style.color = t.color;
+        btn.innerText = t.name;
+        btn.onclick = () => applyTemplate(i);
+        templateGrid.appendChild(btn);
       });
 
-      // Expiry
-      const expiryEl = document.getElementById('preview-expiry');
-      expiryEl.innerText = expiry ? 'Valid until: ' + new Date(expiry).toLocaleDateString() : '';
+      // Render 50 Logos
+      const logoGrid = document.getElementById('logo-grid');
+      predefinedLogos.forEach((url, i) => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-10 h-10 p-1 cursor-pointer hover:bg-slate-100 rounded-lg transition-colors border border-transparent hover:border-slate-300';
+        img.onclick = () => toggleLogo(url);
+        logoGrid.appendChild(img);
+      });
+
+      // Set Date
+      document.getElementById('preview-date').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      
+      renderSelectedLogos();
+      updateCertPreview();
+      updateBadgePreview();
     }
 
-    function applyTemplate(type) {
-      const title = document.getElementById('cert-title');
-      const desc = document.getElementById('cert-desc');
-      const color = document.getElementById('cert-color');
-      const accent = document.getElementById('cert-accent');
+    // --- 3. Certificate Logic ---
 
-      if (type === 'classic') {
-        title.value = 'Certificate of Achievement';
-        desc.value = 'has successfully completed the Advanced Program with distinction.';
-        color.value = '#1e40af';
-        accent.value = '#3b82f6';
-      } else if (type === 'modern') {
-        title.value = 'Digital Excellence Award';
-        desc.value = 'in recognition of outstanding innovation in technology.';
-        color.value = '#0f172a';
-        accent.value = '#06b67f';
-      } else if (type === 'elegant') {
-        title.value = 'Certificate of Merit';
-        desc.value = 'for distinguished service and exceptional achievement.';
-        color.value = '#334155';
-        accent.value = '#854d0e';
-      } else if (type === 'minimal') {
-        title.value = 'Program Completion Certificate';
-        desc.value = 'has successfully fulfilled all requirements.';
-        color.value = '#0f172a';
-        accent.value = '#64748b';
-      } else if (type === 'prestigious') {
-        title.value = 'Presidential Leadership Award';
-        desc.value = 'for extraordinary contribution and visionary leadership.';
-        color.value = '#450a0a';
-        accent.value = '#b91c1c';
-      } else if (type === 'corporate') {
-        title.value = 'Corporate Excellence Certificate';
-        desc.value = 'in recognition of outstanding professional performance.';
-        color.value = '#1e3a8a';
-        accent.value = '#c2410f';
+    function applyTemplate(index) {
+      const t = templates[index];
+      document.getElementById('cert-title').value = t.title;
+      document.getElementById('cert-desc').value = t.desc;
+      document.getElementById('cert-color').value = t.color;
+      updateCertPreview();
+    }
+
+    function toggleLogo(url) {
+      const index = selectedLogos.indexOf(url);
+      if (index === -1) {
+        selectedLogos.push(url);
+      } else {
+        selectedLogos.splice(index, 1);
       }
-
-      updatePreview();
-    }
-
-    function addSelectedLogo() {
-      const select = document.getElementById('logo-select');
-      const url = select.value;
-      if (!url || selectedLogos.includes(url)) return;
-
-      selectedLogos.push(url);
       renderSelectedLogos();
-      updatePreview();
-    }
-
-    function addCustomLogo() {
-      const url = document.getElementById('custom-logo-url').value.trim();
-      if (!url || selectedLogos.includes(url)) return;
-
-      selectedLogos.push(url);
-      renderSelectedLogos();
-      updatePreview();
-      document.getElementById('custom-logo-url').value = '';
+      updateCertPreview();
     }
 
     function renderSelectedLogos() {
       const container = document.getElementById('selected-logos');
       container.innerHTML = '';
-
-      selectedLogos.forEach((url, index) => {
-        const div = document.createElement('div');
-        div.className = 'flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-2xl text-sm';
-        div.innerHTML = `
-          <img src="${url}" class="w-6 h-6 rounded-full" alt="Logo">
-          <span class="text-xs">Logo ${index + 1}</span>
-          <button type="button" onclick="removeLogo(${index})" class="ml-1 text-red-500">×</button>
+      selectedLogos.forEach(url => {
+        const tag = document.createElement('div');
+        tag.className = 'flex items-center gap-2 bg-white border border-slate-200 pl-1 pr-2 py-1 rounded-full text-xs shadow-sm';
+        tag.innerHTML = `
+          <img src="${url}" class="w-5 h-5">
+          <button onclick="toggleLogo('${url}')" class="text-red-500 hover:text-red-700 font-bold ml-1">×</button>
         `;
-        container.appendChild(div);
+        container.appendChild(tag);
       });
     }
 
-    function removeLogo(index) {
-      selectedLogos.splice(index, 1);
-      renderSelectedLogos();
-      updatePreview();
+    function updateCertPreview() {
+      const preview = document.getElementById('certificate-preview');
+      const title = document.getElementById('cert-title').value || 'Certificate Title';
+      const name = document.getElementById('cert-name').value || 'Recipient Name';
+      const desc = document.getElementById('cert-desc').value || '';
+      const color = document.getElementById('cert-color').value;
+      const borderSize = document.getElementById('cert-border-size').value;
+      const signature = document.getElementById('signature-name').value;
+      const alignment = document.getElementById('logo-align').value;
+
+      // Apply Styles
+      preview.style.borderColor = color;
+      preview.style.borderWidth = `${borderSize}px`;
+      document.getElementById('preview-title').style.color = color;
+
+      // Apply Text
+      document.getElementById('preview-title').innerText = title;
+      document.getElementById('preview-name').innerText = name;
+      document.getElementById('preview-desc').innerText = desc;
+      document.getElementById('preview-signature').innerText = signature;
+
+      // Apply Logos & Alignment
+      const logosContainer = document.getElementById('preview-logos');
+      logosContainer.className = `flex gap-4 mb-[4%] w-full ${alignment}`;
+      logosContainer.innerHTML = '';
+      
+      selectedLogos.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-[8cqi] h-[8cqi] object-contain drop-shadow-sm';
+        logosContainer.appendChild(img);
+      });
     }
 
-    function initAdmin() {
-      updatePreview();
-      document.getElementById('certificates-tab').classList.remove('hidden');
-      document.getElementById('tab-certificates').classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+    // --- 4. Badge Logic ---
+
+    function updateBadgePreview() {
+      const title = document.getElementById('badge-title').value || 'Badge';
+      const shape = document.getElementById('badge-shape').value;
+      const color = document.getElementById('badge-color').value;
+      const container = document.getElementById('badge-preview-container');
+      const innerBorder = container.querySelector('div');
+
+      document.getElementById('preview-badge-title').innerText = title;
+      container.style.backgroundColor = color;
+
+      // Reset classes
+      container.className = 'relative w-48 h-48 mx-auto flex items-center justify-center shadow-2xl transition-all duration-300 text-white';
+      innerBorder.className = 'absolute inset-2 border-2 border-white/30';
+
+      if (shape === 'circle') {
+        container.classList.add('rounded-full');
+        innerBorder.classList.add('rounded-full');
+      } else if (shape === 'shield') {
+        container.classList.add('badge-shield');
+        innerBorder.classList.add('badge-shield');
+      } else if (shape === 'star') {
+        container.classList.add('badge-star');
+        innerBorder.classList.add('badge-star');
+      }
     }
 
-    window.onload = initAdmin;
+    // --- 5. Tabs ---
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tab + '-tab').classList.remove('hidden');
+      
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+        el.classList.add('text-slate-500');
+      });
+      
+      const activeTab = document.getElementById('tab-' + tab);
+      activeTab.classList.remove('text-slate-500');
+      activeTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+    }
+
+    // Boot
+    window.onload = init;
   </script>
 </body>
 </html>
