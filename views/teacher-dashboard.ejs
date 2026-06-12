@@ -1,272 +1,1460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Dashboard • Credity.ink</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Dashboard • Credity</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
-    body { font-family: 'Inter', system_ui, sans-serif; }
-    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-    .modern-gradient { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .spotless-card { transition: all .3s cubic-bezier(.4,0,.2,1); }
-    .nav-active { color: #6366f1; font-weight: 600; }
-    .section-header { font-size: 1.65rem; font-weight: 700; letter-spacing: -.02em; }
-    .design-option { transition: all .2s ease; }
-    .design-option.active { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
-    .form-input { background: #18181b; border: 1px solid #27272a; }
-    .form-input:focus { border-color: #6366f1; outline: none; }
-    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #18181b; border-radius: 10px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@500;700&family=Montserrat:wght@400;600;700;800&family=Pinyon+Script&display=swap');
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      background: #f8fafc;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+    }
+
+    .modern-input {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .modern-input:focus {
+      border-color: #2563eb;
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 999px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    .font-signature {
+      font-family: 'Pinyon Script', cursive;
+    }
+
+    .tab-btn {
+      transition: all 0.2s ease;
+    }
+
+    .tab-active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+      font-weight: 800;
+    }
+
+    .stat-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.08);
+    }
+
+    .cert-container {
+      container-type: inline-size;
+      perspective: 1000px;
+    }
+
+    .certificate-preview {
+      background: white;
+      box-shadow: 0 25px 60px rgba(15,23,42,0.18);
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      display: flex;
+      flex-direction: column;
+      color: #1e293b;
+    }
+
+    .draggable-logo {
+      position: absolute;
+      cursor: grab;
+      z-index: 80;
+      width: 8.5cqi;
+      height: 8.5cqi;
+      min-width: 28px;
+      min-height: 28px;
+      mix-blend-mode: multiply;
+      pointer-events: auto;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .draggable-logo:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 20px rgba(15,23,42,0.15);
+    }
+
+    .draggable-logo:active {
+      cursor: grabbing;
+    }
+
+    .draggable-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .tpl-1-degree {
+      font-family: 'Cinzel', serif;
+      border: 2.5cqw solid #1e293b;
+      outline: 0.6cqw solid #1e293b;
+      outline-offset: -1.2cqw;
+      background: linear-gradient(#fffdf8, #fefaf0);
+      box-shadow: inset 0 0 0 1.5cqw #f8f1e3, inset 0 0 90px rgba(180,83,9,0.07);
+    }
+
+    .tpl-1-degree::before {
+      content: '';
+      position: absolute;
+      inset: 1.6cqw;
+      border: 0.45cqw solid #1e293b;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .tpl-1-degree .cert-title {
+      font-size: 4.4cqi;
+      color: #1e293b;
+      font-weight: 700;
+      border-bottom: 2.5px solid #b45309;
+      padding-bottom: 1.4cqw;
+      display: inline-block;
+      letter-spacing: 0.02em;
+    }
+
+    .tpl-2-university {
+      font-family: 'Playfair Display', serif;
+      border: 3cqw solid #1e293b;
+      background: #fff;
+    }
+
+    .tpl-2-university::before {
+      content:'';
+      position:absolute;
+      inset: 1.8cqw;
+      border: 0.35cqw solid #1e293b;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .tpl-2-university .cert-title {
+      font-size: 3.8cqi;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: #1e293b;
+    }
+
+    .tpl-3-corporate {
+      font-family: 'Montserrat', sans-serif;
+      border-top: 5.5cqw solid #1e293b;
+      border-bottom: 1.8cqw solid #1e293b;
+      background: #fff;
+    }
+
+    .tpl-3-corporate .cert-title {
+      font-size: 3.5cqi;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: #1e293b;
+    }
+
+    .tpl-4-tech {
+      font-family: 'Space Grotesk', sans-serif;
+      border: 0.6cqw solid #1e293b;
+      background: #fff;
+      background-image:
+        linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px);
+      background-size: 3.8cqw 3.8cqw;
+    }
+
+    .tpl-4-tech .cert-title {
+      font-size: 3.5cqi;
+      text-transform: uppercase;
+      color: #1e293b;
+      letter-spacing: 0.1em;
+    }
+
+    .tpl-5-scholar {
+      font-family: 'Cinzel', serif;
+      border: 1.6cqw solid #b45309;
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    }
+
+    .tpl-5-scholar::after {
+      content:'';
+      position:absolute;
+      inset: 0.6cqw;
+      border: 0.35cqw solid #b45309;
+      pointer-events: none;
+    }
+
+    .tpl-5-scholar .cert-title {
+      font-size: 4cqi;
+      color: #92400e;
+    }
+
+    .tpl-6-minimal {
+      font-family: 'Inter', sans-serif;
+      border-left: 6.5cqw solid #1e293b;
+      background: #f8fafc;
+    }
+
+    .tpl-6-minimal .cert-title {
+      font-size: 3.6cqi;
+      font-weight: 800;
+      text-align: left;
+      color: #1e293b;
+    }
+
+    .tpl-7-executive {
+      font-family: 'Playfair Display', serif;
+      border: 0.25cqw solid #64748b;
+      background: #fff;
+      box-shadow: inset 0 0 0 2.2cqw #f1f5f9;
+    }
+
+    .tpl-7-executive .cert-title {
+      font-size: 3.9cqi;
+      font-style: italic;
+      color: #1e293b;
+    }
+
+    .tpl-8-dark {
+      font-family: 'Space Grotesk', sans-serif;
+      border: 0.55cqw solid #334155;
+      background: radial-gradient(circle at 50% 0%, #1e293b, #0f172a);
+      color: #f8fafc !important;
+    }
+
+    .tpl-8-dark .cert-title,
+    .tpl-8-dark .cert-text-color {
+      color: #fff !important;
+    }
+
+    .tpl-8-dark .draggable-logo {
+      mix-blend-mode: normal;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.55));
+    }
+
+    .tpl-9-honors {
+      font-family: 'Cinzel', serif;
+      border: 1.1cqw double #9f1239;
+      outline: 2.2cqw solid #fff1f2;
+      outline-offset: -3.2cqw;
+      background: #fff;
+    }
+
+    .tpl-9-honors .cert-title {
+      font-size: 4.1cqi;
+      color: #9f1239;
+    }
+
+    .tpl-10-cyber {
+      font-family: 'Space Grotesk', sans-serif;
+      border-right: 3.2cqw solid #10b981;
+      border-left: 3.2cqw solid #10b981;
+      background: #020617;
+      color: #10b981 !important;
+    }
+
+    .tpl-10-cyber .cert-title,
+    .tpl-10-cyber .cert-text-color {
+      color: #10b981 !important;
+    }
+
+    .tpl-10-cyber .draggable-logo {
+      mix-blend-mode: normal;
+      filter: drop-shadow(0 0 6px #10b981);
+    }
+
+    .tpl-11-startup {
+      font-family: 'Inter', sans-serif;
+      border-radius: 4.5cqw;
+      border: 0.9cqw solid #1e293b;
+      background: #fff;
+      box-shadow: inset 0 0 3.5cqw rgba(0,0,0,0.06);
+    }
+
+    .tpl-11-startup .cert-title {
+      font-size: 3.7cqi;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .tpl-12-medical {
+      font-family: 'Inter', sans-serif;
+      border-left: 6.5cqw solid #0369a1;
+      background: #f0f9ff;
+    }
+
+    .tpl-12-medical .cert-title {
+      font-size: 3.7cqi;
+      color: #0369a1;
+      font-weight: 900;
+    }
+
+    .shape-circle { border-radius: 50%; }
+    .shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
+    .shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    .shape-octagon { clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); }
+    .shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+    .shape-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+
+    @media (max-width: 768px) {
+      .certificate-preview {
+        min-height: 260px;
+      }
+    }
   </style>
 </head>
-<body class="bg-zinc-950 text-white">
-  <nav class="border-b border-white/10 bg-zinc-950/90 backdrop-blur-xl sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+
+<body class="bg-slate-50 text-slate-800">
+  <%
+    const safeBadges = typeof badges !== 'undefined' && Array.isArray(badges) ? badges : [];
+    const safeTests = typeof tests !== 'undefined' && Array.isArray(tests) ? tests : [];
+    const safeEvents = typeof events !== 'undefined' && Array.isArray(events) ? events : [];
+    const safeStudentKeys = typeof studentKeys !== 'undefined' && Array.isArray(studentKeys) ? studentKeys : [];
+    const teacherName = user && user.name ? user.name : 'Teacher';
+    const firstName = teacherName.split(' ')[0];
+    const totalKeyUses = safeStudentKeys.reduce((sum, k) => sum + Number(k.usageCount || 0), 0);
+  %>
+
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-[92rem] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-x-3">
-        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center">
-          <span class="font-bold text-xl">C</span>
+        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <span class="text-white font-black text-xl">C</span>
         </div>
-        <span class="font-semibold text-xl tracking-tight">Credity</span>
+        <div>
+          <div class="font-black text-xl tracking-tight leading-none">Credity</div>
+          <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Teacher Workspace</div>
+        </div>
       </div>
-      
-      <div class="flex items-center gap-x-3 text-sm">
-        <div class="px-4 py-1.5 bg-white/5 rounded-3xl flex items-center gap-x-2 text-xs">
-          <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
-          <span><%= user.name %></span>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+          <i class="fa-solid fa-chalkboard-user text-blue-600"></i>
+          <span class="text-sm font-semibold"><%= teacherName %></span>
         </div>
-        <a href="/logout" class="px-5 py-1.5 hover:bg-white/5 transition-colors rounded-3xl border border-white/20 text-xs">Log out</a>
+
+        <button onclick="showTab('assessment'); scrollToWorkspace();"
+                class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-plus"></i>
+          New Assessment
+        </button>
+
+        <a href="/logout" class="px-5 py-2.5 text-sm font-semibold border border-slate-200 rounded-xl hover:bg-slate-50">
+          Logout
+        </a>
       </div>
     </div>
   </nav>
 
-  <div class="max-w-7xl mx-auto px-8 pt-10 pb-20">
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
-      <div>
-        <div class="text-sm text-indigo-400 font-medium tracking-widest">TEACHER ADMIN PORTAL</div>
-        <h1 class="text-4xl md:text-5xl font-semibold tracking-tighter">Hello, <%= user.name.split(' ')[0] %>.</h1>
-      </div>
-      <div class="text-xs text-white/60 bg-white/5 px-4 py-2 rounded-2xl w-fit">Manage credentials • Issue badges • Create tests</div>
-    </div>
+  <main class="max-w-[92rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
-      <div class="glass p-5 rounded-3xl">
-        <div class="text-xs text-white/60">TOTAL BADGES CREATED</div>
-        <div class="text-4xl font-semibold mt-1"><%= badges.length %></div>
-      </div>
-      <div class="glass p-5 rounded-3xl">
-        <div class="text-xs text-white/60">ACTIVE EVENTS</div>
-        <div class="text-4xl font-semibold mt-1"><%= events.length %></div>
-      </div>
-      <div class="glass p-5 rounded-3xl">
-        <div class="text-xs text-white/60">TESTS CREATED</div>
-        <div class="text-4xl font-semibold mt-1"><%= tests.length %></div>
-      </div>
-      <div class="glass p-5 rounded-3xl">
-        <div class="text-xs text-white/60">STUDENTS ENGAGED</div>
-        <div class="text-4xl font-semibold mt-1">128</div>
-      </div>
-    </div>
+    <section class="mb-8">
+      <div class="glass rounded-[2rem] p-6 md:p-10 border border-blue-100 bg-gradient-to-br from-white via-blue-50/70 to-white">
+        <div class="grid xl:grid-cols-12 gap-8 items-center">
+          <div class="xl:col-span-7">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white text-xs font-black tracking-[2px] rounded-xl mb-5">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>TEACHER ACTION CENTER</span>
+            </div>
 
-    <div class="grid lg:grid-cols-12 gap-6">
-      
-      <div class="lg:col-span-7 glass rounded-3xl p-8">
-        <div class="flex items-center justify-between mb-6">
-          <div class="section-header text-lg md:text-xl">Create Badge or Certificate</div>
-          <div class="text-xs px-3 py-1 bg-white/10 rounded-3xl">Modern Studio</div>
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-slate-950 leading-none">
+              Welcome back, <%= firstName %>.
+            </h1>
+
+            <p class="mt-5 text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed">
+              Create tests, attach certificates, generate student access keys, and issue verified badges from one clean teacher dashboard.
+            </p>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+              <button onclick="showTab('assessment'); scrollToWorkspace();"
+                      class="inline-flex items-center justify-center gap-3 px-7 py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-2xl shadow-xl shadow-blue-600/30 transition-all active:scale-[0.98]">
+                <i class="fa-solid fa-file-circle-plus"></i>
+                Create Assessment
+              </button>
+
+              <button onclick="showTab('certificates'); scrollToWorkspace();"
+                      class="inline-flex items-center justify-center gap-3 px-7 py-4 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-800 font-bold rounded-2xl transition-all active:scale-[0.98]">
+                <i class="fa-solid fa-certificate text-blue-600"></i>
+                Design Certificate
+              </button>
+
+              <button onclick="showTab('keys'); scrollToWorkspace();"
+                      class="inline-flex items-center justify-center gap-3 px-7 py-4 bg-white border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 text-slate-800 font-bold rounded-2xl transition-all active:scale-[0.98]">
+                <i class="fa-solid fa-key text-emerald-600"></i>
+                Generate Class Key
+              </button>
+            </div>
+          </div>
+
+          <div class="xl:col-span-5">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="stat-card bg-white rounded-3xl p-5 border border-slate-200">
+                <div class="w-11 h-11 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mb-4">
+                  <i class="fa-solid fa-clipboard-question"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-950"><%= safeTests.length %></div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Assessments</div>
+              </div>
+
+              <div class="stat-card bg-white rounded-3xl p-5 border border-slate-200">
+                <div class="w-11 h-11 bg-violet-100 text-violet-700 rounded-2xl flex items-center justify-center mb-4">
+                  <i class="fa-solid fa-award"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-950"><%= safeBadges.length %></div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Credentials</div>
+              </div>
+
+              <div class="stat-card bg-white rounded-3xl p-5 border border-slate-200">
+                <div class="w-11 h-11 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mb-4">
+                  <i class="fa-solid fa-key"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-950"><%= safeStudentKeys.length %></div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Class Keys</div>
+              </div>
+
+              <div class="stat-card bg-white rounded-3xl p-5 border border-slate-200">
+                <div class="w-11 h-11 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mb-4">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="text-4xl font-black text-slate-950"><%= totalKeyUses %></div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">Student Joins</div>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <form action="/create-badge" method="POST" class="space-y-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <div class="grid lg:grid-cols-3 gap-5">
+        <div class="glass rounded-3xl p-6">
+          <div class="flex items-start justify-between gap-4">
             <div>
-              <label class="block text-xs text-white/60 mb-1.5">TYPE</label>
-              <select name="type" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
-                <option value="badge">Skill Badge</option>
-                <option value="certificate">Certificate</option>
+              <div class="text-xs font-black text-blue-600 uppercase tracking-widest">Step 1</div>
+              <h3 class="text-xl font-black text-slate-950 mt-1">Create a test</h3>
+              <p class="text-sm text-slate-500 mt-2">Add MCQ or written questions using the quick JSON builder.</p>
+            </div>
+            <i class="fa-solid fa-clipboard-list text-3xl text-blue-200"></i>
+          </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs font-black text-violet-600 uppercase tracking-widest">Step 2</div>
+              <h3 class="text-xl font-black text-slate-950 mt-1">Attach a credential</h3>
+              <p class="text-sm text-slate-500 mt-2">Choose a certificate or badge that students earn after passing.</p>
+            </div>
+            <i class="fa-solid fa-certificate text-3xl text-violet-200"></i>
+          </div>
+        </div>
+
+        <div class="glass rounded-3xl p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs font-black text-emerald-600 uppercase tracking-widest">Step 3</div>
+              <h3 class="text-xl font-black text-slate-950 mt-1">Give students a key</h3>
+              <p class="text-sm text-slate-500 mt-2">Generate a class key so only your students can access the test.</p>
+            </div>
+            <i class="fa-solid fa-user-check text-3xl text-emerald-200"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workspace" class="mb-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+        <div>
+          <h2 class="text-3xl font-black tracking-tight text-slate-950">Teacher Studio</h2>
+          <p class="text-slate-500 mt-1">Everything here is for your own classes, assessments, and credentials.</p>
+        </div>
+      </div>
+
+      <div class="flex border-b border-slate-200 mb-8 overflow-x-auto custom-scroll">
+        <button onclick="showTab('assessment')" class="tab-btn tab-active px-6 py-3 border-b-2 whitespace-nowrap" id="tab-assessment">
+          <i class="fa-solid fa-clipboard-question mr-2"></i> Assessment
+        </button>
+        <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap" id="tab-certificates">
+          <i class="fa-solid fa-certificate mr-2"></i> Certificates
+        </button>
+        <button onclick="showTab('badges')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap" id="tab-badges">
+          <i class="fa-solid fa-award mr-2"></i> Badges
+        </button>
+        <button onclick="showTab('keys')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap" id="tab-keys">
+          <i class="fa-solid fa-key mr-2"></i> Student Keys
+        </button>
+        <button onclick="showTab('events')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap" id="tab-events">
+          <i class="fa-solid fa-calendar-star mr-2"></i> Events
+        </button>
+        <button onclick="showTab('overview')" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap" id="tab-overview">
+          <i class="fa-solid fa-layer-group mr-2"></i> My Work
+        </button>
+      </div>
+
+      <div id="assessment-tab" class="tab-content">
+        <div class="grid xl:grid-cols-12 gap-8">
+          <div class="xl:col-span-7 glass rounded-3xl p-6 md:p-8">
+            <div class="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <h3 class="text-2xl font-black text-slate-950">Quick Create Assessment</h3>
+                <p class="text-sm text-slate-500 mt-1">Create a simple test now. You can link a certificate or badge after.</p>
+              </div>
+              <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 items-center justify-center">
+                <i class="fa-solid fa-file-circle-plus text-xl"></i>
+              </div>
+            </div>
+
+            <form action="/create-test" method="POST" class="space-y-5">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Assessment Title</label>
+                <input type="text" name="title" value="Python Fundamentals Final Assessment" class="modern-input w-full text-lg font-bold px-5 py-4 rounded-2xl" required>
+              </div>
+
+              <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Mode</label>
+                  <select name="isOpen" class="modern-input w-full px-4 py-3 rounded-2xl text-sm font-semibold">
+                    <option value="true">Open anytime</option>
+                    <option value="false">Scheduled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Start Time</label>
+                  <input type="datetime-local" name="examStartTime" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">End Time</label>
+                  <input type="datetime-local" name="examEndTime" class="modern-input w-full px-4 py-3 rounded-2xl text-sm">
+                </div>
+              </div>
+
+              <input type="hidden" name="teacherTimezone" value="Asia/Dubai">
+
+              <div>
+                <div class="flex items-center justify-between gap-3 mb-2">
+                  <label class="block text-xs font-black text-slate-400 uppercase tracking-wider">Questions JSON</label>
+                  <button type="button" onclick="insertQuestionTemplate()" class="text-xs font-bold text-blue-600 hover:text-blue-700">
+                    Insert Example
+                  </button>
+                </div>
+
+                <textarea id="questionsBox" name="questions" rows="9" class="modern-input custom-scroll w-full font-mono text-xs p-5 rounded-2xl" required>[{"q":"What is a variable in programming?","type":"mcq","options":["A container for data","A type of loop","A function call","A comment"],"answer":"A container for data","timer":60},{"q":"Explain the difference between == and === in JavaScript.","type":"frq","timer":120}]</textarea>
+              </div>
+
+              <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-600/20">
+                Create Assessment
+              </button>
+            </form>
+          </div>
+
+          <div class="xl:col-span-5 space-y-5">
+            <div class="glass rounded-3xl p-6 md:p-8">
+              <h3 class="text-xl font-black text-slate-950">Best teacher workflow</h3>
+              <div class="mt-5 space-y-4">
+                <div class="flex gap-4">
+                  <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black">1</div>
+                  <div>
+                    <div class="font-black text-slate-900">Create the assessment first</div>
+                    <p class="text-sm text-slate-500">This gives you a test to attach keys and credentials to.</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-black">2</div>
+                  <div>
+                    <div class="font-black text-slate-900">Design a certificate or badge</div>
+                    <p class="text-sm text-slate-500">Select the assessment in the credential designer.</p>
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black">3</div>
+                  <div>
+                    <div class="font-black text-slate-900">Generate class key</div>
+                    <p class="text-sm text-slate-500">Students paste it in their dashboard to unlock the test.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass rounded-3xl p-6 md:p-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <div class="text-xs font-black text-blue-300 uppercase tracking-widest">Teacher Tip</div>
+                  <h3 class="text-2xl font-black mt-2">Use one key per class.</h3>
+                  <p class="text-sm text-slate-300 mt-2">For example, create separate keys for Grade 10A, Grade 10B, and after-school groups.</p>
+                </div>
+                <i class="fa-solid fa-lightbulb text-3xl text-yellow-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="certificates-tab" class="tab-content hidden">
+        <form id="certificateForm" action="/create-credential" method="POST" class="flex flex-col xl:flex-row gap-8">
+          <input type="hidden" name="type" value="certificate">
+          <input type="hidden" name="templateStyle" id="selected-certificate-template" value="tpl-1-degree">
+          <div id="certificate-hidden-logos"></div>
+
+          <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-2xl font-black text-slate-950">Certificate Designer</h3>
+                <p class="text-sm text-slate-500 mt-1">Create a verified certificate that automatically gets a QR verification link.</p>
+              </div>
+              <div class="hidden sm:flex w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 items-center justify-center">
+                <i class="fa-solid fa-certificate text-xl"></i>
+              </div>
+            </div>
+
+            <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+              <label class="text-xs font-black text-blue-800 uppercase tracking-wider block mb-2">Attach to Assessment</label>
+              <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-bold bg-white" required>
+                <option value="">Select assessment...</option>
+                <% safeTests.forEach(t => { %>
+                  <option value="<%= t.id %>"><%= t.title %></option>
+                <% }) %>
               </select>
+              <% if (safeTests.length === 0) { %>
+                <p class="text-xs text-blue-700 mt-2 font-semibold">Create an assessment first, then come back here.</p>
+              <% } %>
             </div>
-            <div>
-              <label class="block text-xs text-white/60 mb-1.5">TITLE</label>
-              <input type="text" name="title" value="Advanced Python Programming" class="form-input w-full rounded-2xl px-4 py-3 text-sm" required>
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-xs text-white/60 mb-1.5">DESCRIPTION</label>
-            <textarea name="description" rows="2" class="form-input w-full rounded-2xl px-4 py-3 text-sm">Completed rigorous training in Python, data structures, and AI fundamentals.</textarea>
-          </div>
-          
-          <div>
-            <label class="block text-xs text-white/60 mb-2">DESIGN STUDIO</label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div class="grid md:grid-cols-3 gap-4 p-4 border border-slate-200 rounded-2xl bg-slate-50">
               <div>
-                <div class="text-[10px] mb-1 text-white/60">PRIMARY COLOR</div>
-                <div class="flex gap-2">
-                  <input type="color" name="designColor" value="#6366f1" class="w-9 h-9 p-0 border border-white/10 rounded-xl cursor-pointer">
-                  <input type="text" value="#6366f1" class="flex-1 form-input text-xs rounded-2xl px-3">
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-2">Preview Student</label>
+                <input type="text" id="cert-student" value="Alex Rivera" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-2">Signature</label>
+                <input type="text" name="signature" id="cert-signature" value="<%= teacherName %>" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-2">Issue Date Preview</label>
+                <input type="date" id="cert-date" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-5">
+              <div>
+                <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Certificate Title</label>
+                <input type="text" name="title" id="cert-title" value="Certificate of Achievement" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-black" required>
+              </div>
+
+              <div>
+                <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Primary Color</label>
+                <input type="color" name="designColor" id="cert-color" value="#1e293b" oninput="updateCert()" class="w-full h-11 p-0 border-0 rounded-xl cursor-pointer">
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Certificate Description</label>
+              <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-24 text-sm" required>has successfully completed the required assessment and demonstrated strong understanding of the subject.</textarea>
+            </div>
+
+            <div>
+              <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-3">Certificate Templates</label>
+              <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x"></div>
+            </div>
+
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+              <div class="flex justify-between items-center mb-4">
+                <label class="text-xs font-black text-slate-400 uppercase tracking-wider">Logo Tools</label>
+                <button type="button" onclick="clearCertificateLogos()" class="text-xs font-bold text-red-500 hover:text-red-600">Clear logos</button>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-2 mb-4">
+                <input type="text" id="custom-logo-input" placeholder="Paste logo URL..." class="modern-input flex-1 px-4 py-2.5 rounded-xl text-sm">
+                <button type="button" onclick="addCustomLogo()" class="px-5 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl">
+                  Add Logo
+                </button>
+              </div>
+
+              <div class="mb-4">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">Active Logos</label>
+                <div id="active-logos-list" class="flex flex-wrap gap-2 bg-white p-3 rounded-xl border border-slate-200 min-h-[46px]"></div>
+              </div>
+
+              <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">Quick Add Tech Logos</label>
+              <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-44 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl"></div>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-lg shadow-lg shadow-blue-600/20">
+              Create Verified Certificate
+            </button>
+          </div>
+
+          <div class="xl:w-2/5 cert-container">
+            <div class="sticky top-24">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-wider">Live Preview</h3>
+                <div class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
+                  QR included
                 </div>
               </div>
-              
-              <div>
-                <div class="text-[10px] mb-1 text-white/60">LOGOS (UP TO 3)</div>
-                <div class="flex gap-2">
-                  <input type="text" name="logoUrl" value="https://via.placeholder.com/60x60/6366f1/fff?text=LOGO" class="flex-1 form-input text-xs rounded-2xl px-3 py-2" placeholder="Logo URL">
-                  <button type="button" onclick="addLogoField(this)" class="px-3 text-xs border border-white/20 rounded-2xl hover:bg-white/5">+</button>
+
+              <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center">
+                <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none"></div>
+
+                <div class="w-full relative z-10 mt-[7%]">
+                  <div class="text-[1.65cqi] tracking-[0.3em] text-slate-500 uppercase mb-[2%] cert-text-color font-bold">
+                    This certifies that
+                  </div>
+                  <div id="preview-student" class="text-[5.1cqi] font-black text-slate-900 leading-none cert-text-color mt-[2%]">
+                    Alex Rivera
+                  </div>
+                </div>
+
+                <div class="px-[7%] my-[5%] relative z-10 w-full flex-grow">
+                  <div id="preview-title" class="cert-title mb-[4%] drop-shadow-sm">
+                    Certificate of Achievement
+                  </div>
+                  <div id="preview-desc" class="text-[1.6cqi] text-slate-600 cert-text-color leading-relaxed">
+                    has successfully completed the required assessment and demonstrated strong understanding of the subject.
+                  </div>
+                </div>
+
+                <div class="w-full flex justify-between items-end mt-auto pt-1 pb-1 relative z-10">
+                  <div class="text-center border-t border-slate-400 pt-2 min-w-[13cqi]">
+                    <div id="preview-signature" class="font-signature text-[3.9cqi] text-slate-800 cert-text-color leading-none mb-0.5">
+                      <%= teacherName %>
+                    </div>
+                    <div class="text-[0.85cqi] text-slate-500 uppercase tracking-widest cert-text-color font-black">
+                      Teacher
+                    </div>
+                  </div>
+
+                  <div class="text-center border-t border-slate-400 pt-2 min-w-[13cqi]">
+                    <div id="preview-date-display" class="text-[1.45cqi] font-black text-slate-800 cert-text-color leading-none mb-1 mt-1">
+                      Date
+                    </div>
+                    <div class="text-[0.85cqi] text-slate-500 uppercase tracking-widest cert-text-color font-black">
+                      Issue Date
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&amp;data=Verify" class="w-[6.6cqi] h-[6.6cqi] mb-0.5 p-0.5 bg-white border border-slate-200 shadow-sm">
+                    <div class="text-[0.82cqi] text-slate-500 uppercase cert-text-color font-black tracking-widest">
+                      Verify
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <p class="text-xs text-slate-500 mt-4 leading-relaxed">
+                Logos are draggable in the preview. The server will save the logo URLs and auto-generate the final QR link when a student earns it.
+              </p>
             </div>
           </div>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-xs text-white/60 mb-1.5">SIGNATURE</label>
-              <input type="text" name="signature" value="<%= user.name %>" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
-            </div>
-            <div>
-              <label class="block text-xs text-white/60 mb-1.5">VERIFICATION</label>
-              <div class="text-emerald-400 text-xs flex items-center gap-x-1.5 bg-white/5 px-3 py-3 rounded-2xl">
-                <i class="fa-solid fa-qrcode"></i> 
-                <span>QR + Link will be auto-generated</span>
-              </div>
-            </div>
-          </div>
-          
-          <button type="submit" class="w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl mt-2 hover:bg-white/90 transition-all">Create &amp; Publish Badge</button>
         </form>
       </div>
 
-      <div class="lg:col-span-5 space-y-6">
-        <div class="glass rounded-3xl p-8">
-          <div class="section-header mb-5 text-lg md:text-xl">Post Special Event</div>
-          <form action="/post-event" method="POST" class="space-y-4">
-            <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="form-input w-full rounded-2xl px-5 py-3 text-sm" required>
-            <textarea name="description" placeholder="Complete 3 skill badges to earn exclusive recognition" class="form-input w-full rounded-2xl px-5 py-3 text-sm h-20"></textarea>
-            
-            <div>
-              <label class="text-xs text-white/60 mb-1 block">ATTACH SPECIAL BADGE (OPTIONAL)</label>
-              <select name="specialBadgeId" class="form-input w-full rounded-2xl px-4 py-3 text-sm">
-                <option value="">None</option>
-                <% badges.forEach(b => { %>
-                  <option value="<%= b.id %>"><%= b.title %></option>
-                <% }) %>
-              </select>
-            </div>
-            
-            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-semibold rounded-3xl hover:opacity-90 transition-opacity">Publish Event</button>
-          </form>
-        </div>
+      <div id="badges-tab" class="tab-content hidden">
+        <form action="/create-credential" method="POST" class="flex flex-col lg:flex-row gap-8">
+          <input type="hidden" name="type" value="badge">
+          <input type="hidden" id="selected-badge-icon" name="badgeIcon" value="fa-shield-halved">
+          <input type="hidden" id="selected-badge-shape" name="badgeShape" value="shape-shield">
 
-        <div class="glass rounded-3xl p-8">
-          <div class="section-header mb-3 text-lg md:text-xl">Generate Student/Class Key</div>
-          <p class="text-xs text-white/50 mb-5">Create categorized entry keys for specific student groups or classes so they can load designated tasks and earn group-specific badges.</p>
-          
-          <form action="/generate-student-key" method="POST" class="space-y-4">
+          <div class="lg:w-1/2 glass p-6 md:p-8 rounded-3xl space-y-6">
             <div>
-              <label class="block text-[10px] text-white/60 mb-1.5">CLASS / GROUP NAME</label>
-              <input type="text" name="className" placeholder="e.g. Fall 2026 - Section A" class="form-input w-full rounded-2xl px-4 py-2.5 text-sm" required>
+              <h3 class="text-2xl font-black text-slate-950">Badge Creator</h3>
+              <p class="text-sm text-slate-500 mt-1">Create a quick skill badge for students who pass an assessment.</p>
             </div>
-            <div>
-              <label class="block text-[10px] text-white/60 mb-1.5">LINK TO TEST / TASK</label>
-              <select name="testId" class="form-input w-full rounded-2xl px-4 py-2.5 text-sm" required>
-                <option value="">Select an assessment...</option>
-                <% tests.forEach(t => { %>
+
+            <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+              <label class="text-xs font-black text-blue-800 uppercase tracking-wider block mb-2">Attach to Assessment</label>
+              <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-bold bg-white" required>
+                <option value="">Select assessment...</option>
+                <% safeTests.forEach(t => { %>
                   <option value="<%= t.id %>"><%= t.title %></option>
                 <% }) %>
               </select>
             </div>
-            <button type="submit" class="w-full py-3 bg-white/10 border border-white/20 hover:bg-white/20 font-medium text-xs rounded-2xl transition-colors">Generate Unique Class Key</button>
-          </form>
-        </div>
-      </div>
 
-      <div class="lg:col-span-12 glass rounded-3xl p-8">
-        <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
-          <div class="section-header text-lg md:text-xl">Create Assessment / Test</div>
-          <span class="text-xs px-4 py-1 rounded-3xl bg-white/10">AI-ready templates</span>
-        </div>
-        
-        <form action="/create-test" method="POST">
-          <div class="mb-5">
-            <input type="text" name="title" value="Python Fundamentals Final Assessment" class="form-input w-full text-lg font-medium px-6 py-4 rounded-3xl" placeholder="Test title" required>
+            <div>
+              <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Badge Title</label>
+              <input type="text" name="title" id="badge-title" value="Certified Learner" oninput="updateBadge()" class="modern-input w-full px-4 py-3 rounded-xl font-bold" required>
+            </div>
+
+            <div>
+              <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Badge Description</label>
+              <textarea name="description" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">Awarded for passing the assessment and demonstrating strong skill understanding.</textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Shape</label>
+                <select id="badge-shape" onchange="updateBadge()" class="modern-input w-full px-4 py-3 rounded-xl">
+                  <option value="shape-shield">Shield</option>
+                  <option value="shape-hexagon">Hexagon</option>
+                  <option value="shape-circle">Circle</option>
+                  <option value="shape-octagon">Octagon</option>
+                  <option value="shape-diamond">Diamond</option>
+                  <option value="shape-star">Star</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Color</label>
+                <input type="color" name="designColor" id="badge-color" value="#0f172a" oninput="updateBadge()" class="w-full h-12 p-0 border-0 rounded-xl cursor-pointer">
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-black text-slate-400 uppercase tracking-wider block mb-3">Icon</label>
+              <div class="grid grid-cols-6 gap-2">
+                <button type="button" onclick="setBadgeIcon('fa-shield-halved')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-shield-halved text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-award')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-award text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-code')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-code text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-bolt text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-brain text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-graduation-cap')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-graduation-cap text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-robot')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-robot text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-chart-line')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-chart-line text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-language')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-language text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-flask')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-flask text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-medal')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-medal text-xl"></i></button>
+                <button type="button" onclick="setBadgeIcon('fa-star')" class="p-3 bg-slate-100 rounded-xl hover:bg-slate-200"><i class="fa-solid fa-star text-xl"></i></button>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-black text-white font-black rounded-xl">
+              Create Verified Badge
+            </button>
           </div>
-          
-          <div class="mb-5">
-            <label class="text-xs tracking-widest text-white/60 block mb-2">QUESTIONS (JSON format for demo)</label>
-            <textarea name="questions" rows="7" class="form-input w-full font-mono text-xs p-5 rounded-3xl custom-scroll" placeholder='[{"q":"What is a variable?","type":"mcq","options":["A container","A function"],"timer":45,"image":"https://picsum.photos/300/150"}]'>[{"q":"What is a variable in programming?","type":"mcq","options":["A container for data","A type of loop","A function call","A comment"],"timer":60},{"q":"Explain the difference between == and === in JavaScript.","type":"frq","timer":120}]</textarea>
-          </div>
-          
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <button type="submit" class="w-full sm:flex-1 py-3.5 bg-white text-zinc-950 font-semibold rounded-3xl">Create Test</button>
-            <button type="button" onclick="previewTest()" class="w-full sm:w-auto px-8 py-3.5 border border-white/30 hover:bg-white/5 rounded-3xl text-sm">Preview</button>
+
+          <div class="lg:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-10 md:p-14 border border-slate-200 shadow-inner overflow-hidden relative">
+            <div class="absolute inset-0" style="background-image: radial-gradient(#d1d5db 1px, transparent 1px); background-size: 24px 24px; opacity: 0.6;"></div>
+
+            <div class="text-center w-full relative z-10 flex flex-col items-center">
+              <div id="preview-badge-text" class="text-[15px] font-black tracking-[3px] uppercase text-slate-900 mb-7 drop-shadow-sm">
+                Certified Learner
+              </div>
+
+              <div class="badge-preview-container relative w-56 h-56 mb-8">
+                <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-2xl flex flex-col justify-center items-center relative" style="background: linear-gradient(145deg, #0f172a, #1e2937);">
+                  <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.9rem] text-white mb-3 drop-shadow-xl z-20"></i>
+                </div>
+              </div>
+
+              <div class="text-xs text-slate-500 font-semibold">
+                Students receive a verification QR after passing.
+              </div>
+            </div>
           </div>
         </form>
       </div>
-      
-    </div>
 
-    <div class="mt-16 grid lg:grid-cols-2 gap-7">
-      <div>
-        <div class="px-1 flex justify-between items-center mb-4">
-          <div class="font-semibold">Badges &amp; Certificates Created</div>
-        </div>
-        <% if (badges.length > 0) { %>
-          <div class="space-y-3 max-h-80 overflow-y-auto custom-scroll pr-1">
-            <% badges.forEach(b => { %>
-              <div class="glass p-4 rounded-3xl flex justify-between items-center text-sm">
-                <div>
-                  <div class="font-medium"><%= b.title %></div>
-                  <div class="text-xs text-white/50"><%= b.type %> • <%= b.createdBy %></div>
-                </div>
-                <div class="flex gap-x-2">
-                  <div class="px-3 py-px text-xs border border-white/20 rounded-2xl flex items-center">QR ready</div>
-                </div>
+      <div id="keys-tab" class="tab-content hidden">
+        <div class="grid xl:grid-cols-12 gap-8">
+          <div class="xl:col-span-5 glass rounded-3xl p-6 md:p-8">
+            <h3 class="text-2xl font-black text-slate-950">Generate Student/Class Key</h3>
+            <p class="text-sm text-slate-500 mt-1 mb-6">Students paste this key on their dashboard to unlock a specific assessment.</p>
+
+            <form action="/generate-student-key" method="POST" class="space-y-5">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Class / Group Name</label>
+                <input type="text" name="className" placeholder="Grade 10A - Python Final" class="modern-input w-full px-4 py-3 rounded-2xl font-semibold" required>
               </div>
-            <% }) %>
-          </div>
-        <% } else { %>
-          <div class="text-xs text-white/60 px-1">No badges created yet. Use the form above.</div>
-        <% } %>
-      </div>
-      
-      <div>
-        <div class="px-1 flex justify-between items-center mb-4">
-          <div class="font-semibold">Tests Created</div>
-        </div>
-        <% if (tests.length > 0) { %>
-          <div class="space-y-3 max-h-80 overflow-y-auto custom-scroll pr-1">
-            <% tests.forEach(t => { %>
-              <div class="glass p-4 rounded-3xl flex justify-between items-center">
-                <div>
-                  <div class="font-medium"><%= t.title %></div>
-                  <div class="text-xs text-white/60"><%= t.questions.length %> questions</div>
-                </div>
-                <div class="text-xs px-3 py-1 rounded-2xl bg-white/10">Ready</div>
+
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Assign Assessment</label>
+                <select name="testId" class="modern-input w-full px-4 py-3 rounded-2xl font-semibold" required>
+                  <option value="">Select assessment...</option>
+                  <% safeTests.forEach(t => { %>
+                    <option value="<%= t.id %>"><%= t.title %></option>
+                  <% }) %>
+                </select>
               </div>
-            <% }) %>
+
+              <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-lg shadow-emerald-600/20">
+                Generate Unique Key
+              </button>
+            </form>
           </div>
-        <% } else { %>
-          <div class="text-xs text-white/60 px-1">No tests yet. Create one above.</div>
-        <% } %>
+
+          <div class="xl:col-span-7 glass rounded-3xl p-6 md:p-8">
+            <div class="flex items-center justify-between gap-4 mb-5">
+              <div>
+                <h3 class="text-2xl font-black text-slate-950">Recent Class Keys</h3>
+                <p class="text-sm text-slate-500 mt-1">Copy and send these to your students.</p>
+              </div>
+            </div>
+
+            <% if (safeStudentKeys.length > 0) { %>
+              <div class="space-y-3 max-h-[30rem] overflow-y-auto custom-scroll pr-1">
+                <% safeStudentKeys.slice().reverse().forEach(k => { %>
+                  <div class="border border-slate-200 bg-white rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-black text-slate-950"><%= k.className %></span>
+                        <span class="text-[10px] font-black px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                          <%= k.active === false ? 'DISABLED' : 'ACTIVE' %>
+                        </span>
+                      </div>
+                      <div class="text-xs text-slate-500 mt-1">
+                        Assessment: <span class="font-semibold"><%= k.testTitle %></span> • Joined: <%= k.usageCount || 0 %>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <code class="px-3 py-2 bg-slate-100 text-slate-900 rounded-xl text-xs font-black tracking-wider"><%= k.key %></code>
+                      <button type="button" onclick="copyText('<%= k.key %>')" class="px-3 py-2 bg-slate-900 text-white rounded-xl text-xs font-black">
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="p-10 rounded-2xl border border-dashed border-slate-300 text-center">
+                <i class="fa-solid fa-key text-4xl text-slate-300 mb-4"></i>
+                <div class="font-black text-slate-900">No keys generated yet</div>
+                <p class="text-sm text-slate-500 mt-1">Create an assessment, then generate a class key for students.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <div id="events-tab" class="tab-content hidden">
+        <div class="grid xl:grid-cols-12 gap-8">
+          <div class="xl:col-span-5 glass rounded-3xl p-6 md:p-8">
+            <h3 class="text-2xl font-black text-slate-950">Post Special Event</h3>
+            <p class="text-sm text-slate-500 mt-1 mb-6">Show announcements, skill challenges, or badge events on student dashboards.</p>
+
+            <form action="/post-event" method="POST" class="space-y-5">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Event Title</label>
+                <input type="text" name="title" placeholder="Winter Skill Challenge 2026" class="modern-input w-full px-4 py-3 rounded-2xl font-semibold" required>
+              </div>
+
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Description</label>
+                <textarea name="description" placeholder="Complete 3 skill badges to earn exclusive recognition." class="modern-input w-full px-4 py-3 rounded-2xl h-24 text-sm"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Attach Special Badge Optional</label>
+                <select name="specialBadgeId" class="modern-input w-full px-4 py-3 rounded-2xl font-semibold">
+                  <option value="">No badge attached</option>
+                  <% safeBadges.forEach(b => { %>
+                    <option value="<%= b.id || b.templateId %>"><%= b.title %></option>
+                  <% }) %>
+                </select>
+              </div>
+
+              <button type="submit" class="w-full py-4 bg-violet-600 hover:bg-violet-700 text-white font-black rounded-2xl shadow-lg shadow-violet-600/20">
+                Publish Event
+              </button>
+            </form>
+          </div>
+
+          <div class="xl:col-span-7 glass rounded-3xl p-6 md:p-8">
+            <h3 class="text-2xl font-black text-slate-950 mb-5">Published Events</h3>
+
+            <% if (safeEvents.length > 0) { %>
+              <div class="space-y-3 max-h-[30rem] overflow-y-auto custom-scroll pr-1">
+                <% safeEvents.slice().reverse().forEach(e => { %>
+                  <div class="bg-white border border-slate-200 rounded-2xl p-5">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <div class="font-black text-slate-950"><%= e.title %></div>
+                        <p class="text-sm text-slate-500 mt-1"><%= e.description || 'No description.' %></p>
+                        <div class="text-xs text-slate-400 mt-3">
+                          <i class="fa-regular fa-calendar mr-1"></i>
+                          <%= e.date || e.createdAt || 'Recently' %>
+                        </div>
+                      </div>
+
+                      <% if (e.specialBadgeId) { %>
+                        <span class="text-[10px] font-black px-3 py-1 rounded-full bg-amber-100 text-amber-700 whitespace-nowrap">
+                          SPECIAL BADGE
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="p-10 rounded-2xl border border-dashed border-slate-300 text-center">
+                <i class="fa-regular fa-calendar text-4xl text-slate-300 mb-4"></i>
+                <div class="font-black text-slate-900">No events yet</div>
+                <p class="text-sm text-slate-500 mt-1">Post a student challenge or announcement.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <div id="overview-tab" class="tab-content hidden">
+        <div class="grid lg:grid-cols-2 gap-8">
+          <div class="glass rounded-3xl p-6 md:p-8">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-2xl font-black text-slate-950">My Credentials</h3>
+              <span class="text-xs font-black text-slate-500 bg-slate-100 px-3 py-1 rounded-full"><%= safeBadges.length %> total</span>
+            </div>
+
+            <% if (safeBadges.length > 0) { %>
+              <div class="space-y-3 max-h-96 overflow-y-auto custom-scroll pr-1">
+                <% safeBadges.slice().reverse().forEach(b => { %>
+                  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+                    <div>
+                      <div class="font-black text-slate-950"><%= b.title %></div>
+                      <div class="text-xs text-slate-500 mt-1">
+                        <%= b.type || 'credential' %> • <%= b.createdBy || teacherName %>
+                      </div>
+                    </div>
+                    <div class="text-xs font-black px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">
+                      QR READY
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="p-10 rounded-2xl border border-dashed border-slate-300 text-center">
+                <i class="fa-solid fa-award text-4xl text-slate-300 mb-4"></i>
+                <div class="font-black text-slate-900">No credentials yet</div>
+                <p class="text-sm text-slate-500 mt-1">Create a certificate or badge from the studio.</p>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="glass rounded-3xl p-6 md:p-8">
+            <div class="flex items-center justify-between mb-5">
+              <h3 class="text-2xl font-black text-slate-950">My Assessments</h3>
+              <span class="text-xs font-black text-slate-500 bg-slate-100 px-3 py-1 rounded-full"><%= safeTests.length %> total</span>
+            </div>
+
+            <% if (safeTests.length > 0) { %>
+              <div class="space-y-3 max-h-96 overflow-y-auto custom-scroll pr-1">
+                <% safeTests.slice().reverse().forEach(t => { %>
+                  <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+                    <div>
+                      <div class="font-black text-slate-950"><%= t.title %></div>
+                      <div class="text-xs text-slate-500 mt-1">
+                        <%= t.questions ? t.questions.length : 0 %> questions • <%= t.requiresKey ? 'Key required' : 'Open' %>
+                      </div>
+                    </div>
+                    <a href="/take-test/<%= t.id %>" class="text-xs font-black px-3 py-2 rounded-xl bg-slate-900 text-white">
+                      Preview
+                    </a>
+                  </div>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="p-10 rounded-2xl border border-dashed border-slate-300 text-center">
+                <i class="fa-solid fa-clipboard-question text-4xl text-slate-300 mb-4"></i>
+                <div class="font-black text-slate-900">No assessments yet</div>
+                <p class="text-sm text-slate-500 mt-1">Create your first test from the Assessment tab.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    function addLogoField(btn) {
-      const container = btn.parentElement;
-      const newInput = document.createElement('input');
-      newInput.type = 'text';
-      newInput.name = 'logoUrl';
-      newInput.placeholder = 'Additional logo URL';
-      newInput.className = 'flex-1 form-input text-xs rounded-2xl px-3 py-2 mt-2';
-      container.appendChild(newInput);
+    const templates = [
+      { id: '1-degree', name: "Classic Degree" },
+      { id: '2-university', name: "University Seal" },
+      { id: '3-corporate', name: "Corporate" },
+      { id: '4-tech', name: "Tech Grid" },
+      { id: '5-scholar', name: "Gold Scholar" },
+      { id: '6-minimal', name: "Minimal" },
+      { id: '7-executive', name: "Executive" },
+      { id: '8-dark', name: "Dark Pro" },
+      { id: '9-honors', name: "Honors" },
+      { id: '10-cyber', name: "Cyber" },
+      { id: '11-startup', name: "Startup" },
+      { id: '12-medical', name: "Medical" }
+    ];
+
+    const presetLogos = [
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg',
+      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg'
+    ];
+
+    let currentTemplate = 'tpl-1-degree';
+    let activeLogos = [];
+
+    function initTeacherDashboard() {
+      const dateInput = document.getElementById('cert-date');
+      if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+      renderTemplateButtons();
+      renderLogoButtons();
+      updateCert();
+      updateBadge();
     }
-    
-    function previewTest() {
-      alert('Preview mode: In a real app this would open a live test preview modal with timer, MCQ and FRQ.');
+
+    function scrollToWorkspace() {
+      document.getElementById('workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tab + '-tab').classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('tab-active');
+        el.classList.add('text-slate-500', 'border-transparent');
+      });
+
+      const activeBtn = document.getElementById('tab-' + tab);
+      activeBtn.classList.add('tab-active');
+      activeBtn.classList.remove('text-slate-500', 'border-transparent');
+    }
+
+    function renderTemplateButtons() {
+      const templateGrid = document.getElementById('template-grid');
+      if (!templateGrid) return;
+
+      templateGrid.innerHTML = '';
+
+      templates.forEach(t => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-bold hover:border-blue-500 hover:bg-blue-50 transition-all';
+        btn.innerText = t.name;
+        btn.onclick = () => setTemplate(t.id, btn);
+        templateGrid.appendChild(btn);
+      });
+
+      if (templateGrid.firstChild) {
+        templateGrid.firstChild.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+      }
+    }
+
+    function renderLogoButtons() {
+      const logoGrid = document.getElementById('logo-grid');
+      if (!logoGrid) return;
+
+      logoGrid.innerHTML = '';
+
+      presetLogos.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-10 h-10 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain';
+        img.onclick = () => addLogoToDoc(url);
+        logoGrid.appendChild(img);
+      });
+    }
+
+    function setTemplate(id, clickedBtn) {
+      const preview = document.getElementById('cert-preview');
+      if (!preview) return;
+
+      preview.classList.remove(currentTemplate);
+      currentTemplate = `tpl-${id}`;
+      preview.classList.add(currentTemplate);
+
+      const hidden = document.getElementById('selected-certificate-template');
+      if (hidden) hidden.value = currentTemplate;
+
+      document.querySelectorAll('#template-grid button').forEach(btn => {
+        btn.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700');
+      });
+
+      if (clickedBtn) {
+        clickedBtn.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700');
+      }
+
+      updateCert();
+    }
+
+    function updateCert() {
+      const title = document.getElementById('cert-title')?.value || 'Certificate of Achievement';
+      const desc = document.getElementById('cert-desc')?.value || '';
+      const color = document.getElementById('cert-color')?.value || '#1e293b';
+      const student = document.getElementById('cert-student')?.value || '[Student Name]';
+      const signature = document.getElementById('cert-signature')?.value || 'Authorized Signature';
+      const dateVal = document.getElementById('cert-date')?.value;
+
+      const preview = document.getElementById('cert-preview');
+      if (preview) {
+        preview.style.borderColor = color;
+        preview.style.outlineColor = color;
+      }
+
+      const titleEl = document.getElementById('preview-title');
+      const descEl = document.getElementById('preview-desc');
+      const studentEl = document.getElementById('preview-student');
+      const sigEl = document.getElementById('preview-signature');
+      const dateEl = document.getElementById('preview-date-display');
+
+      if (titleEl) titleEl.innerText = title;
+      if (descEl) descEl.innerText = desc;
+      if (studentEl) studentEl.innerText = student;
+      if (sigEl) sigEl.innerText = signature;
+      if (dateEl && dateVal) dateEl.innerText = new Date(dateVal).toLocaleDateString();
+    }
+
+    function addCustomLogo() {
+      const input = document.getElementById('custom-logo-input');
+      const url = input.value.trim();
+
+      if (!url) return;
+
+      addLogoToDoc(url);
+      input.value = '';
+    }
+
+    function addLogoToDoc(url) {
+      if (activeLogos.length >= 3) {
+        alert('You can add up to 3 logos.');
+        return;
+      }
+
+      const boundary = document.getElementById('drag-boundary');
+      if (!boundary) return;
+
+      const id = 'logo_' + Date.now();
+
+      const wrapper = document.createElement('div');
+      wrapper.id = id;
+      wrapper.className = 'draggable-logo';
+      wrapper.style.left = (8 + activeLogos.length * 10) + '%';
+      wrapper.style.top = '8%';
+
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Certificate logo';
+
+      img.onload = () => {
+        wrapper.appendChild(img);
+        boundary.appendChild(wrapper);
+        makeDraggable(wrapper);
+
+        activeLogos.push({ id, url });
+        renderActiveLogosList();
+        syncHiddenLogos();
+      };
+
+      img.onerror = () => {
+        alert('Logo could not load. Try a direct image URL ending in .png, .jpg, .svg, or .webp.');
+      };
+    }
+
+    function removeLogo(id) {
+      activeLogos = activeLogos.filter(l => l.id !== id);
+      const el = document.getElementById(id);
+      if (el) el.remove();
+
+      renderActiveLogosList();
+      syncHiddenLogos();
+    }
+
+    function clearCertificateLogos() {
+      activeLogos.forEach(l => {
+        const el = document.getElementById(l.id);
+        if (el) el.remove();
+      });
+
+      activeLogos = [];
+      renderActiveLogosList();
+      syncHiddenLogos();
+    }
+
+    function renderActiveLogosList() {
+      const list = document.getElementById('active-logos-list');
+      if (!list) return;
+
+      list.innerHTML = '';
+
+      if (activeLogos.length === 0) {
+        list.innerHTML = '<span class="text-xs text-slate-400 font-semibold">No logos added yet.</span>';
+        return;
+      }
+
+      activeLogos.forEach((logo, index) => {
+        const badge = document.createElement('div');
+        badge.className = 'flex items-center gap-2 bg-slate-100 pl-2 pr-1 py-1 rounded-lg text-xs font-bold border border-slate-200';
+
+        badge.innerHTML = `
+          <img src="${logo.url}" class="w-4 h-4 object-contain" alt="">
+          <span>Logo ${index + 1}</span>
+          <button type="button" onclick="removeLogo('${logo.id}')" class="text-red-500 hover:text-red-600 px-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+
+        list.appendChild(badge);
+      });
+    }
+
+    function syncHiddenLogos() {
+      const holder = document.getElementById('certificate-hidden-logos');
+      if (!holder) return;
+
+      holder.innerHTML = '';
+
+      activeLogos.forEach(logo => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'logoUrl';
+        input.value = logo.url;
+        holder.appendChild(input);
+      });
+    }
+
+    function makeDraggable(elmnt) {
+      let startX = 0;
+      let startY = 0;
+      let startLeft = 0;
+      let startTop = 0;
+
+      elmnt.addEventListener('pointerdown', dragStart);
+
+      function dragStart(e) {
+        e.preventDefault();
+
+        const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
+        const rect = elmnt.getBoundingClientRect();
+
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = ((rect.left - boundary.left) / boundary.width) * 100;
+        startTop = ((rect.top - boundary.top) / boundary.height) * 100;
+
+        elmnt.setPointerCapture(e.pointerId);
+        elmnt.addEventListener('pointermove', dragMove);
+        elmnt.addEventListener('pointerup', dragEnd);
+        elmnt.addEventListener('pointercancel', dragEnd);
+      }
+
+      function dragMove(e) {
+        const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
+
+        const deltaX = ((e.clientX - startX) / boundary.width) * 100;
+        const deltaY = ((e.clientY - startY) / boundary.height) * 100;
+
+        const newLeft = Math.max(0, Math.min(startLeft + deltaX, 92));
+        const newTop = Math.max(0, Math.min(startTop + deltaY, 92));
+
+        elmnt.style.left = newLeft + '%';
+        elmnt.style.top = newTop + '%';
+      }
+
+      function dragEnd(e) {
+        elmnt.releasePointerCapture(e.pointerId);
+        elmnt.removeEventListener('pointermove', dragMove);
+        elmnt.removeEventListener('pointerup', dragEnd);
+        elmnt.removeEventListener('pointercancel', dragEnd);
+      }
+    }
+
+    function setBadgeIcon(iconClass) {
+      const hidden = document.getElementById('selected-badge-icon');
+      const previewIcon = document.getElementById('preview-badge-icon');
+
+      if (hidden) hidden.value = iconClass;
+      if (previewIcon) {
+        previewIcon.className = `fa-solid ${iconClass} text-[3.9rem] text-white mb-3 drop-shadow-xl z-20`;
+      }
+    }
+
+    function updateBadge() {
+      const title = document.getElementById('badge-title')?.value || 'Badge Title';
+      const shape = document.getElementById('badge-shape')?.value || 'shape-shield';
+      const color = document.getElementById('badge-color')?.value || '#0f172a';
+
+      const titlePreview = document.getElementById('preview-badge-text');
+      const base = document.getElementById('preview-badge-base');
+      const hiddenShape = document.getElementById('selected-badge-shape');
+
+      if (titlePreview) titlePreview.innerText = title;
+      if (hiddenShape) hiddenShape.value = shape;
+
+      if (base) {
+        base.className = `badge-base ${shape} w-full h-full shadow-2xl flex flex-col justify-center items-center relative`;
+        base.style.background = `linear-gradient(145deg, ${color}, #0f172a)`;
+      }
+    }
+
+    function insertQuestionTemplate() {
+      const box = document.getElementById('questionsBox');
+      if (!box) return;
+
+      box.value = JSON.stringify([
+        {
+          q: 'What is a variable in programming?',
+          type: 'mcq',
+          options: ['A container for data', 'A type of loop', 'A function call', 'A comment'],
+          answer: 'A container for data',
+          timer: 60
+        },
+        {
+          q: 'Explain the difference between == and === in JavaScript.',
+          type: 'frq',
+          timer: 120
+        },
+        {
+          q: 'Which keyword declares a constant in JavaScript?',
+          type: 'mcq',
+          options: ['var', 'let', 'const', 'static'],
+          answer: 'const',
+          timer: 45
+        }
+      ], null, 2);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        alert('Copied: ' + text);
+      } catch (err) {
+        prompt('Copy this key:', text);
+      }
+    }
+
+    window.addEventListener('load', initTeacherDashboard);
   </script>
 </body>
 </html>
