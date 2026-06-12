@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Take Assessment • Credity.ink</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body { font-family: 'Inter', system_ui, sans-serif; }</style>
+</head>
+<body class="bg-zinc-950 text-white">
+  <div class="max-w-3xl mx-auto px-6 pt-10">
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <div class="text-xs text-emerald-400 tracking-widest">STUDENT ASSESSMENT</div>
+        <h1 class="text-3xl font-semibold"><%= test.title %></h1>
+      </div>
+      <a href="/student-dashboard" class="text-xs px-4 py-2 border border-white/30 rounded-3xl">Exit test</a>
+    </div>
+    
+    <div class="glass p-8 rounded-3xl">
+      <% test.questions.forEach((q, i) => { %>
+        <div class="mb-8 pb-8 border-b border-white/10 last:border-none last:mb-0 last:pb-0">
+          <div class="flex gap-x-4">
+            <div class="font-mono text-xs text-white/60 pt-0.5 w-5"><%= i+1 %>.</div>
+            <div class="flex-1">
+              <div class="font-medium mb-4"><%= q.q %></div>
+              
+              <% if (q.image) { %>
+                <img src="<%= q.image %>" class="rounded-2xl mb-4 max-h-48">
+              <% } %>
+              
+              <% if (q.type === 'mcq') { %>
+                <div class="space-y-2">
+                  <% q.options.forEach(opt => { %>
+                    <label class="flex items-center gap-x-3 px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 cursor-pointer rounded-2xl text-sm">
+                      <input type="radio" name="q<%= i %>" class="accent-indigo-500"> 
+                      <span><%= opt %></span>
+                    </label>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <textarea class="w-full form-input rounded-2xl p-5 text-sm h-28" placeholder="Write your answer here..."></textarea>
+              <% } %>
+              
+              <% if (q.timer) { %>
+                <div class="text-xs text-amber-400 mt-3 flex items-center gap-x-1">
+                  <i class="fa-regular fa-clock"></i> 
+                  <span>Time limit: <%= q.timer %> seconds per question</span>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+      
+      <div class="pt-4">
+        <button onclick="submitTest()" class="w-full py-4 bg-white text-zinc-950 font-semibold rounded-3xl">Submit for Marking</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function submitTest() {
+      alert('Test submitted successfully! Your teacher will review shortly. (Demo)');
+      window.location.href = '/student-dashboard';
+    }
+  </script>
+</body>
+</html>
