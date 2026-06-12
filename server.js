@@ -149,7 +149,7 @@ app.get('/admin', (req, res) => {
 });
 
 // ==================== ENHANCED TEST CREATION ====================
-app.post('/create-test', (req, res) => {
+app.post('/assessment', (req, res) => {
   if (!req.session.user || req.session.user.role !== 'teacher') return res.redirect('/');
 
   let questions = [];
