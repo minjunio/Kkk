@@ -7,9 +7,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&family=Space+Grotesk:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&family=Cinzel:wght@600;700&family=Montserrat:wght@400;600&display=swap');
     
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
     .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .modern-input { background: #f8fafc; border: 1px solid #e2e8f0; transition: all 0.2s; }
     .modern-input:focus { border-color: #3b82f6; background: white; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
@@ -17,45 +17,57 @@
     .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     
+    /* Draggable Logo */
+    #draggable-logo {
+      position: absolute;
+      top: 6%; left: 6%;
+      cursor: grab;
+      z-index: 50;
+      transition: transform 0.1s;
+    }
+    #draggable-logo:active { cursor: grabbing; transform: scale(1.05); }
+
     /* Certificate Core */
-    .cert-container { container-type: inline-size; }
+    .cert-container { container-type: inline-size; perspective: 1000px; }
     .certificate-preview {
       background: white;
-      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.2);
       transition: all 0.4s ease;
       position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
     }
 
-    /* 20 Unique Templates */
-    .tpl-classic { font-family: 'Playfair Display', serif; border: 16px solid; background: #fff; }
-    .tpl-modern { font-family: 'Inter', sans-serif; border-left: 32px solid; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); }
-    .tpl-geometric { font-family: 'Space Grotesk', sans-serif; border: 4px solid; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #f8fafc 10px, #f8fafc 20px); }
-    .tpl-corporate { font-family: 'Inter', sans-serif; border-top: 24px solid; border-bottom: 24px solid; background: #ffffff; }
-    .tpl-elegant { font-family: 'Playfair Display', serif; border: 2px solid; padding: 6% !important; outline: 8px solid; outline-offset: -16px; background: #fffaf0; }
-    .tpl-dark { font-family: 'Space Grotesk', sans-serif; border: 8px solid; background: #0f172a; color: #f8fafc !important; }
-    .tpl-minimal { font-family: 'Inter', sans-serif; border: 1px solid #e2e8f0; background: #ffffff; }
-    .tpl-cyber { font-family: 'Space Grotesk', sans-serif; border: 2px solid; box-shadow: inset 0 0 20px currentColor; background: #000; color: #0f0 !important; }
-    .tpl-ocean { font-family: 'Inter', sans-serif; border-bottom: 40px solid; background: linear-gradient(to top, #e0f2fe, #ffffff); }
-    .tpl-sunset { font-family: 'Playfair Display', serif; border-top: 16px solid; background: linear-gradient(to bottom, #ffedd5, #ffffff); }
-    .tpl-nature { font-family: 'Inter', sans-serif; border-left: 16px solid; border-right: 16px solid; background: #f0fdf4; }
-    .tpl-vintage { font-family: 'Playfair Display', serif; border: 12px double; background: #fef3c7; }
-    .tpl-neon { font-family: 'Space Grotesk', sans-serif; border: 4px solid; border-radius: 20px; background: #171717; color: #fff !important; }
-    .tpl-ruby { font-family: 'Playfair Display', serif; border: 20px solid #9f1239; background: #fff1f2; }
-    .tpl-emerald { font-family: 'Inter', sans-serif; border-left: 40px solid #065f46; background: #ffffff; }
-    .tpl-gold { font-family: 'Playfair Display', serif; border: 8px solid #b45309; outline: 2px solid #b45309; outline-offset: -6px; background: linear-gradient(135deg, #fffbeb, #fef3c7); }
-    .tpl-startup { font-family: 'Space Grotesk', sans-serif; border-radius: 30px; border: 4px solid; background: #ffffff; }
-    .tpl-abstract { font-family: 'Inter', sans-serif; border-right: 50px solid; background: #f8fafc; clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%); }
-    .tpl-academic { font-family: 'Playfair Display', serif; border: 24px solid; background: radial-gradient(circle, #ffffff 60%, #f1f5f9 100%); }
-    .tpl-tech { font-family: 'Space Grotesk', sans-serif; border-bottom: 8px solid; background: #f8fafc; background-image: radial-gradient(currentColor 1px, transparent 1px); background-size: 20px 20px; }
-
-    /* Custom Dropdown Animation */
-    .dropdown-menu { transform-origin: top right; transition: all 0.2s ease; }
-    .dropdown-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
-    .dropdown-visible { opacity: 1; transform: scale(1); pointer-events: auto; }
+    /* =========================================================
+       20 HIGHLY DETAILED & DISTINCT TEMPLATES
+       ========================================================= */
+    .tpl-1-classic { font-family: 'Playfair Display', serif; border: 16px double; outline: 4px solid; outline-offset: -24px; background: #fffcf8; }
+    .tpl-2-modern { font-family: 'Montserrat', sans-serif; border-left: 40px solid; border-bottom: 8px solid; background: linear-gradient(135deg, #ffffff 60%, #f1f5f9 100%); }
+    .tpl-3-tech { font-family: 'Space Grotesk', sans-serif; border: 2px solid; background: #ffffff; background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 20px 20px; box-shadow: inset 0 0 0 10px rgba(0,0,0,0.02); }
+    .tpl-4-university { font-family: 'Cinzel', serif; border: 30px solid; background: #fff; position: relative; }
+    .tpl-4-university::before { content:''; position:absolute; inset: 10px; border: 2px dashed rgba(0,0,0,0.2); pointer-events: none; }
+    .tpl-5-corporate { font-family: 'Inter', sans-serif; border-top: 50px solid; background: #ffffff; }
+    .tpl-6-dark-ai { font-family: 'Space Grotesk', sans-serif; border: 4px solid; background: radial-gradient(circle at 50% 0%, #1e293b, #0f172a); color: #f8fafc !important; }
+    .tpl-7-elegant-gold { font-family: 'Playfair Display', serif; border: 12px solid #b45309; background: linear-gradient(135deg, #fffbeb, #fef3c7); position: relative; }
+    .tpl-7-elegant-gold::after { content:''; position:absolute; inset: 5px; border: 1px solid #b45309; pointer-events: none; }
+    .tpl-8-minimalist { font-family: 'Montserrat', sans-serif; border: 1px solid #cbd5e1; background: #ffffff; }
+    .tpl-9-cyberpunk { font-family: 'Space Grotesk', sans-serif; border-right: 20px solid; border-left: 20px solid; background: #000000; color: #00ff00 !important; }
+    .tpl-10-ocean-wave { font-family: 'Inter', sans-serif; border-bottom: 40px solid; background: linear-gradient(to top, #e0f2fe 0%, #ffffff 50%); }
+    .tpl-11-art-deco { font-family: 'Cinzel', serif; border: 8px solid; background: #fafaf9; outline: 2px solid; outline-offset: -12px; }
+    .tpl-12-startup { font-family: 'Montserrat', sans-serif; border-radius: 40px; border: 6px solid; background: #ffffff; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+    .tpl-13-certificate-ruby { font-family: 'Playfair Display', serif; border: 24px solid #9f1239; background: #fff1f2; }
+    .tpl-14-geometric { font-family: 'Space Grotesk', sans-serif; border: 8px solid; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #f8fafc 10px, #f8fafc 20px); }
+    .tpl-15-nature-eco { font-family: 'Inter', sans-serif; border-left: 20px solid #166534; border-top: 20px solid #166534; background: #f0fdf4; }
+    .tpl-16-vintage { font-family: 'Playfair Display', serif; border: 16px groove; background: #fef3c7; }
+    .tpl-17-executive { font-family: 'Montserrat', sans-serif; border-right: 60px solid; background: #f8fafc; clip-path: polygon(0 0, 100% 0, 97% 100%, 0% 100%); }
+    .tpl-18-neon { font-family: 'Space Grotesk', sans-serif; border: 2px solid; border-radius: 20px; background: #171717; color: #fff !important; box-shadow: inset 0 0 30px currentColor; }
+    .tpl-19-scholastic { font-family: 'Cinzel', serif; border-top: 15px solid; border-bottom: 15px solid; background: radial-gradient(ellipse at center, #ffffff 60%, #f1f5f9 100%); }
+    .tpl-20-future { font-family: 'Space Grotesk', sans-serif; border: none; background: #ffffff; box-shadow: inset 0 0 0 4px currentColor, inset 0 0 0 8px #fff, inset 0 0 0 10px currentColor; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
+  <!-- Navigation -->
   <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-[90rem] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-x-3">
@@ -76,36 +88,37 @@
   <div class="max-w-[90rem] mx-auto px-4 sm:px-6 pt-8 pb-20">
     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight text-slate-900">Platform Management</h1>
-        <p class="text-slate-500 mt-1">Design credentials, manage users, and oversee assessments.</p>
+        <h1 class="text-3xl font-bold tracking-tight text-slate-900">Credential Architecture</h1>
+        <p class="text-slate-500 mt-1">Design highly secure, verifiable certificates and badges.</p>
       </div>
-      <a href="/make-test" class="sm:hidden flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors">
-        <i class="fa-solid fa-plus"></i> Create Assessment
-      </a>
     </div>
 
+    <!-- Tabs -->
     <div class="flex border-b border-slate-200 mb-8 overflow-x-auto custom-scroll">
       <button onclick="showTab('certificates')" class="tab-btn px-6 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap" id="tab-certificates">Certificate Editor</button>
       <button onclick="showTab('badges')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-badges">Badge Editor</button>
       <button onclick="showTab('overview')" class="tab-btn px-6 py-3 font-medium text-slate-500 hover:text-slate-700 whitespace-nowrap" id="tab-overview">System Overview</button>
     </div>
 
+    <!-- ================= CERTIFICATE EDITOR ================= -->
     <div id="certificates-tab" class="tab-content">
       <form action="/create-credential" method="POST" class="flex flex-col xl:flex-row gap-8">
         <input type="hidden" name="type" value="certificate">
         <input type="hidden" id="selected-cert-logo" name="logoUrl" value="">
-        <input type="hidden" id="selected-logo-pos" name="logoPosition" value="top-right">
         
+        <!-- Controls -->
         <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-8">
           
           <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
             <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment</label>
             <select name="assessmentId" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium border-blue-200 bg-white" required>
-              <option value="">-- Select an Assessment to attach this to --</option>
+              <option value="">-- Attach to Assessment --</option>
               <% if (typeof tests !== 'undefined') { %>
                 <% tests.forEach(t => { %>
                   <option value="<%= t.id %>"><%= t.title %></option>
                 <% }) %>
+              <% } else { %>
+                <option value="1">Introduction to AI (Demo)</option>
               <% } %>
             </select>
           </div>
@@ -113,78 +126,84 @@
           <div class="grid md:grid-cols-2 gap-5">
             <div>
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Title</label>
-              <input type="text" name="title" id="cert-title" value="Certificate of Excellence" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium">
+              <input type="text" name="title" id="cert-title" value="Certificate of Distinction" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-medium">
             </div>
             <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Theme Color</label>
-              <input type="color" name="designColor" id="cert-color" value="#1e40af" oninput="updateCert()" class="w-full h-11 p-0 border-0 rounded-xl cursor-pointer">
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Primary Color</label>
+              <input type="color" name="designColor" id="cert-color" value="#0f172a" oninput="updateCert()" class="w-full h-11 p-0 border-0 rounded-xl cursor-pointer">
             </div>
           </div>
 
           <div>
             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Description</label>
-            <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has successfully completed the required assessment with outstanding distinction and merit.</textarea>
+            <textarea name="description" id="cert-desc" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl h-20 text-sm">has demonstrated exceptional proficiency and has successfully completed all requirements.</textarea>
           </div>
 
+          <!-- Templates (20) -->
           <div>
-            <div class="flex justify-between items-end mb-3">
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Style Template (20)</label>
-            </div>
+            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Master Templates (20)</label>
             <div id="template-grid" class="flex gap-2 overflow-x-auto pb-4 custom-scroll snap-x">
-              </div>
+              <!-- JS Injected -->
+            </div>
           </div>
 
+          <!-- Logos (70) -->
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-4">
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Professional Logo</label>
-              
-              <div class="relative">
-                <button type="button" onclick="toggleDropdown()" class="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-xl text-sm font-medium hover:border-blue-500 focus:outline-none">
-                  <span id="dropdown-label">Top Right</span>
-                  <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
-                </button>
-                <div id="pos-dropdown" class="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl dropdown-hidden z-50 overflow-hidden">
-                  <div onclick="setLogoPos('top-left', 'Top Left')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Top Left</div>
-                  <div onclick="setLogoPos('top-right', 'Top Right')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Top Right</div>
-                  <div onclick="setLogoPos('bottom-left', 'Bottom Left')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-100">Bottom Left</div>
-                  <div onclick="setLogoPos('bottom-right', 'Bottom Right')" class="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer">Bottom Right</div>
-                </div>
-              </div>
-
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Select Organization Logo</label>
+              <span class="text-xs text-blue-600 font-semibold bg-blue-100 px-2 py-1 rounded-md">70 Available</span>
             </div>
-            
+            <p class="text-xs text-slate-500 mb-3"><i class="fa-solid fa-arrows-up-down-left-right"></i> Note: You can drag and drop the logo directly on the certificate preview.</p>
             <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-48 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl">
-              </div>
+              <!-- JS Injected -->
+            </div>
           </div>
 
-          <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-lg shadow-lg transition-all hover:-translate-y-0.5">Issue Credential Template</button>
+          <button type="submit" class="w-full py-4 bg-slate-900 hover:bg-black text-white font-semibold rounded-xl text-lg shadow-lg transition-all hover:-translate-y-0.5">Generate Secure Credential</button>
         </div>
 
+        <!-- Live Preview -->
         <div class="xl:w-2/5 cert-container">
           <div class="sticky top-24">
-            <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Live Preview</h3>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-sm font-bold text-slate-400 uppercase">Live Preview</h3>
+              <span class="text-[10px] uppercase tracking-widest text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Anti-Forge Active</span>
+            </div>
             
-            <div id="cert-preview" class="certificate-preview tpl-classic w-full aspect-[1.414] p-[5%] flex flex-col justify-center items-center text-center" style="border-color: #1e40af;">
+            <div id="cert-preview" class="certificate-preview tpl-1-classic w-full aspect-[1.414] p-[5%] flex flex-col justify-center items-center text-center" style="border-color: #0f172a; outline-color: #0f172a;">
               
-              <img id="preview-logo" src="" class="absolute hidden object-contain w-[10cqi] h-[10cqi]">
+              <!-- Anti-Forge Wave Watermark -->
+              <svg class="absolute top-[8%] left-0 w-full h-[15%] opacity-[0.15] pointer-events-none" viewBox="0 0 1000 100">
+                <path id="curve" d="M0 50 Q 250 0, 500 50 T 1000 50" fill="transparent"/>
+                <text font-size="16" font-family="monospace" fill="#000" font-weight="bold" letter-spacing="8">
+                  <textPath href="#curve" startOffset="50%" text-anchor="middle">credity.ink • SECURE VERIFIABLE CREDENTIAL • credity.ink</textPath>
+                </text>
+              </svg>
 
-              <div class="w-full">
-                <div class="text-[2cqi] tracking-[0.2em] text-slate-500 uppercase mb-[2%] cert-text-color">This is to certify that</div>
+              <!-- Draggable Logo -->
+              <div id="draggable-logo">
+                <img id="preview-logo" src="" class="hidden object-contain w-[10cqi] h-[10cqi] drop-shadow-md pointer-events-none">
+              </div>
+
+              <div class="w-full relative z-10 mt-[8%]">
+                <div class="text-[1.8cqi] tracking-[0.25em] text-slate-500 uppercase mb-[2%] cert-text-color">This is to certify that</div>
                 <div class="text-[5.5cqi] font-bold italic text-slate-800 leading-tight cert-text-color">[Student Name]</div>
               </div>
 
-              <div class="px-[8%] my-[5%]">
-                <div id="preview-title" class="text-[3.5cqi] font-bold uppercase tracking-widest mb-[4%] text-[#1e40af]">Certificate of Excellence</div>
-                <div id="preview-desc" class="text-[2.2cqi] text-slate-600 cert-text-color">has successfully completed the required assessment with outstanding distinction and merit.</div>
+              <div class="px-[10%] my-[6%] relative z-10">
+                <div id="preview-title" class="text-[3.2cqi] font-bold uppercase tracking-widest mb-[4%] text-[#0f172a] drop-shadow-sm">Certificate of Distinction</div>
+                <div id="preview-desc" class="text-[2cqi] text-slate-600 cert-text-color leading-relaxed">has demonstrated exceptional proficiency and has successfully completed all requirements.</div>
               </div>
 
-              <div class="w-full flex justify-between items-end mt-auto pt-[4%] border-t border-slate-200/50">
+              <div class="w-full flex justify-between items-end mt-auto pt-[4%] border-t border-slate-300/50 relative z-10">
                 <div class="text-left">
-                  <div class="text-[1.5cqi] font-medium text-slate-800 cert-text-color">Date Issued: Today</div>
+                  <div class="text-[1.4cqi] font-medium text-slate-800 cert-text-color" id="preview-date">Issue Date: </div>
+                  <div class="text-[1cqi] text-slate-400 uppercase mt-1 cert-text-color font-bold tracking-wider">Metadata Secured</div>
                 </div>
                 <div class="text-right flex flex-col items-end">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Verify" class="w-[7cqi] h-[7cqi] mb-1 opacity-90 rounded">
-                  <div class="text-[1cqi] text-slate-400 uppercase text-center cert-text-color">Scan to Verify</div>
+                  <!-- Simulated Dynamic QR linked to /verify/:id -->
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://credity.ink/verify/dynamic-id" class="w-[6cqi] h-[6cqi] mb-1.5 p-0.5 bg-white border border-slate-200">
+                  <div class="text-[1cqi] text-slate-500 uppercase text-center cert-text-color font-bold">Scan to Verify Link</div>
                 </div>
               </div>
             </div>
@@ -193,31 +212,26 @@
       </form>
     </div>
 
+    <!-- ================= BADGE EDITOR & OVERVIEW ================= -->
     <div id="badges-tab" class="tab-content hidden">
-      <div class="glass p-8 rounded-3xl text-center">
+      <div class="glass p-8 rounded-3xl text-center border border-slate-200">
         <i class="fa-solid fa-shield-halved text-4xl text-blue-500 mb-4"></i>
         <h2 class="text-2xl font-bold mb-2">Badge Editor active</h2>
-        <p class="text-slate-500">Your badge system is fully functional from the previous setup.</p>
+        <p class="text-slate-500">System uses your previously established Badge Logic.</p>
       </div>
     </div>
 
     <div id="overview-tab" class="tab-content hidden">
       <div class="glass rounded-3xl overflow-hidden border border-slate-200">
-        <div class="p-6 md:p-8 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-          <div>
-            <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
-            <p class="text-sm text-slate-500 mt-1">View all registered students and teachers.</p>
-          </div>
-          <div class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
-            System Status: Online
-          </div>
+        <div class="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+          <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
+          <div class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider">Status: Online</div>
         </div>
-        
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-white border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400 font-bold">
-                <th class="p-5">Account ID</th>
+                <th class="p-5">Acc Number</th>
                 <th class="p-5">Full Name</th>
                 <th class="p-5">Email Address</th>
                 <th class="p-5">Role</th>
@@ -226,8 +240,8 @@
             <tbody class="divide-y divide-slate-100 bg-white">
               <% if (typeof users !== 'undefined' && users.length > 0) { %>
                 <% users.forEach(u => { %>
-                  <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="p-5 font-mono text-sm text-slate-500">#<%= u.id.toString().padStart(4, '0') %></td>
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-5 font-mono text-sm text-slate-500">#<%= u.id.toString().padStart(5, '0') %></td>
                     <td class="p-5 font-semibold text-slate-800"><%= u.name %></td>
                     <td class="p-5 text-slate-600"><%= u.email %></td>
                     <td class="p-5">
@@ -240,22 +254,17 @@
                   </tr>
                 <% }) %>
               <% } else { %>
-                <tr class="hover:bg-slate-50 transition-colors">
-                  <td class="p-5 font-mono text-sm text-slate-500">#0001</td>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-5 font-mono text-sm text-slate-500">#00001</td>
                   <td class="p-5 font-semibold text-slate-800">Ms. Johnson</td>
                   <td class="p-5 text-slate-600">teacher@school.com</td>
                   <td class="p-5"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase">Teacher</span></td>
                 </tr>
-                <tr class="hover:bg-slate-50 transition-colors">
-                  <td class="p-5 font-mono text-sm text-slate-500">#0002</td>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-5 font-mono text-sm text-slate-500">#00002</td>
                   <td class="p-5 font-semibold text-slate-800">Alex Rivera</td>
                   <td class="p-5 text-slate-600">student@school.com</td>
                   <td class="p-5"><span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">Student</span></td>
-                </tr>
-                <tr>
-                  <td colspan="4" class="p-5 text-center text-sm text-slate-400 bg-slate-50">
-                    * Note: To see live data here, pass `users: users` to your /admin render function in server.js.
-                  </td>
                 </tr>
               <% } %>
             </tbody>
@@ -263,48 +272,60 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <script>
-    // --- 1. Dynamic Data Setup ---
-
-    // 20 Unique Templates
+    // --- 1. Templates Setup (20 Distinct Styles) ---
     const templates = [
-      'classic', 'modern', 'geometric', 'corporate', 'elegant', 
-      'dark', 'minimal', 'cyber', 'ocean', 'sunset', 
-      'nature', 'vintage', 'neon', 'ruby', 'emerald', 
-      'gold', 'startup', 'abstract', 'academic', 'tech'
+      { id: '1-classic', name: 'Classic Academic' }, { id: '2-modern', name: 'Modern Sans' },
+      { id: '3-tech', name: 'Grid Technology' }, { id: '4-university', name: 'University Seal' },
+      { id: '5-corporate', name: 'Corporate Header' }, { id: '6-dark-ai', name: 'Dark Mode AI' },
+      { id: '7-elegant-gold', name: 'Gold Leaf' }, { id: '8-minimalist', name: 'Minimalist Clean' },
+      { id: '9-cyberpunk', name: 'Cyberpunk Terminal' }, { id: '10-ocean-wave', name: 'Ocean Wave' },
+      { id: '11-art-deco', name: 'Art Deco' }, { id: '12-startup', name: 'Startup Pitch' },
+      { id: '13-certificate-ruby', name: 'Crimson Ruby' }, { id: '14-geometric', name: 'Geometric Pattern' },
+      { id: '15-nature-eco', name: 'Eco Nature' }, { id: '16-vintage', name: 'Vintage Document' },
+      { id: '17-executive', name: 'Executive Angle' }, { id: '18-neon', name: 'Neon Glow' },
+      { id: '19-scholastic', name: 'Scholastic Honors' }, { id: '20-future', name: 'Future Framework' }
     ];
 
-    // 40 Professional Logos (Mix of Real Tech Stacks & High Quality Abstracts)
+    // --- 2. Logos Setup (70 Total - Meaningful Tech + Professional Generics) ---
     const logos = [
-      'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png',
-      'https://upload.wikimedia.org/wikipedia/commons/2/27/CISCO_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg', // TensorFlow
+      'https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg', // PyTorch
+      'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg', // React
+      'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg', // Python
+      'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg', // AWS
       'https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo_2015.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/2/27/CISCO_logo.svg',
       'https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Bash_Logo_Colored.svg',
       'https://upload.wikimedia.org/wikipedia/commons/0/05/Go_Logo_Blue.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg'
+      'https://upload.wikimedia.org/wikipedia/commons/4/4b/Bash_Logo_Colored.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/1/18/ISO_C%2B%2B_Logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/d/d5/Rust_programming_language_black_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg'
     ];
-    // Fill the rest up to 40 with clean shapes representing institutions/corporations
-    for(let i=0; i<30; i++) {
-      const themes = ['Shapes', 'Icons', 'Initials'];
-      logos.push(`https://api.dicebear.com/7.x/shapes/svg?seed=ProCorp${i}&backgroundColor=transparent`);
+    // Generate 55 more to hit exactly 70
+    for(let i = 1; i <= 55; i++) {
+      logos.push(`https://api.dicebear.com/7.x/shapes/svg?seed=CredityInst${i}&backgroundColor=transparent`);
     }
 
+    let currentTemplate = 'tpl-1-classic';
+
     function init() {
+      // Set Date
+      document.getElementById('preview-date').innerText = `Issue Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+
       // Render Templates
       const templateGrid = document.getElementById('template-grid');
       templates.forEach(t => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-600 focus:bg-blue-50 focus:text-blue-700 capitalize transition-all';
-        btn.innerText = t;
-        btn.onclick = () => setTemplate(t);
+        btn.className = 'snap-start flex-shrink-0 px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium hover:border-blue-500 focus:border-blue-600 focus:bg-blue-50 focus:text-blue-700 transition-all';
+        btn.innerText = t.name;
+        btn.onclick = () => setTemplate(t.id);
         templateGrid.appendChild(btn);
       });
 
@@ -318,37 +339,90 @@
         logoGrid.appendChild(img);
       });
 
-      // Close dropdown if clicked outside
-      document.addEventListener('click', (e) => {
-        const dropdown = document.getElementById('pos-dropdown');
-        const btn = document.querySelector('[onclick="toggleDropdown()"]');
-        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.classList.add('dropdown-hidden');
-          dropdown.classList.remove('dropdown-visible');
-        }
-      });
-
+      initDrag();
       updateCert();
     }
 
-    // --- 2. Certificate Logic ---
-    
-    let currentTemplate = 'tpl-classic';
+    // --- 3. Drag & Drop Logic for Logo ---
+    function initDrag() {
+      const dragItem = document.getElementById('draggable-logo');
+      const container = document.getElementById('cert-preview');
+      let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
 
-    function setTemplate(name) {
+      dragItem.addEventListener("mousedown", dragStart, false);
+      dragItem.addEventListener("touchstart", dragStart, {passive: false});
+      document.addEventListener("mouseup", dragEnd, false);
+      document.addEventListener("touchend", dragEnd, false);
+      document.addEventListener("mousemove", drag, false);
+      document.addEventListener("touchmove", drag, {passive: false});
+
+      function dragStart(e) {
+        if (e.type === "touchstart") {
+          initialX = e.touches[0].clientX - xOffset;
+          initialY = e.touches[0].clientY - yOffset;
+        } else {
+          initialX = e.clientX - xOffset;
+          initialY = e.clientY - yOffset;
+        }
+        if (e.target === dragItem || e.target.parentNode === dragItem) {
+          active = true;
+        }
+      }
+
+      function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
+        active = false;
+        
+        // Convert to percentages so it stays responsive
+        if(xOffset !== 0 || yOffset !== 0) {
+           const rect = container.getBoundingClientRect();
+           const itemRect = dragItem.getBoundingClientRect();
+           // Calculate relative position %
+           let leftPct = ((itemRect.left - rect.left) / rect.width) * 100;
+           let topPct = ((itemRect.top - rect.top) / rect.height) * 100;
+           
+           // Reset transforms and apply absolute %
+           dragItem.style.transform = `translate3d(0px, 0px, 0)`;
+           dragItem.style.left = `${Math.max(0, Math.min(leftPct, 90))}%`;
+           dragItem.style.top = `${Math.max(0, Math.min(topPct, 90))}%`;
+           xOffset = 0; yOffset = 0;
+        }
+      }
+
+      function drag(e) {
+        if (active) {
+          e.preventDefault();
+          if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+          } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+          }
+          xOffset = currentX;
+          yOffset = currentY;
+          dragItem.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+        }
+      }
+    }
+
+    // --- 4. Certificate Update Logic ---
+    function setTemplate(id) {
       const preview = document.getElementById('cert-preview');
       preview.classList.remove(currentTemplate);
-      currentTemplate = `tpl-${name}`;
+      currentTemplate = `tpl-${id}`;
       preview.classList.add(currentTemplate);
       
-      // Handle text colors for dark templates
+      const darkThemes = ['tpl-6-dark-ai', 'tpl-9-cyberpunk', 'tpl-18-neon'];
       const textElements = document.querySelectorAll('.cert-text-color');
-      if(name === 'dark' || name === 'cyber' || name === 'neon') {
+      
+      if(darkThemes.includes(currentTemplate)) {
         textElements.forEach(el => el.style.color = '#e2e8f0');
         document.getElementById('preview-title').style.color = '#ffffff';
       } else {
-        textElements.forEach(el => el.style.color = ''); // reset
-        updateCert(); // reapplies theme color to title
+        textElements.forEach(el => el.style.color = '');
+        updateCert(); // reapplies custom primary color to title
       }
     }
 
@@ -359,40 +433,6 @@
       const previewLogo = document.getElementById('preview-logo');
       previewLogo.src = url;
       previewLogo.classList.remove('hidden');
-      applyLogoPos();
-    }
-
-    // Custom Dropdown Logic
-    function toggleDropdown() {
-      const menu = document.getElementById('pos-dropdown');
-      if(menu.classList.contains('dropdown-hidden')) {
-        menu.classList.remove('dropdown-hidden');
-        menu.classList.add('dropdown-visible');
-      } else {
-        menu.classList.add('dropdown-hidden');
-        menu.classList.remove('dropdown-visible');
-      }
-    }
-
-    function setLogoPos(posValue, posLabel) {
-      document.getElementById('dropdown-label').innerText = posLabel;
-      document.getElementById('selected-logo-pos').value = posValue;
-      toggleDropdown();
-      applyLogoPos();
-    }
-
-    function applyLogoPos() {
-      const logo = document.getElementById('preview-logo');
-      const pos = document.getElementById('selected-logo-pos').value;
-      
-      // Reset positions
-      logo.style.top = ''; logo.style.bottom = ''; logo.style.left = ''; logo.style.right = '';
-
-      // Apply new positioning
-      if(pos === 'top-right') { logo.style.top = '6%'; logo.style.right = '6%'; }
-      if(pos === 'top-left') { logo.style.top = '6%'; logo.style.left = '6%'; }
-      if(pos === 'bottom-right') { logo.style.bottom = '6%'; logo.style.right = '6%'; }
-      if(pos === 'bottom-left') { logo.style.bottom = '6%'; logo.style.left = '6%'; }
     }
 
     function updateCert() {
@@ -403,16 +443,17 @@
       const titleEl = document.getElementById('preview-title');
       titleEl.innerText = title;
       
-      // Only apply color to title if not a dark theme
-      if(!['tpl-dark', 'tpl-cyber', 'tpl-neon'].includes(currentTemplate)) {
+      if(!['tpl-6-dark-ai', 'tpl-9-cyberpunk', 'tpl-18-neon'].includes(currentTemplate)) {
         titleEl.style.color = color;
       }
       
-      document.getElementById('cert-preview').style.borderColor = color;
+      const preview = document.getElementById('cert-preview');
+      preview.style.borderColor = color;
+      preview.style.outlineColor = color;
       document.getElementById('preview-desc').innerText = desc;
     }
 
-    // --- 3. UI Navigation ---
+    // --- 5. Navigation ---
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(tab + '-tab').classList.remove('hidden');
