@@ -40,57 +40,47 @@
       position: relative;
       overflow: hidden;
       transform-style: preserve-3d;
+      display: flex;
+      flex-direction: column;
     }
 
     /* =========================================================
-       20 MASTER-CRAFTED TEMPLATES (DEGREES, AWARDS, TECH)
+       20 MASTER-CRAFTED TEMPLATES
        ========================================================= */
+    .tpl-1-degree { font-family: 'Cinzel', serif; border: 2cqw solid #1e293b; outline: 0.5cqw solid #1e293b; outline-offset: -1cqw; background: #fffdf8; background-image: radial-gradient(circle, rgba(0,0,0,0.02) 0%, transparent 100%); }
+    .tpl-1-degree .cert-title { font-size: 4.5cqi; color: #1e293b; font-weight: 700; border-bottom: 2px solid #cbd5e1; padding-bottom: 1.5cqw; display: inline-block; }
     
-    /* 1. Traditional Master's Degree */
-    .tpl-1-degree { font-family: 'Cinzel', serif; border: 2cqw solid #1e293b; padding: 4cqw; outline: 0.5cqw solid #1e293b; outline-offset: -1cqw; background: #fffdf8; background-image: radial-gradient(circle, rgba(0,0,0,0.02) 0%, transparent 100%); }
-    .tpl-1-degree .cert-title { font-size: 4.5cqi; color: #1e293b; font-weight: 700; border-bottom: 2px solid #cbd5e1; padding-bottom: 2cqw; display: inline-block; }
-    
-    /* 2. Modern University Seal */
     .tpl-2-university { font-family: 'Playfair Display', serif; border: 3cqw solid; background: #ffffff; position: relative; }
     .tpl-2-university::before { content:''; position:absolute; inset: 1.5cqw; border: 0.2cqw solid; opacity: 0.3; pointer-events: none; }
     .tpl-2-university .cert-title { font-size: 4cqi; text-transform: uppercase; letter-spacing: 0.2em; }
     
-    /* 3. Corporate Excellence */
     .tpl-3-corporate { font-family: 'Montserrat', sans-serif; border-top: 5cqw solid; border-bottom: 1.5cqw solid; background: #ffffff; }
     .tpl-3-corporate .cert-title { font-size: 3.5cqi; font-weight: 800; letter-spacing: 0.1em; }
     
-    /* 4. Tech Institute */
     .tpl-4-tech { font-family: 'Space Grotesk', sans-serif; border: 0.5cqw solid; background: #ffffff; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 4cqw 4cqw; }
     .tpl-4-tech .cert-title { font-size: 3.5cqi; text-transform: uppercase; }
 
-    /* 5. Gold Ribbon Scholar */
     .tpl-5-scholar { font-family: 'Cinzel', serif; border: 1.5cqw solid #b45309; background: linear-gradient(135deg, #fffbeb, #fef3c7); position: relative; }
     .tpl-5-scholar::after { content:''; position:absolute; inset: 0.5cqw; border: 0.1cqw solid #b45309; pointer-events: none; }
     .tpl-5-scholar .cert-title { font-size: 4cqi; color: #92400e; }
 
-    /* 6. Minimalist Block */
     .tpl-6-minimal { font-family: 'Inter', sans-serif; border-left: 6cqw solid; background: #f8fafc; }
-    .tpl-6-minimal .cert-title { font-size: 3.5cqi; font-weight: 700; text-align: left; margin-left: -5cqw; }
+    .tpl-6-minimal .cert-title { font-size: 3.5cqi; font-weight: 700; text-align: left; }
 
-    /* 7. Executive Certification */
-    .tpl-7-exec { font-family: 'Playfair Display', serif; border: 0.2cqw solid #64748b; padding: 6cqw; background: #ffffff; box-shadow: inset 0 0 0 2cqw #f1f5f9; }
+    .tpl-7-exec { font-family: 'Playfair Display', serif; border: 0.2cqw solid #64748b; background: #ffffff; box-shadow: inset 0 0 0 2cqw #f1f5f9; }
     .tpl-7-exec .cert-title { font-size: 3.8cqi; font-style: italic; }
 
-    /* 8. Dark Node / AI */
     .tpl-8-dark { font-family: 'Space Grotesk', sans-serif; border: 0.5cqw solid #334155; background: radial-gradient(circle at 50% 0%, #1e293b, #0f172a); color: #f8fafc !important; }
-    .tpl-8-dark .draggable-logo { mix-blend-mode: normal; } /* Turn off blend for dark mode */
+    .tpl-8-dark .draggable-logo { mix-blend-mode: normal; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); } 
     .tpl-8-dark .cert-title { font-size: 3.5cqi; color: #fff; }
 
-    /* 9. Prestigious Honors */
     .tpl-9-honors { font-family: 'Cinzel', serif; border: 1cqw double #9f1239; outline: 2cqw solid #fff1f2; outline-offset: -3cqw; background: #ffffff; }
     .tpl-9-honors .cert-title { font-size: 4cqi; color: #9f1239; }
 
-    /* 10. Cyber Security */
     .tpl-10-cyber { font-family: 'Space Grotesk', sans-serif; border-right: 3cqw solid #10b981; border-left: 3cqw solid #10b981; background: #000000; color: #10b981 !important; }
     .tpl-10-cyber .draggable-logo { mix-blend-mode: normal; filter: drop-shadow(0 0 5px #10b981); }
     .tpl-10-cyber .cert-title { font-size: 3cqi; letter-spacing: 0.3em; }
 
-    /* 11 - 20 (Streamlined beautiful alternates) */
     .tpl-11-artdeco { font-family: 'Montserrat', sans-serif; border: 1cqw solid; background: #fafaf9; outline: 0.2cqw solid; outline-offset: -1.5cqw; }
     .tpl-12-startup { font-family: 'Inter', sans-serif; border-radius: 4cqw; border: 0.8cqw solid; background: #ffffff; box-shadow: inset 0 0 3cqw rgba(0,0,0,0.05); }
     .tpl-13-classic { font-family: 'Playfair Display', serif; border: 2cqw solid; background: #fefce8; }
@@ -103,16 +93,13 @@
     .tpl-19-medical { font-family: 'Inter', sans-serif; border-left: 6cqw solid #0369a1; background: #f0f9ff; }
     .tpl-20-future { font-family: 'Montserrat', sans-serif; background: #ffffff; box-shadow: inset 0 0 0 0.5cqw currentColor, inset 0 0 0 1cqw #fff, inset 0 0 0 1.5cqw currentColor; }
 
-    /* Badge Editor Styles */
-    .badge-preview-container { filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.15)); }
-    .badge-base { position: relative; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.3s; }
-    .badge-ribbon { position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 85%; height: 35px; z-index: 5; border-radius: 4px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
-    
+    /* Badge Editor Shapes */
     .shape-circle { border-radius: 50%; }
     .shape-shield { clip-path: polygon(50% 100%, 0 80%, 0 0, 100% 0, 100% 80%); }
     .shape-hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
-    .shape-star { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
-
+    .shape-octagon { clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); }
+    .shape-pentagon { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+    .shape-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -156,7 +143,7 @@
         <input type="hidden" name="type" value="certificate">
         
         <!-- Controls -->
-        <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-8">
+        <div class="xl:w-3/5 glass p-6 md:p-8 rounded-3xl space-y-6">
           
           <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
             <label class="text-xs font-bold text-blue-800 uppercase tracking-wider block mb-2">Link to Assessment</label>
@@ -173,13 +160,29 @@
             </select>
           </div>
 
+          <!-- Live Preview Data Editors -->
+          <div class="grid md:grid-cols-3 gap-4 p-4 border border-slate-200 rounded-2xl bg-slate-50">
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Preview Student</label>
+              <input type="text" id="cert-student" value="Alex Rivera" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Preview Signature</label>
+              <input type="text" name="signature" id="cert-signature" value="Dr. Admin" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Preview Issue Date</label>
+              <input type="date" id="cert-date" oninput="updateCert()" class="modern-input w-full px-3 py-2 rounded-lg text-sm">
+            </div>
+          </div>
+
           <div class="grid md:grid-cols-2 gap-5">
             <div>
               <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Degree / Certificate Title</label>
               <input type="text" name="title" id="cert-title" value="Master of Science" oninput="updateCert()" class="modern-input w-full px-4 py-3 rounded-xl text-sm font-bold">
             </div>
             <div>
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Primary Color</label>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Primary Template Color</label>
               <input type="color" name="designColor" id="cert-color" value="#1e293b" oninput="updateCert()" class="w-full h-11 p-0 border-0 rounded-xl cursor-pointer">
             </div>
           </div>
@@ -200,7 +203,7 @@
           <!-- Logo Management System -->
           <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-4">
-              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Multi-Logo Engine</label>
+              <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">AI & Tech Logo Engine</label>
               <span class="text-[10px] text-purple-600 font-bold bg-purple-100 px-2 py-1 rounded uppercase tracking-wider">Drag to position</span>
             </div>
             
@@ -218,8 +221,8 @@
               </div>
             </div>
 
-            <!-- Pre-loaded Professional Logos -->
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Professional Logos</label>
+            <!-- 40 Pre-loaded Professional AI/Tech Logos -->
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Quick Add Technology Logos (40)</label>
             <div id="logo-grid" class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-40 overflow-y-auto custom-scroll p-2 bg-white border border-slate-200 rounded-xl">
               <!-- JS Injected -->
             </div>
@@ -236,25 +239,21 @@
               <span class="text-[10px] uppercase tracking-widest text-green-600 font-bold bg-green-100 px-2 py-1 rounded">Anti-Forge Active</span>
             </div>
             
-            <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col justify-center items-center text-center" style="border-color: #1e293b; outline-color: #1e293b;">
+            <div id="cert-preview" class="certificate-preview tpl-1-degree w-full aspect-[1.414] p-[5%] flex flex-col items-center text-center" style="border-color: #1e293b; outline-color: #1e293b;">
               
-              <!-- Stacked Anti-Forge Watermark (5 Layers) -->
-              <svg class="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none z-0" viewBox="0 0 1000 700">
-                <defs>
-                  <path id="w1" d="M-100 100 Q 250 50, 500 100 T 1100 100" />
-                  <path id="w2" d="M-100 250 Q 250 200, 500 250 T 1100 250" />
-                  <path id="w3" d="M-100 400 Q 250 350, 500 400 T 1100 400" />
-                  <path id="w4" d="M-100 550 Q 250 500, 500 550 T 1100 550" />
-                  <path id="w5" d="M-100 700 Q 250 650, 500 700 T 1100 700" />
-                </defs>
-                <g font-family="monospace" font-size="12" font-weight="bold" fill="currentColor" letter-spacing="4">
-                  <text><textPath href="#w1" startOffset="5%">verifiable on credity.ink • verifiable on credity.ink • verifiable on credity.ink</textPath></text>
-                  <text><textPath href="#w2" startOffset="15%">verifiable on credity.ink • verifiable on credity.ink • verifiable on credity.ink</textPath></text>
-                  <text><textPath href="#w3" startOffset="2%">verifiable on credity.ink • verifiable on credity.ink • verifiable on credity.ink</textPath></text>
-                  <text><textPath href="#w4" startOffset="10%">verifiable on credity.ink • verifiable on credity.ink • verifiable on credity.ink</textPath></text>
-                  <text><textPath href="#w5" startOffset="20%">verifiable on credity.ink • verifiable on credity.ink • verifiable on credity.ink</textPath></text>
-                </g>
-              </svg>
+              <!-- 8-Layered Anti-Forge Watermark (Dead Center) -->
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0 opacity-[0.06] overflow-hidden">
+                <div class="font-mono font-bold tracking-[0.5em] text-[2.5cqi] leading-[1.2] text-slate-900 flex flex-col items-center justify-center w-full h-full scale-[1.2]">
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                  <span>VERIFIABLE ON CREDITY.INK</span>
+                </div>
+              </div>
 
               <!-- Logos Container -->
               <div id="drag-boundary" class="absolute inset-0 z-50 overflow-hidden pointer-events-none">
@@ -264,30 +263,36 @@
               <!-- Main Content -->
               <div class="w-full relative z-10 mt-[8%]">
                 <div class="text-[1.8cqi] tracking-[0.25em] text-slate-500 uppercase mb-[2%] cert-text-color font-semibold">The Board of Trustees certifies that</div>
-                <div class="text-[5cqi] font-bold text-slate-800 leading-tight cert-text-color mt-[3%]">[Student Name]</div>
+                <div id="preview-student" class="text-[5cqi] font-bold text-slate-800 leading-tight cert-text-color mt-[3%]">Alex Rivera</div>
               </div>
 
-              <div class="px-[8%] my-[6%] relative z-10 w-full">
+              <div class="px-[8%] my-[6%] relative z-10 w-full flex-grow">
                 <div id="preview-title" class="cert-title mb-[4%] drop-shadow-sm">Master of Science</div>
                 <div id="preview-desc" class="text-[1.8cqi] text-slate-600 cert-text-color leading-relaxed">has fulfilled all requirements and is hereby admitted to the degree with all rights, privileges, and honors appertaining thereto.</div>
               </div>
 
-              <!-- Footer with Signatures & QR -->
+              <!-- Footer with Signatures (Left) & QR (Strictly Bottom Right) -->
               <div class="w-full flex justify-between items-end mt-auto pt-[4%] relative z-10">
-                <div class="text-center w-[25%] border-t border-slate-400 pt-[1%]">
-                  <div class="font-signature text-[4cqi] text-slate-800 cert-text-color leading-none mb-1">Dr. Admin</div>
-                  <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Authorized Signatory</div>
-                </div>
                 
-                <div class="text-center flex flex-col items-center">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://credity.ink/verify/id" class="w-[7cqi] h-[7cqi] mb-1.5 p-0.5 bg-white border border-slate-200">
-                  <div class="text-[1cqi] text-slate-500 uppercase cert-text-color font-bold tracking-widest">Verify</div>
+                <!-- Left/Center Details -->
+                <div class="flex gap-8 items-end">
+                  <div class="text-center border-t border-slate-400 pt-[2%] min-w-[15cqi]">
+                    <div id="preview-signature" class="font-signature text-[4cqi] text-slate-800 cert-text-color leading-none mb-1">Dr. Admin</div>
+                    <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Authorized Signatory</div>
+                  </div>
+
+                  <div class="text-center border-t border-slate-400 pt-[2%] min-w-[15cqi]">
+                    <div id="preview-date-display" class="text-[1.5cqi] font-bold text-slate-800 cert-text-color leading-none mb-2 mt-2">Date</div>
+                    <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Issue Date</div>
+                  </div>
                 </div>
 
-                <div class="text-center w-[25%] border-t border-slate-400 pt-[1%]">
-                  <div class="text-[1.5cqi] font-bold text-slate-800 cert-text-color leading-none mb-2 mt-2" id="preview-date">Date</div>
-                  <div class="text-[1cqi] text-slate-500 uppercase tracking-widest cert-text-color font-bold">Issue Date</div>
+                <!-- Anchored QR Bottom Right -->
+                <div class="text-center flex flex-col items-end">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://credity.ink/verify/id" class="w-[7cqi] h-[7cqi] mb-1.5 p-0.5 bg-white border border-slate-200 shadow-sm">
+                  <div class="text-[1cqi] text-slate-500 uppercase cert-text-color font-bold tracking-widest">Verify</div>
                 </div>
+                
               </div>
             </div>
           </div>
@@ -322,7 +327,9 @@
                 <option value="shape-shield">Shield</option>
                 <option value="shape-hexagon">Hexagon</option>
                 <option value="shape-circle">Circle</option>
-                <option value="shape-star">Starburst</option>
+                <option value="shape-pentagon">Pentagon</option>
+                <option value="shape-octagon">Octagon</option>
+                <option value="shape-diamond">Diamond</option>
               </select>
             </div>
             <div>
@@ -340,6 +347,8 @@
               <button type="button" onclick="setBadgeIcon('fa-bolt')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-bolt text-xl"></i></button>
               <button type="button" onclick="setBadgeIcon('fa-brain')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-brain text-xl"></i></button>
               <button type="button" onclick="setBadgeIcon('fa-check-double')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-check-double text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-database')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-database text-xl"></i></button>
+              <button type="button" onclick="setBadgeIcon('fa-network-wired')" class="p-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fa-solid fa-network-wired text-xl"></i></button>
             </div>
           </div>
 
@@ -347,32 +356,36 @@
         </div>
 
         <!-- Live Preview -->
-        <div class="md:w-1/2 flex items-center justify-center bg-white rounded-3xl p-12 border border-slate-200 shadow-inner overflow-hidden relative">
+        <div class="md:w-1/2 flex items-center justify-center bg-slate-100 rounded-3xl p-12 border border-slate-200 shadow-inner overflow-hidden relative">
           <!-- Background Grid for aesthetics -->
-          <div class="absolute inset-0" style="background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <div class="absolute inset-0" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;"></div>
           
-          <div class="text-center w-full relative z-10">
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-12">Live Rendering</h3>
+          <div class="text-center w-full relative z-10 flex flex-col items-center">
             
-            <div class="badge-preview-container relative w-56 mx-auto h-56">
+            <!-- Separated Title Above Badge -->
+            <div id="preview-badge-text" class="text-xl font-bold tracking-widest uppercase text-slate-900 mb-6 drop-shadow-sm">Certified Engineer</div>
+
+            <div class="badge-preview-container relative w-48 h-48 mb-8">
               <!-- Base Shape -->
-              <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-inner flex flex-col justify-start pt-6" style="background: linear-gradient(135deg, #0f172a, #334155);">
+              <div id="preview-badge-base" class="badge-base shape-shield w-full h-full shadow-xl flex flex-col justify-center items-center" style="background: linear-gradient(135deg, #0f172a, #334155);">
+                <!-- Inner Border Details -->
                 <div class="absolute inset-1.5 border-[3px] border-white/20" id="preview-badge-inner" style="clip-path: inherit;"></div>
                 <div class="absolute inset-3 border border-white/10" id="preview-badge-inner2" style="clip-path: inherit;"></div>
                 
-                <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[4rem] text-white mb-2 drop-shadow-md z-20"></i>
+                <i id="preview-badge-icon" class="fa-solid fa-shield-halved text-[3.5rem] text-white mb-2 drop-shadow-md z-20"></i>
                 
                 <!-- Embedded QR Code -->
-                <div class="mt-2 bg-white p-1 rounded z-20 shadow-lg">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=Verify" class="w-10 h-10">
+                <div class="mt-2 bg-white p-1 rounded z-20 shadow-md">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=Verify" class="w-8 h-8">
                 </div>
               </div>
-              
-              <!-- Ribbon -->
-              <div id="preview-badge-ribbon" class="badge-ribbon shadow-2xl flex flex-col items-center justify-center text-white border-y border-white/20" style="background-color: #020617;">
-                <div id="preview-badge-text" class="text-[11px] font-bold tracking-widest uppercase text-center leading-tight">Certified Engineer</div>
-              </div>
             </div>
+
+            <!-- Neatly Separated Watermark -->
+            <div class="text-[11px] text-slate-500 font-mono tracking-widest uppercase opacity-80 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-circle text-blue-500"></i> credity.ink
+            </div>
+
           </div>
         </div>
       </form>
@@ -418,12 +431,6 @@
                   <td class="p-5 text-slate-600">teacher@school.com</td>
                   <td class="p-5"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold uppercase">Teacher</span></td>
                 </tr>
-                <tr class="hover:bg-slate-50">
-                  <td class="p-5 font-mono text-sm text-slate-500">#00002</td>
-                  <td class="p-5 font-semibold text-slate-800">Alex Rivera</td>
-                  <td class="p-5 text-slate-600">student@school.com</td>
-                  <td class="p-5"><span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">Student</span></td>
-                </tr>
               <% } %>
             </tbody>
           </table>
@@ -447,31 +454,26 @@
       { id: '19-medical', name: 'Clinical Medical' }, { id: '20-future', name: 'Future Frame' }
     ];
 
-    // --- 2. Reliable Logos (Using Devicon SVG CDN + UI Avatars) ---
-    const presetLogos = [
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/figma/figma-original.svg'
+    // --- 2. Reliable Logos (40 AI & Tech Logos via SimpleIcons CDN) ---
+    const techSlugs = [
+      'openai', 'tensorflow', 'pytorch', 'keras', 'scikitlearn', 'pandas', 'numpy', 'python', 
+      'jupyter', 'huggingface', 'meta', 'ibm', 'nvidia', 'intel', 'amd', 'linux', 'ubuntu', 
+      'docker', 'kubernetes', 'git', 'github', 'gitlab', 'react', 'nodedotjs', 'javascript', 
+      'typescript', 'html5', 'css3', 'mongodb', 'postgresql', 'redis', 'amazon', 'apple', 
+      'android', 'ios', 'firebase', 'amazonwebservices', 'googlecloud', 'microsoftazure', 'cloudflare'
     ];
-    // Add generic institution shapes
-    for(let i=1; i<=20; i++) {
-      presetLogos.push(`https://ui-avatars.com/api/?name=U+${i}&background=random&color=fff&rounded=true&bold=true`);
-    }
+    
+    // Convert to SimpleIcons CDN URLs (using black/slate color for neat design, blend mode handles background)
+    const presetLogos = techSlugs.map(slug => `https://cdn.simpleicons.org/${slug}/0f172a`);
 
     let currentTemplate = 'tpl-1-degree';
-    let activeLogos = []; // Array to track multiple added logos
+    let activeLogos = []; 
 
     function init() {
-      // Set Date
-      document.getElementById('preview-date').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
+      // Set current date in the input field
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('cert-date').value = today;
+      
       // Render Templates
       const templateGrid = document.getElementById('template-grid');
       templates.forEach(t => {
@@ -483,12 +485,12 @@
         templateGrid.appendChild(btn);
       });
 
-      // Render Preset Logos
+      // Render 40 Tech Logos
       const logoGrid = document.getElementById('logo-grid');
       presetLogos.forEach(url => {
         const img = document.createElement('img');
         img.src = url;
-        img.className = 'w-10 h-10 p-1.5 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
+        img.className = 'w-10 h-10 p-2 cursor-pointer bg-slate-50 rounded-lg border border-transparent hover:border-blue-500 object-contain transition-colors';
         img.onclick = () => addLogoToDoc(url);
         logoGrid.appendChild(img);
       });
@@ -517,19 +519,16 @@
       const boundary = document.getElementById('drag-boundary');
       const wrapper = document.createElement('div');
       wrapper.id = id;
-      wrapper.className = 'draggable-logo w-[10cqi] h-[10cqi] pointer-events-auto';
-      wrapper.style.left = '5%';
-      wrapper.style.top = '5%';
+      wrapper.className = 'draggable-logo w-[8cqi] h-[8cqi] pointer-events-auto';
+      wrapper.style.left = '8%';
+      wrapper.style.top = '8%';
       
       const img = document.createElement('img');
       img.src = url;
-      // Use devicon's error fallback if image fails
       img.onerror = function() { this.src = 'https://ui-avatars.com/api/?name=Err&background=ff0000&color=fff'; };
       
       wrapper.appendChild(img);
       boundary.appendChild(wrapper);
-
-      // Make it draggable
       makeDraggable(wrapper);
     }
 
@@ -561,7 +560,6 @@
 
       function dragMouseDown(e) {
         e.preventDefault();
-        // get the mouse cursor position at startup:
         if(e.type === 'touchstart') {
           pos3 = e.touches[0].clientX;
           pos4 = e.touches[0].clientY;
@@ -591,12 +589,10 @@
         pos3 = clientX;
         pos4 = clientY;
         
-        // Calculate new position in percentages for responsiveness
         const boundary = document.getElementById('drag-boundary').getBoundingClientRect();
         let newTop = ((elmnt.offsetTop - pos2) / boundary.height) * 100;
         let newLeft = ((elmnt.offsetLeft - pos1) / boundary.width) * 100;
         
-        // Keep inside bounds
         newTop = Math.max(0, Math.min(newTop, 90));
         newLeft = Math.max(0, Math.min(newLeft, 90));
 
@@ -625,20 +621,24 @@
       if(darkThemes.includes(currentTemplate)) {
         textElements.forEach(el => el.style.color = '#f8fafc');
         document.getElementById('preview-title').style.color = '#ffffff';
-        // Fix watermark color for dark themes
-        document.querySelector('svg').style.color = '#ffffff';
+        document.querySelector('.absolute.inset-0.flex').style.color = '#ffffff';
       } else {
         textElements.forEach(el => el.style.color = '');
-        document.querySelector('svg').style.color = 'currentColor';
+        document.querySelector('.absolute.inset-0.flex').style.color = '#0f172a';
         updateCert(); 
       }
     }
 
     function updateCert() {
+      // Input Values
       const title = document.getElementById('cert-title').value;
       const desc = document.getElementById('cert-desc').value;
       const color = document.getElementById('cert-color').value;
+      const student = document.getElementById('cert-student').value;
+      const signature = document.getElementById('cert-signature').value;
+      const dateVal = document.getElementById('cert-date').value;
 
+      // Apply to Preview
       const titleEl = document.getElementById('preview-title');
       titleEl.innerText = title;
       
@@ -649,13 +649,20 @@
       const preview = document.getElementById('cert-preview');
       preview.style.borderColor = color;
       preview.style.outlineColor = color;
+      
       document.getElementById('preview-desc').innerText = desc;
+      document.getElementById('preview-student').innerText = student || '[Student Name]';
+      document.getElementById('preview-signature').innerText = signature || 'Authorized Signature';
+
+      if (dateVal) {
+        document.getElementById('preview-date-display').innerText = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      }
     }
 
     // --- 5. Badge Editor Logic ---
     function setBadgeIcon(iconClass) {
       document.getElementById('selected-badge-icon').value = iconClass;
-      document.getElementById('preview-badge-icon').className = `fa-solid ${iconClass} text-[4rem] text-white mb-2 drop-shadow-md z-20`;
+      document.getElementById('preview-badge-icon').className = `fa-solid ${iconClass} text-[3.5rem] text-white mb-2 drop-shadow-md z-20`;
     }
 
     function updateBadge() {
@@ -663,17 +670,15 @@
       const shape = document.getElementById('badge-shape').value;
       const hexColor = document.getElementById('badge-color').value;
       
-      document.getElementById('preview-badge-text').innerText = title;
+      document.getElementById('preview-badge-text').innerText = title || 'Badge Title';
       
       const base = document.getElementById('preview-badge-base');
-      const ribbon = document.getElementById('preview-badge-ribbon');
-
+      
       // Update Shape
-      base.className = `badge-base ${shape} w-full h-full shadow-inner flex flex-col justify-start pt-6`;
+      base.className = `badge-base ${shape} w-full h-full shadow-xl flex flex-col justify-center items-center`;
 
       // 3D Color Gradients
       base.style.background = `linear-gradient(135deg, ${hexColor}, ${adjustColor(hexColor, -50)})`;
-      ribbon.style.backgroundColor = adjustColor(hexColor, -70);
     }
 
     function adjustColor(color, amount) {
