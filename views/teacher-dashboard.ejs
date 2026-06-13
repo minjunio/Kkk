@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- Credity Teacher Dashboard Enhanced v4 | Auto student certificates + digital copies | 2026-06-13 -->
+<html lang="en" data-dashboard-version="enhanced-v4">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teacher Dashboard • Credity</title>
+  <meta name="credity-dashboard-version" content="enhanced-v4-2026-06-13" />
+  <title>Teacher Dashboard • Credity Enhanced v4</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
@@ -322,6 +326,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
+      padding-bottom: 4.5cqi;
     }
 
     .cert-paper-texture {
@@ -489,51 +494,95 @@
 
     .cert-footer {
       width: 100%;
+      min-height: 14.8cqi;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr) minmax(0, 1fr);
       align-items: end;
-      gap: 3cqi;
+      gap: 2.4cqi;
       margin-top: auto;
-      padding-top: 2cqi;
+      margin-bottom: 1.5cqi;
+      padding-top: 1.4cqi;
     }
 
     .cert-footer-block {
+      min-height: 10.8cqi;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
       text-align: center;
     }
 
-    .cert-signature-line {
-      padding-top: 0.8cqi;
+    .cert-detail-line {
+      width: 100%;
+      min-height: 5.4cqi;
+      padding: 0.9cqi 0.6cqi 0;
       border-top: 0.12cqi solid currentColor;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
 
-    .cert-signature {
+    .cert-record-icon {
+      width: 3.3cqi;
+      height: 3.3cqi;
+      display: grid;
+      place-items: center;
+      margin-bottom: 0.55cqi;
+      color: var(--cert-accent);
+      border: 0.12cqi solid rgba(15, 23, 42, 0.22);
+      border-radius: 50%;
+      font-size: 1.35cqi;
+    }
+
+    .cert-record-value {
+      max-width: 100%;
+      overflow: hidden;
       color: var(--cert-ink);
-      font-family: 'Pinyon Script', cursive;
-      font-size: 3.4cqi;
-      line-height: 0.9;
+      font-size: 1.05cqi;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 0.03em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .cert-footer-label {
       margin-top: 0.6cqi;
       color: var(--cert-muted);
-      font-size: 0.68cqi;
+      font-size: 0.64cqi;
       font-weight: 700;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.2em;
+      line-height: 1.25;
       text-transform: uppercase;
     }
 
     .certificate-serial {
       position: absolute;
       left: 4cqi;
-      bottom: 2.7cqi;
-      z-index: 9;
+      right: 4cqi;
+      bottom: 1.65cqi;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1cqi;
       color: var(--cert-muted);
-      opacity: 0.58;
+      opacity: 0.68;
       font-family: 'Montserrat', sans-serif;
-      font-size: 0.57cqi;
+      font-size: 0.53cqi;
       font-weight: 700;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.13em;
+      line-height: 1.2;
       text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .certificate-serial span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     /*
@@ -542,17 +591,16 @@
     */
     .security-wave-svg {
       position: absolute;
-      left: -2%;
-      width: 104%;
+      left: -28%;
       top: 31%;
-      height: 15%;
       z-index: 8;
+      width: 170%;
+      height: 15%;
       overflow: visible;
-      pointer-events: none;
       color: var(--cert-accent);
-      opacity: 0.22;
+      opacity: 0.28;
       transform: rotate(-0.8deg);
-      mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+      pointer-events: none;
     }
 
     .security-wave-svg text {
@@ -578,21 +626,24 @@
       width: 12.4cqi;
       height: 12.4cqi;
       margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       color: var(--cert-accent);
+      line-height: 0;
+      isolation: isolate;
     }
 
     .qr-ring-svg {
       position: absolute;
-      inset: -0.6cqi;
+      left: 50%;
+      top: 50%;
       z-index: 2;
       width: calc(100% + 1.2cqi);
       height: calc(100% + 1.2cqi);
+      transform: translate(-50%, -50%);
       overflow: visible;
-      pointer-events: none;
       color: var(--cert-accent);
+      pointer-events: none;
     }
 
     .qr-ring-svg text {
@@ -620,21 +671,29 @@
 
     .qr-guilloche-core {
       position: absolute;
-      inset: 1.05cqi;
+      left: 50%;
+      top: 50%;
       z-index: 1;
+      width: calc(100% - 2.1cqi);
+      height: calc(100% - 2.1cqi);
+      transform: translate(-50%, -50%);
       border-radius: 50%;
       opacity: 0.16;
-      background:
-        repeating-conic-gradient(from 0deg, var(--cert-accent) 0deg 1deg, transparent 1deg 5deg);
+      background: repeating-conic-gradient(from 0deg, var(--cert-accent) 0deg 1deg, transparent 1deg 5deg);
       mask-image: radial-gradient(circle, transparent 0 57%, #000 58% 62%, transparent 63%);
     }
 
     .qr-security-code {
-      position: relative;
+      position: absolute;
+      left: 50%;
+      top: 50%;
       z-index: 10;
       width: 5.9cqi;
       height: 5.9cqi;
+      margin: 0;
       padding: 0.32cqi;
+      display: block;
+      transform: translate(-50%, -50%);
       object-fit: contain;
       background: #ffffff;
       border: 0.1cqi solid rgba(15, 23, 42, 0.2);
@@ -1129,7 +1188,6 @@
     }
 
     .tpl-midnight .cert-recipient,
-    .tpl-midnight .cert-signature,
     .tpl-midnight .cert-title {
       color: #ffffff;
     }
@@ -1139,10 +1197,6 @@
     .tpl-midnight .cert-recipient-label,
     .tpl-midnight .cert-footer-label {
       color: #cbd5e1;
-    }
-
-    .tpl-midnight .cert-signature-line {
-      border-color: rgba(255, 255, 255, 0.45);
     }
 
     .tpl-midnight .qr-security-code {
@@ -1289,6 +1343,129 @@
       border-bottom: 1px solid var(--mini-secondary);
     }
 
+
+    .certificate-action-bar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .certificate-action-button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid #dbe2ea;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.16s ease;
+    }
+
+    .certificate-action-button:hover {
+      background: #f8fafc;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+
+    .digital-copy-card {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: #ffffff;
+      transition:
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.16s ease;
+    }
+
+    .digital-copy-card:hover {
+      border-color: #bfdbfe;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .certificate-viewer-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(2, 6, 23, 0.78);
+      backdrop-filter: blur(8px);
+    }
+
+    .certificate-viewer-modal.open {
+      display: flex;
+    }
+
+    .certificate-viewer-shell {
+      width: min(1500px, 100%);
+      max-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 18px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+    }
+
+    .certificate-viewer-head {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .certificate-viewer-stage {
+      flex: 1;
+      min-height: 0;
+      padding: 24px;
+      overflow: auto;
+      display: grid;
+      place-items: center;
+    }
+
+    .certificate-viewer-stage .certificate-preview {
+      width: min(1240px, 100%);
+      min-width: 760px;
+    }
+
+    .certificate-viewer-stage .draggable-logo {
+      pointer-events: none;
+    }
+
+    .completion-mode-box {
+      border: 1px solid #bae6fd;
+      background: linear-gradient(135deg, #f0f9ff, #ffffff);
+    }
+
+    .completion-status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .certificate-loading {
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
     .badge-shape-circle { border-radius: 50%; }
     .badge-shape-shield { clip-path: polygon(50% 100%, 6% 77%, 6% 7%, 94% 7%, 94% 77%); }
     .badge-shape-hexagon { clip-path: polygon(50% 0, 95% 24%, 95% 76%, 50% 100%, 5% 76%, 5% 24%); }
@@ -1357,47 +1534,430 @@
     @media (max-width: 700px) {
       .page { padding: 12px; }
       .safe-table { min-width: 720px; }
+
+      .certificate-action-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .certificate-viewer-stage {
+        display: block;
+        padding: 12px;
+      }
+
+      .certificate-viewer-stage .certificate-preview {
+        width: 920px;
+        min-width: 920px;
+      }
+
+      .certificate-viewer-head {
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 
 <body>
   <%
-    const safeBadges = typeof badges !== 'undefined' && Array.isArray(badges) ? badges : [];
-    const safeTests = typeof tests !== 'undefined' && Array.isArray(tests) ? tests : [];
-    const safeEvents = typeof events !== 'undefined' && Array.isArray(events) ? events : [];
-    const safeClasses = typeof classes !== 'undefined' && Array.isArray(classes)
-      ? classes
-      : (typeof studentKeys !== 'undefined' && Array.isArray(studentKeys) ? studentKeys : []);
-
-    const teacherName = user && (user.name || user.fullName)
-      ? (user.name || user.fullName)
-      : 'Teacher';
-
-    const firstName = teacherName.split(' ')[0];
-
-    function assignedForClass(cls) {
-      if (Array.isArray(cls.assignedTests)) return cls.assignedTests;
-
-      const ids = Array.isArray(cls.assignedTestIds)
-        ? cls.assignedTestIds.map(Number)
+    const safeCredentialRecords =
+      typeof badges !== 'undefined' && Array.isArray(badges)
+        ? badges
         : [];
 
-      return safeTests.filter(test => ids.includes(Number(test.id)));
+    const safeBadges =
+      safeCredentialRecords.filter(item =>
+        !item.type || item.type === 'badge'
+      );
+
+    const safeCertificates =
+      safeCredentialRecords.filter(item =>
+        item.type === 'certificate'
+      );
+
+    const suppliedIssuedCredentials =
+      typeof issuedCredentials !== 'undefined' && Array.isArray(issuedCredentials)
+        ? issuedCredentials
+        : (
+            typeof credentials !== 'undefined' && Array.isArray(credentials)
+              ? credentials
+              : []
+          );
+
+    const safeIssuedCertificates = [
+      ...suppliedIssuedCredentials,
+      ...safeCertificates
+    ].filter(item =>
+      !item.type ||
+      item.type === 'certificate' ||
+      item.credentialType === 'certificate'
+    );
+
+    const safeTests =
+      typeof tests !== 'undefined' && Array.isArray(tests)
+        ? tests
+        : [];
+
+    const safeEvents =
+      typeof events !== 'undefined' && Array.isArray(events)
+        ? events
+        : [];
+
+    const safeClasses =
+      typeof classes !== 'undefined' && Array.isArray(classes)
+        ? classes
+        : (
+            typeof studentKeys !== 'undefined' && Array.isArray(studentKeys)
+              ? studentKeys
+              : []
+          );
+
+    const safeGlobalSubmissions =
+      typeof submissions !== 'undefined' && Array.isArray(submissions)
+        ? submissions
+        : [];
+
+    const safeUser =
+      typeof user !== 'undefined' && user
+        ? user
+        : {};
+
+    const teacherName =
+      safeUser.name ||
+      safeUser.fullName ||
+      safeUser.username ||
+      'Teacher';
+
+    const firstName =
+      String(teacherName).split(' ')[0];
+
+    function assignedForClass(cls) {
+      if (Array.isArray(cls.assignedTests)) {
+        return cls.assignedTests;
+      }
+
+      const ids =
+        Array.isArray(cls.assignedTestIds)
+          ? cls.assignedTestIds.map(Number)
+          : [];
+
+      return safeTests.filter(test =>
+        ids.includes(Number(test.id))
+      );
     }
 
-    const totalStudents = safeClasses.reduce((sum, cls) => {
-      if (Array.isArray(cls.students)) return sum + cls.students.length;
-      return sum + Number(cls.usageCount || 0);
-    }, 0);
+    const completedRecipients = [];
+    const completedRecipientKeys = new Set();
+
+    safeClasses.forEach(cls => {
+      const students =
+        Array.isArray(cls.students)
+          ? cls.students
+          : [];
+
+      students.forEach(student => {
+        const studentName =
+          student.fullName ||
+          student.name ||
+          student.username ||
+          student.email ||
+          'Student';
+
+        const studentId =
+          student.userId ||
+          student.id ||
+          student.studentId ||
+          student.email ||
+          '';
+
+        const studentEmail =
+          student.email ||
+          '';
+
+        const studentSubmissions =
+          Array.isArray(student.submissions)
+            ? student.submissions
+            : [];
+
+        studentSubmissions.forEach((submission, submissionIndex) => {
+          if (!submission) {
+            return;
+          }
+
+          const assessmentId =
+            submission.testId ||
+            submission.assessmentId ||
+            submission.assignmentId ||
+            '';
+
+          const assessmentTitle =
+            submission.testTitle ||
+            submission.assessmentTitle ||
+            submission.assignmentTitle ||
+            submission.title ||
+            'Completed Assignment';
+
+          const submissionId =
+            submission.id ||
+            submission.submissionId ||
+            [
+              cls.id || 'class',
+              studentId || studentName,
+              assessmentId || assessmentTitle,
+              submissionIndex
+            ].join('-');
+
+          const key =
+            String(submissionId);
+
+          if (completedRecipientKeys.has(key)) {
+            return;
+          }
+
+          completedRecipientKeys.add(key);
+
+          completedRecipients.push({
+            classId: cls.id || '',
+            className: cls.className || 'Class',
+            studentId,
+            studentName,
+            studentEmail,
+            submissionId,
+            assessmentId,
+            assessmentTitle,
+            score:
+              submission.score !== undefined &&
+              submission.score !== null
+                ? submission.score
+                : '',
+            passed:
+              submission.passed !== undefined
+                ? Boolean(submission.passed)
+                : true,
+            submittedAt:
+              submission.submittedAt ||
+              submission.completedAt ||
+              submission.createdAt ||
+              '',
+            submittedAtFormatted:
+              submission.submittedAtFormatted ||
+              submission.completedAtFormatted ||
+              ''
+          });
+        });
+      });
+    });
+
+    safeGlobalSubmissions.forEach((submission, submissionIndex) => {
+      if (!submission) {
+        return;
+      }
+
+      const studentId =
+        submission.studentId ||
+        submission.userId ||
+        submission.recipientId ||
+        '';
+
+      let matchedStudent = null;
+      let matchedClass = null;
+
+      safeClasses.some(cls => {
+        const students =
+          Array.isArray(cls.students)
+            ? cls.students
+            : [];
+
+        const found =
+          students.find(student =>
+            String(
+              student.userId ||
+              student.id ||
+              student.studentId ||
+              student.email ||
+              ''
+            ) === String(studentId)
+          );
+
+        if (found) {
+          matchedStudent = found;
+          matchedClass = cls;
+          return true;
+        }
+
+        return false;
+      });
+
+      const studentName =
+        submission.studentName ||
+        submission.recipientName ||
+        submission.fullName ||
+        matchedStudent?.fullName ||
+        matchedStudent?.name ||
+        matchedStudent?.username ||
+        matchedStudent?.email ||
+        'Student';
+
+      const studentEmail =
+        submission.studentEmail ||
+        submission.recipientEmail ||
+        matchedStudent?.email ||
+        '';
+
+      const assessmentId =
+        submission.testId ||
+        submission.assessmentId ||
+        submission.assignmentId ||
+        '';
+
+      const matchingTest =
+        safeTests.find(test =>
+          String(test.id) ===
+          String(assessmentId)
+        );
+
+      const assessmentTitle =
+        submission.testTitle ||
+        submission.assessmentTitle ||
+        submission.assignmentTitle ||
+        submission.title ||
+        matchingTest?.title ||
+        'Completed Assignment';
+
+      const submissionId =
+        submission.id ||
+        submission.submissionId ||
+        [
+          'submission',
+          studentId || studentName,
+          assessmentId || assessmentTitle,
+          submissionIndex
+        ].join('-');
+
+      const key =
+        String(submissionId);
+
+      if (completedRecipientKeys.has(key)) {
+        return;
+      }
+
+      completedRecipientKeys.add(key);
+
+      completedRecipients.push({
+        classId:
+          submission.classId ||
+          matchedClass?.id ||
+          '',
+        className:
+          submission.className ||
+          matchedClass?.className ||
+          'Class',
+        studentId:
+          studentId ||
+          matchedStudent?.userId ||
+          matchedStudent?.id ||
+          '',
+        studentName,
+        studentEmail,
+        submissionId,
+        assessmentId,
+        assessmentTitle,
+        score:
+          submission.score !== undefined &&
+          submission.score !== null
+            ? submission.score
+            : '',
+        passed:
+          submission.passed !== undefined
+            ? Boolean(submission.passed)
+            : true,
+        submittedAt:
+          submission.submittedAt ||
+          submission.completedAt ||
+          submission.createdAt ||
+          '',
+        submittedAtFormatted:
+          submission.submittedAtFormatted ||
+          submission.completedAtFormatted ||
+          ''
+      });
+    });
+
+    const totalStudents =
+      safeClasses.reduce((sum, cls) => {
+        if (Array.isArray(cls.students)) {
+          return sum + cls.students.length;
+        }
+
+        return sum + Number(cls.usageCount || 0);
+      }, 0);
 
     const totalSubmissions =
       typeof submissions !== 'undefined' && Array.isArray(submissions)
         ? submissions.length
-        : safeClasses.reduce((sum, cls) => sum + Number(cls.submissionCount || 0), 0);
+        : safeClasses.reduce(
+            (sum, cls) =>
+              sum + Number(cls.submissionCount || 0),
+            0
+          );
   %>
 
   <div id="mobileOverlay" class="mobile-overlay" onclick="closeSidebar()"></div>
+
+  <div
+    id="certificateViewerModal"
+    class="certificate-viewer-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Digital certificate viewer"
+    onclick="handleCertificateViewerBackdrop(event)"
+  >
+    <div class="certificate-viewer-shell">
+      <div class="certificate-viewer-head">
+        <div>
+          <div class="font-semibold text-slate-950">
+            Digital Certificate Copy
+          </div>
+
+          <div class="text-xs text-slate-500 mt-1">
+            Full-resolution preview ready to download or print.
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            onclick="downloadCertificate()"
+            class="btn btn-light px-4 py-2 text-sm"
+          >
+            <i class="fa-solid fa-download mr-1"></i>
+            Download
+          </button>
+
+          <button
+            type="button"
+            onclick="printCertificate()"
+            class="btn btn-dark px-4 py-2 text-sm"
+          >
+            <i class="fa-solid fa-print mr-1"></i>
+            Print / PDF
+          </button>
+
+          <button
+            type="button"
+            onclick="closeCertificateViewer()"
+            class="w-10 h-10 rounded-lg border border-slate-200 bg-white"
+            aria-label="Close certificate viewer"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="certificateViewerStage"
+        class="certificate-viewer-stage custom-scroll"
+      ></div>
+    </div>
+  </div>
 
   <div class="app-shell">
     <aside id="sidebar" class="sidebar">
@@ -1422,6 +1982,11 @@
         <div class="panel rounded-xl p-4 mb-5">
           <div class="text-sm font-semibold truncate"><%= teacherName %></div>
           <div class="text-xs text-slate-500 mt-1">Teacher workspace</div>
+
+          <div class="mt-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-semibold uppercase tracking-wider">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Enhanced v4 • Auto certificates
+          </div>
         </div>
 
         <nav class="space-y-1 mb-6">
@@ -1443,6 +2008,11 @@
           <button class="side-link" data-view-link="certificates" onclick="showView('certificates')">
             <i class="fa-solid fa-certificate w-5 shrink-0"></i>
             <span>Certificates</span>
+          </button>
+
+          <button class="side-link" data-view-link="digital-copies" onclick="showView('digital-copies')">
+            <i class="fa-solid fa-file-arrow-down w-5 shrink-0"></i>
+            <span>Digital Copies</span>
           </button>
 
           <button class="side-link" data-view-link="badges" onclick="showView('badges')">
@@ -1857,11 +2427,17 @@
           </div>
         </section>
 
+        <!-- Enhanced v4: no teacher signature; recipient comes from completed submissions -->
         <section class="view-panel hidden" data-view-panel="certificates">
           <form id="certificateForm" action="/create-credential" method="POST" class="grid xl:grid-cols-[minmax(0,1.12fr)_minmax(420px,.88fr)] gap-6">
             <input type="hidden" name="type" value="certificate">
             <input type="hidden" name="templateStyle" id="selectedCertificateTemplate" value="tpl-sovereign">
             <input type="hidden" name="antiForge" value="true">
+            <input type="hidden" name="recipientSource" value="student_completion">
+            <input type="hidden" id="certificateRecipientName" name="recipientName" value="">
+            <input type="hidden" id="certificateStudentId" name="studentId" value="">
+            <input type="hidden" id="certificateRecipientEmail" name="recipientEmail" value="">
+            <input type="hidden" id="certificateSubmissionId" name="submissionId" value="">
             <div id="certificateHiddenLogos"></div>
 
             <div class="panel-strong rounded-2xl p-5 md:p-6 space-y-6">
@@ -1878,31 +2454,108 @@
                 </p>
               </div>
 
-              <div class="p-5 rounded-xl bg-blue-50 border border-blue-100">
-                <label class="block text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">Optional Assignment</label>
+              <div class="completion-mode-box rounded-xl p-5">
+                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <span class="completion-status-dot"></span>
 
-                <select name="assessmentId" class="input px-4 py-3 rounded-lg bg-white text-sm">
-                  <option value="">Standalone certificate</option>
-                  <% safeTests.forEach(test => { %>
-                    <option value="<%= test.id %>"><%= test.title %></option>
-                  <% }) %>
-                </select>
+                      <div class="font-semibold text-slate-950">
+                        Automatic completed-student recipient
+                      </div>
+                    </div>
+
+                    <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                      When a student completes the linked assignment,
+                      Credity automatically uses the student's account
+                      name on the certificate.
+                    </p>
+                  </div>
+
+                  <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-sky-200 text-sm font-medium whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      id="autoIssueOnCompletion"
+                      name="autoIssueOnCompletion"
+                      value="true"
+                      checked
+                      class="accent-blue-600"
+                    >
+
+                    Auto-issue
+                  </label>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 mt-5">
+                  <div>
+                    <label class="block text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">
+                      Certificate Assignment
+                    </label>
+
+                    <select
+                      id="certificateAssessmentSelect"
+                      name="assessmentId"
+                      onchange="refreshCompletedStudentOptions()"
+                      class="input px-4 py-3 rounded-lg bg-white text-sm"
+                      required
+                    >
+                      <option value="">
+                        Select an assignment...
+                      </option>
+
+                      <% safeTests.forEach(test => { %>
+                        <option value="<%= test.id %>">
+                          <%= test.title %>
+                        </option>
+                      <% }) %>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">
+                      Completed Student Preview
+                    </label>
+
+                    <select
+                      id="certificateRecipientSelect"
+                      onchange="applyCompletedRecipient()"
+                      class="input px-4 py-3 rounded-lg bg-white text-sm"
+                    >
+                      <option value="">
+                        Select an assignment first
+                      </option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div class="grid md:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="grid md:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">Preview Recipient</label>
-                  <input type="text" id="certStudent" value="Alex Rivera" oninput="updateCertificate()" class="input px-3 py-2 rounded-lg text-sm">
+                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">
+                    Automatic Recipient Name
+                  </label>
+
+                  <input
+                    type="text"
+                    id="certStudent"
+                    value="Student Name"
+                    readonly
+                    class="input px-3 py-2 rounded-lg text-sm bg-slate-100"
+                  >
                 </div>
 
                 <div>
-                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">Authorized Signature</label>
-                  <input type="text" id="certSignature" name="signature" value="<%= teacherName %>" oninput="updateCertificate()" class="input px-3 py-2 rounded-lg text-sm">
-                </div>
+                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">
+                    Issue Date
+                  </label>
 
-                <div>
-                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">Issue Date</label>
-                  <input type="date" id="certDate" oninput="updateCertificate()" class="input px-3 py-2 rounded-lg text-sm">
+                  <input
+                    type="date"
+                    id="certDate"
+                    name="issueDate"
+                    oninput="updateCertificate()"
+                    class="input px-3 py-2 rounded-lg text-sm"
+                  >
                 </div>
               </div>
 
@@ -1952,7 +2605,10 @@
                 <div id="logoGrid" class="grid grid-cols-5 sm:grid-cols-8 gap-2 max-h-40 overflow-y-auto custom-scroll p-2 rounded-lg bg-white border border-slate-200"></div>
               </div>
 
-              <button type="submit" class="btn btn-primary w-full py-4 text-lg">Save Certificate Template</button>
+              <button type="submit" class="btn btn-primary w-full py-4 text-lg">
+                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+                Save & Enable Automatic Issuing
+              </button>
             </div>
 
             <div class="cert-container">
@@ -1978,54 +2634,106 @@
                   <div class="cert-corner corner-br"></div>
                   <div class="cert-corner corner-bl"></div>
 
-                  <svg class="security-wave-svg" viewBox="0 0 1200 170" preserveAspectRatio="none" aria-hidden="true">
+                  <svg
+                    class="security-wave-svg"
+                    viewBox="-600 0 3200 170"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
                     <defs>
-                      <path id="wavePath1" d="M0,42 C75,18 125,18 200,42 S325,66 400,42 S525,18 600,42 S725,66 800,42 S925,18 1000,42 S1125,66 1200,42" />
-                      <path id="wavePath2" d="M0,54 C75,30 125,30 200,54 S325,78 400,54 S525,30 600,54 S725,78 800,54 S925,30 1000,54 S1125,78 1200,54" />
-                      <path id="wavePath3" d="M0,66 C75,42 125,42 200,66 S325,90 400,66 S525,42 600,66 S725,90 800,66 S925,42 1000,66 S1125,90 1200,66" />
-                      <path id="wavePath4" d="M0,78 C75,54 125,54 200,78 S325,102 400,78 S525,54 600,78 S725,102 800,78 S925,54 1000,78 S1125,102 1200,78" />
-                      <path id="wavePath5" d="M0,90 C75,66 125,66 200,90 S325,114 400,90 S525,66 600,90 S725,114 800,90 S925,66 1000,90 S1125,114 1200,90" />
-                      <path id="wavePath6" d="M0,102 C75,78 125,78 200,102 S325,126 400,102 S525,78 600,102 S725,126 800,102 S925,78 1000,102 S1125,126 1200,102" />
-                      <path id="wavePath7" d="M0,114 C75,90 125,90 200,114 S325,138 400,114 S525,90 600,114 S725,138 800,114 S925,90 1000,114 S1125,138 1200,114" />
-                      <path id="wavePath8" d="M0,126 C75,102 125,102 200,126 S325,150 400,126 S525,102 600,126 S725,150 800,126 S925,102 1000,126 S1125,150 1200,126" />
+                      <path id="wavePath1" d="M-600,42 C-525,18 -475,18 -400,42 S-275,66 -200,42 S-75,18 0,42 S125,66 200,42 S325,18 400,42 S525,66 600,42 S725,18 800,42 S925,66 1000,42 S1125,18 1200,42 S1325,66 1400,42 S1525,18 1600,42 S1725,66 1800,42 S1925,18 2000,42 S2125,66 2200,42 S2325,18 2400,42" />
+                      <path id="wavePath2" d="M-600,54 C-525,78 -475,78 -400,54 S-275,30 -200,54 S-75,78 0,54 S125,30 200,54 S325,78 400,54 S525,30 600,54 S725,78 800,54 S925,30 1000,54 S1125,78 1200,54 S1325,30 1400,54 S1525,78 1600,54 S1725,30 1800,54 S1925,78 2000,54 S2125,30 2200,54 S2325,78 2400,54" />
+                      <path id="wavePath3" d="M-600,66 C-525,42 -475,42 -400,66 S-275,90 -200,66 S-75,42 0,66 S125,90 200,66 S325,42 400,66 S525,90 600,66 S725,42 800,66 S925,90 1000,66 S1125,42 1200,66 S1325,90 1400,66 S1525,42 1600,66 S1725,90 1800,66 S1925,42 2000,66 S2125,90 2200,66 S2325,42 2400,66" />
+                      <path id="wavePath4" d="M-600,78 C-525,102 -475,102 -400,78 S-275,54 -200,78 S-75,102 0,78 S125,54 200,78 S325,102 400,78 S525,54 600,78 S725,102 800,78 S925,54 1000,78 S1125,102 1200,78 S1325,54 1400,78 S1525,102 1600,78 S1725,54 1800,78 S1925,102 2000,78 S2125,54 2200,78 S2325,102 2400,78" />
+                      <path id="wavePath5" d="M-600,90 C-525,66 -475,66 -400,90 S-275,114 -200,90 S-75,66 0,90 S125,114 200,90 S325,66 400,90 S525,114 600,90 S725,66 800,90 S925,114 1000,90 S1125,66 1200,90 S1325,114 1400,90 S1525,66 1600,90 S1725,114 1800,90 S1925,66 2000,90 S2125,114 2200,90 S2325,66 2400,90" />
+                      <path id="wavePath6" d="M-600,102 C-525,126 -475,126 -400,102 S-275,78 -200,102 S-75,126 0,102 S125,78 200,102 S325,126 400,102 S525,78 600,102 S725,126 800,102 S925,78 1000,102 S1125,126 1200,102 S1325,78 1400,102 S1525,126 1600,102 S1725,78 1800,102 S1925,126 2000,102 S2125,78 2200,102 S2325,126 2400,102" />
+                      <path id="wavePath7" d="M-600,114 C-525,90 -475,90 -400,114 S-275,138 -200,114 S-75,90 0,114 S125,138 200,114 S325,90 400,114 S525,138 600,114 S725,90 800,114 S925,138 1000,114 S1125,90 1200,114 S1325,138 1400,114 S1525,90 1600,114 S1725,138 1800,114 S1925,90 2000,114 S2125,138 2200,114 S2325,90 2400,114" />
+                      <path id="wavePath8" d="M-600,126 C-525,150 -475,150 -400,126 S-275,102 -200,126 S-75,150 0,126 S125,102 200,126 S325,150 400,126 S525,102 600,126 S725,150 800,126 S925,102 1000,126 S1125,150 1200,126 S1325,102 1400,126 S1525,150 1600,126 S1725,102 1800,126 S1925,150 2000,126 S2125,102 2200,126 S2325,150 2400,126" />
                     </defs>
 
                     <text>
-                      <textPath href="#wavePath1" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath1"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text class="wave-secondary">
-                      <textPath href="#wavePath2" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath2"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text>
-                      <textPath href="#wavePath3" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath3"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text class="wave-secondary">
-                      <textPath href="#wavePath4" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath4"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text>
-                      <textPath href="#wavePath5" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath5"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text class="wave-secondary">
-                      <textPath href="#wavePath6" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath6"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text>
-                      <textPath href="#wavePath7" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath7"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                     <text class="wave-secondary">
-                      <textPath href="#wavePath8" startOffset="0%" textLength="1200" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      <textPath
+                        href="#wavePath8"
+                        startOffset="0%"
+                        textLength="3200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
                     </text>
                   </svg>
 
                   <div id="logoDragBoundary" class="absolute inset-0 z-[80] overflow-hidden pointer-events-none"></div>
 
                   <div class="certificate-serial">
-                    Security Series CRD-2026 • Verifiable on Credity.ink
+                    <span>
+                      Security Series
+                      <strong id="previewCredentialId">CRD-PREVIEW</strong>
+                    </span>
+
+                    <span>
+                      Verifiable on Credity.ink
+                    </span>
                   </div>
 
                   <div class="certificate-content text-center">
                     <div class="mt-[4%]">
                       <div class="cert-emblem">
-                        <i class="fa-solid fa-shield-halved"></i>
+                        <i class="fa-solid fa-graduation-cap"></i>
                       </div>
 
                       <div class="cert-pretitle">Official verified credential</div>
@@ -2042,14 +2750,38 @@
                     </div>
 
                     <div class="cert-footer">
-                      <div class="cert-footer-block cert-signature-line">
-                        <div id="previewSignature" class="cert-signature"><%= teacherName %></div>
-                        <div class="cert-footer-label">Authorized Teacher</div>
+                      <div class="cert-footer-block">
+                        <div class="cert-detail-line">
+                          <div class="cert-record-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                          </div>
+
+                          <div
+                            id="previewCompletionLabel"
+                            class="cert-record-value"
+                          >
+                            Verified Completion
+                          </div>
+
+                          <div class="cert-footer-label">
+                            Achievement Record
+                          </div>
+                        </div>
                       </div>
 
-                      <div class="cert-footer-block cert-signature-line">
-                        <div id="previewDate" class="text-[1.25cqi] font-semibold">Issue Date</div>
-                        <div class="cert-footer-label">Date of Issue</div>
+                      <div class="cert-footer-block">
+                        <div class="cert-detail-line">
+                          <div
+                            id="previewDate"
+                            class="cert-record-value"
+                          >
+                            Issue Date
+                          </div>
+
+                          <div class="cert-footer-label">
+                            Date of Issue
+                          </div>
+                        </div>
                       </div>
 
                       <div class="cert-footer-block">
@@ -2058,10 +2790,10 @@
 
                           <svg class="qr-ring-svg" viewBox="0 0 220 220" aria-hidden="true">
                             <defs>
-                              <path id="ringPath1" d="M110,8 a102,102 0 1,1 -0.1,0" />
-                              <path id="ringPath2" d="M110,22 a88,88 0 1,1 -0.1,0" />
-                              <path id="ringPath3" d="M110,36 a74,74 0 1,1 -0.1,0" />
-                              <path id="ringPath4" d="M110,50 a60,60 0 1,1 -0.1,0" />
+                              <path id="ringPath1" d="M110 8 a102 102 0 1 1 0 204 a102 102 0 1 1 0 -204" />
+                              <path id="ringPath2" d="M110 22 a88 88 0 1 1 0 176 a88 88 0 1 1 0 -176" />
+                              <path id="ringPath3" d="M110 36 a74 74 0 1 1 0 148 a74 74 0 1 1 0 -148" />
+                              <path id="ringPath4" d="M110 50 a60 60 0 1 1 0 120 a60 60 0 1 1 0 -120" />
                             </defs>
 
                             <text>
@@ -2082,9 +2814,11 @@
                           </svg>
 
                           <img
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https%3A%2F%2Fcredity.ink%2Fverify"
+                            id="previewQrCode"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fcredity.ink%2Fverify"
                             alt="Verification QR code"
                             class="qr-security-code"
+                            crossorigin="anonymous"
                           >
                         </div>
 
@@ -2092,6 +2826,35 @@
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div class="certificate-action-bar">
+                  <button
+                    type="button"
+                    onclick="openCertificateViewer()"
+                    class="certificate-action-button"
+                  >
+                    <i class="fa-solid fa-expand"></i>
+                    View Digital Copy
+                  </button>
+
+                  <button
+                    type="button"
+                    onclick="downloadCertificate()"
+                    class="certificate-action-button"
+                  >
+                    <i class="fa-solid fa-download"></i>
+                    Download PNG
+                  </button>
+
+                  <button
+                    type="button"
+                    onclick="printCertificate()"
+                    class="certificate-action-button"
+                  >
+                    <i class="fa-solid fa-print"></i>
+                    Print / Save PDF
+                  </button>
                 </div>
 
                 <div class="grid sm:grid-cols-2 gap-3 mt-4">
@@ -2112,6 +2875,264 @@
               </div>
             </div>
           </form>
+        </section>
+
+        <section
+          class="view-panel hidden"
+          data-view-panel="digital-copies"
+        >
+          <div class="panel-strong rounded-2xl p-5 md:p-7 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
+              <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium mb-4">
+                  <i class="fa-solid fa-file-shield"></i>
+                  DIGITAL CERTIFICATE LIBRARY
+                </div>
+
+                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">
+                  View, download, and print certificates
+                </h2>
+
+                <p class="text-slate-500 mt-2 max-w-3xl leading-relaxed">
+                  Completed students are detected from assignment
+                  submissions. Load a student into the certificate
+                  designer, then download the digital copy or print it
+                  as a PDF.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onclick="showView('certificates')"
+                class="btn btn-primary px-5 py-3"
+              >
+                Open Certificate Designer
+              </button>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-3 mt-7">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-xs text-slate-500 uppercase tracking-wider">
+                  Completed Students
+                </div>
+
+                <div class="text-3xl font-semibold mt-1">
+                  <%= completedRecipients.length %>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-xs text-slate-500 uppercase tracking-wider">
+                  Issued Copies
+                </div>
+
+                <div class="text-3xl font-semibold mt-1">
+                  <%= safeIssuedCertificates.length %>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-xs text-slate-500 uppercase tracking-wider">
+                  Auto-Issue
+                </div>
+
+                <div class="text-lg font-semibold text-emerald-700 mt-2">
+                  Ready
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid xl:grid-cols-2 gap-6">
+            <div class="panel-strong rounded-2xl p-5 md:p-6">
+              <div class="flex items-center justify-between gap-3 mb-5">
+                <div>
+                  <h3 class="text-xl font-semibold">
+                    Completed Assignment Records
+                  </h3>
+
+                  <p class="text-xs text-slate-500 mt-1">
+                    The student account name becomes the certificate name.
+                  </p>
+                </div>
+
+                <span class="text-xs text-slate-400">
+                  <%= completedRecipients.length %>
+                </span>
+              </div>
+
+              <% if (completedRecipients.length > 0) { %>
+                <div class="space-y-3 max-h-[42rem] overflow-y-auto custom-scroll pr-1">
+                  <% completedRecipients.slice().reverse().forEach((record, reverseIndex) => {
+                    const originalIndex =
+                      completedRecipients.length - 1 - reverseIndex;
+                  %>
+                    <article class="digital-copy-card">
+                      <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                          <div class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-user-graduate"></i>
+                          </div>
+
+                          <div>
+                            <div class="font-semibold break-anywhere">
+                              <%= record.studentName %>
+                            </div>
+
+                            <div class="text-sm text-slate-600 mt-1 break-anywhere">
+                              <%= record.assessmentTitle %>
+                            </div>
+
+                            <div class="text-xs text-slate-500 mt-1">
+                              <%= record.className %>
+                              <% if (record.score !== '') { %>
+                                • Score <%= record.score %>%
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+
+                        <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-medium">
+                          COMPLETED
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onclick="loadCompletionIntoCertificate(<%= originalIndex %>)"
+                        class="btn btn-dark w-full py-3 mt-4 text-sm"
+                      >
+                        <i class="fa-solid fa-certificate mr-1"></i>
+                        Create Digital Copy
+                      </button>
+                    </article>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="p-10 rounded-xl border border-dashed border-slate-300 text-center">
+                  <i class="fa-solid fa-hourglass-half text-4xl text-slate-300 mb-4"></i>
+
+                  <div class="font-semibold">
+                    No completed assignments yet
+                  </div>
+
+                  <p class="text-sm text-slate-500 mt-1">
+                    Student records will appear here after submission.
+                  </p>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="panel-strong rounded-2xl p-5 md:p-6">
+              <div class="flex items-center justify-between gap-3 mb-5">
+                <div>
+                  <h3 class="text-xl font-semibold">
+                    Issued Certificate Copies
+                  </h3>
+
+                  <p class="text-xs text-slate-500 mt-1">
+                    Open a saved certificate or load it for printing.
+                  </p>
+                </div>
+
+                <span class="text-xs text-slate-400">
+                  <%= safeIssuedCertificates.length %>
+                </span>
+              </div>
+
+              <% if (safeIssuedCertificates.length > 0) { %>
+                <div class="space-y-3 max-h-[42rem] overflow-y-auto custom-scroll pr-1">
+                  <% safeIssuedCertificates.slice().reverse().forEach((credential, reverseIndex) => {
+                    const originalIndex =
+                      safeIssuedCertificates.length - 1 - reverseIndex;
+
+                    const verifyHash =
+                      credential.hash ||
+                      credential.verifyHash ||
+                      credential.verificationHash ||
+                      credential.verificationCode ||
+                      credential.id ||
+                      '';
+
+                    const recipient =
+                      credential.recipientName ||
+                      credential.studentName ||
+                      credential.issuedToName ||
+                      credential.holderName ||
+                      'Student';
+
+                    const credentialTitle =
+                      credential.title ||
+                      credential.credentialTitle ||
+                      'Certificate of Achievement';
+                  %>
+                    <article class="digital-copy-card">
+                      <div class="flex items-start gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                          <i class="fa-solid fa-file-circle-check"></i>
+                        </div>
+
+                        <div>
+                          <div class="font-semibold break-anywhere">
+                            <%= credentialTitle %>
+                          </div>
+
+                          <div class="text-sm text-slate-600 mt-1 break-anywhere">
+                            <%= recipient %>
+                          </div>
+
+                          <div class="text-xs text-slate-500 mt-1">
+                            <%= credential.createdAtFormatted || credential.issuedAtFormatted || credential.createdAt || 'Digital certificate' %>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="grid sm:grid-cols-2 gap-2 mt-4">
+                        <button
+                          type="button"
+                          onclick="loadSavedCertificate(<%= originalIndex %>)"
+                          class="btn btn-dark py-3 text-sm"
+                        >
+                          Load Copy
+                        </button>
+
+                        <% if (verifyHash) { %>
+                          <a
+                            href="/verify/<%= verifyHash %>"
+                            target="_blank"
+                            rel="noopener"
+                            class="btn btn-light py-3 text-sm"
+                          >
+                            View Verification
+                          </a>
+                        <% } else { %>
+                          <button
+                            type="button"
+                            onclick="loadSavedCertificate(<%= originalIndex %>)"
+                            class="btn btn-light py-3 text-sm"
+                          >
+                            View Copy
+                          </button>
+                        <% } %>
+                      </div>
+                    </article>
+                  <% }) %>
+                </div>
+              <% } else { %>
+                <div class="p-10 rounded-xl border border-dashed border-slate-300 text-center">
+                  <i class="fa-solid fa-file-circle-plus text-4xl text-slate-300 mb-4"></i>
+
+                  <div class="font-semibold">
+                    No issued copies yet
+                  </div>
+
+                  <p class="text-sm text-slate-500 mt-1">
+                    Save a certificate template and issue it to a completed student.
+                  </p>
+                </div>
+              <% } %>
+            </div>
+          </div>
         </section>
 
         <section class="view-panel hidden" data-view-panel="badges">
@@ -2219,6 +3240,12 @@
   </div>
 
   <script>
+    const completedRecipientData =
+      <%- JSON.stringify(completedRecipients).replace(/</g, '\\u003c') %>;
+
+    const issuedCertificateData =
+      <%- JSON.stringify(safeIssuedCertificates).replace(/</g, '\\u003c') %>;
+
     const certificateTemplates = [
       { className: 'tpl-sovereign', name: 'Sovereign Navy', subtitle: 'Ornate triple-border classic', accent: '#14213d', secondary: '#c89b3c', paper: '#fffdf7', border: '5px double #14213d' },
       { className: 'tpl-university', name: 'Royal University', subtitle: 'Academic crest and arch', accent: '#1e3a8a', secondary: '#b68b2c', paper: '#ffffff', border: '7px double #172554' },
@@ -2363,24 +3390,941 @@
       updateCertificate();
     }
 
-    function updateCertificate() {
-      const title = document.getElementById('certTitle')?.value || 'Certificate of Achievement';
-      const description = document.getElementById('certDescription')?.value || '';
-      const student = document.getElementById('certStudent')?.value || 'Student Name';
-      const signature = document.getElementById('certSignature')?.value || 'Authorized Teacher';
-      const date = document.getElementById('certDate')?.value;
-      const accent = document.getElementById('certColor')?.value || '#14213d';
+    function refreshCompletedStudentOptions() {
+      const assessmentSelect =
+        document.getElementById(
+          'certificateAssessmentSelect'
+        );
 
-      document.getElementById('previewTitle').textContent = title;
-      document.getElementById('previewDescription').textContent = description;
-      document.getElementById('previewStudent').textContent = student;
-      document.getElementById('previewSignature').textContent = signature;
+      const recipientSelect =
+        document.getElementById(
+          'certificateRecipientSelect'
+        );
 
-      if (date) {
-        document.getElementById('previewDate').textContent = new Date(`${date}T12:00:00`).toLocaleDateString();
+      if (!assessmentSelect || !recipientSelect) {
+        return;
       }
 
-      document.getElementById('certificatePreview').style.setProperty('--cert-accent', accent);
+      const assessmentId =
+        String(assessmentSelect.value || '');
+
+      const selectedTest =
+        Array.from(assessmentSelect.options)
+          .find(option =>
+            option.value === assessmentId
+          );
+
+      const matchingRecipients =
+        completedRecipientData
+          .map((record, index) => ({
+            ...record,
+            sourceIndex: index
+          }))
+          .filter(record => {
+            if (!assessmentId) {
+              return false;
+            }
+
+            return (
+              String(record.assessmentId || '') ===
+              assessmentId
+            );
+          });
+
+      recipientSelect.innerHTML = '';
+
+      if (!assessmentId) {
+        recipientSelect.innerHTML =
+          '<option value="">Select an assignment first</option>';
+
+        setCertificateRecipient(null);
+        updateCertificate();
+        return;
+      }
+
+      if (matchingRecipients.length === 0) {
+        recipientSelect.innerHTML =
+          '<option value="">Automatic when a student completes</option>';
+
+        setCertificateRecipient(null);
+
+        document.getElementById(
+          'previewCompletionLabel'
+        ).textContent =
+          selectedTest?.textContent?.trim() ||
+          'Verified Completion';
+
+        updateCertificate();
+        return;
+      }
+
+      matchingRecipients.forEach(record => {
+        const option =
+          document.createElement('option');
+
+        option.value =
+          String(record.sourceIndex);
+
+        const scoreLabel =
+          record.score !== '' &&
+          record.score !== null &&
+          record.score !== undefined
+            ? ` • ${record.score}%`
+            : '';
+
+        option.textContent =
+          `${record.studentName}${scoreLabel}`;
+
+        recipientSelect.appendChild(option);
+      });
+
+      recipientSelect.value =
+        String(
+          matchingRecipients[0].sourceIndex
+        );
+
+      applyCompletedRecipient();
+    }
+
+    function setCertificateRecipient(record) {
+      const recipientName =
+        record?.studentName ||
+        'Student Name';
+
+      document.getElementById(
+        'certStudent'
+      ).value = recipientName;
+
+      document.getElementById(
+        'certificateRecipientName'
+      ).value =
+        record?.studentName || '';
+
+      document.getElementById(
+        'certificateStudentId'
+      ).value =
+        record?.studentId || '';
+
+      document.getElementById(
+        'certificateRecipientEmail'
+      ).value =
+        record?.studentEmail || '';
+
+      document.getElementById(
+        'certificateSubmissionId'
+      ).value =
+        record?.submissionId || '';
+    }
+
+    function applyCompletedRecipient() {
+      const recipientSelect =
+        document.getElementById(
+          'certificateRecipientSelect'
+        );
+
+      const rawIndex =
+        recipientSelect?.value;
+
+      const sourceIndex =
+        rawIndex !== '' &&
+        rawIndex !== undefined &&
+        rawIndex !== null
+          ? Number(rawIndex)
+          : NaN;
+
+      const record =
+        Number.isInteger(sourceIndex)
+          ? completedRecipientData[sourceIndex]
+          : null;
+
+      setCertificateRecipient(record);
+
+      if (record) {
+        const assessmentSelect =
+          document.getElementById(
+            'certificateAssessmentSelect'
+          );
+
+        if (
+          record.assessmentId &&
+          assessmentSelect
+        ) {
+          assessmentSelect.value =
+            String(record.assessmentId);
+        }
+      }
+
+      updateCertificate();
+    }
+
+    function loadCompletionIntoCertificate(index) {
+      const record =
+        completedRecipientData[index];
+
+      if (!record) {
+        return;
+      }
+
+      showView('certificates');
+
+      const assessmentSelect =
+        document.getElementById(
+          'certificateAssessmentSelect'
+        );
+
+      if (assessmentSelect) {
+        assessmentSelect.value =
+          String(record.assessmentId || '');
+      }
+
+      refreshCompletedStudentOptions();
+
+      const recipientSelect =
+        document.getElementById(
+          'certificateRecipientSelect'
+        );
+
+      if (recipientSelect) {
+        recipientSelect.value =
+          String(index);
+      }
+
+      setCertificateRecipient(record);
+      updateCertificate();
+
+      setTimeout(
+        () =>
+          document
+            .getElementById(
+              'certificatePreview'
+            )
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            }),
+        140
+      );
+    }
+
+    function loadSavedCertificate(index) {
+      const credential =
+        issuedCertificateData[index];
+
+      if (!credential) {
+        return;
+      }
+
+      showView('certificates');
+
+      const title =
+        credential.title ||
+        credential.credentialTitle ||
+        'Certificate of Achievement';
+
+      const description =
+        credential.description ||
+        credential.credentialDescription ||
+        'has successfully completed the required learning experience and demonstrated exceptional understanding, commitment, and achievement.';
+
+      const recipientName =
+        credential.recipientName ||
+        credential.studentName ||
+        credential.issuedToName ||
+        credential.holderName ||
+        'Student Name';
+
+      const accent =
+        credential.designColor ||
+        credential.color ||
+        '#14213d';
+
+      const assessmentId =
+        credential.assessmentId ||
+        credential.testId ||
+        '';
+
+      document.getElementById(
+        'certTitle'
+      ).value = title;
+
+      document.getElementById(
+        'certDescription'
+      ).value = description;
+
+      document.getElementById(
+        'certColor'
+      ).value = accent;
+
+      document.getElementById(
+        'certStudent'
+      ).value = recipientName;
+
+      document.getElementById(
+        'certificateRecipientName'
+      ).value = recipientName;
+
+      document.getElementById(
+        'certificateStudentId'
+      ).value =
+        credential.studentId ||
+        credential.recipientId ||
+        '';
+
+      document.getElementById(
+        'certificateRecipientEmail'
+      ).value =
+        credential.recipientEmail ||
+        credential.studentEmail ||
+        '';
+
+      document.getElementById(
+        'certificateSubmissionId'
+      ).value =
+        credential.submissionId ||
+        '';
+
+      const assessmentSelect =
+        document.getElementById(
+          'certificateAssessmentSelect'
+        );
+
+      if (
+        assessmentSelect &&
+        assessmentId
+      ) {
+        assessmentSelect.value =
+          String(assessmentId);
+      }
+
+      const templateClass =
+        credential.templateStyle;
+
+      if (templateClass) {
+        const templateIndex =
+          certificateTemplates.findIndex(
+            item =>
+              item.className ===
+              templateClass
+          );
+
+        const template =
+          certificateTemplates[
+            templateIndex
+          ];
+
+        const button =
+          Array.from(
+            document.querySelectorAll(
+              '.template-picker-button'
+            )
+          )[templateIndex];
+
+        if (template && button) {
+          setCertificateTemplate(
+            template,
+            button
+          );
+        }
+      }
+
+      updateCertificate();
+
+      setTimeout(
+        openCertificateViewer,
+        160
+      );
+    }
+
+    function updateCertificate() {
+      const title =
+        document.getElementById(
+          'certTitle'
+        )?.value ||
+        'Certificate of Achievement';
+
+      const description =
+        document.getElementById(
+          'certDescription'
+        )?.value ||
+        '';
+
+      const student =
+        document.getElementById(
+          'certStudent'
+        )?.value ||
+        'Student Name';
+
+      const date =
+        document.getElementById(
+          'certDate'
+        )?.value;
+
+      const accent =
+        document.getElementById(
+          'certColor'
+        )?.value ||
+        '#14213d';
+
+      const assessmentSelect =
+        document.getElementById(
+          'certificateAssessmentSelect'
+        );
+
+      const assessmentLabel =
+        assessmentSelect?.selectedOptions?.[0]
+          ?.textContent?.trim();
+
+      const submissionId =
+        document.getElementById(
+          'certificateSubmissionId'
+        )?.value ||
+        '';
+
+      const studentId =
+        document.getElementById(
+          'certificateStudentId'
+        )?.value ||
+        '';
+
+      const serialSeed =
+        submissionId ||
+        studentId ||
+        `${title}-${student}`;
+
+      const serial =
+        createCredentialSerial(
+          serialSeed
+        );
+
+      document.getElementById(
+        'previewTitle'
+      ).textContent = title;
+
+      document.getElementById(
+        'previewDescription'
+      ).textContent = description;
+
+      document.getElementById(
+        'previewStudent'
+      ).textContent = student;
+
+      document.getElementById(
+        'previewCredentialId'
+      ).textContent = serial;
+
+      document.getElementById(
+        'previewCompletionLabel'
+      ).textContent =
+        assessmentLabel &&
+        assessmentSelect?.value
+          ? assessmentLabel
+          : 'Verified Completion';
+
+      if (date) {
+        document.getElementById(
+          'previewDate'
+        ).textContent =
+          new Date(
+            `${date}T12:00:00`
+          ).toLocaleDateString();
+      } else {
+        document.getElementById(
+          'previewDate'
+        ).textContent =
+          'Issue Date';
+      }
+
+      const preview =
+        document.getElementById(
+          'certificatePreview'
+        );
+
+      preview.style.setProperty(
+        '--cert-accent',
+        accent
+      );
+
+      const verificationPayload =
+        new URL(
+          '/verify',
+          'https://credity.ink'
+        );
+
+      verificationPayload.searchParams.set(
+        'credential',
+        serial
+      );
+
+      if (studentId) {
+        verificationPayload.searchParams.set(
+          'student',
+          studentId
+        );
+      }
+
+      if (assessmentSelect?.value) {
+        verificationPayload.searchParams.set(
+          'assessment',
+          assessmentSelect.value
+        );
+      }
+
+      const qrCode =
+        document.getElementById(
+          'previewQrCode'
+        );
+
+      if (qrCode) {
+        renderQrCodeDataUrl(
+          qrCode,
+          verificationPayload.toString()
+        );
+      }
+    }
+
+    function renderQrCodeDataUrl(
+      imageElement,
+      value
+    ) {
+      if (
+        !imageElement ||
+        typeof QRCode !== 'function'
+      ) {
+        imageElement.src =
+          'https://api.qrserver.com/v1/create-qr-code/' +
+          '?size=180x180&data=' +
+          encodeURIComponent(value);
+
+        return;
+      }
+
+      const holder =
+        document.createElement('div');
+
+      holder.style.position =
+        'fixed';
+
+      holder.style.left =
+        '-99999px';
+
+      holder.style.top =
+        '-99999px';
+
+      document.body.appendChild(holder);
+
+      new QRCode(holder, {
+        text: value,
+        width: 180,
+        height: 180,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel:
+          QRCode.CorrectLevel.H
+      });
+
+      requestAnimationFrame(() => {
+        const canvas =
+          holder.querySelector('canvas');
+
+        const generatedImage =
+          holder.querySelector('img');
+
+        if (canvas) {
+          imageElement.src =
+            canvas.toDataURL(
+              'image/png'
+            );
+        } else if (generatedImage?.src) {
+          imageElement.src =
+            generatedImage.src;
+        }
+
+        holder.remove();
+      });
+    }
+
+    function createCredentialSerial(value) {
+      const normalized =
+        String(value || 'preview')
+          .toUpperCase();
+
+      let hash = 0;
+
+      for (
+        let index = 0;
+        index < normalized.length;
+        index += 1
+      ) {
+        hash =
+          (
+            (hash << 5) -
+            hash +
+            normalized.charCodeAt(index)
+          ) |
+          0;
+      }
+
+      return (
+        'CRD-' +
+        Math.abs(hash)
+          .toString(36)
+          .toUpperCase()
+          .padStart(8, '0')
+          .slice(0, 8)
+      );
+    }
+
+    function prepareCertificateClone() {
+      const source =
+        document.getElementById(
+          'certificatePreview'
+        );
+
+      if (!source) {
+        return null;
+      }
+
+      const clone =
+        source.cloneNode(true);
+
+      const clonePrefix =
+        `certificate-copy-${Date.now()}-${Math.random().toString(36).slice(2)}-`;
+
+      const idMap =
+        new Map();
+
+      if (clone.id) {
+        idMap.set(
+          clone.id,
+          clonePrefix + clone.id
+        );
+
+        clone.id =
+          clonePrefix + clone.id;
+      }
+
+      clone
+        .querySelectorAll('[id]')
+        .forEach(element => {
+          const originalId =
+            element.id;
+
+          const replacementId =
+            clonePrefix + originalId;
+
+          idMap.set(
+            originalId,
+            replacementId
+          );
+
+          element.id =
+            replacementId;
+        });
+
+      clone
+        .querySelectorAll(
+          '[href^="#"], [xlink\\:href^="#"]'
+        )
+        .forEach(element => {
+          const href =
+            element.getAttribute('href') ||
+            element.getAttribute(
+              'xlink:href'
+            );
+
+          if (!href) {
+            return;
+          }
+
+          const originalId =
+            href.slice(1);
+
+          const replacementId =
+            idMap.get(originalId);
+
+          if (!replacementId) {
+            return;
+          }
+
+          element.setAttribute(
+            'href',
+            `#${replacementId}`
+          );
+
+          element.setAttribute(
+            'xlink:href',
+            `#${replacementId}`
+          );
+        });
+
+      clone
+        .querySelectorAll(
+          '.draggable-logo'
+        )
+        .forEach(element => {
+          element.style.pointerEvents =
+            'none';
+        });
+
+      const computed =
+        getComputedStyle(source);
+
+      [
+        '--cert-accent',
+        '--cert-secondary',
+        '--cert-ink',
+        '--cert-muted',
+        '--cert-paper'
+      ].forEach(property => {
+        clone.style.setProperty(
+          property,
+          computed.getPropertyValue(
+            property
+          )
+        );
+      });
+
+      return clone;
+    }
+
+    function openCertificateViewer() {
+      const stage =
+        document.getElementById(
+          'certificateViewerStage'
+        );
+
+      const modal =
+        document.getElementById(
+          'certificateViewerModal'
+        );
+
+      const clone =
+        prepareCertificateClone();
+
+      if (!stage || !modal || !clone) {
+        return;
+      }
+
+      stage.innerHTML = '';
+      stage.appendChild(clone);
+      modal.classList.add('open');
+
+      document.body.style.overflow =
+        'hidden';
+    }
+
+    function closeCertificateViewer() {
+      document
+        .getElementById(
+          'certificateViewerModal'
+        )
+        ?.classList.remove('open');
+
+      document.body.style.overflow =
+        '';
+    }
+
+    function handleCertificateViewerBackdrop(
+      event
+    ) {
+      if (
+        event.target?.id ===
+        'certificateViewerModal'
+      ) {
+        closeCertificateViewer();
+      }
+    }
+
+    async function downloadCertificate() {
+      const source =
+        document.getElementById(
+          'certificatePreview'
+        );
+
+      if (!source) {
+        return;
+      }
+
+      if (
+        typeof html2canvas !==
+        'function'
+      ) {
+        alert(
+          'The image renderer is still loading. Please try again.'
+        );
+
+        return;
+      }
+
+      source.classList.add(
+        'certificate-loading'
+      );
+
+      try {
+        const canvas =
+          await html2canvas(source, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: null,
+            logging: false
+          });
+
+        const studentName =
+          document.getElementById(
+            'certStudent'
+          )?.value ||
+          'student';
+
+        const title =
+          document.getElementById(
+            'certTitle'
+          )?.value ||
+          'certificate';
+
+        const fileName =
+          sanitizeFileName(
+            `${studentName}-${title}`
+          ) + '.png';
+
+        const link =
+          document.createElement('a');
+
+        link.download = fileName;
+        link.href =
+          canvas.toDataURL(
+            'image/png',
+            1
+          );
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (error) {
+        console.error(error);
+
+        alert(
+          'The certificate image could not be downloaded. Check that custom logo URLs allow cross-origin image access.'
+        );
+      } finally {
+        source.classList.remove(
+          'certificate-loading'
+        );
+      }
+    }
+
+    function printCertificate() {
+      const clone =
+        prepareCertificateClone();
+
+      if (!clone) {
+        return;
+      }
+
+      const printWindow =
+        window.open(
+          '',
+          '_blank',
+          'width=1400,height=1000'
+        );
+
+      if (!printWindow) {
+        alert(
+          'Allow pop-ups to print the certificate.'
+        );
+
+        return;
+      }
+
+      const styles =
+        Array.from(
+          document.querySelectorAll(
+            'style, link[rel="stylesheet"]'
+          )
+        )
+          .map(node => node.outerHTML)
+          .join('\n');
+
+      printWindow.document.open();
+
+      printWindow.document.write(
+        `<!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Credity Digital Certificate</title>
+            ${styles}
+            <style>
+              @page {
+                size: A4 landscape;
+                margin: 8mm;
+              }
+
+              html,
+              body {
+                width: 100%;
+                min-height: 100%;
+                margin: 0;
+                background: #ffffff;
+              }
+
+              body {
+                display: grid;
+                place-items: center;
+                padding: 0;
+              }
+
+              .print-certificate-stage {
+                width: 100%;
+                display: grid;
+                place-items: center;
+              }
+
+              .print-certificate-stage .certificate-preview {
+                width: 100%;
+                max-width: 1120px;
+                box-shadow: none !important;
+              }
+
+              .draggable-logo {
+                pointer-events: none !important;
+              }
+
+              @media print {
+                .print-certificate-stage {
+                  break-inside: avoid;
+                }
+              }
+            </style>
+          </head>
+
+          <body>
+            <div class="print-certificate-stage">
+              ${clone.outerHTML}
+            </div>
+          </body>
+        </html>`
+      );
+
+      printWindow.document.close();
+
+      printWindow.addEventListener(
+        'load',
+        () => {
+          setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+          }, 500);
+        }
+      );
+    }
+
+    function sanitizeFileName(value) {
+      return String(value || 'certificate')
+        .trim()
+        .replace(/[^a-z0-9-_]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase();
     }
 
     function renderLogoButtons() {
@@ -2585,8 +4529,29 @@
       renderTemplatePicker();
       renderLogoButtons();
       renderActiveLogos();
+      refreshCompletedStudentOptions();
       updateCertificate();
       updateBadge();
+
+      document.addEventListener(
+        'keydown',
+        event => {
+          if (event.key === 'Escape') {
+            closeCertificateViewer();
+          }
+        }
+      );
+
+      document
+        .getElementById(
+          'certificateForm'
+        )
+        ?.addEventListener(
+          'submit',
+          () => {
+            applyCompletedRecipient();
+          }
+        );
 
       const hash = window.location.hash.replace('#', '');
 
