@@ -53,8 +53,8 @@
 
     img,
     svg,
-    video,
-    canvas {
+    canvas,
+    video {
       max-width: 100%;
     }
 
@@ -386,7 +386,9 @@
           rgba(15, 23, 42, 0.025) 0 0.55px,
           transparent 0.65px
         );
-      background-size: 9px 9px, 13px 13px;
+      background-size:
+        9px 9px,
+        13px 13px;
       mix-blend-mode: multiply;
     }
 
@@ -587,6 +589,35 @@
       line-height: 1.7;
     }
 
+    /*
+      Foreground certificate text always stays above
+      the wave security microprinting.
+    */
+    .cert-pretitle,
+    .cert-recipient-label,
+    .cert-recipient,
+    .cert-title,
+    .cert-description {
+      position: relative;
+      z-index: 25;
+    }
+
+    .cert-recipient,
+    .cert-title {
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.82),
+        0 0 10px rgba(255, 255, 255, 0.72),
+        0 0 18px rgba(255, 255, 255, 0.3);
+    }
+
+    .tpl-midnight .cert-recipient,
+    .tpl-midnight .cert-title {
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.72),
+        0 0 10px rgba(0, 0, 0, 0.7),
+        0 0 18px rgba(0, 0, 0, 0.4);
+    }
+
     .cert-footer {
       width: 100%;
       display: grid;
@@ -602,6 +633,13 @@
 
     .cert-footer-block {
       text-align: center;
+    }
+
+    .cert-footer-block:last-child {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .cert-signature-line {
@@ -640,20 +678,22 @@
     }
 
     /*
-      Extended past both certificate edges so the text does not
-      stop early. No mask is used, so there is no fading near the
-      beginning or end. Lower opacity keeps foreground text clear.
+      Eight real text waves.
+
+      The SVG is intentionally wider than the certificate.
+      It begins 20% before the left edge and finishes 20%
+      beyond the right edge, so no line stops early.
     */
     .security-wave-svg {
       position: absolute;
-      left: -7%;
+      left: -20%;
       top: 31%;
       z-index: 8;
-      width: 114%;
+      width: 140%;
       height: 15%;
       overflow: visible;
       color: var(--cert-accent);
-      opacity: 0.115;
+      opacity: 0.07;
       transform: rotate(-0.8deg);
       pointer-events: none;
     }
@@ -669,12 +709,12 @@
 
     .security-wave-svg .wave-secondary {
       fill: var(--cert-secondary);
-      opacity: 0.7;
+      opacity: 0.72;
     }
 
     /*
-      The ring design remains unchanged. Grid centering and absolute
-      transforms lock every component onto the exact same center.
+      Four concentric text rings.
+      Ring design remains unchanged.
     */
     .qr-security-wrap {
       position: relative;
@@ -684,6 +724,8 @@
       display: grid;
       place-items: center;
       color: var(--cert-accent);
+      line-height: 0;
+      isolation: isolate;
     }
 
     .qr-ring-svg {
@@ -747,14 +789,21 @@
         );
     }
 
+    /*
+      Exact absolute centering prevents the QR image
+      from drifting away from the text rings.
+    */
     .qr-security-code {
       position: absolute;
       left: 50%;
       top: 50%;
+      right: auto;
+      bottom: auto;
       z-index: 10;
       width: 5.9cqi;
       height: 5.9cqi;
       margin: 0;
+      display: block;
       transform: translate(-50%, -50%);
       padding: 0.32cqi;
       object-fit: contain;
@@ -883,13 +932,11 @@
       left: 12%;
       right: 12%;
       top: 3.1cqw;
-      height: 12cqw;
       z-index: 2;
+      height: 12cqw;
       border: 0.22cqw solid rgba(30, 58, 138, 0.16);
       border-bottom: 0;
-      border-radius:
-        50% 50% 0 0 /
-        80% 80% 0 0;
+      border-radius: 50% 50% 0 0 / 80% 80% 0 0;
       pointer-events: none;
     }
 
@@ -1062,9 +1109,7 @@
 
     .tpl-azure .cert-title {
       padding: 0.7cqi 1.7cqi;
-      border:
-        0.11cqi solid
-        rgba(3, 105, 161, 0.35);
+      border: 0.11cqi solid rgba(3, 105, 161, 0.35);
       border-radius: 999px;
       font-size: 3cqi;
       letter-spacing: 0.06em;
@@ -1104,9 +1149,7 @@
       position: absolute;
       inset: 2.2cqw;
       z-index: 3;
-      border:
-        0.35cqw double
-        rgba(120, 53, 15, 0.52);
+      border: 0.35cqw double rgba(120, 53, 15, 0.52);
       pointer-events: none;
     }
 
@@ -1119,12 +1162,8 @@
       width: 22cqw;
       height: 4.8cqw;
       transform: translateX(-50%);
-      border-top:
-        0.18cqw solid
-        rgba(120, 53, 15, 0.28);
-      border-bottom:
-        0.18cqw solid
-        rgba(120, 53, 15, 0.28);
+      border-top: 0.18cqw solid rgba(120, 53, 15, 0.28);
+      border-bottom: 0.18cqw solid rgba(120, 53, 15, 0.28);
     }
 
     .tpl-gold .cert-emblem {
@@ -1132,8 +1171,7 @@
       height: 10cqi;
       border-width: 0.38cqi;
       box-shadow:
-        0 0 0 0.6cqi
-        rgba(212, 166, 74, 0.12);
+        0 0 0 0.6cqi rgba(212, 166, 74, 0.12);
     }
 
     .tpl-gold .cert-title {
@@ -1196,9 +1234,7 @@
 
     .tpl-emerald .cert-title {
       padding-bottom: 0.8cqi;
-      border-bottom:
-        0.18cqi solid
-        var(--cert-secondary);
+      border-bottom: 0.18cqi solid var(--cert-secondary);
       letter-spacing: 0.04em;
     }
 
@@ -1238,11 +1274,8 @@
       width: 21cqw;
       height: 21cqw;
       transform: rotate(45deg);
-      background:
-        rgba(107, 21, 49, 0.1);
-      border:
-        0.5cqw solid
-        rgba(198, 164, 93, 0.38);
+      background: rgba(107, 21, 49, 0.1);
+      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
     }
 
     .tpl-burgundy::after {
@@ -1254,11 +1287,8 @@
       width: 21cqw;
       height: 21cqw;
       transform: rotate(45deg);
-      background:
-        rgba(107, 21, 49, 0.1);
-      border:
-        0.5cqw solid
-        rgba(198, 164, 93, 0.38);
+      background: rgba(107, 21, 49, 0.1);
+      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
     }
 
     .tpl-burgundy .cert-title {
@@ -1267,9 +1297,7 @@
     }
 
     .tpl-burgundy .cert-recipient {
-      font-family:
-        'Cormorant Garamond',
-        serif;
+      font-family: 'Cormorant Garamond', serif;
       font-weight: 600;
     }
 
@@ -1313,18 +1341,14 @@
       position: absolute;
       inset: 2cqw;
       z-index: 3;
-      border:
-        0.18cqw solid
-        rgba(51, 65, 85, 0.4);
+      border: 0.18cqw solid rgba(51, 65, 85, 0.4);
       box-shadow:
-        inset 0 0 0 0.55cqw
-        rgba(142, 162, 183, 0.08);
+        inset 0 0 0 0.55cqw rgba(142, 162, 183, 0.08);
       pointer-events: none;
     }
 
     .tpl-platinum::after {
-      content:
-        'DIGITAL CREDENTIAL • CRYPTOGRAPHICALLY VERIFIABLE';
+      content: 'DIGITAL CREDENTIAL • CRYPTOGRAPHICALLY VERIFIABLE';
       position: absolute;
       left: 50%;
       bottom: 2.15cqw;
@@ -1338,9 +1362,7 @@
 
     .tpl-platinum .cert-title {
       padding: 0.9cqi 1.6cqi;
-      border:
-        0.14cqi solid
-        var(--cert-accent);
+      border: 0.14cqi solid var(--cert-accent);
       font-size: 3.05cqi;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -1393,9 +1415,7 @@
       position: absolute;
       inset: 1.7cqw;
       z-index: 3;
-      border:
-        0.26cqw double
-        rgba(215, 183, 109, 0.68);
+      border: 0.26cqw double rgba(215, 183, 109, 0.68);
       pointer-events: none;
     }
 
@@ -1404,9 +1424,7 @@
       position: absolute;
       inset: 2.8cqw;
       z-index: 3;
-      border:
-        0.09cqw solid
-        rgba(138, 180, 255, 0.28);
+      border: 0.09cqw solid rgba(138, 180, 255, 0.28);
       pointer-events: none;
     }
 
@@ -1429,21 +1447,18 @@
     }
 
     .tpl-midnight .cert-signature-line {
-      border-color:
-        rgba(255, 255, 255, 0.45);
+      border-color: rgba(255, 255, 255, 0.45);
     }
 
     .tpl-midnight .qr-security-code {
-      border-color:
-        rgba(255, 255, 255, 0.35);
+      border-color: rgba(255, 255, 255, 0.35);
     }
 
     .tpl-midnight .draggable-logo {
       mix-blend-mode: normal;
       filter:
         drop-shadow(
-          0 0 8px
-          rgba(255, 255, 255, 0.58)
+          0 0 8px rgba(255, 255, 255, 0.58)
         );
     }
 
@@ -1482,8 +1497,7 @@
       transform:
         translateY(-50%)
         rotate(-90deg);
-      color:
-        rgba(255, 255, 255, 0.92);
+      color: rgba(255, 255, 255, 0.92);
       font-size: 1.25cqi;
       font-weight: 700;
       letter-spacing: 0.5em;
@@ -1497,15 +1511,11 @@
       z-index: 2;
       width: 15cqw;
       height: 15cqw;
-      border:
-        0.24cqw solid
-        rgba(24, 24, 27, 0.08);
+      border: 0.24cqw solid rgba(24, 24, 27, 0.08);
       border-radius: 50%;
       box-shadow:
-        0 0 0 1cqw
-        rgba(181, 139, 85, 0.035),
-        0 0 0 2cqw
-        rgba(24, 24, 27, 0.025);
+        0 0 0 1cqw rgba(181, 139, 85, 0.035),
+        0 0 0 2cqw rgba(24, 24, 27, 0.025);
     }
 
     .tpl-luxe .cert-emblem {
@@ -1536,7 +1546,7 @@
     }
 
     /* =========================================================
-       TEMPLATE PICKER
+       HORIZONTAL TEMPLATE SELECTOR
        ========================================================= */
 
     .template-picker {
@@ -1568,8 +1578,7 @@
       background: #eff6ff;
       border-color: #2563eb;
       box-shadow:
-        0 0 0 2px
-        rgba(37, 99, 235, 0.08);
+        0 0 0 2px rgba(37, 99, 235, 0.08);
     }
 
     .template-miniature {
@@ -1586,9 +1595,7 @@
       content: '';
       position: absolute;
       inset: 9px;
-      border:
-        1px solid
-        var(--mini-accent);
+      border: 1px solid var(--mini-accent);
       opacity: 0.5;
     }
 
@@ -1599,12 +1606,8 @@
       right: 24%;
       top: 22px;
       height: 6px;
-      border-top:
-        2px solid
-        var(--mini-accent);
-      border-bottom:
-        1px solid
-        var(--mini-secondary);
+      border-top: 2px solid var(--mini-accent);
+      border-bottom: 1px solid var(--mini-secondary);
     }
 
     /* =========================================================
@@ -1667,9 +1670,7 @@
     .badge-security-ring {
       position: absolute;
       inset: 11%;
-      border:
-        1px solid
-        rgba(255, 255, 255, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.32);
       border-radius: inherit;
       pointer-events: none;
     }
@@ -1678,9 +1679,7 @@
       content: '';
       position: absolute;
       inset: 10%;
-      border:
-        1px dashed
-        rgba(255, 255, 255, 0.2);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
       border-radius: inherit;
     }
 
@@ -1703,8 +1702,7 @@
         transform: translateX(-100%);
         transition: transform 0.22s ease;
         box-shadow:
-          18px 0 40px
-          rgba(15, 23, 42, 0.12);
+          18px 0 40px rgba(15, 23, 42, 0.12);
         z-index: 90;
       }
 
@@ -1717,8 +1715,7 @@
         inset: 0;
         z-index: 80;
         display: block;
-        background:
-          rgba(15, 23, 42, 0.45);
+        background: rgba(15, 23, 42, 0.45);
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.22s ease;
@@ -2129,9 +2126,9 @@
                 </h1>
 
                 <p class="mt-5 max-w-3xl text-lg md:text-xl text-slate-600 leading-relaxed">
-                  Manage classes, assignments, professional
-                  credentials, verified badges, scores, and
-                  announcements from one workspace.
+                  Manage classes, assignments, professional credentials,
+                  verified badges, scores, and announcements from one
+                  workspace.
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-3">
@@ -2726,6 +2723,38 @@
                                     <% } %>
                                   </td>
                                 </tr>
+
+                                <% if (
+                                  Array.isArray(student.submissions) &&
+                                  student.submissions.length > 0
+                                ) { %>
+                                  <tr class="bg-slate-50">
+                                    <td
+                                      colspan="6"
+                                      class="px-5 py-4"
+                                    >
+                                      <div class="grid md:grid-cols-2 gap-2">
+                                        <% student.submissions.forEach(submission => { %>
+                                          <div class="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between gap-3">
+                                            <div>
+                                              <div class="text-sm font-medium break-anywhere">
+                                                <%= submission.testTitle %>
+                                              </div>
+
+                                              <div class="text-xs text-slate-500 mt-1">
+                                                <%= submission.submittedAtFormatted || '' %>
+                                              </div>
+                                            </div>
+
+                                            <div class="font-semibold <%= submission.passed ? 'text-emerald-700' : 'text-red-600' %>">
+                                              <%= submission.score %>%
+                                            </div>
+                                          </div>
+                                        <% }) %>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                <% } %>
                               <% }) %>
                             </tbody>
                           </table>
@@ -2795,9 +2824,7 @@
                           ? cls.assignedTestIds.map(Number)
                           : [];
 
-                      return ids.includes(
-                        Number(test.id)
-                      );
+                      return ids.includes(Number(test.id));
                     });
                 %>
                   <article
@@ -2967,7 +2994,7 @@
 
                 <div>
                   <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">
-                    Authorized Signature
+                    Issuing Authority / Authorized Signatory
                   </label>
 
                   <input
@@ -3124,7 +3151,7 @@
                     </h3>
 
                     <p class="text-xs text-slate-400 mt-1">
-                      Text reaches both edges and remains subtle
+                      Text follows every wave and every ring
                     </p>
                   </div>
 
@@ -3147,130 +3174,130 @@
                   <div class="cert-corner corner-bl"></div>
 
                   <!--
-                    Extended 1400-unit wave paths.
+                    The wave drawing area begins far before
+                    the certificate and ends far after it.
 
-                    The SVG itself is 114% wide and begins at -7%,
-                    ensuring the text extends beyond both visible
-                    certificate edges without stopping early.
+                    Each line contains enough repeated text
+                    to cover the complete width without stopping.
                   -->
                   <svg
                     class="security-wave-svg"
-                    viewBox="0 0 1400 170"
+                    viewBox="-400 0 2800 170"
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
                     <defs>
                       <path
                         id="wavePath1"
-                        d="M0,42 C87.5,18 145.8,18 233.3,42 S379.2,66 466.7,42 S612.5,18 700,42 S845.8,66 933.3,42 S1079.2,18 1166.7,42 S1312.5,66 1400,42"
+                        d="M-400,42 C-325,18 -275,18 -200,42 S-75,66 0,42 S125,18 200,42 S325,66 400,42 S525,18 600,42 S725,66 800,42 S925,18 1000,42 S1125,66 1200,42 S1325,18 1400,42 S1525,66 1600,42 S1725,18 1800,42 S1925,66 2000,42 S2125,18 2200,42 S2325,66 2400,42"
                       />
 
                       <path
                         id="wavePath2"
-                        d="M0,54 C87.5,30 145.8,30 233.3,54 S379.2,78 466.7,54 S612.5,30 700,54 S845.8,78 933.3,54 S1079.2,30 1166.7,54 S1312.5,78 1400,54"
+                        d="M-400,54 C-325,78 -275,78 -200,54 S-75,30 0,54 S125,78 200,54 S325,30 400,54 S525,78 600,54 S725,30 800,54 S925,78 1000,54 S1125,30 1200,54 S1325,78 1400,54 S1525,30 1600,54 S1725,78 1800,54 S1925,30 2000,54 S2125,78 2200,54 S2325,30 2400,54"
                       />
 
                       <path
                         id="wavePath3"
-                        d="M0,66 C87.5,42 145.8,42 233.3,66 S379.2,90 466.7,66 S612.5,42 700,66 S845.8,90 933.3,66 S1079.2,42 1166.7,66 S1312.5,90 1400,66"
+                        d="M-400,66 C-325,42 -275,42 -200,66 S-75,90 0,66 S125,42 200,66 S325,90 400,66 S525,42 600,66 S725,90 800,66 S925,42 1000,66 S1125,90 1200,66 S1325,42 1400,66 S1525,90 1600,66 S1725,42 1800,66 S1925,90 2000,66 S2125,42 2200,66 S2325,90 2400,66"
                       />
 
                       <path
                         id="wavePath4"
-                        d="M0,78 C87.5,54 145.8,54 233.3,78 S379.2,102 466.7,78 S612.5,54 700,78 S845.8,102 933.3,78 S1079.2,54 1166.7,78 S1312.5,102 1400,78"
+                        d="M-400,78 C-325,102 -275,102 -200,78 S-75,54 0,78 S125,102 200,78 S325,54 400,78 S525,102 600,78 S725,54 800,78 S925,102 1000,78 S1125,54 1200,78 S1325,102 1400,78 S1525,54 1600,78 S1725,102 1800,78 S1925,54 2000,78 S2125,102 2200,78 S2325,54 2400,78"
                       />
 
                       <path
                         id="wavePath5"
-                        d="M0,90 C87.5,66 145.8,66 233.3,90 S379.2,114 466.7,90 S612.5,66 700,90 S845.8,114 933.3,90 S1079.2,66 1166.7,90 S1312.5,114 1400,90"
+                        d="M-400,90 C-325,66 -275,66 -200,90 S-75,114 0,90 S125,66 200,90 S325,114 400,90 S525,66 600,90 S725,114 800,90 S925,66 1000,90 S1125,114 1200,90 S1325,66 1400,90 S1525,114 1600,90 S1725,66 1800,90 S1925,114 2000,90 S2125,66 2200,90 S2325,114 2400,90"
                       />
 
                       <path
                         id="wavePath6"
-                        d="M0,102 C87.5,78 145.8,78 233.3,102 S379.2,126 466.7,102 S612.5,78 700,102 S845.8,126 933.3,102 S1079.2,78 1166.7,102 S1312.5,126 1400,102"
+                        d="M-400,102 C-325,126 -275,126 -200,102 S-75,78 0,102 S125,126 200,102 S325,78 400,102 S525,126 600,102 S725,78 800,102 S925,126 1000,102 S1125,78 1200,102 S1325,126 1400,102 S1525,78 1600,102 S1725,126 1800,102 S1925,78 2000,102 S2125,126 2200,102 S2325,78 2400,102"
                       />
 
                       <path
                         id="wavePath7"
-                        d="M0,114 C87.5,90 145.8,90 233.3,114 S379.2,138 466.7,114 S612.5,90 700,114 S845.8,138 933.3,114 S1079.2,90 1166.7,114 S1312.5,138 1400,114"
+                        d="M-400,114 C-325,90 -275,90 -200,114 S-75,138 0,114 S125,90 200,114 S325,138 400,114 S525,90 600,114 S725,138 800,114 S925,90 1000,114 S1125,138 1200,114 S1325,90 1400,114 S1525,138 1600,114 S1725,90 1800,114 S1925,138 2000,114 S2125,90 2200,114 S2325,138 2400,114"
                       />
 
                       <path
                         id="wavePath8"
-                        d="M0,126 C87.5,102 145.8,102 233.3,126 S379.2,150 466.7,126 S612.5,102 700,126 S845.8,150 933.3,126 S1079.2,102 1166.7,126 S1312.5,150 1400,126"
+                        d="M-400,126 C-325,150 -275,150 -200,126 S-75,102 0,126 S125,150 200,126 S325,102 400,126 S525,150 600,126 S725,102 800,126 S925,150 1000,126 S1125,102 1200,126 S1325,150 1400,126 S1525,102 1600,126 S1725,150 1800,126 S1925,102 2000,126 S2125,150 2200,126 S2325,102 2400,126"
                       />
                     </defs>
 
                     <text>
                       <textPath
                         href="#wavePath1"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text class="wave-secondary">
                       <textPath
                         href="#wavePath2"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text>
                       <textPath
                         href="#wavePath3"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text class="wave-secondary">
                       <textPath
                         href="#wavePath4"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text>
                       <textPath
                         href="#wavePath5"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text class="wave-secondary">
                       <textPath
                         href="#wavePath6"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text>
                       <textPath
                         href="#wavePath7"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
 
                     <text class="wave-secondary">
                       <textPath
                         href="#wavePath8"
-                        startOffset="0%"
-                        textLength="1400"
+                        startOffset="-2%"
+                        textLength="2880"
                         lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
                     </text>
                   </svg>
 
@@ -3286,7 +3313,7 @@
                   <div class="certificate-content text-center">
                     <div class="mt-[4%]">
                       <div class="cert-emblem">
-                        <i class="fa-solid fa-shield-halved"></i>
+                        <i class="fa-solid fa-graduation-cap"></i>
                       </div>
 
                       <div class="cert-pretitle">
@@ -3318,9 +3345,8 @@
                         class="cert-description"
                       >
                         has successfully completed the required
-                        learning experience and demonstrated
-                        exceptional understanding, commitment,
-                        and achievement.
+                        learning experience and demonstrated exceptional
+                        understanding, commitment, and achievement.
                       </div>
                     </div>
 
@@ -3334,7 +3360,7 @@
                         </div>
 
                         <div class="cert-footer-label">
-                          Authorized Teacher
+                          Authorized Signatory
                         </div>
                       </div>
 
@@ -3355,6 +3381,9 @@
                         <div class="qr-security-wrap">
                           <div class="qr-guilloche-core"></div>
 
+                          <!--
+                            Existing ring text is kept unchanged.
+                          -->
                           <svg
                             class="qr-ring-svg"
                             viewBox="0 0 220 220"
@@ -3441,13 +3470,13 @@
 
                       <div>
                         <div class="text-sm font-semibold">
-                          Edge-to-edge text waves
+                          Full-width text waves
                         </div>
 
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                          Every security row extends beyond both
-                          certificate edges and stays transparent so
-                          the main certificate information stands out.
+                          Every row extends beyond both certificate
+                          edges so the anti-forge text cannot stop
+                          before the border.
                         </p>
                       </div>
                     </div>
@@ -3459,12 +3488,12 @@
 
                       <div>
                         <div class="text-sm font-semibold">
-                          Perfectly centered QR seal
+                          Perfectly centered QR
                         </div>
 
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                          The QR code, guilloche center, and all four
-                          text rings share the exact same center point.
+                          The QR image is positioned at the exact
+                          center point of all four verification rings.
                         </p>
                       </div>
                     </div>
@@ -4007,7 +4036,10 @@
         .classList.remove('open');
     }
 
-    function showView(view, scroll = true) {
+    function showView(
+      view,
+      scroll = true
+    ) {
       document
         .querySelectorAll('.view-panel')
         .forEach(panel => {
@@ -4037,7 +4069,9 @@
         );
 
       if (selectedLink) {
-        selectedLink.classList.add('active');
+        selectedLink.classList.add(
+          'active'
+        );
       }
 
       history.replaceState(
@@ -4064,7 +4098,9 @@
           '[data-class-button]'
         )
         .forEach(button => {
-          button.classList.remove('active');
+          button.classList.remove(
+            'active'
+          );
         });
 
       const classButton =
@@ -4073,7 +4109,9 @@
         );
 
       if (classButton) {
-        classButton.classList.add('active');
+        classButton.classList.add(
+          'active'
+        );
       }
 
       document
@@ -4111,7 +4149,9 @@
           '[data-task-button]'
         )
         .forEach(button => {
-          button.classList.remove('active');
+          button.classList.remove(
+            'active'
+          );
         });
 
       const taskButton =
@@ -4120,7 +4160,9 @@
         );
 
       if (taskButton) {
-        taskButton.classList.add('active');
+        taskButton.classList.add(
+          'active'
+        );
       }
 
       document
@@ -4159,7 +4201,9 @@
           'templatePicker'
         );
 
-      if (!container) return;
+      if (!container) {
+        return;
+      }
 
       container.innerHTML = '';
 
@@ -4253,7 +4297,9 @@
           '.template-picker-button'
         )
         .forEach(item => {
-          item.classList.remove('active');
+          item.classList.remove(
+            'active'
+          );
         });
 
       button.classList.add('active');
@@ -4284,7 +4330,7 @@
         document.getElementById(
           'certSignature'
         )?.value ||
-        'Authorized Teacher';
+        'Authorized Signatory';
 
       const date =
         document.getElementById(
@@ -4338,7 +4384,9 @@
           'logoGrid'
         );
 
-      if (!container) return;
+      if (!container) {
+        return;
+      }
 
       container.innerHTML = '';
 
@@ -4377,7 +4425,9 @@
       const url =
         input.value.trim();
 
-      if (!url) return;
+      if (!url) {
+        return;
+      }
 
       addLogoToCertificate(url);
 
@@ -4485,7 +4535,8 @@
       container.innerHTML = '';
 
       if (
-        activeCertificateLogos.length === 0
+        activeCertificateLogos.length ===
+        0
       ) {
         container.innerHTML =
           '<span class="text-xs text-slate-400">No logos added.</span>';
