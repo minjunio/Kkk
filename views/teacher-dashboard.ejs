@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
-  />
+  >
 
   <title>Teacher Dashboard • Credity</title>
 
@@ -15,7 +15,7 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
+  >
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&family=Pinyon+Script&family=Space+Grotesk:wght@500;600;700&display=swap');
@@ -51,6 +51,13 @@
       cursor: pointer;
     }
 
+    img,
+    svg,
+    video,
+    canvas {
+      max-width: 100%;
+    }
+
     .app-shell {
       width: 100%;
       max-width: 100vw;
@@ -68,8 +75,8 @@
       height: 100vh;
       background: #ffffff;
       border-right: 1px solid #e2e8f0;
-      z-index: 50;
       overflow: hidden;
+      z-index: 50;
     }
 
     .sidebar-inner {
@@ -81,9 +88,9 @@
     }
 
     .main-shell {
+      flex: 1;
       width: calc(100vw - 304px);
       max-width: calc(100vw - 304px);
-      flex: 1;
       overflow-x: hidden;
     }
 
@@ -161,7 +168,6 @@
 
     .btn-dark:hover {
       background: #030712;
-      border-color: #030712;
     }
 
     .btn-light {
@@ -183,7 +189,6 @@
 
     .btn-green:hover {
       background: #047857;
-      border-color: #047857;
     }
 
     .btn-purple {
@@ -194,7 +199,6 @@
 
     .btn-purple:hover {
       background: #6d28d9;
-      border-color: #6d28d9;
     }
 
     .btn-red {
@@ -205,7 +209,6 @@
 
     .btn-red:hover {
       background: #b91c1c;
-      border-color: #b91c1c;
     }
 
     .side-link {
@@ -257,7 +260,8 @@
       border-color: #111827;
     }
 
-    .class-box.active .muted-active {
+    .class-box.active .muted-active,
+    .task-link.active .muted-active {
       color: rgba(255, 255, 255, 0.66);
     }
 
@@ -267,30 +271,26 @@
       border-color: #111827;
     }
 
-    .task-link.active .muted-active {
-      color: rgba(255, 255, 255, 0.66);
-    }
-
     .grid-safe {
+      width: 100%;
+      max-width: 100%;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 14px;
-      width: 100%;
-      max-width: 100%;
     }
 
     .two-col-safe {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
-      width: 100%;
     }
 
     .three-col-safe {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-      width: 100%;
     }
 
     .table-wrap {
@@ -303,6 +303,11 @@
       width: 100%;
       min-width: 780px;
       border-collapse: collapse;
+    }
+
+    .break-anywhere {
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .custom-scroll::-webkit-scrollbar {
@@ -320,7 +325,7 @@
     }
 
     /* =========================================================
-       CERTIFICATE DESIGNER
+       CERTIFICATE BASE
        ========================================================= */
 
     .cert-container {
@@ -331,9 +336,9 @@
     }
 
     .certificate-preview {
-      --cert-accent: #172554;
-      --cert-secondary: #b58a3c;
-      --cert-ink: #172033;
+      --cert-accent: #14213d;
+      --cert-secondary: #c89b3c;
+      --cert-ink: #111827;
       --cert-muted: #64748b;
       --cert-paper: #fffdf8;
 
@@ -366,12 +371,51 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      opacity: 0.35;
+      opacity: 0.32;
       background-image:
-        radial-gradient(circle at 12% 18%, rgba(15, 23, 42, 0.035) 0 0.6px, transparent 0.7px),
-        radial-gradient(circle at 78% 56%, rgba(15, 23, 42, 0.025) 0 0.55px, transparent 0.65px);
+        radial-gradient(
+          circle at 12% 18%,
+          rgba(15, 23, 42, 0.035) 0 0.6px,
+          transparent 0.7px
+        ),
+        radial-gradient(
+          circle at 78% 56%,
+          rgba(15, 23, 42, 0.025) 0 0.55px,
+          transparent 0.65px
+        );
       background-size: 9px 9px, 13px 13px;
       mix-blend-mode: multiply;
+    }
+
+    .cert-rosette {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      z-index: 2;
+      width: 30cqi;
+      height: 30cqi;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.065;
+      background:
+        repeating-radial-gradient(
+          circle,
+          transparent 0 0.7cqi,
+          var(--cert-accent) 0.75cqi 0.85cqi,
+          transparent 0.9cqi 1.5cqi
+        ),
+        repeating-conic-gradient(
+          from 0deg,
+          var(--cert-secondary) 0deg 2deg,
+          transparent 2deg 8deg
+        );
+      mask-image:
+        radial-gradient(
+          circle,
+          #000 0 63%,
+          transparent 65%
+        );
     }
 
     .cert-corner {
@@ -379,8 +423,9 @@
       z-index: 5;
       width: 11cqi;
       height: 11cqi;
+      color: var(--cert-accent);
+      opacity: 0.5;
       pointer-events: none;
-      opacity: 0.52;
     }
 
     .cert-corner::before,
@@ -426,7 +471,7 @@
 
     .cert-top-rule {
       position: absolute;
-      top: 5.4cqi;
+      top: 5.2cqi;
       left: 14%;
       right: 14%;
       z-index: 4;
@@ -461,99 +506,6 @@
 
     .cert-top-rule::after {
       right: 18%;
-    }
-
-    .cert-rosette {
-      position: absolute;
-      left: 50%;
-      top: 45%;
-      z-index: 2;
-      width: 30cqi;
-      height: 30cqi;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.07;
-      background:
-        repeating-radial-gradient(
-          circle,
-          transparent 0 0.7cqi,
-          var(--cert-accent) 0.75cqi 0.85cqi,
-          transparent 0.9cqi 1.5cqi
-        ),
-        repeating-conic-gradient(
-          from 0deg,
-          var(--cert-secondary) 0deg 2deg,
-          transparent 2deg 8deg
-        );
-      mask-image: radial-gradient(circle, #000 0 63%, transparent 65%);
-    }
-
-    /*
-      Eight stacked wave lines.
-      They sit slightly above the certificate midpoint.
-    */
-    .anti-forge-wave-band {
-      position: absolute;
-      left: -4%;
-      right: -4%;
-      top: 34%;
-      z-index: 7;
-      height: 8.2cqi;
-      pointer-events: none;
-      overflow: hidden;
-      opacity: 0.22;
-      transform: rotate(-1.2deg);
-      mask-image:
-        linear-gradient(
-          90deg,
-          transparent,
-          #000 8%,
-          #000 92%,
-          transparent
-        );
-    }
-
-    .anti-forge-wave {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 1.85cqi;
-      top: calc(var(--wave-index) * 0.78cqi);
-      opacity: calc(0.58 - var(--wave-index) * 0.035);
-      background-repeat: repeat-x;
-      background-size: 10cqi 1.85cqi;
-      background-position: 0 center;
-      filter: drop-shadow(0 0 0.05cqi var(--cert-accent));
-    }
-
-    .anti-forge-wave:nth-child(odd) {
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='28' viewBox='0 0 150 28'%3E%3Cpath d='M0 14 C18 2 32 2 50 14 S82 26 100 14 S132 2 150 14' fill='none' stroke='%23172554' stroke-width='0.9'/%3E%3Cpath d='M0 16 C18 4 32 4 50 16 S82 28 100 16 S132 4 150 16' fill='none' stroke='%23b58a3c' stroke-width='0.45'/%3E%3C/svg%3E");
-    }
-
-    .anti-forge-wave:nth-child(even) {
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='28' viewBox='0 0 150 28'%3E%3Cpath d='M0 14 C18 26 32 26 50 14 S82 2 100 14 S132 26 150 14' fill='none' stroke='%23172554' stroke-width='0.9'/%3E%3Cpath d='M0 12 C18 24 32 24 50 12 S82 0 100 12 S132 24 150 12' fill='none' stroke='%23b58a3c' stroke-width='0.45'/%3E%3C/svg%3E");
-    }
-
-    .anti-forge-wave-text {
-      position: absolute;
-      left: 5%;
-      right: 5%;
-      top: 42%;
-      z-index: 8;
-      overflow: hidden;
-      white-space: nowrap;
-      text-align: center;
-      color: var(--cert-accent);
-      opacity: 0.13;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.72cqi;
-      font-weight: 700;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      pointer-events: none;
     }
 
     .cert-emblem {
@@ -597,7 +549,7 @@
     }
 
     .cert-recipient-label {
-      margin-top: 1.6cqi;
+      margin-top: 1.55cqi;
       color: var(--cert-muted);
       font-size: 0.95cqi;
       font-weight: 700;
@@ -606,7 +558,7 @@
     }
 
     .cert-recipient {
-      margin-top: 1.25cqi;
+      margin-top: 1.2cqi;
       color: var(--cert-ink);
       font-size: 5.1cqi;
       font-weight: 700;
@@ -633,7 +585,10 @@
     .cert-footer {
       width: 100%;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr) minmax(0, 1fr);
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 0.82fr)
+        minmax(0, 1fr);
       align-items: end;
       gap: 3cqi;
       margin-top: auto;
@@ -665,112 +620,6 @@
       text-transform: uppercase;
     }
 
-    /*
-      QR anti-forge seal.
-      Four watermark circles are placed directly over one another.
-    */
-    .qr-security-wrap {
-      position: relative;
-      width: 11.5cqi;
-      height: 11.5cqi;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .qr-guilloche {
-      position: absolute;
-      inset: -0.9cqi;
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.56;
-      background:
-        repeating-conic-gradient(
-          from 0deg,
-          var(--cert-accent) 0deg 1deg,
-          transparent 1deg 5deg
-        );
-      mask-image:
-        radial-gradient(
-          circle,
-          transparent 0 56%,
-          #000 57% 60%,
-          transparent 61% 64%,
-          #000 65% 68%,
-          transparent 69%
-        );
-    }
-
-    .qr-watermark-ring {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: calc(100% - var(--ring-inset));
-      height: calc(100% - var(--ring-inset));
-      transform: translate(-50%, -50%);
-      border: 0.1cqi solid var(--cert-accent);
-      border-radius: 50%;
-      opacity: calc(0.42 - var(--ring-order) * 0.06);
-      box-shadow:
-        inset 0 0 0 0.05cqi var(--cert-secondary),
-        0 0 0 0.04cqi rgba(255, 255, 255, 0.4);
-      pointer-events: none;
-    }
-
-    .qr-watermark-ring::before {
-      content: '';
-      position: absolute;
-      inset: 0.36cqi;
-      border: 0.08cqi dashed var(--cert-secondary);
-      border-radius: 50%;
-      opacity: 0.55;
-    }
-
-    .qr-watermark-ring::after {
-      content: '';
-      position: absolute;
-      inset: 0.66cqi;
-      border-radius: 50%;
-      background:
-        repeating-conic-gradient(
-          from 0deg,
-          transparent 0deg 7deg,
-          var(--cert-accent) 7deg 8deg
-        );
-      opacity: 0.18;
-    }
-
-    .qr-security-code {
-      position: relative;
-      z-index: 10;
-      width: 6.1cqi;
-      height: 6.1cqi;
-      padding: 0.35cqi;
-      object-fit: contain;
-      background: #ffffff;
-      border: 0.1cqi solid rgba(15, 23, 42, 0.2);
-      box-shadow: 0 0.5cqi 1.4cqi rgba(15, 23, 42, 0.12);
-    }
-
-    .qr-microtext {
-      position: absolute;
-      left: 50%;
-      bottom: -1.7cqi;
-      z-index: 11;
-      width: 15cqi;
-      transform: translateX(-50%);
-      overflow: hidden;
-      white-space: nowrap;
-      color: var(--cert-accent);
-      opacity: 0.48;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.56cqi;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
     .certificate-serial {
       position: absolute;
       left: 4cqi;
@@ -783,6 +632,130 @@
       font-weight: 700;
       letter-spacing: 0.16em;
       text-transform: uppercase;
+    }
+
+    /*
+      The words themselves follow eight wave paths.
+      The phrase fills each row from the left edge to the right edge.
+    */
+    .security-wave-svg {
+      position: absolute;
+      left: -2%;
+      top: 31%;
+      z-index: 8;
+      width: 104%;
+      height: 15%;
+      overflow: visible;
+      color: var(--cert-accent);
+      opacity: 0.22;
+      transform: rotate(-0.8deg);
+      pointer-events: none;
+      mask-image:
+        linear-gradient(
+          90deg,
+          transparent,
+          #000 4%,
+          #000 96%,
+          transparent
+        );
+    }
+
+    .security-wave-svg text {
+      fill: currentColor;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .security-wave-svg .wave-secondary {
+      fill: var(--cert-secondary);
+      opacity: 0.76;
+    }
+
+    /*
+      Four concentric text rings.
+      Every ring continuously repeats:
+      VERIFIABLE ON CREDITY.INK
+    */
+    .qr-security-wrap {
+      position: relative;
+      width: 12.4cqi;
+      height: 12.4cqi;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cert-accent);
+    }
+
+    .qr-ring-svg {
+      position: absolute;
+      inset: -0.6cqi;
+      z-index: 2;
+      width: calc(100% + 1.2cqi);
+      height: calc(100% + 1.2cqi);
+      overflow: visible;
+      color: var(--cert-accent);
+      pointer-events: none;
+    }
+
+    .qr-ring-svg text {
+      fill: currentColor;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 6.2px;
+      font-weight: 700;
+      letter-spacing: 0.55px;
+      text-transform: uppercase;
+    }
+
+    .qr-ring-svg .ring-two {
+      fill: var(--cert-secondary);
+      opacity: 0.8;
+    }
+
+    .qr-ring-svg .ring-three {
+      opacity: 0.58;
+    }
+
+    .qr-ring-svg .ring-four {
+      fill: var(--cert-secondary);
+      opacity: 0.48;
+    }
+
+    .qr-guilloche-core {
+      position: absolute;
+      inset: 1.05cqi;
+      z-index: 1;
+      border-radius: 50%;
+      opacity: 0.16;
+      background:
+        repeating-conic-gradient(
+          from 0deg,
+          var(--cert-accent) 0deg 1deg,
+          transparent 1deg 5deg
+        );
+      mask-image:
+        radial-gradient(
+          circle,
+          transparent 0 57%,
+          #000 58% 62%,
+          transparent 63%
+        );
+    }
+
+    .qr-security-code {
+      position: relative;
+      z-index: 10;
+      width: 5.9cqi;
+      height: 5.9cqi;
+      padding: 0.32cqi;
+      object-fit: contain;
+      background: #ffffff;
+      border: 0.1cqi solid rgba(15, 23, 42, 0.2);
+      box-shadow:
+        0 0.5cqi 1.4cqi rgba(15, 23, 42, 0.12);
     }
 
     .draggable-logo {
@@ -810,10 +783,10 @@
     }
 
     /* =========================================================
-       TEN PREMIUM CERTIFICATE TEMPLATES
+       TEMPLATE 1 — SOVEREIGN NAVY
+       Ornate centered layout with three borders.
        ========================================================= */
 
-    /* 1. Sovereign Navy */
     .tpl-sovereign {
       --cert-accent: #14213d;
       --cert-secondary: #c89b3c;
@@ -827,8 +800,16 @@
       outline: 0.48cqw solid #c89b3c;
       outline-offset: -1.18cqw;
       background:
-        radial-gradient(circle at center, rgba(200, 155, 60, 0.055), transparent 46%),
-        linear-gradient(135deg, #fffdf7, #fdf8ea);
+        radial-gradient(
+          circle at center,
+          rgba(200, 155, 60, 0.055),
+          transparent 46%
+        ),
+        linear-gradient(
+          135deg,
+          #fffdf7,
+          #fdf8ea
+        );
     }
 
     .tpl-sovereign::before {
@@ -855,7 +836,11 @@
       letter-spacing: 0.05em;
     }
 
-    /* 2. Royal University */
+    /* =========================================================
+       TEMPLATE 2 — ROYAL UNIVERSITY
+       Academic arch, larger crest, double institutional border.
+       ========================================================= */
+
     .tpl-university {
       --cert-accent: #1e3a8a;
       --cert-secondary: #b68b2c;
@@ -867,8 +852,15 @@
       font-family: 'Playfair Display', serif;
       border: 2.8cqw solid #172554;
       background:
-        radial-gradient(circle at 50% 12%, rgba(30, 58, 138, 0.075), transparent 24%),
-        linear-gradient(#ffffff, #f8fafc);
+        radial-gradient(
+          ellipse at 50% 0%,
+          rgba(30, 58, 138, 0.1),
+          transparent 36%
+        ),
+        linear-gradient(
+          #ffffff,
+          #f8fafc
+        );
     }
 
     .tpl-university::before {
@@ -882,30 +874,36 @@
     }
 
     .tpl-university::after {
-      content: 'ACADEMIC EXCELLENCE • VERIFIED CREDENTIAL • ACADEMIC EXCELLENCE';
+      content: '';
       position: absolute;
-      left: 50%;
-      bottom: 2.3cqw;
-      z-index: 5;
-      width: 70%;
-      transform: translateX(-50%);
-      overflow: hidden;
-      white-space: nowrap;
-      text-align: center;
-      color: #1e3a8a;
-      opacity: 0.28;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.62cqi;
-      font-weight: 700;
-      letter-spacing: 0.28em;
+      left: 12%;
+      right: 12%;
+      top: 3.1cqw;
+      height: 12cqw;
+      z-index: 2;
+      border: 0.22cqw solid rgba(30, 58, 138, 0.16);
+      border-bottom: 0;
+      border-radius: 50% 50% 0 0 / 80% 80% 0 0;
+      pointer-events: none;
     }
 
     .tpl-university .cert-title {
+      font-size: 3.15cqi;
       text-transform: uppercase;
       letter-spacing: 0.18em;
     }
 
-    /* 3. Executive Black */
+    .tpl-university .cert-emblem {
+      width: 9.2cqi;
+      height: 9.2cqi;
+      border-width: 0.42cqi;
+    }
+
+    /* =========================================================
+       TEMPLATE 3 — EXECUTIVE BLACK
+       Corporate masthead with left-aligned body.
+       ========================================================= */
+
     .tpl-executive {
       --cert-accent: #111827;
       --cert-secondary: #bfa56a;
@@ -913,14 +911,18 @@
       --cert-muted: #64748b;
       --cert-paper: #ffffff;
 
-      padding: 5.8%;
+      padding: 6.4% 6.8% 5.8%;
       font-family: 'Montserrat', sans-serif;
       border-top: 5.2cqw solid #111827;
       border-right: 0.9cqw solid #111827;
       border-bottom: 1.8cqw solid #111827;
       border-left: 0.9cqw solid #111827;
       background:
-        linear-gradient(120deg, rgba(17, 24, 39, 0.035), transparent 35%),
+        linear-gradient(
+          120deg,
+          rgba(17, 24, 39, 0.035),
+          transparent 35%
+        ),
         #ffffff;
     }
 
@@ -942,12 +944,27 @@
     }
 
     .tpl-executive::after {
-      content: '';
+      content: 'EXECUTIVE CREDENTIAL';
       position: absolute;
-      inset: 6.2cqw 2.5cqw 2.5cqw;
-      z-index: 3;
-      border: 0.11cqw solid rgba(17, 24, 39, 0.18);
-      pointer-events: none;
+      top: 1.25cqw;
+      left: 50%;
+      z-index: 4;
+      transform: translateX(-50%);
+      color: #ffffff;
+      font-size: 0.68cqi;
+      font-weight: 700;
+      letter-spacing: 0.34em;
+      white-space: nowrap;
+    }
+
+    .tpl-executive .certificate-content {
+      text-align: left;
+    }
+
+    .tpl-executive .cert-emblem {
+      margin-left: 0;
+      margin-right: 0;
+      border-radius: 18%;
     }
 
     .tpl-executive .cert-title {
@@ -957,7 +974,16 @@
       text-transform: uppercase;
     }
 
-    /* 4. Modern Azure */
+    .tpl-executive .cert-description {
+      width: 76%;
+      margin-left: 0;
+    }
+
+    /* =========================================================
+       TEMPLATE 4 — MODERN AZURE
+       Geometric asymmetric technology style.
+       ========================================================= */
+
     .tpl-azure {
       --cert-accent: #0369a1;
       --cert-secondary: #38bdf8;
@@ -969,44 +995,65 @@
       font-family: 'Space Grotesk', sans-serif;
       border: 0.7cqw solid #0369a1;
       background:
-        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.17), transparent 20%),
-        radial-gradient(circle at 92% 78%, rgba(3, 105, 161, 0.1), transparent 26%),
-        linear-gradient(#ffffff, #f0f9ff);
+        radial-gradient(
+          circle at 10% 10%,
+          rgba(56, 189, 248, 0.17),
+          transparent 20%
+        ),
+        radial-gradient(
+          circle at 92% 78%,
+          rgba(3, 105, 161, 0.1),
+          transparent 26%
+        ),
+        linear-gradient(
+          #ffffff,
+          #f0f9ff
+        );
     }
 
     .tpl-azure::before {
       content: '';
       position: absolute;
-      inset: 2cqw;
-      z-index: 3;
-      border: 0.18cqw solid rgba(3, 105, 161, 0.3);
-      clip-path: polygon(
-        0 0,
-        35% 0,
-        35% 1%,
-        65% 1%,
-        65% 0,
-        100% 0,
-        100% 100%,
-        65% 100%,
-        65% 99%,
-        35% 99%,
-        35% 100%,
-        0 100%
-      );
-      pointer-events: none;
+      right: -5cqw;
+      top: -3cqw;
+      z-index: 2;
+      width: 22cqw;
+      height: 48cqw;
+      transform: rotate(13deg);
+      background:
+        linear-gradient(
+          145deg,
+          rgba(3, 105, 161, 0.12),
+          rgba(56, 189, 248, 0.03)
+        );
     }
 
     .tpl-azure::after {
       content: '';
       position: absolute;
-      right: -4cqw;
-      top: -4cqw;
-      z-index: 2;
-      width: 18cqw;
-      height: 18cqw;
-      border: 2.8cqw solid rgba(56, 189, 248, 0.13);
-      border-radius: 50%;
+      inset: 2cqw;
+      z-index: 3;
+      border: 0.18cqw solid rgba(3, 105, 161, 0.3);
+      clip-path:
+        polygon(
+          0 0,
+          35% 0,
+          35% 1%,
+          65% 1%,
+          65% 0,
+          100% 0,
+          100% 100%,
+          65% 100%,
+          65% 99%,
+          35% 99%,
+          35% 100%,
+          0 100%
+        );
+      pointer-events: none;
+    }
+
+    .tpl-azure .cert-emblem {
+      border-radius: 22%;
     }
 
     .tpl-azure .cert-title {
@@ -1017,7 +1064,11 @@
       letter-spacing: 0.06em;
     }
 
-    /* 5. Gold Scholar */
+    /* =========================================================
+       TEMPLATE 5 — GOLD SCHOLAR
+       Parchment, medallion and classical typography.
+       ========================================================= */
+
     .tpl-gold {
       --cert-accent: #78350f;
       --cert-secondary: #d4a64a;
@@ -1031,8 +1082,16 @@
       outline: 0.42cqw solid #d4a64a;
       outline-offset: -1.12cqw;
       background:
-        radial-gradient(circle at center, rgba(212, 166, 74, 0.09), transparent 46%),
-        linear-gradient(145deg, #fffdf7, #faedcf);
+        radial-gradient(
+          circle at center,
+          rgba(212, 166, 74, 0.09),
+          transparent 46%
+        ),
+        linear-gradient(
+          145deg,
+          #fffdf7,
+          #faedcf
+        );
     }
 
     .tpl-gold::before {
@@ -1047,10 +1106,22 @@
     .tpl-gold::after {
       content: '';
       position: absolute;
-      inset: 3.25cqw;
-      z-index: 3;
-      border: 0.1cqw solid rgba(212, 166, 74, 0.55);
-      pointer-events: none;
+      left: 50%;
+      bottom: 3.6cqw;
+      z-index: 2;
+      width: 22cqw;
+      height: 4.8cqw;
+      transform: translateX(-50%);
+      border-top: 0.18cqw solid rgba(120, 53, 15, 0.28);
+      border-bottom: 0.18cqw solid rgba(120, 53, 15, 0.28);
+    }
+
+    .tpl-gold .cert-emblem {
+      width: 10cqi;
+      height: 10cqi;
+      border-width: 0.38cqi;
+      box-shadow:
+        0 0 0 0.6cqi rgba(212, 166, 74, 0.12);
     }
 
     .tpl-gold .cert-title {
@@ -1059,7 +1130,11 @@
       font-weight: 500;
     }
 
-    /* 6. Emerald Laureate */
+    /* =========================================================
+       TEMPLATE 6 — EMERALD LAUREATE
+       Decorative laurel sides and prestigious green styling.
+       ========================================================= */
+
     .tpl-emerald {
       --cert-accent: #065f46;
       --cert-secondary: #b9a15b;
@@ -1067,31 +1142,41 @@
       --cert-muted: #55746b;
       --cert-paper: #fbfffd;
 
-      padding: 5.8%;
+      padding: 5.8% 8%;
       font-family: 'Libre Baskerville', serif;
       border: 1.75cqw solid #064e3b;
       background:
-        radial-gradient(circle at 50% 52%, rgba(6, 95, 70, 0.055), transparent 38%),
-        linear-gradient(135deg, #ffffff, #ecfdf5);
+        radial-gradient(
+          circle at 50% 52%,
+          rgba(6, 95, 70, 0.055),
+          transparent 38%
+        ),
+        linear-gradient(
+          135deg,
+          #ffffff,
+          #ecfdf5
+        );
+    }
+
+    .tpl-emerald::before,
+    .tpl-emerald::after {
+      content: '❧';
+      position: absolute;
+      top: 50%;
+      z-index: 2;
+      color: rgba(6, 95, 70, 0.18);
+      font-family: Georgia, serif;
+      font-size: 12cqi;
     }
 
     .tpl-emerald::before {
-      content: '';
-      position: absolute;
-      inset: 1.4cqw;
-      z-index: 3;
-      border: 0.28cqw solid #b9a15b;
-      opacity: 0.55;
-      pointer-events: none;
+      left: 0.9cqw;
+      transform: translateY(-50%) rotate(-90deg);
     }
 
     .tpl-emerald::after {
-      content: '';
-      position: absolute;
-      inset: 2.3cqw;
-      z-index: 3;
-      border: 0.12cqw dashed rgba(6, 95, 70, 0.28);
-      pointer-events: none;
+      right: 0.9cqw;
+      transform: translateY(-50%) rotate(90deg);
     }
 
     .tpl-emerald .cert-title {
@@ -1100,7 +1185,15 @@
       letter-spacing: 0.04em;
     }
 
-    /* 7. Burgundy Heritage */
+    .tpl-emerald .cert-emblem {
+      border-radius: 50% 50% 42% 42%;
+    }
+
+    /* =========================================================
+       TEMPLATE 7 — BURGUNDY HERITAGE
+       Formal burgundy certificate with diagonal corner panels.
+       ========================================================= */
+
     .tpl-burgundy {
       --cert-accent: #6b1531;
       --cert-secondary: #c6a45d;
@@ -1112,31 +1205,38 @@
       font-family: 'Playfair Display', serif;
       border: 2.1cqw solid #6b1531;
       background:
-        linear-gradient(135deg, rgba(107, 21, 49, 0.05), transparent 38%),
+        linear-gradient(
+          135deg,
+          rgba(107, 21, 49, 0.05),
+          transparent 38%
+        ),
         #fffafb;
     }
 
     .tpl-burgundy::before {
       content: '';
       position: absolute;
-      inset: 1.35cqw;
-      z-index: 3;
-      border: 0.34cqw double #c6a45d;
-      opacity: 0.72;
-      pointer-events: none;
+      left: -7cqw;
+      top: -7cqw;
+      z-index: 2;
+      width: 21cqw;
+      height: 21cqw;
+      transform: rotate(45deg);
+      background: rgba(107, 21, 49, 0.1);
+      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
     }
 
     .tpl-burgundy::after {
       content: '';
       position: absolute;
-      left: 50%;
-      top: -8cqw;
+      right: -7cqw;
+      bottom: -7cqw;
       z-index: 2;
-      width: 32cqw;
-      height: 18cqw;
-      transform: translateX(-50%);
-      border: 1.8cqw solid rgba(107, 21, 49, 0.08);
-      border-radius: 50%;
+      width: 21cqw;
+      height: 21cqw;
+      transform: rotate(45deg);
+      background: rgba(107, 21, 49, 0.1);
+      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
     }
 
     .tpl-burgundy .cert-title {
@@ -1144,7 +1244,16 @@
       font-style: italic;
     }
 
-    /* 8. Digital Platinum */
+    .tpl-burgundy .cert-recipient {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+    }
+
+    /* =========================================================
+       TEMPLATE 8 — DIGITAL PLATINUM
+       Circuit grid and boxed digital credential title.
+       ========================================================= */
+
     .tpl-platinum {
       --cert-accent: #334155;
       --cert-secondary: #8ea2b7;
@@ -1156,10 +1265,24 @@
       font-family: 'Space Grotesk', sans-serif;
       border: 0.65cqw solid #334155;
       background:
-        linear-gradient(rgba(51, 65, 85, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(51, 65, 85, 0.045) 1px, transparent 1px),
-        linear-gradient(145deg, #ffffff, #f1f5f9);
-      background-size: 3.4cqw 3.4cqw, 3.4cqw 3.4cqw, auto;
+        linear-gradient(
+          rgba(51, 65, 85, 0.045) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(51, 65, 85, 0.045) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          145deg,
+          #ffffff,
+          #f1f5f9
+        );
+      background-size:
+        3.4cqw 3.4cqw,
+        3.4cqw 3.4cqw,
+        auto;
     }
 
     .tpl-platinum::before {
@@ -1174,30 +1297,40 @@
     }
 
     .tpl-platinum::after {
-      content: '';
+      content: 'DIGITAL CREDENTIAL • CRYPTOGRAPHICALLY VERIFIABLE';
       position: absolute;
-      left: 2cqw;
-      right: 2cqw;
-      top: 7cqw;
-      z-index: 3;
-      height: 0.16cqw;
-      background:
-        linear-gradient(
-          90deg,
-          transparent,
-          #334155,
-          transparent
-        );
-      opacity: 0.35;
+      left: 50%;
+      bottom: 2.15cqw;
+      z-index: 4;
+      transform: translateX(-50%);
+      color: rgba(51, 65, 85, 0.42);
+      font-size: 0.58cqi;
+      letter-spacing: 0.2em;
+      white-space: nowrap;
     }
 
     .tpl-platinum .cert-title {
-      font-size: 3.2cqi;
-      letter-spacing: 0.16em;
+      padding: 0.9cqi 1.6cqi;
+      border: 0.14cqi solid var(--cert-accent);
+      font-size: 3.05cqi;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
-    /* 9. Midnight Prestige */
+    .tpl-platinum .cert-emblem {
+      border-radius: 0;
+      transform: rotate(45deg);
+    }
+
+    .tpl-platinum .cert-emblem i {
+      transform: rotate(-45deg);
+    }
+
+    /* =========================================================
+       TEMPLATE 9 — MIDNIGHT PRESTIGE
+       Dark luxury template with gold and blue security elements.
+       ========================================================= */
+
     .tpl-midnight {
       --cert-accent: #d7b76d;
       --cert-secondary: #8ab4ff;
@@ -1210,9 +1343,21 @@
       font-family: 'Cinzel', serif;
       border: 0.8cqw solid #334155;
       background:
-        radial-gradient(circle at 50% -5%, rgba(59, 130, 246, 0.25), transparent 36%),
-        radial-gradient(circle at 80% 90%, rgba(215, 183, 109, 0.12), transparent 28%),
-        linear-gradient(150deg, #111827, #020617);
+        radial-gradient(
+          circle at 50% -5%,
+          rgba(59, 130, 246, 0.25),
+          transparent 36%
+        ),
+        radial-gradient(
+          circle at 80% 90%,
+          rgba(215, 183, 109, 0.12),
+          transparent 28%
+        ),
+        linear-gradient(
+          150deg,
+          #111827,
+          #020617
+        );
     }
 
     .tpl-midnight::before {
@@ -1261,10 +1406,17 @@
 
     .tpl-midnight .draggable-logo {
       mix-blend-mode: normal;
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.58));
+      filter:
+        drop-shadow(
+          0 0 8px rgba(255, 255, 255, 0.58)
+        );
     }
 
-    /* 10. Minimal Luxe */
+    /* =========================================================
+       TEMPLATE 10 — MINIMAL LUXE
+       Vertical side band with open, left-aligned composition.
+       ========================================================= */
+
     .tpl-luxe {
       --cert-accent: #18181b;
       --cert-secondary: #b58b55;
@@ -1272,18 +1424,35 @@
       --cert-muted: #71717a;
       --cert-paper: #ffffff;
 
-      padding: 5.8%;
+      padding: 6% 6% 5.5% 10%;
       font-family: 'Montserrat', sans-serif;
       border-left: 6.2cqw solid #18181b;
       border-top: 0.55cqw solid #18181b;
       border-right: 0.55cqw solid #18181b;
       border-bottom: 0.55cqw solid #18181b;
       background:
-        linear-gradient(90deg, rgba(181, 139, 85, 0.08), transparent 24%),
+        linear-gradient(
+          90deg,
+          rgba(181, 139, 85, 0.08),
+          transparent 24%
+        ),
         #ffffff;
     }
 
     .tpl-luxe::before {
+      content: 'CREDITY';
+      position: absolute;
+      left: 1.55cqw;
+      top: 50%;
+      z-index: 4;
+      transform: translateY(-50%) rotate(-90deg);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.25cqi;
+      font-weight: 700;
+      letter-spacing: 0.5em;
+    }
+
+    .tpl-luxe::after {
       content: '';
       position: absolute;
       top: 4cqw;
@@ -1298,25 +1467,9 @@
         0 0 0 2cqw rgba(24, 24, 27, 0.025);
     }
 
-    .tpl-luxe::after {
-      content: '';
-      position: absolute;
-      left: 9cqw;
-      right: 4cqw;
-      bottom: 3cqw;
-      z-index: 3;
-      height: 0.13cqw;
-      background:
-        linear-gradient(
-          90deg,
-          #18181b,
-          #b58b55,
-          transparent
-        );
-      opacity: 0.42;
-    }
-
     .tpl-luxe .cert-emblem {
+      margin-left: 0;
+      margin-right: 0;
       border-radius: 18%;
       transform: rotate(45deg);
     }
@@ -1325,11 +1478,85 @@
       transform: rotate(-45deg);
     }
 
+    .tpl-luxe .certificate-content {
+      text-align: left;
+    }
+
+    .tpl-luxe .cert-description {
+      width: 74%;
+      margin-left: 0;
+    }
+
     .tpl-luxe .cert-title {
       font-size: 3.15cqi;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+    }
+
+    /* =========================================================
+       HORIZONTAL TEMPLATE SELECTOR
+       ========================================================= */
+
+    .template-picker {
+      display: flex;
+      gap: 10px;
+      padding-bottom: 8px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .template-picker-button {
+      width: 170px;
+      min-width: 170px;
+      padding: 12px;
+      scroll-snap-align: start;
+      text-align: left;
+      background: #ffffff;
+      border: 1px solid #dbe2ea;
+      border-radius: 13px;
+      transition: all 0.16s ease;
+    }
+
+    .template-picker-button:hover {
+      background: #f8fbff;
+      border-color: #93c5fd;
+    }
+
+    .template-picker-button.active {
+      background: #eff6ff;
+      border-color: #2563eb;
+      box-shadow:
+        0 0 0 2px rgba(37, 99, 235, 0.08);
+    }
+
+    .template-miniature {
+      position: relative;
+      height: 74px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: var(--mini-paper);
+      border: var(--mini-border);
+    }
+
+    .template-miniature::before {
+      content: '';
+      position: absolute;
+      inset: 9px;
+      border: 1px solid var(--mini-accent);
+      opacity: 0.5;
+    }
+
+    .template-miniature::after {
+      content: '';
+      position: absolute;
+      left: 24%;
+      right: 24%;
+      top: 22px;
+      height: 6px;
+      border-top: 2px solid var(--mini-accent);
+      border-bottom: 1px solid var(--mini-secondary);
     }
 
     /* =========================================================
@@ -1341,54 +1568,58 @@
     }
 
     .badge-shape-shield {
-      clip-path: polygon(
-        50% 100%,
-        6% 77%,
-        6% 7%,
-        94% 7%,
-        94% 77%
-      );
+      clip-path:
+        polygon(
+          50% 100%,
+          6% 77%,
+          6% 7%,
+          94% 7%,
+          94% 77%
+        );
     }
 
     .badge-shape-hexagon {
-      clip-path: polygon(
-        50% 0,
-        95% 24%,
-        95% 76%,
-        50% 100%,
-        5% 76%,
-        5% 24%
-      );
+      clip-path:
+        polygon(
+          50% 0,
+          95% 24%,
+          95% 76%,
+          50% 100%,
+          5% 76%,
+          5% 24%
+        );
     }
 
     .badge-shape-diamond {
-      clip-path: polygon(
-        50% 0,
-        100% 50%,
-        50% 100%,
-        0 50%
-      );
+      clip-path:
+        polygon(
+          50% 0,
+          100% 50%,
+          50% 100%,
+          0 50%
+        );
     }
 
     .badge-shape-star {
-      clip-path: polygon(
-        50% 0,
-        61% 35%,
-        98% 35%,
-        68% 57%,
-        79% 91%,
-        50% 70%,
-        21% 91%,
-        32% 57%,
-        2% 35%,
-        39% 35%
-      );
+      clip-path:
+        polygon(
+          50% 0,
+          61% 35%,
+          98% 35%,
+          68% 57%,
+          79% 91%,
+          50% 70%,
+          21% 91%,
+          32% 57%,
+          2% 35%,
+          39% 35%
+        );
     }
 
     .badge-security-ring {
       position: absolute;
       inset: 11%;
-      border: 1px solid rgba(255,255,255,0.32);
+      border: 1px solid rgba(255, 255, 255, 0.32);
       border-radius: inherit;
       pointer-events: none;
     }
@@ -1397,7 +1628,7 @@
       content: '';
       position: absolute;
       inset: 10%;
-      border: 1px dashed rgba(255,255,255,0.2);
+      border: 1px dashed rgba(255, 255, 255, 0.2);
       border-radius: inherit;
     }
 
@@ -1419,7 +1650,8 @@
         min-width: 0;
         transform: translateX(-100%);
         transition: transform 0.22s ease;
-        box-shadow: 18px 0 40px rgba(15, 23, 42, 0.12);
+        box-shadow:
+          18px 0 40px rgba(15, 23, 42, 0.12);
         z-index: 90;
       }
 
@@ -1430,12 +1662,12 @@
       .mobile-overlay {
         position: fixed;
         inset: 0;
+        z-index: 80;
         display: block;
         background: rgba(15, 23, 42, 0.45);
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.22s ease;
-        z-index: 80;
       }
 
       .mobile-overlay.open {
@@ -1463,17 +1695,13 @@
         padding: 12px;
       }
 
-      .panel,
-      .panel-strong {
-        border-radius: 15px;
-      }
-
       .safe-table {
         min-width: 720px;
       }
 
-      .certificate-preview {
-        min-width: 0;
+      .template-picker-button {
+        width: 150px;
+        min-width: 150px;
       }
     }
   </style>
@@ -1481,10 +1709,20 @@
 
 <body>
   <%
-    const safeBadges =
+    const safeCredentials =
       typeof badges !== 'undefined' && Array.isArray(badges)
         ? badges
         : [];
+
+    const safeBadges =
+      safeCredentials.filter(item =>
+        !item.type || item.type === 'badge'
+      );
+
+    const safeCertificates =
+      safeCredentials.filter(item =>
+        item.type === 'certificate'
+      );
 
     const safeTests =
       typeof tests !== 'undefined' && Array.isArray(tests)
@@ -1507,33 +1745,40 @@
           );
 
     const teacherName =
-      user && (user.name || user.fullName)
-        ? (user.name || user.fullName)
+      user && (user.name || user.fullName || user.username)
+        ? (
+            user.name ||
+            user.fullName ||
+            user.username
+          )
         : 'Teacher';
 
-    const firstName = teacherName.split(' ')[0];
+    const firstName =
+      teacherName.split(' ')[0];
 
     function assignedForClass(cls) {
       if (Array.isArray(cls.assignedTests)) {
         return cls.assignedTests;
       }
 
-      const ids = Array.isArray(cls.assignedTestIds)
-        ? cls.assignedTestIds.map(Number)
-        : [];
+      const ids =
+        Array.isArray(cls.assignedTestIds)
+          ? cls.assignedTestIds.map(Number)
+          : [];
 
       return safeTests.filter(test =>
         ids.includes(Number(test.id))
       );
     }
 
-    const totalStudents = safeClasses.reduce((sum, cls) => {
-      if (Array.isArray(cls.students)) {
-        return sum + cls.students.length;
-      }
+    const totalStudents =
+      safeClasses.reduce((sum, cls) => {
+        if (Array.isArray(cls.students)) {
+          return sum + cls.students.length;
+        }
 
-      return sum + Number(cls.usageCount || 0);
-    }, 0);
+        return sum + Number(cls.usageCount || 0);
+      }, 0);
 
     const totalSubmissions =
       typeof submissions !== 'undefined' &&
@@ -1553,7 +1798,10 @@
   ></div>
 
   <div class="app-shell">
-    <aside id="sidebar" class="sidebar">
+    <aside
+      id="sidebar"
+      class="sidebar"
+    >
       <div class="sidebar-inner custom-scroll">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
@@ -1598,7 +1846,7 @@
             onclick="showView('overview')"
           >
             <i class="fa-solid fa-gauge-high w-5 shrink-0"></i>
-            <span class="truncate">Overview</span>
+            <span>Overview</span>
           </button>
 
           <button
@@ -1607,7 +1855,7 @@
             onclick="showView('classes')"
           >
             <i class="fa-solid fa-users-rectangle w-5 shrink-0"></i>
-            <span class="truncate">Classes</span>
+            <span>Classes</span>
           </button>
 
           <button
@@ -1616,7 +1864,7 @@
             onclick="showView('tasks')"
           >
             <i class="fa-solid fa-clipboard-question w-5 shrink-0"></i>
-            <span class="truncate">Assignments</span>
+            <span>Assignments</span>
           </button>
 
           <button
@@ -1625,7 +1873,7 @@
             onclick="showView('certificates')"
           >
             <i class="fa-solid fa-certificate w-5 shrink-0"></i>
-            <span class="truncate">Certificates</span>
+            <span>Certificates</span>
           </button>
 
           <button
@@ -1634,7 +1882,7 @@
             onclick="showView('badges')"
           >
             <i class="fa-solid fa-award w-5 shrink-0"></i>
-            <span class="truncate">Badges</span>
+            <span>Badges</span>
           </button>
 
           <button
@@ -1643,7 +1891,7 @@
             onclick="showView('announcements')"
           >
             <i class="fa-solid fa-bullhorn w-5 shrink-0"></i>
-            <span class="truncate">Announcements</span>
+            <span>Announcements</span>
           </button>
         </nav>
 
@@ -1661,10 +1909,13 @@
           <div class="space-y-2">
             <% if (safeClasses.length > 0) { %>
               <% safeClasses.forEach((cls, index) => {
-                const classTasks = assignedForClass(cls);
-                const classStudents = Array.isArray(cls.students)
-                  ? cls.students
-                  : [];
+                const classTasks =
+                  assignedForClass(cls);
+
+                const classStudents =
+                  Array.isArray(cls.students)
+                    ? cls.students
+                    : [];
               %>
                 <button
                   type="button"
@@ -1806,8 +2057,9 @@
                 </h1>
 
                 <p class="mt-5 max-w-3xl text-lg md:text-xl text-slate-600 leading-relaxed">
-                  Manage classes, assignments, professional credentials,
-                  verified badges, scores, and announcements from one workspace.
+                  Manage classes, assignments, professional
+                  credentials, verified badges, scores, and
+                  announcements from one workspace.
                 </p>
 
                 <div class="mt-8 flex flex-wrap gap-3">
@@ -1902,14 +2154,18 @@
           <div class="grid-safe">
             <% if (safeClasses.length > 0) { %>
               <% safeClasses.forEach(cls => {
-                const classTasks = assignedForClass(cls);
-                const classStudents = Array.isArray(cls.students)
-                  ? cls.students
-                  : [];
+                const classTasks =
+                  assignedForClass(cls);
 
-                const classResults = Array.isArray(cls.results)
-                  ? cls.results
-                  : [];
+                const classStudents =
+                  Array.isArray(cls.students)
+                    ? cls.students
+                    : [];
+
+                const classResults =
+                  Array.isArray(cls.results)
+                    ? cls.results
+                    : [];
               %>
                 <button
                   type="button"
@@ -1972,7 +2228,7 @@
                 </div>
 
                 <p class="text-slate-500 mt-2">
-                  Create a class key from the Classes section.
+                  Create your first class from the Classes section.
                 </p>
               </div>
             <% } %>
@@ -2010,7 +2266,7 @@
                     placeholder="Grade 10A - Mathematics"
                     class="input px-4 py-3 rounded-lg"
                     required
-                  />
+                  >
                 </div>
 
                 <button
@@ -2025,7 +2281,8 @@
             <div>
               <% if (safeClasses.length > 0) { %>
                 <% safeClasses.forEach((cls, classIndex) => {
-                  const assignedTests = assignedForClass(cls);
+                  const assignedTests =
+                    assignedForClass(cls);
 
                   const classAnnouncements =
                     Array.isArray(cls.announcements)
@@ -2049,7 +2306,7 @@
                     <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
                       <div>
                         <div class="flex flex-wrap items-center gap-2">
-                          <h3 class="text-2xl md:text-3xl font-semibold">
+                          <h3 class="text-2xl md:text-3xl font-semibold break-anywhere">
                             <%= cls.className %>
                           </h3>
 
@@ -2145,7 +2402,7 @@
                             type="hidden"
                             name="classId"
                             value="<%= cls.id %>"
-                          />
+                          >
 
                           <select
                             name="testId"
@@ -2177,7 +2434,7 @@
                               <div class="p-3 rounded-lg bg-white border border-slate-200">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                   <div>
-                                    <div class="text-sm font-medium">
+                                    <div class="text-sm font-medium break-anywhere">
                                       <%= test.title %>
                                     </div>
 
@@ -2196,13 +2453,13 @@
                                         type="hidden"
                                         name="classId"
                                         value="<%= cls.id %>"
-                                      />
+                                      >
 
                                       <input
                                         type="hidden"
                                         name="testId"
                                         value="<%= test.id %>"
-                                      />
+                                      >
 
                                       <button
                                         type="submit"
@@ -2221,7 +2478,7 @@
                                         type="hidden"
                                         name="testId"
                                         value="<%= test.id %>"
-                                      />
+                                      >
 
                                       <button
                                         type="submit"
@@ -2260,7 +2517,7 @@
                             type="hidden"
                             name="classId"
                             value="<%= cls.id %>"
-                          />
+                          >
 
                           <input
                             type="text"
@@ -2268,7 +2525,7 @@
                             placeholder="Announcement title"
                             class="input px-4 py-3 rounded-lg text-sm"
                             required
-                          />
+                          >
 
                           <textarea
                             name="description"
@@ -2288,11 +2545,11 @@
                           <% if (classAnnouncements.length > 0) { %>
                             <% classAnnouncements.slice().reverse().forEach(item => { %>
                               <div class="p-3 rounded-lg bg-white border border-slate-200">
-                                <div class="text-sm font-medium">
+                                <div class="text-sm font-medium break-anywhere">
                                   <%= item.title %>
                                 </div>
 
-                                <div class="text-xs text-slate-500 mt-1">
+                                <div class="text-xs text-slate-500 mt-1 break-anywhere">
                                   <%= item.description || 'No description.' %>
                                 </div>
                               </div>
@@ -2313,7 +2570,7 @@
                         </div>
 
                         <div class="text-xs text-slate-500 mt-1">
-                          Names, emails, progress, and average scores.
+                          Names, emails, completion progress, and scores.
                         </div>
                       </div>
 
@@ -2322,12 +2579,29 @@
                           <table class="safe-table text-left text-sm">
                             <thead>
                               <tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
-                                <th class="px-5 py-3 font-medium">Student</th>
-                                <th class="px-5 py-3 font-medium">Email</th>
-                                <th class="px-5 py-3 font-medium">Joined</th>
-                                <th class="px-5 py-3 font-medium">Completed</th>
-                                <th class="px-5 py-3 font-medium">Pending</th>
-                                <th class="px-5 py-3 font-medium">Average</th>
+                                <th class="px-5 py-3 font-medium">
+                                  Student
+                                </th>
+
+                                <th class="px-5 py-3 font-medium">
+                                  Email
+                                </th>
+
+                                <th class="px-5 py-3 font-medium">
+                                  Joined
+                                </th>
+
+                                <th class="px-5 py-3 font-medium">
+                                  Completed
+                                </th>
+
+                                <th class="px-5 py-3 font-medium">
+                                  Pending
+                                </th>
+
+                                <th class="px-5 py-3 font-medium">
+                                  Average
+                                </th>
                               </tr>
                             </thead>
 
@@ -2335,7 +2609,7 @@
                               <% students.forEach(student => { %>
                                 <tr class="hover:bg-slate-50">
                                   <td class="px-5 py-4">
-                                    <div class="font-medium">
+                                    <div class="font-medium break-anywhere">
                                       <%= student.fullName || student.name || 'Student' %>
                                     </div>
 
@@ -2345,7 +2619,7 @@
                                     </div>
                                   </td>
 
-                                  <td class="px-5 py-4 text-slate-600">
+                                  <td class="px-5 py-4 text-slate-600 break-anywhere">
                                     <%= student.email || 'No email' %>
                                   </td>
 
@@ -2380,6 +2654,38 @@
                                     <% } %>
                                   </td>
                                 </tr>
+
+                                <% if (
+                                  Array.isArray(student.submissions) &&
+                                  student.submissions.length > 0
+                                ) { %>
+                                  <tr class="bg-slate-50">
+                                    <td
+                                      colspan="6"
+                                      class="px-5 py-4"
+                                    >
+                                      <div class="grid md:grid-cols-2 gap-2">
+                                        <% student.submissions.forEach(submission => { %>
+                                          <div class="p-3 rounded-lg bg-white border border-slate-200 flex items-center justify-between gap-3">
+                                            <div>
+                                              <div class="text-sm font-medium break-anywhere">
+                                                <%= submission.testTitle %>
+                                              </div>
+
+                                              <div class="text-xs text-slate-500 mt-1">
+                                                <%= submission.submittedAtFormatted || '' %>
+                                              </div>
+                                            </div>
+
+                                            <div class="font-semibold <%= submission.passed ? 'text-emerald-700' : 'text-red-600' %>">
+                                              <%= submission.score %>%
+                                            </div>
+                                          </div>
+                                        <% }) %>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                <% } %>
                               <% }) %>
                             </tbody>
                           </table>
@@ -2407,10 +2713,6 @@
                   <div class="text-2xl font-semibold">
                     No classes yet
                   </div>
-
-                  <p class="text-slate-500 mt-2">
-                    Generate your first class key.
-                  </p>
                 </div>
               <% } %>
             </div>
@@ -2446,13 +2748,15 @@
             <% if (safeTests.length > 0) { %>
               <div class="grid-safe">
                 <% safeTests.forEach(test => {
-                  const linkedClasses = safeClasses.filter(cls => {
-                    const ids = Array.isArray(cls.assignedTestIds)
-                      ? cls.assignedTestIds.map(Number)
-                      : [];
+                  const linkedClasses =
+                    safeClasses.filter(cls => {
+                      const ids =
+                        Array.isArray(cls.assignedTestIds)
+                          ? cls.assignedTestIds.map(Number)
+                          : [];
 
-                    return ids.includes(Number(test.id));
-                  });
+                      return ids.includes(Number(test.id));
+                    });
                 %>
                   <article
                     class="panel rounded-xl p-5 task-card"
@@ -2460,7 +2764,7 @@
                   >
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <h3 class="text-lg font-semibold truncate">
+                        <h3 class="text-lg font-semibold break-anywhere">
                           <%= test.title %>
                         </h3>
 
@@ -2509,7 +2813,7 @@
                         type="hidden"
                         name="testId"
                         value="<%= test.id %>"
-                      />
+                      >
 
                       <button
                         type="submit"
@@ -2542,26 +2846,26 @@
             id="certificateForm"
             action="/create-credential"
             method="POST"
-            class="grid xl:grid-cols-[minmax(0,1.15fr)_minmax(390px,.85fr)] gap-6"
+            class="grid xl:grid-cols-[minmax(0,1.12fr)_minmax(420px,.88fr)] gap-6"
           >
             <input
               type="hidden"
               name="type"
               value="certificate"
-            />
+            >
 
             <input
               type="hidden"
               name="templateStyle"
               id="selectedCertificateTemplate"
               value="tpl-sovereign"
-            />
+            >
 
             <input
               type="hidden"
               name="antiForge"
               value="true"
-            />
+            >
 
             <div id="certificateHiddenLogos"></div>
 
@@ -2569,17 +2873,17 @@
               <div>
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-800 text-xs font-medium mb-4">
                   <i class="fa-solid fa-shield-halved"></i>
-                  Premium anti-forge certificate system
+                  Text-wave anti-forge security
                 </div>
 
                 <h2 class="text-2xl md:text-3xl font-semibold">
-                  Certificate Designer
+                  Premium Certificate Designer
                 </h2>
 
                 <p class="text-sm text-slate-500 mt-1 leading-relaxed">
-                  Ten detailed templates with wave microprinting,
-                  guilloche patterns, security borders, serial markings,
-                  and a four-ring QR verification seal.
+                  Ten structurally different templates with eight
+                  full-width wave-text rows and four continuous
+                  verification-text rings around the QR code.
                 </p>
               </div>
 
@@ -2616,7 +2920,7 @@
                     value="Alex Rivera"
                     oninput="updateCertificate()"
                     class="input px-3 py-2 rounded-lg text-sm"
-                  />
+                  >
                 </div>
 
                 <div>
@@ -2631,7 +2935,7 @@
                     value="<%= teacherName %>"
                     oninput="updateCertificate()"
                     class="input px-3 py-2 rounded-lg text-sm"
-                  />
+                  >
                 </div>
 
                 <div>
@@ -2644,7 +2948,7 @@
                     id="certDate"
                     oninput="updateCertificate()"
                     class="input px-3 py-2 rounded-lg text-sm"
-                  />
+                  >
                 </div>
               </div>
 
@@ -2662,7 +2966,7 @@
                     oninput="updateCertificate()"
                     class="input px-4 py-3 rounded-lg"
                     required
-                  />
+                  >
                 </div>
 
                 <div>
@@ -2674,10 +2978,10 @@
                     type="color"
                     id="certColor"
                     name="designColor"
-                    value="#172554"
+                    value="#14213d"
                     oninput="updateCertificate()"
                     class="w-full h-12 p-0 border-0 rounded-lg cursor-pointer"
-                  />
+                  >
                 </div>
               </div>
 
@@ -2702,13 +3006,13 @@
                   </label>
 
                   <span class="text-xs text-slate-400">
-                    10 designs
+                    Horizontal selector
                   </span>
                 </div>
 
                 <div
-                  id="templateGrid"
-                  class="grid sm:grid-cols-2 gap-3"
+                  id="templatePicker"
+                  class="template-picker custom-scroll"
                 ></div>
               </div>
 
@@ -2739,7 +3043,7 @@
                     id="customLogoInput"
                     placeholder="Paste a direct logo URL..."
                     class="input px-4 py-2.5 rounded-lg text-sm"
-                  />
+                  >
 
                   <button
                     type="button"
@@ -2778,7 +3082,7 @@
                     </h3>
 
                     <p class="text-xs text-slate-400 mt-1">
-                      Eight wave lines and four QR rings
+                      Text follows every wave and every ring
                     </p>
                   </div>
 
@@ -2800,20 +3104,130 @@
                   <div class="cert-corner corner-br"></div>
                   <div class="cert-corner corner-bl"></div>
 
-                  <div class="anti-forge-wave-band">
-                    <div class="anti-forge-wave" style="--wave-index:0"></div>
-                    <div class="anti-forge-wave" style="--wave-index:1"></div>
-                    <div class="anti-forge-wave" style="--wave-index:2"></div>
-                    <div class="anti-forge-wave" style="--wave-index:3"></div>
-                    <div class="anti-forge-wave" style="--wave-index:4"></div>
-                    <div class="anti-forge-wave" style="--wave-index:5"></div>
-                    <div class="anti-forge-wave" style="--wave-index:6"></div>
-                    <div class="anti-forge-wave" style="--wave-index:7"></div>
-                  </div>
+                  <!--
+                    Eight full-width text rows.
+                    Each row follows a true SVG wave path.
+                  -->
+                  <svg
+                    class="security-wave-svg"
+                    viewBox="0 0 1200 170"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <path
+                        id="wavePath1"
+                        d="M0,42 C75,18 125,18 200,42 S325,66 400,42 S525,18 600,42 S725,66 800,42 S925,18 1000,42 S1125,66 1200,42"
+                      />
 
-                  <div class="anti-forge-wave-text">
-                    CREDITY VERIFIED • AUTHENTIC CREDENTIAL • SECURITY MICROPRINT • CREDITY VERIFIED • AUTHENTIC CREDENTIAL
-                  </div>
+                      <path
+                        id="wavePath2"
+                        d="M0,54 C75,30 125,30 200,54 S325,78 400,54 S525,30 600,54 S725,78 800,54 S925,30 1000,54 S1125,78 1200,54"
+                      />
+
+                      <path
+                        id="wavePath3"
+                        d="M0,66 C75,42 125,42 200,66 S325,90 400,66 S525,42 600,66 S725,90 800,66 S925,42 1000,66 S1125,90 1200,66"
+                      />
+
+                      <path
+                        id="wavePath4"
+                        d="M0,78 C75,54 125,54 200,78 S325,102 400,78 S525,54 600,78 S725,102 800,78 S925,54 1000,78 S1125,102 1200,78"
+                      />
+
+                      <path
+                        id="wavePath5"
+                        d="M0,90 C75,66 125,66 200,90 S325,114 400,90 S525,66 600,90 S725,114 800,90 S925,66 1000,90 S1125,114 1200,90"
+                      />
+
+                      <path
+                        id="wavePath6"
+                        d="M0,102 C75,78 125,78 200,102 S325,126 400,102 S525,78 600,102 S725,126 800,102 S925,78 1000,102 S1125,126 1200,102"
+                      />
+
+                      <path
+                        id="wavePath7"
+                        d="M0,114 C75,90 125,90 200,114 S325,138 400,114 S525,90 600,114 S725,138 800,114 S925,90 1000,114 S1125,138 1200,114"
+                      />
+
+                      <path
+                        id="wavePath8"
+                        d="M0,126 C75,102 125,102 200,126 S325,150 400,126 S525,102 600,126 S725,150 800,126 S925,102 1000,126 S1125,150 1200,126"
+                      />
+                    </defs>
+
+                    <text>
+                      <textPath
+                        href="#wavePath1"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text class="wave-secondary">
+                      <textPath
+                        href="#wavePath2"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text>
+                      <textPath
+                        href="#wavePath3"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text class="wave-secondary">
+                      <textPath
+                        href="#wavePath4"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text>
+                      <textPath
+                        href="#wavePath5"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text class="wave-secondary">
+                      <textPath
+                        href="#wavePath6"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text>
+                      <textPath
+                        href="#wavePath7"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+
+                    <text class="wave-secondary">
+                      <textPath
+                        href="#wavePath8"
+                        startOffset="0%"
+                        textLength="1200"
+                        lengthAdjust="spacingAndGlyphs"
+                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                    </text>
+                  </svg>
 
                   <div
                     id="logoDragBoundary"
@@ -2821,7 +3235,7 @@
                   ></div>
 
                   <div class="certificate-serial">
-                    Security Series CRD-2026 • Verified Original
+                    Security Series CRD-2026 • Verifiable on Credity.ink
                   </div>
 
                   <div class="certificate-content text-center">
@@ -2858,9 +3272,10 @@
                         id="previewDescription"
                         class="cert-description"
                       >
-                        has successfully completed the required learning
-                        experience and demonstrated exceptional understanding,
-                        commitment, and achievement.
+                        has successfully completed the required
+                        learning experience and demonstrated
+                        exceptional understanding, commitment,
+                        and achievement.
                       </div>
                     </div>
 
@@ -2893,40 +3308,85 @@
 
                       <div class="cert-footer-block">
                         <div class="qr-security-wrap">
-                          <div class="qr-guilloche"></div>
+                          <div class="qr-guilloche-core"></div>
 
-                          <div
-                            class="qr-watermark-ring"
-                            style="--ring-inset:0%;--ring-order:0"
-                          ></div>
+                          <!--
+                            Four full circular text rings.
+                            Every ring repeats the verification phrase
+                            continuously from start to finish.
+                          -->
+                          <svg
+                            class="qr-ring-svg"
+                            viewBox="0 0 220 220"
+                            aria-hidden="true"
+                          >
+                            <defs>
+                              <path
+                                id="ringPath1"
+                                d="M110 8 a102 102 0 1 1 0 204 a102 102 0 1 1 0 -204"
+                              />
 
-                          <div
-                            class="qr-watermark-ring"
-                            style="--ring-inset:12%;--ring-order:1"
-                          ></div>
+                              <path
+                                id="ringPath2"
+                                d="M110 22 a88 88 0 1 1 0 176 a88 88 0 1 1 0 -176"
+                              />
 
-                          <div
-                            class="qr-watermark-ring"
-                            style="--ring-inset:24%;--ring-order:2"
-                          ></div>
+                              <path
+                                id="ringPath3"
+                                d="M110 36 a74 74 0 1 1 0 148 a74 74 0 1 1 0 -148"
+                              />
 
-                          <div
-                            class="qr-watermark-ring"
-                            style="--ring-inset:36%;--ring-order:3"
-                          ></div>
+                              <path
+                                id="ringPath4"
+                                d="M110 50 a60 60 0 1 1 0 120 a60 60 0 1 1 0 -120"
+                              />
+                            </defs>
+
+                            <text>
+                              <textPath
+                                href="#ringPath1"
+                                startOffset="0%"
+                                textLength="640"
+                                lengthAdjust="spacingAndGlyphs"
+                              >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                            </text>
+
+                            <text class="ring-two">
+                              <textPath
+                                href="#ringPath2"
+                                startOffset="0%"
+                                textLength="552"
+                                lengthAdjust="spacingAndGlyphs"
+                              >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                            </text>
+
+                            <text class="ring-three">
+                              <textPath
+                                href="#ringPath3"
+                                startOffset="0%"
+                                textLength="465"
+                                lengthAdjust="spacingAndGlyphs"
+                              >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                            </text>
+
+                            <text class="ring-four">
+                              <textPath
+                                href="#ringPath4"
+                                startOffset="0%"
+                                textLength="377"
+                                lengthAdjust="spacingAndGlyphs"
+                              >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
+                            </text>
+                          </svg>
 
                           <img
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Credity-Verified-Certificate"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https%3A%2F%2Fcredity.ink%2Fverify"
                             alt="Verification QR code"
                             class="qr-security-code"
-                          />
-
-                          <div class="qr-microtext">
-                            Scan to verify • secure original • scan to verify
-                          </div>
+                          >
                         </div>
 
-                        <div class="cert-footer-label mt-[1.8cqi]">
+                        <div class="cert-footer-label mt-[1.2cqi]">
                           Digital Verification
                         </div>
                       </div>
@@ -2941,12 +3401,13 @@
 
                       <div>
                         <div class="text-sm font-semibold">
-                          Eight-line wave band
+                          Eight text waves
                         </div>
 
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                          Eight transparent guilloche wave lines are stacked
-                          closely above the certificate midpoint.
+                          Every security row is real text following a
+                          wave path and filling the certificate from
+                          left to right.
                         </p>
                       </div>
                     </div>
@@ -2958,17 +3419,46 @@
 
                       <div>
                         <div class="text-sm font-semibold">
-                          Four-ring QR seal
+                          Four continuous text rings
                         </div>
 
                         <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                          Four transparent security circles and radial
-                          microprinting surround the QR code.
+                          Every QR ring repeats “VERIFIABLE ON
+                          CREDITY.INK” around its complete
+                          circumference.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <% if (safeCertificates.length > 0) { %>
+                  <div class="panel-strong rounded-2xl p-5 mt-5">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                      <h3 class="font-semibold">
+                        Saved Certificates
+                      </h3>
+
+                      <span class="text-xs text-slate-400">
+                        <%= safeCertificates.length %>
+                      </span>
+                    </div>
+
+                    <div class="space-y-2 max-h-64 overflow-y-auto custom-scroll">
+                      <% safeCertificates.slice().reverse().forEach(item => { %>
+                        <div class="p-3 rounded-lg border border-slate-200 bg-white">
+                          <div class="font-medium text-sm break-anywhere">
+                            <%= item.title %>
+                          </div>
+
+                          <div class="text-xs text-slate-500 mt-1">
+                            <%= item.templateStyle || 'Premium template' %>
+                          </div>
+                        </div>
+                      <% }) %>
+                    </div>
+                  </div>
+                <% } %>
               </div>
             </div>
           </form>
@@ -2989,21 +3479,21 @@
                 type="hidden"
                 name="type"
                 value="badge"
-              />
+              >
 
               <input
                 type="hidden"
                 id="selectedBadgeIcon"
                 name="badgeIcon"
                 value="fa-shield-halved"
-              />
+              >
 
               <input
                 type="hidden"
                 id="selectedBadgeShape"
                 name="badgeShape"
                 value="badge-shape-shield"
-              />
+              >
 
               <div>
                 <h2 class="text-2xl font-semibold">
@@ -3011,7 +3501,8 @@
                 </h2>
 
                 <p class="text-sm text-slate-500 mt-1">
-                  Create verified badges for achievements and assessments.
+                  Create verified badges for achievements and
+                  assessments.
                 </p>
               </div>
 
@@ -3049,7 +3540,7 @@
                   oninput="updateBadge()"
                   class="input px-4 py-3 rounded-lg"
                   required
-                />
+                >
               </div>
 
               <div>
@@ -3108,7 +3599,7 @@
                     value="#0f172a"
                     oninput="updateBadge()"
                     class="w-full h-12 p-0 border-0 rounded-lg cursor-pointer"
-                  />
+                  >
                 </div>
               </div>
 
@@ -3213,9 +3704,15 @@
               </div>
 
               <div class="panel-strong rounded-2xl p-5">
-                <h3 class="text-xl font-semibold mb-4">
-                  Created Badges
-                </h3>
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <h3 class="text-xl font-semibold">
+                    Created Badges
+                  </h3>
+
+                  <span class="text-xs text-slate-400">
+                    <%= safeBadges.length %>
+                  </span>
+                </div>
 
                 <% if (safeBadges.length > 0) { %>
                   <div class="space-y-3 max-h-[28rem] overflow-y-auto custom-scroll">
@@ -3229,7 +3726,7 @@
                         </div>
 
                         <div>
-                          <div class="font-semibold">
+                          <div class="font-semibold break-anywhere">
                             <%= badge.title %>
                           </div>
 
@@ -3276,7 +3773,7 @@
                   placeholder="Announcement title"
                   class="input px-4 py-3 rounded-lg"
                   required
-                />
+                >
 
                 <textarea
                   name="description"
@@ -3317,11 +3814,11 @@
                 <div class="space-y-3 max-h-[34rem] overflow-y-auto custom-scroll">
                   <% safeEvents.slice().reverse().forEach(item => { %>
                     <div class="p-5 rounded-xl border border-slate-200">
-                      <div class="font-semibold">
+                      <div class="font-semibold break-anywhere">
                         <%= item.title %>
                       </div>
 
-                      <p class="text-sm text-slate-500 mt-2">
+                      <p class="text-sm text-slate-500 mt-2 break-anywhere">
                         <%= item.description || 'No description.' %>
                       </p>
                     </div>
@@ -3348,62 +3845,92 @@
       {
         className: 'tpl-sovereign',
         name: 'Sovereign Navy',
-        subtitle: 'Classic navy and gold',
-        accent: '#14213d'
+        subtitle: 'Ornate triple-border classic',
+        accent: '#14213d',
+        secondary: '#c89b3c',
+        paper: '#fffdf7',
+        border: '5px double #14213d'
       },
       {
         className: 'tpl-university',
         name: 'Royal University',
-        subtitle: 'Academic double-border',
-        accent: '#1e3a8a'
+        subtitle: 'Academic crest and arch',
+        accent: '#1e3a8a',
+        secondary: '#b68b2c',
+        paper: '#ffffff',
+        border: '7px double #172554'
       },
       {
         className: 'tpl-executive',
         name: 'Executive Black',
-        subtitle: 'Corporate board style',
-        accent: '#111827'
+        subtitle: 'Corporate masthead layout',
+        accent: '#111827',
+        secondary: '#bfa56a',
+        paper: '#ffffff',
+        border: '8px solid #111827'
       },
       {
         className: 'tpl-azure',
         name: 'Modern Azure',
-        subtitle: 'Clean technology design',
-        accent: '#0369a1'
+        subtitle: 'Asymmetric geometric design',
+        accent: '#0369a1',
+        secondary: '#38bdf8',
+        paper: '#f0f9ff',
+        border: '3px solid #0369a1'
       },
       {
         className: 'tpl-gold',
         name: 'Gold Scholar',
-        subtitle: 'Warm premium parchment',
-        accent: '#78350f'
+        subtitle: 'Parchment and medallion',
+        accent: '#78350f',
+        secondary: '#d4a64a',
+        paper: '#fff6df',
+        border: '6px double #78350f'
       },
       {
         className: 'tpl-emerald',
         name: 'Emerald Laureate',
-        subtitle: 'Prestigious green seal',
-        accent: '#065f46'
+        subtitle: 'Laurel-side composition',
+        accent: '#065f46',
+        secondary: '#b9a15b',
+        paper: '#ecfdf5',
+        border: '5px solid #065f46'
       },
       {
         className: 'tpl-burgundy',
         name: 'Burgundy Heritage',
-        subtitle: 'Traditional formal style',
-        accent: '#6b1531'
+        subtitle: 'Diagonal heritage corners',
+        accent: '#6b1531',
+        secondary: '#c6a45d',
+        paper: '#fffafb',
+        border: '6px double #6b1531'
       },
       {
         className: 'tpl-platinum',
         name: 'Digital Platinum',
-        subtitle: 'Structured modern grid',
-        accent: '#334155'
+        subtitle: 'Circuit grid credential',
+        accent: '#334155',
+        secondary: '#8ea2b7',
+        paper: '#f1f5f9',
+        border: '3px solid #334155'
       },
       {
         className: 'tpl-midnight',
         name: 'Midnight Prestige',
-        subtitle: 'Dark luxury certificate',
-        accent: '#d7b76d'
+        subtitle: 'Dark luxury presentation',
+        accent: '#d7b76d',
+        secondary: '#8ab4ff',
+        paper: '#0f172a',
+        border: '4px double #d7b76d'
       },
       {
         className: 'tpl-luxe',
         name: 'Minimal Luxe',
-        subtitle: 'Simple executive layout',
-        accent: '#18181b'
+        subtitle: 'Vertical band and open space',
+        accent: '#18181b',
+        secondary: '#b58b55',
+        paper: '#ffffff',
+        border: '4px solid #18181b'
       }
     ];
 
@@ -3417,26 +3944,42 @@
       'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'
     ];
 
-    let currentCertificateTemplate = 'tpl-sovereign';
+    let currentCertificateTemplate =
+      'tpl-sovereign';
+
     let activeCertificateLogos = [];
 
     function openSidebar() {
-      document.getElementById('sidebar').classList.add('open');
-      document.getElementById('mobileOverlay').classList.add('open');
+      document
+        .getElementById('sidebar')
+        .classList.add('open');
+
+      document
+        .getElementById('mobileOverlay')
+        .classList.add('open');
     }
 
     function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('mobileOverlay').classList.remove('open');
+      document
+        .getElementById('sidebar')
+        .classList.remove('open');
+
+      document
+        .getElementById('mobileOverlay')
+        .classList.remove('open');
     }
 
     function showView(view, scroll = true) {
       document
         .querySelectorAll('.view-panel')
-        .forEach(panel => panel.classList.add('hidden'));
+        .forEach(panel => {
+          panel.classList.add('hidden');
+        });
 
       const selectedPanel =
-        document.querySelector(`[data-view-panel="${view}"]`);
+        document.querySelector(
+          `[data-view-panel="${view}"]`
+        );
 
       if (selectedPanel) {
         selectedPanel.classList.remove('hidden');
@@ -3444,16 +3987,24 @@
 
       document
         .querySelectorAll('[data-view-link]')
-        .forEach(link => link.classList.remove('active'));
+        .forEach(link => {
+          link.classList.remove('active');
+        });
 
       const selectedLink =
-        document.querySelector(`[data-view-link="${view}"]`);
+        document.querySelector(
+          `[data-view-link="${view}"]`
+        );
 
       if (selectedLink) {
         selectedLink.classList.add('active');
       }
 
-      history.replaceState(null, '', `#${view}`);
+      history.replaceState(
+        null,
+        '',
+        `#${view}`
+      );
 
       closeSidebar();
 
@@ -3470,10 +4021,14 @@
 
       document
         .querySelectorAll('[data-class-button]')
-        .forEach(button => button.classList.remove('active'));
+        .forEach(button => {
+          button.classList.remove('active');
+        });
 
       const classButton =
-        document.querySelector(`[data-class-button="${classId}"]`);
+        document.querySelector(
+          `[data-class-button="${classId}"]`
+        );
 
       if (classButton) {
         classButton.classList.add('active');
@@ -3481,10 +4036,14 @@
 
       document
         .querySelectorAll('[data-class-panel]')
-        .forEach(panel => panel.classList.add('hidden'));
+        .forEach(panel => {
+          panel.classList.add('hidden');
+        });
 
       const classPanel =
-        document.querySelector(`[data-class-panel="${classId}"]`);
+        document.querySelector(
+          `[data-class-panel="${classId}"]`
+        );
 
       if (classPanel) {
         classPanel.classList.remove('hidden');
@@ -3503,10 +4062,14 @@
 
       document
         .querySelectorAll('[data-task-button]')
-        .forEach(button => button.classList.remove('active'));
+        .forEach(button => {
+          button.classList.remove('active');
+        });
 
       const taskButton =
-        document.querySelector(`[data-task-button="${taskId}"]`);
+        document.querySelector(
+          `[data-task-button="${taskId}"]`
+        );
 
       if (taskButton) {
         taskButton.classList.add('active');
@@ -3520,13 +4083,16 @@
         });
 
       const taskCard =
-        document.querySelector(`[data-task-card="${taskId}"]`);
+        document.querySelector(
+          `[data-task-card="${taskId}"]`
+        );
 
       if (taskCard) {
         taskCard.style.outline =
           '3px solid rgba(37,99,235,.22)';
 
-        taskCard.style.outlineOffset = '2px';
+        taskCard.style.outlineOffset =
+          '2px';
 
         setTimeout(() => {
           taskCard.scrollIntoView({
@@ -3537,75 +4103,78 @@
       }
     }
 
-    function renderTemplateButtons() {
+    function renderTemplatePicker() {
       const container =
-        document.getElementById('templateGrid');
+        document.getElementById(
+          'templatePicker'
+        );
 
       if (!container) return;
 
       container.innerHTML = '';
 
-      certificateTemplates.forEach((template, index) => {
-        const button = document.createElement('button');
+      certificateTemplates.forEach(
+        (template, index) => {
+          const button =
+            document.createElement('button');
 
-        button.type = 'button';
+          button.type = 'button';
 
-        button.className =
-          'template-button text-left p-4 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition';
+          button.className =
+            `template-picker-button ${
+              index === 0 ? 'active' : ''
+            }`;
 
-        button.innerHTML = `
-          <div class="flex items-start gap-3">
+          button.innerHTML = `
             <div
-              class="w-10 h-10 rounded-lg border border-black/10 shrink-0"
-              style="background:${template.accent}"
+              class="template-miniature"
+              style="
+                --mini-paper:${template.paper};
+                --mini-accent:${template.accent};
+                --mini-secondary:${template.secondary};
+                --mini-border:${template.border};
+              "
             ></div>
 
-            <div>
-              <div class="text-sm font-semibold">
-                ${template.name}
-              </div>
-
-              <div class="text-xs text-slate-500 mt-1">
-                ${template.subtitle}
-              </div>
+            <div class="text-sm font-semibold">
+              ${template.name}
             </div>
-          </div>
-        `;
 
-        button.onclick = () =>
-          setCertificateTemplate(template, button);
+            <div class="text-xs text-slate-500 mt-1">
+              ${template.subtitle}
+            </div>
+          `;
 
-        if (index === 0) {
-          activateTemplateButton(button);
+          button.onclick = () =>
+            setCertificateTemplate(
+              template,
+              button
+            );
+
+          container.appendChild(button);
         }
-
-        container.appendChild(button);
-      });
+      );
     }
 
-    function activateTemplateButton(selectedButton) {
-      document
-        .querySelectorAll('.template-button')
-        .forEach(button => {
-          button.style.borderColor = '#e2e8f0';
-          button.style.background = '#ffffff';
-          button.style.boxShadow = '';
-        });
-
-      selectedButton.style.borderColor = '#2563eb';
-      selectedButton.style.background = '#eff6ff';
-      selectedButton.style.boxShadow =
-        '0 0 0 2px rgba(37,99,235,.08)';
-    }
-
-    function setCertificateTemplate(template, button) {
+    function setCertificateTemplate(
+      template,
+      button
+    ) {
       const preview =
-        document.getElementById('certificatePreview');
+        document.getElementById(
+          'certificatePreview'
+        );
 
-      preview.classList.remove(currentCertificateTemplate);
-      preview.classList.add(template.className);
+      preview.classList.remove(
+        currentCertificateTemplate
+      );
 
-      currentCertificateTemplate = template.className;
+      preview.classList.add(
+        template.className
+      );
+
+      currentCertificateTemplate =
+        template.className;
 
       document.getElementById(
         'selectedCertificateTemplate'
@@ -3615,33 +4184,64 @@
         'certColor'
       ).value = template.accent;
 
-      activateTemplateButton(button);
+      preview.style.setProperty(
+        '--cert-accent',
+        template.accent
+      );
+
+      preview.style.setProperty(
+        '--cert-secondary',
+        template.secondary
+      );
+
+      document
+        .querySelectorAll(
+          '.template-picker-button'
+        )
+        .forEach(item => {
+          item.classList.remove('active');
+        });
+
+      button.classList.add('active');
+
       updateCertificate();
     }
 
     function updateCertificate() {
       const title =
-        document.getElementById('certTitle')?.value ||
+        document.getElementById(
+          'certTitle'
+        )?.value ||
         'Certificate of Achievement';
 
       const description =
-        document.getElementById('certDescription')?.value ||
+        document.getElementById(
+          'certDescription'
+        )?.value ||
         '';
 
       const student =
-        document.getElementById('certStudent')?.value ||
+        document.getElementById(
+          'certStudent'
+        )?.value ||
         'Student Name';
 
       const signature =
-        document.getElementById('certSignature')?.value ||
+        document.getElementById(
+          'certSignature'
+        )?.value ||
         'Authorized Teacher';
 
       const date =
-        document.getElementById('certDate')?.value;
+        document.getElementById(
+          'certDate'
+        )?.value;
 
       const accent =
-        document.getElementById('certColor')?.value ||
-        '#172554';
+        document.getElementById(
+          'certColor'
+        )?.value ||
+        '#14213d';
 
       document.getElementById(
         'previewTitle'
@@ -3662,26 +4262,35 @@
       if (date) {
         document.getElementById(
           'previewDate'
-        ).textContent = new Date(
-          `${date}T12:00:00`
-        ).toLocaleDateString();
+        ).textContent =
+          new Date(
+            `${date}T12:00:00`
+          ).toLocaleDateString();
       }
 
       document
-        .getElementById('certificatePreview')
-        .style.setProperty('--cert-accent', accent);
+        .getElementById(
+          'certificatePreview'
+        )
+        .style.setProperty(
+          '--cert-accent',
+          accent
+        );
     }
 
     function renderLogoButtons() {
       const container =
-        document.getElementById('logoGrid');
+        document.getElementById(
+          'logoGrid'
+        );
 
       if (!container) return;
 
       container.innerHTML = '';
 
       presetLogos.forEach(url => {
-        const button = document.createElement('button');
+        const button =
+          document.createElement('button');
 
         button.type = 'button';
 
@@ -3693,7 +4302,7 @@
             src="${url}"
             alt="Preset logo"
             class="w-full h-full object-contain"
-          />
+          >
         `;
 
         button.onclick = () =>
@@ -3705,36 +4314,52 @@
 
     function addCustomLogo() {
       const input =
-        document.getElementById('customLogoInput');
+        document.getElementById(
+          'customLogoInput'
+        );
 
-      const url = input.value.trim();
+      const url =
+        input.value.trim();
 
       if (!url) return;
 
       addLogoToCertificate(url);
+
       input.value = '';
     }
 
     function addLogoToCertificate(url) {
-      if (activeCertificateLogos.length >= 3) {
-        alert('You can add up to three logos.');
+      if (
+        activeCertificateLogos.length >= 3
+      ) {
+        alert(
+          'You can add up to three logos.'
+        );
+
         return;
       }
 
       const boundary =
-        document.getElementById('logoDragBoundary');
+        document.getElementById(
+          'logoDragBoundary'
+        );
 
-      const id = `certificate_logo_${Date.now()}`;
+      const id =
+        `certificate_logo_${Date.now()}`;
 
-      const wrapper = document.createElement('div');
+      const wrapper =
+        document.createElement('div');
 
       wrapper.id = id;
       wrapper.className = 'draggable-logo';
+
       wrapper.style.left =
         `${8 + activeCertificateLogos.length * 11}%`;
+
       wrapper.style.top = '7%';
 
-      const image = document.createElement('img');
+      const image =
+        document.createElement('img');
 
       image.src = url;
       image.alt = 'Certificate logo';
@@ -3755,7 +4380,9 @@
       };
 
       image.onerror = () => {
-        alert('The logo could not be loaded.');
+        alert(
+          'The logo could not be loaded. Use a direct image URL.'
+        );
       };
     }
 
@@ -3765,16 +4392,22 @@
           logo => logo.id !== id
         );
 
-      document.getElementById(id)?.remove();
+      document
+        .getElementById(id)
+        ?.remove();
 
       renderActiveLogos();
       syncHiddenLogos();
     }
 
     function clearCertificateLogos() {
-      activeCertificateLogos.forEach(logo => {
-        document.getElementById(logo.id)?.remove();
-      });
+      activeCertificateLogos.forEach(
+        logo => {
+          document
+            .getElementById(logo.id)
+            ?.remove();
+        }
+      );
 
       activeCertificateLogos = [];
 
@@ -3784,62 +4417,74 @@
 
     function renderActiveLogos() {
       const container =
-        document.getElementById('activeLogosList');
+        document.getElementById(
+          'activeLogosList'
+        );
 
       container.innerHTML = '';
 
-      if (activeCertificateLogos.length === 0) {
+      if (
+        activeCertificateLogos.length === 0
+      ) {
         container.innerHTML =
           '<span class="text-xs text-slate-400">No logos added.</span>';
 
         return;
       }
 
-      activeCertificateLogos.forEach((logo, index) => {
-        const item = document.createElement('div');
+      activeCertificateLogos.forEach(
+        (logo, index) => {
+          const item =
+            document.createElement('div');
 
-        item.className =
-          'max-w-full flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs';
+          item.className =
+            'max-w-full flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs';
 
-        item.innerHTML = `
-          <img
-            src="${logo.url}"
-            alt=""
-            class="w-4 h-4 object-contain"
-          />
+          item.innerHTML = `
+            <img
+              src="${logo.url}"
+              alt=""
+              class="w-4 h-4 object-contain"
+            >
 
-          <span class="truncate">
-            Logo ${index + 1}
-          </span>
+            <span class="truncate">
+              Logo ${index + 1}
+            </span>
 
-          <button
-            type="button"
-            onclick="removeCertificateLogo('${logo.id}')"
-            class="px-1 text-red-500"
-          >
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        `;
+            <button
+              type="button"
+              onclick="removeCertificateLogo('${logo.id}')"
+              class="px-1 text-red-500"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          `;
 
-        container.appendChild(item);
-      });
+          container.appendChild(item);
+        }
+      );
     }
 
     function syncHiddenLogos() {
       const container =
-        document.getElementById('certificateHiddenLogos');
+        document.getElementById(
+          'certificateHiddenLogos'
+        );
 
       container.innerHTML = '';
 
-      activeCertificateLogos.forEach(logo => {
-        const input = document.createElement('input');
+      activeCertificateLogos.forEach(
+        logo => {
+          const input =
+            document.createElement('input');
 
-        input.type = 'hidden';
-        input.name = 'logoUrl';
-        input.value = logo.url;
+          input.type = 'hidden';
+          input.name = 'logoUrl';
+          input.value = logo.url;
 
-        container.appendChild(input);
-      });
+          container.appendChild(input);
+        }
+      );
     }
 
     function makeDraggable(element) {
@@ -3858,7 +4503,9 @@
 
         const boundary =
           document
-            .getElementById('logoDragBoundary')
+            .getElementById(
+              'logoDragBoundary'
+            )
             .getBoundingClientRect();
 
         const rectangle =
@@ -3868,16 +4515,28 @@
         startingY = event.clientY;
 
         startingLeft =
-          ((rectangle.left - boundary.left) /
-            boundary.width) *
+          (
+            (
+              rectangle.left -
+              boundary.left
+            ) /
+            boundary.width
+          ) *
           100;
 
         startingTop =
-          ((rectangle.top - boundary.top) /
-            boundary.height) *
+          (
+            (
+              rectangle.top -
+              boundary.top
+            ) /
+            boundary.height
+          ) *
           100;
 
-        element.setPointerCapture(event.pointerId);
+        element.setPointerCapture(
+          event.pointerId
+        );
 
         element.addEventListener(
           'pointermove',
@@ -3898,29 +4557,47 @@
       function moveLogo(event) {
         const boundary =
           document
-            .getElementById('logoDragBoundary')
+            .getElementById(
+              'logoDragBoundary'
+            )
             .getBoundingClientRect();
 
         const deltaX =
-          ((event.clientX - startingX) /
-            boundary.width) *
+          (
+            (
+              event.clientX -
+              startingX
+            ) /
+            boundary.width
+          ) *
           100;
 
         const deltaY =
-          ((event.clientY - startingY) /
-            boundary.height) *
+          (
+            (
+              event.clientY -
+              startingY
+            ) /
+            boundary.height
+          ) *
           100;
 
         element.style.left =
           `${Math.max(
             0,
-            Math.min(startingLeft + deltaX, 91)
+            Math.min(
+              startingLeft + deltaX,
+              91
+            )
           )}%`;
 
         element.style.top =
           `${Math.max(
             0,
-            Math.min(startingTop + deltaY, 91)
+            Math.min(
+              startingTop + deltaY,
+              91
+            )
           )}%`;
       }
 
@@ -3961,15 +4638,21 @@
 
     function updateBadge() {
       const title =
-        document.getElementById('badgeTitle')?.value ||
+        document.getElementById(
+          'badgeTitle'
+        )?.value ||
         'Certified Learner';
 
       const shape =
-        document.getElementById('badgeShape')?.value ||
+        document.getElementById(
+          'badgeShape'
+        )?.value ||
         'badge-shape-shield';
 
       const color =
-        document.getElementById('badgeColor')?.value ||
+        document.getElementById(
+          'badgeColor'
+        )?.value ||
         '#0f172a';
 
       document.getElementById(
@@ -3981,7 +4664,9 @@
       ).value = shape;
 
       const preview =
-        document.getElementById('previewBadgeBase');
+        document.getElementById(
+          'previewBadgeBase'
+        );
 
       preview.className =
         `${shape} w-full h-full flex flex-col items-center justify-center text-white shadow-2xl relative`;
@@ -3992,30 +4677,43 @@
 
     async function copyText(text) {
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(
+          text
+        );
+
         alert(`Copied: ${text}`);
       } catch {
-        prompt('Copy this value:', text);
+        prompt(
+          'Copy this value:',
+          text
+        );
       }
     }
 
     function initializeDashboard() {
       const dateInput =
-        document.getElementById('certDate');
+        document.getElementById(
+          'certDate'
+        );
 
       if (dateInput) {
         dateInput.value =
-          new Date().toISOString().split('T')[0];
+          new Date()
+            .toISOString()
+            .split('T')[0];
       }
 
-      renderTemplateButtons();
+      renderTemplatePicker();
       renderLogoButtons();
       renderActiveLogos();
       updateCertificate();
       updateBadge();
 
       const hash =
-        window.location.hash.replace('#', '');
+        window.location.hash.replace(
+          '#',
+          ''
+        );
 
       if (
         hash &&
