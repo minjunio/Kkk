@@ -60,6 +60,7 @@ let networkLogs = [];
 let classes = [];
 let classEnrollments = [];
 let submissions = [];
+let courses = []; // Added for Course Builder
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -106,7 +107,8 @@ function saveDB() {
       classes,
       studentKeys: classes,
       classEnrollments,
-      submissions
+      submissions,
+      courses // Added for Course Builder
     };
 
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
@@ -134,6 +136,7 @@ function loadDB() {
     networkLogs = Array.isArray(db.networkLogs) ? db.networkLogs : [];
     classEnrollments = Array.isArray(db.classEnrollments) ? db.classEnrollments : [];
     submissions = Array.isArray(db.submissions) ? db.submissions : [];
+    courses = Array.isArray(db.courses) ? db.courses : []; // Added for Course Builder
 
     if (Array.isArray(db.classes) && db.classes.length > 0) {
       classes = db.classes;
@@ -475,6 +478,11 @@ function getTeacherDashboardData(user) {
     ? classes
     : classes.filter(c => Number(c.teacherId) === Number(user.id));
 
+  // Added for Course Builder
+  const teacherCourses = isAdminUser(user)
+    ? courses
+    : courses.filter(c => Number(c.teacherId) === Number(user.id));
+
   const teacherClasses = teacherClassesRaw.map(cls => {
     const assignedTestIds = Array.isArray(cls.assignedTestIds)
       ? cls.assignedTestIds.map(Number)
@@ -570,6 +578,7 @@ function getTeacherDashboardData(user) {
     events: teacherEvents,
     classes: teacherClasses,
     studentKeys: teacherClasses,
+    courses: teacherCourses, // Added for Course Builder
     enrollments: classEnrollments,
     submissions,
     users
@@ -1031,6 +1040,83 @@ app.get('/api/student-keys', requireTeacher, (req, res) => {
     classes: visibleClasses,
     keys: visibleClasses
   });
+});
+
+// ==================== COURSES BUILDER ====================
+app.post('/create-course', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  const {
+    courseTitle,
+    classId,
+    courseDescription,
+    pricingType,
+    paypalEmbedCode,
+    finalCourseTestId,
+    modules
+  } = req.body;
+
+  let parsedModules = [];
+
+  if (modules && typeof modules === 'object') {
+    // Normalize modules object/array
+    const modulesArray = Array.isArray(modules) ? modules : Object.values(modules);
+    
+    parsedModules = modulesArray.map(mod => {
+      let lessons = [];
+      if (mod.lessons && Array.isArray(mod.lessons)) {
+        lessons = mod.lessons.map(l => ({
+          title: l.title || 'Untitled Lesson',
+          url: l.url || ''
+        }));
+      } else if (mod.lessons && typeof mod.lessons === 'object') {
+        lessons = Object.values(mod.lessons).map(l => ({
+          title: l.title || 'Untitled Lesson',
+          url: l.url || ''
+        }));
+      }
+
+      return {
+        title: mod.title || 'Untitled Module',
+        testId: mod.testId ? parseInt(mod.testId) : null,
+        lessons: lessons
+      };
+    });
+  }
+
+  const newCourse = {
+    id: nextId(courses),
+    teacherId: user.id,
+    classId: classId ? parseInt(classId) : null,
+    title: courseTitle || 'Untitled Course',
+    description: courseDescription || '',
+    isPaid: pricingType === 'paid',
+    paypalEmbedCode: pricingType === 'paid' ? (paypalEmbedCode || '') : '',
+    modules: parsedModules,
+    finalCourseTestId: finalCourseTestId ? parseInt(finalCourseTestId) : null,
+    createdAt: new Date().toISOString()
+  };
+
+  courses.push(newCourse);
+  saveDB();
+
+  res.redirect('/teacher-dashboard#courses');
+});
+
+app.post('/delete-course', requireTeacher, (req, res) => {
+  const user = currentUser(req);
+  const courseId = parseInt(req.body.courseId);
+
+  const courseIndex = courses.findIndex(c => 
+    Number(c.id) === Number(courseId) && 
+    (isAdminUser(user) || Number(c.teacherId) === Number(user.id))
+  );
+
+  if (courseIndex !== -1) {
+    courses.splice(courseIndex, 1);
+    saveDB();
+  }
+
+  res.redirect('/teacher-dashboard#courses');
 });
 
 // ==================== CREDENTIALS / BADGES / CERTIFICATES ====================
@@ -1525,7 +1611,8 @@ app.get('/api/health', (req, res) => {
     tests: tests.length,
     classes: classes.length,
     enrollments: classEnrollments.length,
-    submissions: submissions.length
+    submissions: submissions.length,
+    courses: courses.length // Added for Course Builder
   });
 });
 
