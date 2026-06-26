@@ -1,1963 +1,111 @@
 <!DOCTYPE html>
-<!-- Credity Teacher Dashboard Enhanced v4 | Auto student certificates + digital copies | 2026-06-13 -->
-<html lang="en" data-dashboard-version="enhanced-v4">
+<!-- Credity Teacher Dashboard Enhanced v5 | Courses & Modules integration -->
+<html lang="en" data-dashboard-version="enhanced-v5">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="credity-dashboard-version" content="enhanced-v4-2026-06-13" />
-  <title>Teacher Dashboard • Credity Enhanced v4</title>
+  <meta name="credity-dashboard-version" content="enhanced-v5-courses" />
+  <title>Teacher Dashboard • Credity</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&family=Pinyon+Script&family=Space+Grotesk:wght@500;600;700&display=swap');
-
-    * {
-      box-sizing: border-box;
-      min-width: 0;
-    }
-
-    html,
-    body {
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-      overflow-x: hidden;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #f5f7fa;
-      color: #0f172a;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .app-shell {
-      width: 100%;
-      max-width: 100vw;
-      min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 0;
-      width: 304px;
-      min-width: 304px;
-      max-width: 304px;
-      height: 100vh;
-      background: #ffffff;
-      border-right: 1px solid #e2e8f0;
-      z-index: 50;
-      overflow: hidden;
-    }
-
-    .sidebar-inner {
-      width: 100%;
-      height: 100%;
-      padding: 18px;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
-    .main-shell {
-      flex: 1;
-      width: calc(100vw - 304px);
-      max-width: calc(100vw - 304px);
-      overflow-x: hidden;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 100%;
-      padding: 24px;
-    }
-
-    .panel {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
-    }
-
-    .panel-strong {
-      background: #ffffff;
-      border: 1px solid #dbe2ea;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-    }
-
-    .input {
-      width: 100%;
-      max-width: 100%;
-      background: #ffffff;
-      border: 1px solid #d7dee8;
-      color: #0f172a;
-      outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease;
-    }
-
-    .input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    textarea.input {
-      resize: vertical;
-    }
-
-    .btn {
-      max-width: 100%;
-      border-radius: 11px;
-      font-weight: 500;
-      text-align: center;
-      transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .btn-primary {
-      color: #ffffff;
-      background: #1d4ed8;
-      border: 1px solid #1d4ed8;
-    }
-
-    .btn-primary:hover {
-      background: #1e40af;
-      border-color: #1e40af;
-    }
-
-    .btn-dark {
-      color: #ffffff;
-      background: #111827;
-      border: 1px solid #111827;
-    }
-
-    .btn-dark:hover {
-      background: #030712;
-    }
-
-    .btn-light {
-      color: #111827;
-      background: #ffffff;
-      border: 1px solid #d7dee8;
-    }
-
-    .btn-light:hover {
-      background: #f8fafc;
-    }
-
-    .btn-green {
-      color: #ffffff;
-      background: #059669;
-      border: 1px solid #059669;
-    }
-
-    .btn-purple {
-      color: #ffffff;
-      background: #7c3aed;
-      border: 1px solid #7c3aed;
-    }
-
-    .btn-red {
-      color: #ffffff;
-      background: #dc2626;
-      border: 1px solid #dc2626;
-    }
-
-    .side-link {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 12px;
-      border: 1px solid transparent;
-      border-radius: 12px;
-      background: transparent;
-      color: #475569;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.16s ease;
-    }
-
-    .side-link:hover {
-      color: #0f172a;
-      background: #f1f5f9;
-    }
-
-    .side-link.active {
-      color: #1d4ed8;
-      background: #eff6ff;
-      border-color: #bfdbfe;
-    }
-
-    .class-box {
-      width: 100%;
-      padding: 14px;
-      overflow: hidden;
-      text-align: left;
-      color: #0f172a;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 15px;
-      transition: all 0.16s ease;
-    }
-
-    .class-box:hover {
-      background: #f8fafc;
-      border-color: #bfdbfe;
-    }
-
-    .class-box.active {
-      color: #ffffff;
-      background: #111827;
-      border-color: #111827;
-    }
-
-    .class-box.active .muted-active,
-    .task-link.active .muted-active {
-      color: rgba(255, 255, 255, 0.66);
-    }
-
-    .task-link.active {
-      color: #ffffff;
-      background: #111827;
-      border-color: #111827;
-    }
-
-    .grid-safe {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .two-col-safe {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      width: 100%;
-    }
-
-    .three-col-safe {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      width: 100%;
-    }
-
-    .table-wrap {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: auto;
-    }
-
-    .safe-table {
-      width: 100%;
-      min-width: 780px;
-      border-collapse: collapse;
-    }
-
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    .custom-scroll::-webkit-scrollbar-track {
-      background: #eef2f7;
-    }
-
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #c4cdd9;
-      border-radius: 999px;
-    }
-
-    /* ========================= CERTIFICATES ========================= */
-
-    .cert-container {
-      width: 100%;
-      max-width: 100%;
-      container-type: inline-size;
-      perspective: 1200px;
-    }
-
-    .certificate-preview {
-      --cert-accent: #14213d;
-      --cert-secondary: #c89b3c;
-      --cert-ink: #111827;
-      --cert-muted: #64748b;
-      --cert-paper: #fffdf8;
-
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      color: var(--cert-ink);
-      background: var(--cert-paper);
-      box-shadow:
-        0 24px 60px rgba(15, 23, 42, 0.18),
-        0 4px 12px rgba(15, 23, 42, 0.08);
-      isolation: isolate;
-      transform-style: preserve-3d;
-    }
-
-    .certificate-content {
-      position: relative;
-      z-index: 20;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 4.5cqi;
-    }
-
-    .cert-paper-texture {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.32;
-      background-image:
-        radial-gradient(circle at 12% 18%, rgba(15, 23, 42, 0.035) 0 0.6px, transparent 0.7px),
-        radial-gradient(circle at 78% 56%, rgba(15, 23, 42, 0.025) 0 0.55px, transparent 0.65px);
-      background-size: 9px 9px, 13px 13px;
-      mix-blend-mode: multiply;
-    }
-
-    .cert-rosette {
-      position: absolute;
-      left: 50%;
-      top: 45%;
-      z-index: 2;
-      width: 30cqi;
-      height: 30cqi;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0.065;
-      background:
-        repeating-radial-gradient(circle, transparent 0 0.7cqi, var(--cert-accent) 0.75cqi 0.85cqi, transparent 0.9cqi 1.5cqi),
-        repeating-conic-gradient(from 0deg, var(--cert-secondary) 0deg 2deg, transparent 2deg 8deg);
-      mask-image: radial-gradient(circle, #000 0 63%, transparent 65%);
-    }
-
-    .cert-corner {
-      position: absolute;
-      z-index: 5;
-      width: 11cqi;
-      height: 11cqi;
-      pointer-events: none;
-      color: var(--cert-accent);
-      opacity: 0.5;
-    }
-
-    .cert-corner::before,
-    .cert-corner::after {
-      content: '';
-      position: absolute;
-      border-color: currentColor;
-      border-style: solid;
-    }
-
-    .cert-corner::before {
-      inset: 0;
-      border-width: 0.24cqi 0 0 0.24cqi;
-    }
-
-    .cert-corner::after {
-      inset: 1.25cqi;
-      border-width: 0.12cqi 0 0 0.12cqi;
-    }
-
-    .corner-tl { top: 2.2cqi; left: 2.2cqi; }
-    .corner-tr { top: 2.2cqi; right: 2.2cqi; transform: rotate(90deg); }
-    .corner-br { right: 2.2cqi; bottom: 2.2cqi; transform: rotate(180deg); }
-    .corner-bl { left: 2.2cqi; bottom: 2.2cqi; transform: rotate(270deg); }
-
-    .cert-top-rule {
-      position: absolute;
-      top: 5.2cqi;
-      left: 14%;
-      right: 14%;
-      z-index: 4;
-      height: 0.2cqi;
-      opacity: 0.46;
-      background: linear-gradient(90deg, transparent, var(--cert-secondary), var(--cert-accent), var(--cert-secondary), transparent);
-    }
-
-    .cert-top-rule::before,
-    .cert-top-rule::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 1.7cqi;
-      height: 1.7cqi;
-      transform: translateY(-50%) rotate(45deg);
-      border: 0.16cqi solid var(--cert-secondary);
-      background: var(--cert-paper);
-    }
-
-    .cert-top-rule::before { left: 18%; }
-    .cert-top-rule::after { right: 18%; }
-
-    .cert-emblem {
-      position: relative;
-      width: 8.4cqi;
-      height: 8.4cqi;
-      margin: 0 auto 1.4cqi;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--cert-accent);
-      border: 0.28cqi double currentColor;
-      border-radius: 50%;
-      font-size: 2.6cqi;
-    }
-
-    .cert-emblem::before {
-      content: '';
-      position: absolute;
-      inset: -0.9cqi;
-      border: 0.1cqi solid currentColor;
-      border-radius: 50%;
-      opacity: 0.25;
-    }
-
-    .cert-emblem::after {
-      content: '';
-      position: absolute;
-      inset: 0.85cqi;
-      border: 0.1cqi dashed currentColor;
-      border-radius: 50%;
-      opacity: 0.28;
-    }
-
-    .cert-pretitle {
-      color: var(--cert-muted);
-      font-size: 1cqi;
-      font-weight: 700;
-      letter-spacing: 0.42em;
-      text-transform: uppercase;
-    }
-
-    .cert-recipient-label {
-      margin-top: 1.55cqi;
-      color: var(--cert-muted);
-      font-size: 0.95cqi;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-    }
-
-    .cert-recipient {
-      margin-top: 1.2cqi;
-      color: var(--cert-ink);
-      font-size: 5.1cqi;
-      font-weight: 700;
-      line-height: 0.98;
-      letter-spacing: -0.035em;
-    }
-
-    .cert-title {
-      display: inline-block;
-      color: var(--cert-accent);
-      font-size: 3.5cqi;
-      font-weight: 700;
-      line-height: 1.12;
-    }
-
-    .cert-description {
-      width: 82%;
-      margin: 2cqi auto 0;
-      color: var(--cert-muted);
-      font-size: 1.45cqi;
-      line-height: 1.7;
-    }
-
-    .cert-footer {
-      width: 100%;
-      min-height: 14.8cqi;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr) minmax(0, 1fr);
-      align-items: end;
-      gap: 2.4cqi;
-      margin-top: auto;
-      margin-bottom: 1.5cqi;
-      padding-top: 1.4cqi;
-    }
-
-    .cert-footer-block {
-      min-height: 10.8cqi;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      text-align: center;
-    }
-
-    .cert-detail-line {
-      width: 100%;
-      min-height: 5.4cqi;
-      padding: 0.9cqi 0.6cqi 0;
-      border-top: 0.12cqi solid currentColor;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .cert-record-icon {
-      width: 3.3cqi;
-      height: 3.3cqi;
-      display: grid;
-      place-items: center;
-      margin-bottom: 0.55cqi;
-      color: var(--cert-accent);
-      border: 0.12cqi solid rgba(15, 23, 42, 0.22);
-      border-radius: 50%;
-      font-size: 1.35cqi;
-    }
-
-    .cert-record-value {
-      max-width: 100%;
-      overflow: hidden;
-      color: var(--cert-ink);
-      font-size: 1.05cqi;
-      font-weight: 700;
-      line-height: 1.25;
-      letter-spacing: 0.03em;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .cert-footer-label {
-      margin-top: 0.6cqi;
-      color: var(--cert-muted);
-      font-size: 0.64cqi;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      line-height: 1.25;
-      text-transform: uppercase;
-    }
-
-    .certificate-serial {
-      position: absolute;
-      left: 4cqi;
-      right: 4cqi;
-      bottom: 1.65cqi;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1cqi;
-      color: var(--cert-muted);
-      opacity: 0.68;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.53cqi;
-      font-weight: 700;
-      letter-spacing: 0.13em;
-      line-height: 1.2;
-      text-transform: uppercase;
-      pointer-events: none;
-    }
-
-    .certificate-serial span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    /*
-      Real anti-forge wave text. The words themselves follow eight
-      full-width wave paths; there are no random security lines.
-    */
-    .security-wave-svg {
-      position: absolute;
-      left: -28%;
-      top: 31%;
-      z-index: 8;
-      width: 170%;
-      height: 15%;
-      overflow: visible;
-      color: var(--cert-accent);
-      opacity: 0.28;
-      transform: rotate(-0.8deg);
-      pointer-events: none;
-    }
-
-    .security-wave-svg text {
-      fill: currentColor;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 8px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-    }
-
-    .security-wave-svg .wave-secondary {
-      fill: var(--cert-secondary);
-      opacity: 0.76;
-    }
-
-    /*
-      QR security seal. Four concentric SVG text paths repeat
-      VERIFIABLE ON CREDITY.INK continuously around the full circle.
-    */
-    .qr-security-wrap {
-      position: relative;
-      width: 12.4cqi;
-      height: 12.4cqi;
-      margin: 0 auto;
-      display: grid;
-      place-items: center;
-      color: var(--cert-accent);
-      line-height: 0;
-      isolation: isolate;
-    }
-
-    .qr-ring-svg {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      z-index: 2;
-      width: calc(100% + 1.2cqi);
-      height: calc(100% + 1.2cqi);
-      transform: translate(-50%, -50%);
-      overflow: visible;
-      color: var(--cert-accent);
-      pointer-events: none;
-    }
-
-    .qr-ring-svg text {
-      fill: currentColor;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 6.2px;
-      font-weight: 700;
-      letter-spacing: 0.55px;
-      text-transform: uppercase;
-    }
-
-    .qr-ring-svg .ring-two {
-      fill: var(--cert-secondary);
-      opacity: 0.8;
-    }
-
-    .qr-ring-svg .ring-three {
-      opacity: 0.58;
-    }
-
-    .qr-ring-svg .ring-four {
-      fill: var(--cert-secondary);
-      opacity: 0.48;
-    }
-
-    .qr-guilloche-core {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      z-index: 1;
-      width: calc(100% - 2.1cqi);
-      height: calc(100% - 2.1cqi);
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      opacity: 0.16;
-      background: repeating-conic-gradient(from 0deg, var(--cert-accent) 0deg 1deg, transparent 1deg 5deg);
-      mask-image: radial-gradient(circle, transparent 0 57%, #000 58% 62%, transparent 63%);
-    }
-
-    .qr-security-code {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      z-index: 10;
-      width: 5.9cqi;
-      height: 5.9cqi;
-      margin: 0;
-      padding: 0.32cqi;
-      display: block;
-      transform: translate(-50%, -50%);
-      object-fit: contain;
-      background: #ffffff;
-      border: 0.1cqi solid rgba(15, 23, 42, 0.2);
-      box-shadow: 0 0.5cqi 1.4cqi rgba(15, 23, 42, 0.12);
-    }
-
-    .draggable-logo {
-      position: absolute;
-      z-index: 90;
-      width: 8.5cqi;
-      height: 8.5cqi;
-      min-width: 28px;
-      min-height: 28px;
-      cursor: grab;
-      pointer-events: auto;
-      mix-blend-mode: multiply;
-    }
-
-    .draggable-logo:active {
-      cursor: grabbing;
-    }
-
-    .draggable-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    /* 1 — Sovereign Navy: ornate, centered, triple border */
-    .tpl-sovereign {
-      --cert-accent: #14213d;
-      --cert-secondary: #c89b3c;
-      --cert-ink: #111827;
-      --cert-muted: #596579;
-      --cert-paper: #fffdf7;
-
-      padding: 5.8%;
-      font-family: 'Cinzel', serif;
-      border: 2.3cqw solid #14213d;
-      outline: 0.48cqw solid #c89b3c;
-      outline-offset: -1.18cqw;
-      background:
-        radial-gradient(circle at center, rgba(200, 155, 60, 0.055), transparent 46%),
-        linear-gradient(135deg, #fffdf7, #fdf8ea);
-    }
-
-    .tpl-sovereign::before {
-      content: '';
-      position: absolute;
-      inset: 2.05cqw;
-      z-index: 3;
-      border: 0.16cqw solid rgba(20, 33, 61, 0.34);
-      pointer-events: none;
-    }
-
-    .tpl-sovereign::after {
-      content: '';
-      position: absolute;
-      inset: 2.75cqw;
-      z-index: 3;
-      border: 0.09cqw dashed rgba(200, 155, 60, 0.5);
-      pointer-events: none;
-    }
-
-    .tpl-sovereign .cert-title {
-      padding: 0 1.5cqi 1cqi;
-      border-bottom: 0.22cqi solid var(--cert-secondary);
-      letter-spacing: 0.05em;
-    }
-
-    /* 2 — Royal University: crest, arch, academic double frame */
-    .tpl-university {
-      --cert-accent: #1e3a8a;
-      --cert-secondary: #b68b2c;
-      --cert-ink: #172554;
-      --cert-muted: #64748b;
-      --cert-paper: #ffffff;
-
-      padding: 5.8%;
-      font-family: 'Playfair Display', serif;
-      border: 2.8cqw solid #172554;
-      background:
-        radial-gradient(ellipse at 50% 0%, rgba(30, 58, 138, 0.1), transparent 36%),
-        linear-gradient(#ffffff, #f8fafc);
-    }
-
-    .tpl-university::before {
-      content: '';
-      position: absolute;
-      inset: 1.35cqw;
-      z-index: 3;
-      border: 0.42cqw double #b68b2c;
-      opacity: 0.65;
-      pointer-events: none;
-    }
-
-    .tpl-university::after {
-      content: '';
-      position: absolute;
-      left: 12%;
-      right: 12%;
-      top: 3.1cqw;
-      height: 12cqw;
-      z-index: 2;
-      border: 0.22cqw solid rgba(30, 58, 138, 0.16);
-      border-bottom: 0;
-      border-radius: 50% 50% 0 0 / 80% 80% 0 0;
-      pointer-events: none;
-    }
-
-    .tpl-university .cert-title {
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      font-size: 3.15cqi;
-    }
-
-    .tpl-university .cert-emblem {
-      width: 9.2cqi;
-      height: 9.2cqi;
-      border-width: 0.42cqi;
-    }
-
-    /* 3 — Executive Black: strong top masthead, left-aligned content */
-    .tpl-executive {
-      --cert-accent: #111827;
-      --cert-secondary: #bfa56a;
-      --cert-ink: #111827;
-      --cert-muted: #64748b;
-      --cert-paper: #ffffff;
-
-      padding: 6.4% 6.8% 5.8%;
-      font-family: 'Montserrat', sans-serif;
-      border-top: 5.2cqw solid #111827;
-      border-right: 0.9cqw solid #111827;
-      border-bottom: 1.8cqw solid #111827;
-      border-left: 0.9cqw solid #111827;
-      background:
-        linear-gradient(120deg, rgba(17, 24, 39, 0.035), transparent 35%),
-        #ffffff;
-    }
-
-    .tpl-executive::before {
-      content: '';
-      position: absolute;
-      left: 4cqw;
-      right: 4cqw;
-      top: 2cqw;
-      z-index: 3;
-      height: 0.18cqw;
-      background: linear-gradient(90deg, #bfa56a, #ffffff, #bfa56a);
-    }
-
-    .tpl-executive::after {
-      content: 'EXECUTIVE CREDENTIAL';
-      position: absolute;
-      top: 1.25cqw;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #ffffff;
-      font-size: 0.68cqi;
-      letter-spacing: 0.34em;
-      font-weight: 700;
-      z-index: 4;
-    }
-
-    .tpl-executive .certificate-content {
-      text-align: left;
-    }
-
-    .tpl-executive .cert-emblem {
-      margin-left: 0;
-      margin-right: 0;
-      border-radius: 18%;
-    }
-
-    .tpl-executive .cert-title {
-      font-size: 3.15cqi;
-      font-weight: 800;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    .tpl-executive .cert-description {
-      width: 76%;
-      margin-left: 0;
-    }
-
-    /* 4 — Modern Azure: geometric, asymmetric right ribbon */
-    .tpl-azure {
-      --cert-accent: #0369a1;
-      --cert-secondary: #38bdf8;
-      --cert-ink: #0c4a6e;
-      --cert-muted: #64748b;
-      --cert-paper: #fafdff;
-
-      padding: 5.8%;
-      font-family: 'Space Grotesk', sans-serif;
-      border: 0.7cqw solid #0369a1;
-      background:
-        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.17), transparent 20%),
-        radial-gradient(circle at 92% 78%, rgba(3, 105, 161, 0.1), transparent 26%),
-        linear-gradient(#ffffff, #f0f9ff);
-    }
-
-    .tpl-azure::before {
-      content: '';
-      position: absolute;
-      right: -5cqw;
-      top: -3cqw;
-      width: 22cqw;
-      height: 48cqw;
-      background:
-        linear-gradient(145deg, rgba(3, 105, 161, 0.12), rgba(56, 189, 248, 0.03));
-      transform: rotate(13deg);
-      z-index: 2;
-    }
-
-    .tpl-azure::after {
-      content: '';
-      position: absolute;
-      inset: 2cqw;
-      z-index: 3;
-      border: 0.18cqw solid rgba(3, 105, 161, 0.3);
-      clip-path: polygon(0 0, 35% 0, 35% 1%, 65% 1%, 65% 0, 100% 0, 100% 100%, 65% 100%, 65% 99%, 35% 99%, 35% 100%, 0 100%);
-      pointer-events: none;
-    }
-
-    .tpl-azure .cert-emblem {
-      border-radius: 22%;
-    }
-
-    .tpl-azure .cert-title {
-      padding: 0.7cqi 1.7cqi;
-      border: 0.11cqi solid rgba(3, 105, 161, 0.35);
-      border-radius: 999px;
-      font-size: 3cqi;
-      letter-spacing: 0.06em;
-    }
-
-    /* 5 — Gold Scholar: parchment, classical medallion */
-    .tpl-gold {
-      --cert-accent: #78350f;
-      --cert-secondary: #d4a64a;
-      --cert-ink: #451a03;
-      --cert-muted: #785f44;
-      --cert-paper: #fffaf0;
-
-      padding: 5.8%;
-      font-family: 'Cormorant Garamond', serif;
-      border: 2cqw solid #78350f;
-      outline: 0.42cqw solid #d4a64a;
-      outline-offset: -1.12cqw;
-      background:
-        radial-gradient(circle at center, rgba(212, 166, 74, 0.09), transparent 46%),
-        linear-gradient(145deg, #fffdf7, #faedcf);
-    }
-
-    .tpl-gold::before {
-      content: '';
-      position: absolute;
-      inset: 2.2cqw;
-      z-index: 3;
-      border: 0.35cqw double rgba(120, 53, 15, 0.52);
-      pointer-events: none;
-    }
-
-    .tpl-gold::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 3.6cqw;
-      width: 22cqw;
-      height: 4.8cqw;
-      transform: translateX(-50%);
-      border-top: 0.18cqw solid rgba(120, 53, 15, 0.28);
-      border-bottom: 0.18cqw solid rgba(120, 53, 15, 0.28);
-      z-index: 2;
-    }
-
-    .tpl-gold .cert-emblem {
-      width: 10cqi;
-      height: 10cqi;
-      border-width: 0.38cqi;
-      box-shadow: 0 0 0 0.6cqi rgba(212, 166, 74, 0.12);
-    }
-
-    .tpl-gold .cert-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 4cqi;
-      font-weight: 500;
-    }
-
-    /* 6 — Emerald Laureate: laurel-side composition */
-    .tpl-emerald {
-      --cert-accent: #065f46;
-      --cert-secondary: #b9a15b;
-      --cert-ink: #064e3b;
-      --cert-muted: #55746b;
-      --cert-paper: #fbfffd;
-
-      padding: 5.8% 8%;
-      font-family: 'Libre Baskerville', serif;
-      border: 1.75cqw solid #064e3b;
-      background:
-        radial-gradient(circle at 50% 52%, rgba(6, 95, 70, 0.055), transparent 38%),
-        linear-gradient(135deg, #ffffff, #ecfdf5);
-    }
-
-    .tpl-emerald::before,
-    .tpl-emerald::after {
-      content: '❧';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(6, 95, 70, 0.18);
-      font-family: Georgia, serif;
-      font-size: 12cqi;
-      z-index: 2;
-    }
-
-    .tpl-emerald::before {
-      left: 0.9cqw;
-      transform: translateY(-50%) rotate(-90deg);
-    }
-
-    .tpl-emerald::after {
-      right: 0.9cqw;
-      transform: translateY(-50%) rotate(90deg);
-    }
-
-    .tpl-emerald .cert-title {
-      padding-bottom: 0.8cqi;
-      border-bottom: 0.18cqi solid var(--cert-secondary);
-      letter-spacing: 0.04em;
-    }
-
-    .tpl-emerald .cert-emblem {
-      border-radius: 50% 50% 42% 42%;
-    }
-
-    /* 7 — Burgundy Heritage: diagonal corner panels */
-    .tpl-burgundy {
-      --cert-accent: #6b1531;
-      --cert-secondary: #c6a45d;
-      --cert-ink: #4c1025;
-      --cert-muted: #775967;
-      --cert-paper: #fffafb;
-
-      padding: 5.8%;
-      font-family: 'Playfair Display', serif;
-      border: 2.1cqw solid #6b1531;
-      background:
-        linear-gradient(135deg, rgba(107, 21, 49, 0.05), transparent 38%),
-        #fffafb;
-    }
-
-    .tpl-burgundy::before {
-      content: '';
-      position: absolute;
-      left: -7cqw;
-      top: -7cqw;
-      width: 21cqw;
-      height: 21cqw;
-      transform: rotate(45deg);
-      background: rgba(107, 21, 49, 0.1);
-      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
-      z-index: 2;
-    }
-
-    .tpl-burgundy::after {
-      content: '';
-      position: absolute;
-      right: -7cqw;
-      bottom: -7cqw;
-      width: 21cqw;
-      height: 21cqw;
-      transform: rotate(45deg);
-      background: rgba(107, 21, 49, 0.1);
-      border: 0.5cqw solid rgba(198, 164, 93, 0.38);
-      z-index: 2;
-    }
-
-    .tpl-burgundy .cert-title {
-      font-size: 3.7cqi;
-      font-style: italic;
-    }
-
-    .tpl-burgundy .cert-recipient {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 600;
-    }
-
-    /* 8 — Digital Platinum: circuit grid, boxed title */
-    .tpl-platinum {
-      --cert-accent: #334155;
-      --cert-secondary: #8ea2b7;
-      --cert-ink: #0f172a;
-      --cert-muted: #64748b;
-      --cert-paper: #ffffff;
-
-      padding: 5.8%;
-      font-family: 'Space Grotesk', sans-serif;
-      border: 0.65cqw solid #334155;
-      background:
-        linear-gradient(rgba(51, 65, 85, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(51, 65, 85, 0.045) 1px, transparent 1px),
-        linear-gradient(145deg, #ffffff, #f1f5f9);
-      background-size: 3.4cqw 3.4cqw, 3.4cqw 3.4cqw, auto;
-    }
-
-    .tpl-platinum::before {
-      content: '';
-      position: absolute;
-      inset: 2cqw;
-      z-index: 3;
-      border: 0.18cqw solid rgba(51, 65, 85, 0.4);
-      box-shadow: inset 0 0 0 0.55cqw rgba(142, 162, 183, 0.08);
-      pointer-events: none;
-    }
-
-    .tpl-platinum::after {
-      content: 'DIGITAL CREDENTIAL • CRYPTOGRAPHICALLY VERIFIABLE';
-      position: absolute;
-      left: 50%;
-      bottom: 2.15cqw;
-      transform: translateX(-50%);
-      color: rgba(51, 65, 85, 0.42);
-      font-size: 0.58cqi;
-      letter-spacing: 0.2em;
-      white-space: nowrap;
-      z-index: 4;
-    }
-
-    .tpl-platinum .cert-title {
-      padding: 0.9cqi 1.6cqi;
-      border: 0.14cqi solid var(--cert-accent);
-      font-size: 3.05cqi;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .tpl-platinum .cert-emblem {
-      border-radius: 0;
-      transform: rotate(45deg);
-    }
-
-    .tpl-platinum .cert-emblem i {
-      transform: rotate(-45deg);
-    }
-
-    /* 9 — Midnight Prestige: dark luxury */
-    .tpl-midnight {
-      --cert-accent: #d7b76d;
-      --cert-secondary: #8ab4ff;
-      --cert-ink: #ffffff;
-      --cert-muted: #cbd5e1;
-      --cert-paper: #0f172a;
-
-      padding: 5.8%;
-      color: #ffffff;
-      font-family: 'Cinzel', serif;
-      border: 0.8cqw solid #334155;
-      background:
-        radial-gradient(circle at 50% -5%, rgba(59, 130, 246, 0.25), transparent 36%),
-        radial-gradient(circle at 80% 90%, rgba(215, 183, 109, 0.12), transparent 28%),
-        linear-gradient(150deg, #111827, #020617);
-    }
-
-    .tpl-midnight::before {
-      content: '';
-      position: absolute;
-      inset: 1.7cqw;
-      z-index: 3;
-      border: 0.26cqw double rgba(215, 183, 109, 0.68);
-      pointer-events: none;
-    }
-
-    .tpl-midnight::after {
-      content: '';
-      position: absolute;
-      inset: 2.8cqw;
-      z-index: 3;
-      border: 0.09cqw solid rgba(138, 180, 255, 0.28);
-      pointer-events: none;
-    }
-
-    .tpl-midnight .cert-paper-texture {
-      opacity: 0.12;
-      mix-blend-mode: screen;
-    }
-
-    .tpl-midnight .cert-recipient,
-    .tpl-midnight .cert-title {
-      color: #ffffff;
-    }
-
-    .tpl-midnight .cert-description,
-    .tpl-midnight .cert-pretitle,
-    .tpl-midnight .cert-recipient-label,
-    .tpl-midnight .cert-footer-label {
-      color: #cbd5e1;
-    }
-
-    .tpl-midnight .qr-security-code {
-      border-color: rgba(255, 255, 255, 0.35);
-    }
-
-    .tpl-midnight .draggable-logo {
-      mix-blend-mode: normal;
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.58));
-    }
-
-    /* 10 — Minimal Luxe: vertical band, open spacing */
-    .tpl-luxe {
-      --cert-accent: #18181b;
-      --cert-secondary: #b58b55;
-      --cert-ink: #18181b;
-      --cert-muted: #71717a;
-      --cert-paper: #ffffff;
-
-      padding: 6% 6% 5.5% 10%;
-      font-family: 'Montserrat', sans-serif;
-      border-left: 6.2cqw solid #18181b;
-      border-top: 0.55cqw solid #18181b;
-      border-right: 0.55cqw solid #18181b;
-      border-bottom: 0.55cqw solid #18181b;
-      background:
-        linear-gradient(90deg, rgba(181, 139, 85, 0.08), transparent 24%),
-        #ffffff;
-    }
-
-    .tpl-luxe::before {
-      content: 'CREDITY';
-      position: absolute;
-      left: 1.55cqw;
-      top: 50%;
-      transform: translateY(-50%) rotate(-90deg);
-      color: rgba(255,255,255,0.92);
-      font-size: 1.25cqi;
-      letter-spacing: 0.5em;
-      font-weight: 700;
-      z-index: 4;
-    }
-
-    .tpl-luxe::after {
-      content: '';
-      position: absolute;
-      top: 4cqw;
-      right: 4cqw;
-      z-index: 2;
-      width: 15cqw;
-      height: 15cqw;
-      border: 0.24cqw solid rgba(24, 24, 27, 0.08);
-      border-radius: 50%;
-      box-shadow:
-        0 0 0 1cqw rgba(181, 139, 85, 0.035),
-        0 0 0 2cqw rgba(24, 24, 27, 0.025);
-    }
-
-    .tpl-luxe .cert-emblem {
-      margin-left: 0;
-      margin-right: 0;
-      border-radius: 18%;
-      transform: rotate(45deg);
-    }
-
-    .tpl-luxe .cert-emblem i {
-      transform: rotate(-45deg);
-    }
-
-    .tpl-luxe .certificate-content {
-      text-align: left;
-    }
-
-    .tpl-luxe .cert-description {
-      width: 74%;
-      margin-left: 0;
-    }
-
-    .tpl-luxe .cert-title {
-      font-size: 3.15cqi;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* Template picker restored to horizontal scrolling style */
-    .template-picker {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      scroll-snap-type: x mandatory;
-    }
-
-    .template-picker-button {
-      width: 170px;
-      min-width: 170px;
-      scroll-snap-align: start;
-      text-align: left;
-      padding: 12px;
-      border: 1px solid #dbe2ea;
-      border-radius: 13px;
-      background: #ffffff;
-      transition: all 0.16s ease;
-    }
-
-    .template-picker-button:hover {
-      border-color: #93c5fd;
-      background: #f8fbff;
-    }
-
-    .template-picker-button.active {
-      border-color: #2563eb;
-      background: #eff6ff;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
-    }
-
-    .template-miniature {
-      position: relative;
-      height: 74px;
-      overflow: hidden;
-      border-radius: 8px;
-      background: var(--mini-paper);
-      border: var(--mini-border);
-      margin-bottom: 10px;
-    }
-
-    .template-miniature::before {
-      content: '';
-      position: absolute;
-      inset: 9px;
-      border: 1px solid var(--mini-accent);
-      opacity: 0.5;
-    }
-
-    .template-miniature::after {
-      content: '';
-      position: absolute;
-      left: 24%;
-      right: 24%;
-      top: 22px;
-      height: 6px;
-      border-top: 2px solid var(--mini-accent);
-      border-bottom: 1px solid var(--mini-secondary);
-    }
-
-
-    .certificate-action-bar {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .certificate-action-button {
-      min-height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border-radius: 11px;
-      border: 1px solid #dbe2ea;
-      background: #ffffff;
-      color: #0f172a;
-      font-size: 13px;
-      font-weight: 600;
-      transition: 0.16s ease;
-    }
-
-    .certificate-action-button:hover {
-      background: #f8fafc;
-      border-color: #93c5fd;
-      color: #1d4ed8;
-    }
-
-    .digital-copy-card {
-      width: 100%;
-      padding: 16px;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      background: #ffffff;
-      transition:
-        border-color 0.16s ease,
-        box-shadow 0.16s ease,
-        transform 0.16s ease;
-    }
-
-    .digital-copy-card:hover {
-      border-color: #bfdbfe;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
-      transform: translateY(-1px);
-    }
-
-    .certificate-viewer-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(8px);
-    }
-
-    .certificate-viewer-modal.open {
-      display: flex;
-    }
-
-    .certificate-viewer-shell {
-      width: min(1500px, 100%);
-      max-height: calc(100vh - 36px);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: #f8fafc;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 18px;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
-    }
-
-    .certificate-viewer-head {
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 14px 18px;
-      background: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .certificate-viewer-stage {
-      flex: 1;
-      min-height: 0;
-      padding: 24px;
-      overflow: auto;
-      display: grid;
-      place-items: center;
-    }
-
-    .certificate-viewer-stage .certificate-preview {
-      width: min(1240px, 100%);
-      min-width: 760px;
-    }
-
-    .certificate-viewer-stage .draggable-logo {
-      pointer-events: none;
-    }
-
-    .completion-mode-box {
-      border: 1px solid #bae6fd;
-      background: linear-gradient(135deg, #f0f9ff, #ffffff);
-    }
-
-    .completion-status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      background: #10b981;
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
-    }
-
-    .certificate-loading {
-      pointer-events: none;
-      opacity: 0.65;
-    }
-
-    .badge-shape-circle { border-radius: 50%; }
-    .badge-shape-shield { clip-path: polygon(50% 100%, 6% 77%, 6% 7%, 94% 7%, 94% 77%); }
-    .badge-shape-hexagon { clip-path: polygon(50% 0, 95% 24%, 95% 76%, 50% 100%, 5% 76%, 5% 24%); }
-    .badge-shape-diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-    .badge-shape-star { clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
-
-    .badge-security-ring {
-      position: absolute;
-      inset: 11%;
-      border: 1px solid rgba(255,255,255,0.32);
-      border-radius: inherit;
-      pointer-events: none;
-    }
-
-    .mobile-overlay {
-      display: none;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; min-width: 0; }
+    html, body { width: 100%; max-width: 100%; margin: 0; overflow-x: hidden; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f5f7fa; color: #0f172a; -webkit-font-smoothing: antialiased; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app-shell { width: 100%; max-width: 100vw; min-height: 100vh; display: flex; overflow-x: hidden; }
+    .sidebar { position: sticky; top: 0; width: 304px; min-width: 304px; max-width: 304px; height: 100vh; background: #ffffff; border-right: 1px solid #e2e8f0; z-index: 50; overflow: hidden; }
+    .sidebar-inner { width: 100%; height: 100%; padding: 18px; overflow-y: auto; overflow-x: hidden; }
+    .main-shell { flex: 1; width: calc(100vw - 304px); max-width: calc(100vw - 304px); overflow-x: hidden; }
+    .page { width: 100%; max-width: 100%; padding: 24px; }
+    
+    .panel { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035); }
+    .panel-strong { background: #ffffff; border: 1px solid #dbe2ea; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05); }
+    
+    .input { width: 100%; max-width: 100%; background: #ffffff; border: 1px solid #d7dee8; color: #0f172a; outline: none; transition: border-color 0.16s ease, box-shadow 0.16s ease; }
+    .input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+    textarea.input { resize: vertical; }
+
+    .btn { max-width: 100%; border-radius: 11px; font-weight: 500; text-align: center; transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { color: #ffffff; background: #1d4ed8; border: 1px solid #1d4ed8; }
+    .btn-primary:hover { background: #1e40af; border-color: #1e40af; }
+    .btn-dark { color: #ffffff; background: #111827; border: 1px solid #111827; }
+    .btn-dark:hover { background: #030712; }
+    .btn-light { color: #111827; background: #ffffff; border: 1px solid #d7dee8; }
+    .btn-light:hover { background: #f8fafc; }
+    .btn-green { color: #ffffff; background: #059669; border: 1px solid #059669; }
+    .btn-purple { color: #ffffff; background: #7c3aed; border: 1px solid #7c3aed; }
+    .btn-red { color: #ffffff; background: #dc2626; border: 1px solid #dc2626; }
+
+    .side-link { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: #475569; font-size: 14px; font-weight: 500; transition: all 0.16s ease; }
+    .side-link:hover { color: #0f172a; background: #f1f5f9; }
+    .side-link.active { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+
+    .class-box { width: 100%; padding: 14px; overflow: hidden; text-align: left; color: #0f172a; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 15px; transition: all 0.16s ease; }
+    .class-box:hover { background: #f8fafc; border-color: #bfdbfe; }
+    .class-box.active { color: #ffffff; background: #111827; border-color: #111827; }
+    .class-box.active .muted-active, .task-link.active .muted-active { color: rgba(255, 255, 255, 0.66); }
+    .task-link.active { color: #ffffff; background: #111827; border-color: #111827; }
+
+    .grid-safe { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; width: 100%; max-width: 100%; }
+    .two-col-safe { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: 100%; }
+    .table-wrap { width: 100%; max-width: 100%; overflow-x: auto; }
+    .safe-table { width: 100%; min-width: 780px; border-collapse: collapse; }
+
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #eef2f7; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #c4cdd9; border-radius: 999px; }
+
+    .mobile-overlay { display: none; }
 
     @media (max-width: 1279px) {
       .app-shell { display: block; }
-
-      .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 304px;
-        max-width: calc(100vw - 32px);
-        min-width: 0;
-        transform: translateX(-100%);
-        transition: transform 0.22s ease;
-        box-shadow: 18px 0 40px rgba(15, 23, 42, 0.12);
-        z-index: 90;
-      }
-
+      .sidebar { position: fixed; left: 0; top: 0; width: 304px; max-width: calc(100vw - 32px); min-width: 0; transform: translateX(-100%); transition: transform 0.22s ease; box-shadow: 18px 0 40px rgba(15, 23, 42, 0.12); z-index: 90; }
       .sidebar.open { transform: translateX(0); }
-
-      .mobile-overlay {
-        position: fixed;
-        inset: 0;
-        display: block;
-        background: rgba(15, 23, 42, 0.45);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.22s ease;
-        z-index: 80;
-      }
-
-      .mobile-overlay.open {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .main-shell {
-        width: 100%;
-        max-width: 100%;
-      }
-
+      .mobile-overlay { position: fixed; inset: 0; display: block; background: rgba(15, 23, 42, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.22s ease; z-index: 80; }
+      .mobile-overlay.open { opacity: 1; pointer-events: auto; }
+      .main-shell { width: 100%; max-width: 100%; }
       .page { padding: 16px; }
-
-      .two-col-safe,
-      .three-col-safe {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 700px) {
-      .page { padding: 12px; }
-      .safe-table { min-width: 720px; }
-
-      .certificate-action-bar {
-        grid-template-columns: 1fr;
-      }
-
-      .certificate-viewer-stage {
-        display: block;
-        padding: 12px;
-      }
-
-      .certificate-viewer-stage .certificate-preview {
-        width: 920px;
-        min-width: 920px;
-      }
-
-      .certificate-viewer-head {
-        align-items: flex-start;
-      }
+      .two-col-safe { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
   <%
-    const safeCredentialRecords =
-      typeof badges !== 'undefined' && Array.isArray(badges)
-        ? badges
-        : [];
-
-    const safeBadges =
-      safeCredentialRecords.filter(item =>
-        !item.type || item.type === 'badge'
-      );
-
-    const safeCertificates =
-      safeCredentialRecords.filter(item =>
-        item.type === 'certificate'
-      );
-
-    const suppliedIssuedCredentials =
-      typeof issuedCredentials !== 'undefined' && Array.isArray(issuedCredentials)
-        ? issuedCredentials
-        : (
-            typeof credentials !== 'undefined' && Array.isArray(credentials)
-              ? credentials
-              : []
-          );
-
-    const safeIssuedCertificates = [
-      ...suppliedIssuedCredentials,
-      ...safeCertificates
-    ].filter(item =>
-      !item.type ||
-      item.type === 'certificate' ||
-      item.credentialType === 'certificate'
-    );
-
-    const safeTests =
-      typeof tests !== 'undefined' && Array.isArray(tests)
-        ? tests
-        : [];
-
-    const safeEvents =
-      typeof events !== 'undefined' && Array.isArray(events)
-        ? events
-        : [];
-
-    const safeClasses =
-      typeof classes !== 'undefined' && Array.isArray(classes)
-        ? classes
-        : (
-            typeof studentKeys !== 'undefined' && Array.isArray(studentKeys)
-              ? studentKeys
-              : []
-          );
-
-    const safeGlobalSubmissions =
-      typeof submissions !== 'undefined' && Array.isArray(submissions)
-        ? submissions
-        : [];
-
-    const safeUser =
-      typeof user !== 'undefined' && user
-        ? user
-        : {};
-
-    const teacherName =
-      safeUser.name ||
-      safeUser.fullName ||
-      safeUser.username ||
-      'Teacher';
-
-    const firstName =
-      String(teacherName).split(' ')[0];
+    // Ensure data variables are defined safely
+    const safeTests = typeof tests !== 'undefined' && Array.isArray(tests) ? tests : [];
+    const safeEvents = typeof events !== 'undefined' && Array.isArray(events) ? events : [];
+    const safeClasses = typeof classes !== 'undefined' && Array.isArray(classes) ? classes : (typeof studentKeys !== 'undefined' && Array.isArray(studentKeys) ? studentKeys : []);
+    const safeCourses = typeof courses !== 'undefined' && Array.isArray(courses) ? courses : [];
+    const safeGlobalSubmissions = typeof submissions !== 'undefined' && Array.isArray(submissions) ? submissions : [];
+    
+    const safeUser = typeof user !== 'undefined' && user ? user : {};
+    const teacherName = safeUser.name || safeUser.fullName || safeUser.username || 'Teacher';
+    const firstName = String(teacherName).split(' ')[0];
 
     function assignedForClass(cls) {
-      if (Array.isArray(cls.assignedTests)) {
-        return cls.assignedTests;
-      }
-
-      const ids =
-        Array.isArray(cls.assignedTestIds)
-          ? cls.assignedTestIds.map(Number)
-          : [];
-
-      return safeTests.filter(test =>
-        ids.includes(Number(test.id))
-      );
+      if (Array.isArray(cls.assignedTests)) return cls.assignedTests;
+      const ids = Array.isArray(cls.assignedTestIds) ? cls.assignedTestIds.map(Number) : [];
+      return safeTests.filter(test => ids.includes(Number(test.id)));
     }
 
-    const completedRecipients = [];
-    const completedRecipientKeys = new Set();
+    const totalStudents = safeClasses.reduce((sum, cls) => {
+      if (Array.isArray(cls.students)) return sum + cls.students.length;
+      return sum + Number(cls.usageCount || 0);
+    }, 0);
 
-    safeClasses.forEach(cls => {
-      const students =
-        Array.isArray(cls.students)
-          ? cls.students
-          : [];
-
-      students.forEach(student => {
-        const studentName =
-          student.fullName ||
-          student.name ||
-          student.username ||
-          student.email ||
-          'Student';
-
-        const studentId =
-          student.userId ||
-          student.id ||
-          student.studentId ||
-          student.email ||
-          '';
-
-        const studentEmail =
-          student.email ||
-          '';
-
-        const studentSubmissions =
-          Array.isArray(student.submissions)
-            ? student.submissions
-            : [];
-
-        studentSubmissions.forEach((submission, submissionIndex) => {
-          if (!submission) {
-            return;
-          }
-
-          const assessmentId =
-            submission.testId ||
-            submission.assessmentId ||
-            submission.assignmentId ||
-            '';
-
-          const assessmentTitle =
-            submission.testTitle ||
-            submission.assessmentTitle ||
-            submission.assignmentTitle ||
-            submission.title ||
-            'Completed Assignment';
-
-          const submissionId =
-            submission.id ||
-            submission.submissionId ||
-            [
-              cls.id || 'class',
-              studentId || studentName,
-              assessmentId || assessmentTitle,
-              submissionIndex
-            ].join('-');
-
-          const key =
-            String(submissionId);
-
-          if (completedRecipientKeys.has(key)) {
-            return;
-          }
-
-          completedRecipientKeys.add(key);
-
-          completedRecipients.push({
-            classId: cls.id || '',
-            className: cls.className || 'Class',
-            studentId,
-            studentName,
-            studentEmail,
-            submissionId,
-            assessmentId,
-            assessmentTitle,
-            score:
-              submission.score !== undefined &&
-              submission.score !== null
-                ? submission.score
-                : '',
-            passed:
-              submission.passed !== undefined
-                ? Boolean(submission.passed)
-                : true,
-            submittedAt:
-              submission.submittedAt ||
-              submission.completedAt ||
-              submission.createdAt ||
-              '',
-            submittedAtFormatted:
-              submission.submittedAtFormatted ||
-              submission.completedAtFormatted ||
-              ''
-          });
-        });
-      });
-    });
-
-    safeGlobalSubmissions.forEach((submission, submissionIndex) => {
-      if (!submission) {
-        return;
-      }
-
-      const studentId =
-        submission.studentId ||
-        submission.userId ||
-        submission.recipientId ||
-        '';
-
-      let matchedStudent = null;
-      let matchedClass = null;
-
-      safeClasses.some(cls => {
-        const students =
-          Array.isArray(cls.students)
-            ? cls.students
-            : [];
-
-        const found =
-          students.find(student =>
-            String(
-              student.userId ||
-              student.id ||
-              student.studentId ||
-              student.email ||
-              ''
-            ) === String(studentId)
-          );
-
-        if (found) {
-          matchedStudent = found;
-          matchedClass = cls;
-          return true;
-        }
-
-        return false;
-      });
-
-      const studentName =
-        submission.studentName ||
-        submission.recipientName ||
-        submission.fullName ||
-        matchedStudent?.fullName ||
-        matchedStudent?.name ||
-        matchedStudent?.username ||
-        matchedStudent?.email ||
-        'Student';
-
-      const studentEmail =
-        submission.studentEmail ||
-        submission.recipientEmail ||
-        matchedStudent?.email ||
-        '';
-
-      const assessmentId =
-        submission.testId ||
-        submission.assessmentId ||
-        submission.assignmentId ||
-        '';
-
-      const matchingTest =
-        safeTests.find(test =>
-          String(test.id) ===
-          String(assessmentId)
-        );
-
-      const assessmentTitle =
-        submission.testTitle ||
-        submission.assessmentTitle ||
-        submission.assignmentTitle ||
-        submission.title ||
-        matchingTest?.title ||
-        'Completed Assignment';
-
-      const submissionId =
-        submission.id ||
-        submission.submissionId ||
-        [
-          'submission',
-          studentId || studentName,
-          assessmentId || assessmentTitle,
-          submissionIndex
-        ].join('-');
-
-      const key =
-        String(submissionId);
-
-      if (completedRecipientKeys.has(key)) {
-        return;
-      }
-
-      completedRecipientKeys.add(key);
-
-      completedRecipients.push({
-        classId:
-          submission.classId ||
-          matchedClass?.id ||
-          '',
-        className:
-          submission.className ||
-          matchedClass?.className ||
-          'Class',
-        studentId:
-          studentId ||
-          matchedStudent?.userId ||
-          matchedStudent?.id ||
-          '',
-        studentName,
-        studentEmail,
-        submissionId,
-        assessmentId,
-        assessmentTitle,
-        score:
-          submission.score !== undefined &&
-          submission.score !== null
-            ? submission.score
-            : '',
-        passed:
-          submission.passed !== undefined
-            ? Boolean(submission.passed)
-            : true,
-        submittedAt:
-          submission.submittedAt ||
-          submission.completedAt ||
-          submission.createdAt ||
-          '',
-        submittedAtFormatted:
-          submission.submittedAtFormatted ||
-          submission.completedAtFormatted ||
-          ''
-      });
-    });
-
-    const totalStudents =
-      safeClasses.reduce((sum, cls) => {
-        if (Array.isArray(cls.students)) {
-          return sum + cls.students.length;
-        }
-
-        return sum + Number(cls.usageCount || 0);
-      }, 0);
-
-    const totalSubmissions =
-      typeof submissions !== 'undefined' && Array.isArray(submissions)
-        ? submissions.length
-        : safeClasses.reduce(
-            (sum, cls) =>
-              sum + Number(cls.submissionCount || 0),
-            0
-          );
+    const totalSubmissions = safeClasses.reduce((sum, cls) => sum + Number(cls.submissionCount || 0), 0);
   %>
 
   <div id="mobileOverlay" class="mobile-overlay" onclick="closeSidebar()"></div>
-
-  <div
-    id="certificateViewerModal"
-    class="certificate-viewer-modal"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Digital certificate viewer"
-    onclick="handleCertificateViewerBackdrop(event)"
-  >
-    <div class="certificate-viewer-shell">
-      <div class="certificate-viewer-head">
-        <div>
-          <div class="font-semibold text-slate-950">
-            Digital Certificate Copy
-          </div>
-
-          <div class="text-xs text-slate-500 mt-1">
-            Full-resolution preview ready to download or print.
-          </div>
-        </div>
-
-        <div class="flex flex-wrap justify-end gap-2">
-          <button
-            type="button"
-            onclick="downloadCertificate()"
-            class="btn btn-light px-4 py-2 text-sm"
-          >
-            <i class="fa-solid fa-download mr-1"></i>
-            Download
-          </button>
-
-          <button
-            type="button"
-            onclick="printCertificate()"
-            class="btn btn-dark px-4 py-2 text-sm"
-          >
-            <i class="fa-solid fa-print mr-1"></i>
-            Print / PDF
-          </button>
-
-          <button
-            type="button"
-            onclick="closeCertificateViewer()"
-            class="w-10 h-10 rounded-lg border border-slate-200 bg-white"
-            aria-label="Close certificate viewer"
-          >
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      </div>
-
-      <div
-        id="certificateViewerStage"
-        class="certificate-viewer-stage custom-scroll"
-      ></div>
-    </div>
-  </div>
 
   <div class="app-shell">
     <aside id="sidebar" class="sidebar">
@@ -1967,13 +115,11 @@
             <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
               <span class="font-semibold text-xl">C</span>
             </div>
-
             <div>
               <div class="font-semibold text-xl leading-none">Credity</div>
               <div class="text-[10px] text-slate-500 uppercase tracking-[0.16em] mt-1">Teacher Dashboard</div>
             </div>
           </div>
-
           <button type="button" onclick="closeSidebar()" class="xl:hidden w-9 h-9 rounded-lg border border-slate-200">
             <i class="fa-solid fa-xmark"></i>
           </button>
@@ -1982,11 +128,6 @@
         <div class="panel rounded-xl p-4 mb-5">
           <div class="text-sm font-semibold truncate"><%= teacherName %></div>
           <div class="text-xs text-slate-500 mt-1">Teacher workspace</div>
-
-          <div class="mt-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-semibold uppercase tracking-wider">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Enhanced v4 • Auto certificates
-          </div>
         </div>
 
         <nav class="space-y-1 mb-6">
@@ -1994,32 +135,18 @@
             <i class="fa-solid fa-gauge-high w-5 shrink-0"></i>
             <span>Overview</span>
           </button>
-
           <button class="side-link" data-view-link="classes" onclick="showView('classes')">
             <i class="fa-solid fa-users-rectangle w-5 shrink-0"></i>
             <span>Classes</span>
           </button>
-
           <button class="side-link" data-view-link="tasks" onclick="showView('tasks')">
             <i class="fa-solid fa-clipboard-question w-5 shrink-0"></i>
-            <span>Assignments</span>
+            <span>Assignments / Tests</span>
           </button>
-
-          <button class="side-link" data-view-link="certificates" onclick="showView('certificates')">
-            <i class="fa-solid fa-certificate w-5 shrink-0"></i>
-            <span>Certificates</span>
+          <button class="side-link" data-view-link="courses" onclick="showView('courses')">
+            <i class="fa-solid fa-book-open-reader w-5 shrink-0"></i>
+            <span>Courses & Modules</span>
           </button>
-
-          <button class="side-link" data-view-link="digital-copies" onclick="showView('digital-copies')">
-            <i class="fa-solid fa-file-arrow-down w-5 shrink-0"></i>
-            <span>Digital Copies</span>
-          </button>
-
-          <button class="side-link" data-view-link="badges" onclick="showView('badges')">
-            <i class="fa-solid fa-award w-5 shrink-0"></i>
-            <span>Badges</span>
-          </button>
-
           <button class="side-link" data-view-link="announcements" onclick="showView('announcements')">
             <i class="fa-solid fa-bullhorn w-5 shrink-0"></i>
             <span>Announcements</span>
@@ -2031,24 +158,17 @@
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Class Boxes</div>
             <span class="text-xs text-slate-400"><%= safeClasses.length %></span>
           </div>
-
           <div class="space-y-2">
             <% if (safeClasses.length > 0) { %>
               <% safeClasses.forEach((cls, index) => {
                 const classTasks = assignedForClass(cls);
                 const classStudents = Array.isArray(cls.students) ? cls.students : [];
               %>
-                <button
-                  type="button"
-                  class="class-box <%= index === 0 ? 'active' : '' %>"
-                  data-class-button="<%= cls.id %>"
-                  onclick="selectClass('<%= cls.id %>')"
-                >
+                <button type="button" class="class-box <%= index === 0 ? 'active' : '' %>" data-class-button="<%= cls.id %>" onclick="selectClass('<%= cls.id %>')">
                   <div class="flex items-center justify-between gap-2">
                     <div class="text-sm font-semibold truncate"><%= cls.className %></div>
                     <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 shrink-0"><%= classTasks.length %></span>
                   </div>
-
                   <div class="text-xs text-slate-500 muted-active mt-1 truncate">
                     <%= classStudents.length || cls.usageCount || 0 %> students
                   </div>
@@ -2062,41 +182,7 @@
           </div>
         </div>
 
-        <div class="mb-5">
-          <div class="flex items-center justify-between mb-2">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Assignment Bar</div>
-            <span class="text-xs text-slate-400"><%= safeTests.length %></span>
-          </div>
-
-          <div class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1">
-            <% if (safeTests.length > 0) { %>
-              <% safeTests.forEach(test => { %>
-                <button
-                  type="button"
-                  class="task-link w-full text-left px-3 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition"
-                  data-task-button="<%= test.id %>"
-                  onclick="selectTask('<%= test.id %>')"
-                >
-                  <div class="text-sm font-medium truncate"><%= test.title %></div>
-                  <div class="text-xs text-slate-500 muted-active mt-1 truncate">
-                    <%= test.questions ? test.questions.length : 0 %> questions
-                  </div>
-                </button>
-              <% }) %>
-            <% } else { %>
-              <div class="p-4 rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-500">
-                No assignments yet
-              </div>
-            <% } %>
-          </div>
-        </div>
-
         <div class="space-y-2 mt-6">
-          <a href="/assessment" class="btn btn-primary w-full py-3 flex items-center justify-center gap-2 text-sm">
-            <i class="fa-solid fa-plus"></i>
-            New Assignment
-          </a>
-
           <a href="/logout" class="btn btn-light w-full py-3 flex items-center justify-center gap-2 text-sm">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             Logout
@@ -2112,132 +198,70 @@
             <button type="button" onclick="openSidebar()" class="w-10 h-10 rounded-lg border border-slate-200">
               <i class="fa-solid fa-bars"></i>
             </button>
-
             <div>
               <div class="font-semibold leading-none">Credity Teacher</div>
               <div class="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Dashboard</div>
             </div>
           </div>
-
-          <a href="/assessment" class="btn btn-dark px-4 py-2 text-sm">New</a>
         </div>
       </nav>
 
       <div class="page">
+        <!-- OVERVIEW -->
         <section class="view-panel" data-view-panel="overview">
           <div class="panel-strong rounded-2xl p-5 md:p-8 mb-6">
             <div class="grid lg:grid-cols-[minmax(0,1.25fr)_minmax(270px,.75fr)] gap-7 items-center">
               <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-blue-100 bg-blue-50 text-blue-700 text-xs font-medium tracking-[0.14em] mb-5">
-                  <i class="fa-solid fa-shield-halved"></i>
-                  TEACHER ACTION CENTER
-                </div>
-
                 <h1 class="text-4xl md:text-6xl font-semibold tracking-tighter leading-none text-slate-950">
                   Welcome back, <%= firstName %>.
                 </h1>
-
                 <p class="mt-5 max-w-3xl text-lg md:text-xl text-slate-600 leading-relaxed">
-                  Manage classes, assignments, professional credentials, verified badges, scores, and announcements.
+                  Manage classes, assignments, courses, modules, and announcements.
                 </p>
-
                 <div class="mt-8 flex flex-wrap gap-3">
                   <a href="/assessment" class="btn btn-primary px-6 py-3.5 inline-flex items-center gap-2">
                     <i class="fa-solid fa-file-circle-plus"></i>
                     New Assignment
                   </a>
-
-                  <button type="button" onclick="showView('classes')" class="btn btn-light px-6 py-3.5 inline-flex items-center gap-2">
-                    <i class="fa-solid fa-users-rectangle text-emerald-600"></i>
-                    View Classes
-                  </button>
-
-                  <button type="button" onclick="showView('certificates')" class="btn btn-light px-6 py-3.5 inline-flex items-center gap-2">
-                    <i class="fa-solid fa-certificate text-blue-600"></i>
-                    Design Certificate
+                  <button type="button" onclick="showView('courses')" class="btn btn-light px-6 py-3.5 inline-flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-purple-600"></i>
+                    Build Course
                   </button>
                 </div>
               </div>
-
               <div class="grid grid-cols-2 gap-3">
                 <div class="panel rounded-xl p-4">
                   <div class="text-3xl md:text-4xl font-semibold"><%= safeClasses.length %></div>
                   <div class="text-xs text-slate-500 uppercase tracking-wider">Classes</div>
                 </div>
-
                 <div class="panel rounded-xl p-4">
                   <div class="text-3xl md:text-4xl font-semibold"><%= safeTests.length %></div>
                   <div class="text-xs text-slate-500 uppercase tracking-wider">Assignments</div>
                 </div>
-
                 <div class="panel rounded-xl p-4">
                   <div class="text-3xl md:text-4xl font-semibold"><%= totalStudents %></div>
                   <div class="text-xs text-slate-500 uppercase tracking-wider">Students</div>
                 </div>
-
                 <div class="panel rounded-xl p-4">
-                  <div class="text-3xl md:text-4xl font-semibold"><%= totalSubmissions %></div>
-                  <div class="text-xs text-slate-500 uppercase tracking-wider">Submissions</div>
+                  <div class="text-3xl md:text-4xl font-semibold"><%= safeCourses.length %></div>
+                  <div class="text-xs text-slate-500 uppercase tracking-wider">Courses</div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="grid-safe">
-            <% if (safeClasses.length > 0) { %>
-              <% safeClasses.forEach(cls => {
-                const classTasks = assignedForClass(cls);
-                const classStudents = Array.isArray(cls.students) ? cls.students : [];
-                const classResults = Array.isArray(cls.results) ? cls.results : [];
-              %>
-                <button type="button" onclick="selectClass('<%= cls.id %>')" class="panel-strong rounded-2xl p-5 text-left hover:border-blue-300 transition">
-                  <div class="flex items-start justify-between gap-3">
-                    <div>
-                      <div class="text-lg font-semibold truncate"><%= cls.className %></div>
-                      <div class="text-sm text-slate-500 mt-1 truncate"><%= cls.key %></div>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
-                  </div>
-
-                  <div class="grid grid-cols-3 gap-2 mt-5">
-                    <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                      <div class="text-[10px] text-slate-500 uppercase tracking-wider">Tasks</div>
-                      <div class="text-xl font-semibold mt-1"><%= classTasks.length %></div>
-                    </div>
-
-                    <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                      <div class="text-[10px] text-slate-500 uppercase tracking-wider">Students</div>
-                      <div class="text-xl font-semibold mt-1"><%= classStudents.length || cls.usageCount || 0 %></div>
-                    </div>
-
-                    <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-                      <div class="text-[10px] text-slate-500 uppercase tracking-wider">Scores</div>
-                      <div class="text-xl font-semibold mt-1"><%= classResults.length %></div>
-                    </div>
-                  </div>
-                </button>
-              <% }) %>
-            <% } else { %>
-              <div class="panel-strong rounded-2xl p-10 text-center">
-                <i class="fa-solid fa-users-rectangle text-4xl text-slate-300 mb-4"></i>
-                <div class="text-xl font-semibold">No classes yet</div>
-              </div>
-            <% } %>
-          </div>
         </section>
 
+        <!-- CLASSES -->
         <section class="view-panel hidden" data-view-panel="classes">
           <div class="grid lg:grid-cols-[minmax(260px,360px)_minmax(0,1fr)] gap-6">
             <div class="panel-strong rounded-2xl p-5 md:p-6 h-fit">
               <h2 class="text-2xl font-semibold">Create Class</h2>
               <p class="text-sm text-slate-500 mt-1 mb-6">Generate a class key and share it with students.</p>
-
               <form action="/generate-student-key" method="POST" class="space-y-5">
                 <div>
                   <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Class Name</label>
                   <input type="text" name="className" placeholder="Grade 10A - Mathematics" class="input px-4 py-3 rounded-lg" required>
                 </div>
-
                 <button type="submit" class="btn btn-green w-full py-4">Generate Class Key</button>
               </form>
             </div>
@@ -2257,132 +281,9 @@
                           <%= students.length || cls.usageCount || 0 %> students • <%= assignedTests.length %> assignments
                         </div>
                       </div>
-
                       <div class="flex flex-wrap gap-2">
                         <code class="max-w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold tracking-wider overflow-x-auto"><%= cls.key %></code>
-                        <button type="button" onclick="copyText('<%= cls.key %>')" class="btn btn-dark px-3 py-2 text-xs">Copy</button>
                       </div>
-                    </div>
-
-                    <div class="two-col-safe mt-6">
-                      <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                        <div class="flex items-center justify-between gap-3 mb-4">
-                          <div>
-                            <div class="font-semibold">Class Assignments</div>
-                            <p class="text-xs text-slate-500 mt-1">Assign existing work or create a new test.</p>
-                          </div>
-
-                          <a href="/assessment?classId=<%= cls.id %>" class="btn btn-primary px-3 py-2 text-xs">New</a>
-                        </div>
-
-                        <form action="/assign-class-test" method="POST" class="grid sm:grid-cols-[minmax(0,1fr)_auto] gap-2">
-                          <input type="hidden" name="classId" value="<%= cls.id %>">
-
-                          <select name="testId" class="input px-4 py-3 rounded-lg text-sm" required>
-                            <option value="">Select assignment...</option>
-                            <% safeTests.forEach(test => { %>
-                              <option value="<%= test.id %>"><%= test.title %></option>
-                            <% }) %>
-                          </select>
-
-                          <button type="submit" class="btn btn-dark px-5 py-3 text-sm">Assign</button>
-                        </form>
-
-                        <div class="mt-4 space-y-2">
-                          <% if (assignedTests.length > 0) { %>
-                            <% assignedTests.forEach(test => { %>
-                              <div class="p-3 rounded-lg bg-white border border-slate-200">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                  <div>
-                                    <div class="text-sm font-medium"><%= test.title %></div>
-                                    <div class="text-xs text-slate-500 mt-1"><%= test.questions ? test.questions.length : 0 %> questions</div>
-                                  </div>
-
-                                  <div class="flex gap-2">
-                                    <form action="/unassign-class-test" method="POST">
-                                      <input type="hidden" name="classId" value="<%= cls.id %>">
-                                      <input type="hidden" name="testId" value="<%= test.id %>">
-                                      <button type="submit" class="btn btn-light px-3 py-2 text-xs">Unassign</button>
-                                    </form>
-
-                                    <form action="/delete-test" method="POST" onsubmit="return confirm('Delete this assignment permanently?');">
-                                      <input type="hidden" name="testId" value="<%= test.id %>">
-                                      <button type="submit" class="btn btn-red px-3 py-2 text-xs">Delete</button>
-                                    </form>
-                                  </div>
-                                </div>
-                              </div>
-                            <% }) %>
-                          <% } else { %>
-                            <div class="p-4 rounded-lg bg-white border border-dashed border-slate-300 text-sm text-slate-500 text-center">
-                              No assignments attached.
-                            </div>
-                          <% } %>
-                        </div>
-                      </div>
-
-                      <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                        <div class="font-semibold">Class Announcement</div>
-                        <p class="text-xs text-slate-500 mt-1 mb-4">Only members of this class will see it.</p>
-
-                        <form action="/class-announcement" method="POST" class="space-y-3">
-                          <input type="hidden" name="classId" value="<%= cls.id %>">
-                          <input type="text" name="title" placeholder="Announcement title" class="input px-4 py-3 rounded-lg text-sm" required>
-                          <textarea name="description" placeholder="Write an announcement..." class="input px-4 py-3 rounded-lg h-24 text-sm"></textarea>
-                          <button type="submit" class="btn btn-purple w-full py-3 text-sm">Post to Class</button>
-                        </form>
-
-                        <div class="mt-4 space-y-2 max-h-48 overflow-y-auto custom-scroll">
-                          <% if (classAnnouncements.length > 0) { %>
-                            <% classAnnouncements.slice().reverse().forEach(item => { %>
-                              <div class="p-3 rounded-lg bg-white border border-slate-200">
-                                <div class="text-sm font-medium"><%= item.title %></div>
-                                <div class="text-xs text-slate-500 mt-1"><%= item.description || 'No description.' %></div>
-                              </div>
-                            <% }) %>
-                          <% } else { %>
-                            <div class="p-4 rounded-lg bg-white border border-dashed border-slate-300 text-sm text-slate-500 text-center">
-                              No announcements yet.
-                            </div>
-                          <% } %>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="mt-6 rounded-xl border border-slate-200 overflow-hidden">
-                      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200">
-                        <div class="font-semibold">Students and Scores</div>
-                      </div>
-
-                      <% if (students.length > 0) { %>
-                        <div class="table-wrap custom-scroll">
-                          <table class="safe-table text-left text-sm">
-                            <thead>
-                              <tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
-                                <th class="px-5 py-3 font-medium">Student</th>
-                                <th class="px-5 py-3 font-medium">Email</th>
-                                <th class="px-5 py-3 font-medium">Completed</th>
-                                <th class="px-5 py-3 font-medium">Pending</th>
-                                <th class="px-5 py-3 font-medium">Average</th>
-                              </tr>
-                            </thead>
-
-                            <tbody class="divide-y divide-slate-100">
-                              <% students.forEach(student => { %>
-                                <tr>
-                                  <td class="px-5 py-4 font-medium"><%= student.fullName || student.name || 'Student' %></td>
-                                  <td class="px-5 py-4 text-slate-600"><%= student.email || 'No email' %></td>
-                                  <td class="px-5 py-4"><%= student.completedCount || 0 %></td>
-                                  <td class="px-5 py-4"><%= student.pendingCount || 0 %></td>
-                                  <td class="px-5 py-4"><%= student.averageScore !== null && student.averageScore !== undefined ? `${student.averageScore}%` : 'No score' %></td>
-                                </tr>
-                              <% }) %>
-                            </tbody>
-                          </table>
-                        </div>
-                      <% } else { %>
-                        <div class="p-10 text-center text-slate-500">No students joined.</div>
-                      <% } %>
                     </div>
                   </div>
                 <% }) %>
@@ -2393,14 +294,14 @@
           </div>
         </section>
 
+        <!-- ASSIGNMENTS -->
         <section class="view-panel hidden" data-view-panel="tasks">
           <div class="panel-strong rounded-2xl p-5 md:p-6">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
               <div>
-                <h2 class="text-3xl font-semibold tracking-tight">Assignments</h2>
-                <p class="text-slate-500 mt-1">Create, review, assign, and delete assessments.</p>
+                <h2 class="text-3xl font-semibold tracking-tight">Assignments / Tests</h2>
+                <p class="text-slate-500 mt-1">Create, review, and delete assessments.</p>
               </div>
-
               <a href="/assessment" class="btn btn-primary px-5 py-3 inline-flex items-center gap-2 text-sm">
                 <i class="fa-solid fa-plus"></i>
                 New Assignment
@@ -2410,10 +311,9 @@
             <% if (safeTests.length > 0) { %>
               <div class="grid-safe">
                 <% safeTests.forEach(test => { %>
-                  <article class="panel rounded-xl p-5 task-card" data-task-card="<%= test.id %>">
+                  <article class="panel rounded-xl p-5 task-card">
                     <h3 class="text-lg font-semibold truncate"><%= test.title %></h3>
                     <p class="text-xs text-slate-500 mt-1"><%= test.questions ? test.questions.length : 0 %> questions</p>
-
                     <form action="/delete-test" method="POST" class="mt-5" onsubmit="return confirm('Delete this assignment permanently?');">
                       <input type="hidden" name="testId" value="<%= test.id %>">
                       <button type="submit" class="btn btn-red w-full py-3 text-sm">Delete Assignment</button>
@@ -2427,799 +327,131 @@
           </div>
         </section>
 
-        <!-- Enhanced v4: no teacher signature; recipient comes from completed submissions -->
-        <section class="view-panel hidden" data-view-panel="certificates">
-          <form id="certificateForm" action="/create-credential" method="POST" class="grid xl:grid-cols-[minmax(0,1.12fr)_minmax(420px,.88fr)] gap-6">
-            <input type="hidden" name="type" value="certificate">
-            <input type="hidden" name="templateStyle" id="selectedCertificateTemplate" value="tpl-sovereign">
-            <input type="hidden" name="antiForge" value="true">
-            <input type="hidden" name="recipientSource" value="student_completion">
-            <input type="hidden" id="certificateRecipientName" name="recipientName" value="">
-            <input type="hidden" id="certificateStudentId" name="studentId" value="">
-            <input type="hidden" id="certificateRecipientEmail" name="recipientEmail" value="">
-            <input type="hidden" id="certificateSubmissionId" name="submissionId" value="">
-            <div id="certificateHiddenLogos"></div>
+        <!-- COURSES BUILDER -->
+        <section class="view-panel hidden" data-view-panel="courses">
+          <div class="panel-strong rounded-2xl p-5 md:p-6 space-y-6">
+            <div>
+              <h2 class="text-3xl font-semibold">Course Builder</h2>
+              <p class="text-sm text-slate-500 mt-1">Assign courses with links to files/videos, structured into modules and lessons.</p>
+            </div>
 
-            <div class="panel-strong rounded-2xl p-5 md:p-6 space-y-6">
-              <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-800 text-xs font-medium mb-4">
-                  <i class="fa-solid fa-shield-halved"></i>
-                  Text-wave anti-forge security
+            <form action="/create-course" method="POST" id="courseForm">
+              
+              <!-- Basic Course Info -->
+              <div class="grid md:grid-cols-2 gap-5 mb-6">
+                <div>
+                  <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Course Title</label>
+                  <input type="text" name="courseTitle" placeholder="e.g. Master React in 10 Days" class="input px-4 py-3 rounded-lg" required>
                 </div>
-
-                <h2 class="text-2xl md:text-3xl font-semibold">Premium Certificate Designer</h2>
-
-                <p class="text-sm text-slate-500 mt-1 leading-relaxed">
-                  Ten structurally different templates with eight full-width wave-text rows and four continuous verification-text rings around the QR code.
-                </p>
+                <div>
+                  <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Assign to Class</label>
+                  <select name="classId" class="input px-4 py-3 rounded-lg" required>
+                    <option value="">Select a class...</option>
+                    <% safeClasses.forEach(cls => { %>
+                      <option value="<%= cls.id %>"><%= cls.className %></option>
+                    <% }) %>
+                  </select>
+                </div>
               </div>
 
-              <div class="completion-mode-box rounded-xl p-5">
-                <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div>
-                    <div class="flex items-center gap-3">
-                      <span class="completion-status-dot"></span>
+              <div class="mb-6">
+                <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Course Description</label>
+                <textarea name="courseDescription" placeholder="Brief description of the course..." class="input px-4 py-3 rounded-lg h-24"></textarea>
+              </div>
 
-                      <div class="font-semibold text-slate-950">
-                        Automatic completed-student recipient
-                      </div>
-                    </div>
-
-                    <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                      When a student completes the linked assignment,
-                      Credity automatically uses the student's account
-                      name on the certificate.
-                    </p>
-                  </div>
-
-                  <label class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-sky-200 text-sm font-medium whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      id="autoIssueOnCompletion"
-                      name="autoIssueOnCompletion"
-                      value="true"
-                      checked
-                      class="accent-blue-600"
-                    >
-
-                    Auto-issue
+              <!-- Pricing Settings -->
+              <div class="mb-8 p-5 rounded-xl border border-slate-200 bg-slate-50">
+                <h3 class="text-lg font-semibold mb-3">Pricing Settings</h3>
+                <div class="flex gap-4 mb-4">
+                  <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="pricingType" value="free" checked onchange="togglePaypalForm(this.value)">
+                    <span class="text-sm font-medium">Free</span>
+                  </label>
+                  <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="pricingType" value="paid" onchange="togglePaypalForm(this.value)">
+                    <span class="text-sm font-medium">Paid Course</span>
                   </label>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-4 mt-5">
-                  <div>
-                    <label class="block text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">
-                      Certificate Assignment
-                    </label>
-
-                    <select
-                      id="certificateAssessmentSelect"
-                      name="assessmentId"
-                      onchange="refreshCompletedStudentOptions()"
-                      class="input px-4 py-3 rounded-lg bg-white text-sm"
-                      required
-                    >
-                      <option value="">
-                        Select an assignment...
-                      </option>
-
-                      <% safeTests.forEach(test => { %>
-                        <option value="<%= test.id %>">
-                          <%= test.title %>
-                        </option>
-                      <% }) %>
-                    </select>
+                <div id="paypalEmbedSection" class="hidden">
+                  <div class="mb-4 bg-white p-4 border border-blue-200 rounded-lg text-sm text-slate-600">
+                    <strong class="text-blue-800 block mb-2"><i class="fa-solid fa-circle-info"></i> How to setup paid access via PayPal:</strong>
+                    1. Go to your PayPal account and generate a "Buy Now" button.<br>
+                    2. Copy the full HTML <strong>Embed Code</strong> provided by PayPal.<br>
+                    3. Paste that code exactly into the box below. It should look similar to the example shown in the placeholder.<br>
+                    <em>Note: Once a student pays, you will manually grant them access based on PayPal receipts, or they bypass if they paste the transaction ID.</em>
                   </div>
-
-                  <div>
-                    <label class="block text-xs font-medium text-blue-800 uppercase tracking-wider mb-2">
-                      Completed Student Preview
-                    </label>
-
-                    <select
-                      id="certificateRecipientSelect"
-                      onchange="applyCompletedRecipient()"
-                      class="input px-4 py-3 rounded-lg bg-white text-sm"
-                    >
-                      <option value="">
-                        Select an assignment first
-                      </option>
-                    </select>
-                  </div>
+                  <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">PayPal Embed Code (HTML)</label>
+                  <textarea name="paypalEmbedCode" placeholder='<div>&#10;<style>.pp-UFWQ9F9J8N7NU{...}</style>&#10;<form action="https://www.paypal.com/..." ...>&#10;...&#10;</form>&#10;</div>' class="input px-4 py-3 rounded-lg h-32 font-mono text-sm"></textarea>
                 </div>
               </div>
 
-              <div class="grid md:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <div>
-                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">
-                    Automatic Recipient Name
-                  </label>
+              <hr class="border-slate-200 mb-8">
 
-                  <input
-                    type="text"
-                    id="certStudent"
-                    value="Student Name"
-                    readonly
-                    class="input px-3 py-2 rounded-lg text-sm bg-slate-100"
-                  >
-                </div>
-
-                <div>
-                  <label class="block text-[10px] text-slate-500 uppercase tracking-wider font-medium mb-2">
-                    Issue Date
-                  </label>
-
-                  <input
-                    type="date"
-                    id="certDate"
-                    name="issueDate"
-                    oninput="updateCertificate()"
-                    class="input px-3 py-2 rounded-lg text-sm"
-                  >
-                </div>
+              <!-- Modules Section -->
+              <div class="mb-6 flex justify-between items-center">
+                <h3 class="text-xl font-semibold">Curriculum (Modules & Lessons)</h3>
+                <button type="button" onclick="addModule()" class="btn btn-dark px-4 py-2 text-sm">
+                  <i class="fa-solid fa-plus mr-1"></i> Add Module
+                </button>
               </div>
 
-              <div class="grid md:grid-cols-2 gap-5">
-                <div>
-                  <label class="block text-xs text-slate-500 uppercase tracking-wider font-medium mb-2">Certificate Title</label>
-                  <input type="text" id="certTitle" name="title" value="Certificate of Achievement" oninput="updateCertificate()" class="input px-4 py-3 rounded-lg" required>
-                </div>
-
-                <div>
-                  <label class="block text-xs text-slate-500 uppercase tracking-wider font-medium mb-2">Main Accent</label>
-                  <input type="color" id="certColor" name="designColor" value="#14213d" oninput="updateCertificate()" class="w-full h-12 p-0 border-0 rounded-lg cursor-pointer">
-                </div>
+              <div id="modulesContainer" class="space-y-6">
+                <!-- Modules injected here via JS -->
               </div>
 
-              <div>
-                <label class="block text-xs text-slate-500 uppercase tracking-wider font-medium mb-2">Achievement Description</label>
-
-                <textarea id="certDescription" name="description" oninput="updateCertificate()" class="input px-4 py-3 rounded-lg h-28 text-sm" required>has successfully completed the required learning experience and demonstrated exceptional understanding, commitment, and achievement.</textarea>
-              </div>
-
-              <div>
-                <div class="flex items-center justify-between gap-3 mb-3">
-                  <label class="text-xs text-slate-500 uppercase tracking-wider font-medium">Premium Templates</label>
-                  <span class="text-xs text-slate-400">Horizontal selector</span>
-                </div>
-
-                <div id="templatePicker" class="template-picker custom-scroll"></div>
-              </div>
-
-              <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="flex items-center justify-between gap-3 mb-4">
-                  <div>
-                    <div class="text-sm font-semibold">Certificate Logos</div>
-                    <div class="text-xs text-slate-500 mt-1">Add up to three draggable logos.</div>
-                  </div>
-
-                  <button type="button" onclick="clearCertificateLogos()" class="text-xs text-red-500 font-medium">Clear</button>
-                </div>
-
-                <div class="grid sm:grid-cols-[minmax(0,1fr)_auto] gap-2 mb-4">
-                  <input type="text" id="customLogoInput" placeholder="Paste a direct logo URL..." class="input px-4 py-2.5 rounded-lg text-sm">
-                  <button type="button" onclick="addCustomLogo()" class="btn btn-dark px-5 py-2.5 text-sm">Add Logo</button>
-                </div>
-
-                <div id="activeLogosList" class="min-h-[46px] flex flex-wrap gap-2 p-3 rounded-lg bg-white border border-slate-200 mb-4"></div>
-                <div id="logoGrid" class="grid grid-cols-5 sm:grid-cols-8 gap-2 max-h-40 overflow-y-auto custom-scroll p-2 rounded-lg bg-white border border-slate-200"></div>
-              </div>
-
-              <button type="submit" class="btn btn-primary w-full py-4 text-lg">
-                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
-                Save & Enable Automatic Issuing
-              </button>
-            </div>
-
-            <div class="cert-container">
-              <div class="sticky top-6">
-                <div class="flex items-center justify-between gap-3 mb-4">
-                  <div>
-                    <h3 class="text-sm text-slate-500 uppercase tracking-wider font-medium">Live Security Preview</h3>
-                    <p class="text-xs text-slate-400 mt-1">Text follows every wave and every ring</p>
-                  </div>
-
-                  <span class="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium">
-                    Anti-forge active
-                  </span>
-                </div>
-
-                <div id="certificatePreview" class="certificate-preview tpl-sovereign aspect-[1.414]">
-                  <div class="cert-paper-texture"></div>
-                  <div class="cert-rosette"></div>
-                  <div class="cert-top-rule"></div>
-
-                  <div class="cert-corner corner-tl"></div>
-                  <div class="cert-corner corner-tr"></div>
-                  <div class="cert-corner corner-br"></div>
-                  <div class="cert-corner corner-bl"></div>
-
-                  <svg
-                    class="security-wave-svg"
-                    viewBox="-600 0 3200 170"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                  >
-                    <defs>
-                      <path id="wavePath1" d="M-600,42 C-525,18 -475,18 -400,42 S-275,66 -200,42 S-75,18 0,42 S125,66 200,42 S325,18 400,42 S525,66 600,42 S725,18 800,42 S925,66 1000,42 S1125,18 1200,42 S1325,66 1400,42 S1525,18 1600,42 S1725,66 1800,42 S1925,18 2000,42 S2125,66 2200,42 S2325,18 2400,42" />
-                      <path id="wavePath2" d="M-600,54 C-525,78 -475,78 -400,54 S-275,30 -200,54 S-75,78 0,54 S125,30 200,54 S325,78 400,54 S525,30 600,54 S725,78 800,54 S925,30 1000,54 S1125,78 1200,54 S1325,30 1400,54 S1525,78 1600,54 S1725,30 1800,54 S1925,78 2000,54 S2125,30 2200,54 S2325,78 2400,54" />
-                      <path id="wavePath3" d="M-600,66 C-525,42 -475,42 -400,66 S-275,90 -200,66 S-75,42 0,66 S125,90 200,66 S325,42 400,66 S525,90 600,66 S725,42 800,66 S925,90 1000,66 S1125,42 1200,66 S1325,90 1400,66 S1525,42 1600,66 S1725,90 1800,66 S1925,42 2000,66 S2125,90 2200,66 S2325,42 2400,66" />
-                      <path id="wavePath4" d="M-600,78 C-525,102 -475,102 -400,78 S-275,54 -200,78 S-75,102 0,78 S125,54 200,78 S325,102 400,78 S525,54 600,78 S725,102 800,78 S925,54 1000,78 S1125,102 1200,78 S1325,54 1400,78 S1525,102 1600,78 S1725,54 1800,78 S1925,102 2000,78 S2125,54 2200,78 S2325,102 2400,78" />
-                      <path id="wavePath5" d="M-600,90 C-525,66 -475,66 -400,90 S-275,114 -200,90 S-75,66 0,90 S125,114 200,90 S325,66 400,90 S525,114 600,90 S725,66 800,90 S925,114 1000,90 S1125,66 1200,90 S1325,114 1400,90 S1525,66 1600,90 S1725,114 1800,90 S1925,66 2000,90 S2125,114 2200,90 S2325,66 2400,90" />
-                      <path id="wavePath6" d="M-600,102 C-525,126 -475,126 -400,102 S-275,78 -200,102 S-75,126 0,102 S125,78 200,102 S325,126 400,102 S525,78 600,102 S725,126 800,102 S925,78 1000,102 S1125,126 1200,102 S1325,78 1400,102 S1525,126 1600,102 S1725,78 1800,102 S1925,126 2000,102 S2125,78 2200,102 S2325,126 2400,102" />
-                      <path id="wavePath7" d="M-600,114 C-525,90 -475,90 -400,114 S-275,138 -200,114 S-75,90 0,114 S125,138 200,114 S325,90 400,114 S525,138 600,114 S725,90 800,114 S925,138 1000,114 S1125,90 1200,114 S1325,138 1400,114 S1525,90 1600,114 S1725,138 1800,114 S1925,90 2000,114 S2125,138 2200,114 S2325,90 2400,114" />
-                      <path id="wavePath8" d="M-600,126 C-525,150 -475,150 -400,126 S-275,102 -200,126 S-75,150 0,126 S125,102 200,126 S325,150 400,126 S525,102 600,126 S725,150 800,126 S925,102 1000,126 S1125,150 1200,126 S1325,102 1400,126 S1525,150 1600,126 S1725,102 1800,126 S1925,150 2000,126 S2125,102 2200,126 S2325,150 2400,126" />
-                    </defs>
-
-                    <text>
-                      <textPath
-                        href="#wavePath1"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text class="wave-secondary">
-                      <textPath
-                        href="#wavePath2"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text>
-                      <textPath
-                        href="#wavePath3"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text class="wave-secondary">
-                      <textPath
-                        href="#wavePath4"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text>
-                      <textPath
-                        href="#wavePath5"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text class="wave-secondary">
-                      <textPath
-                        href="#wavePath6"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text>
-                      <textPath
-                        href="#wavePath7"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                    <text class="wave-secondary">
-                      <textPath
-                        href="#wavePath8"
-                        startOffset="0%"
-                        textLength="3200"
-                        lengthAdjust="spacingAndGlyphs"
-                      >VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • </textPath>
-                    </text>
-                  </svg>
-
-                  <div id="logoDragBoundary" class="absolute inset-0 z-[80] overflow-hidden pointer-events-none"></div>
-
-                  <div class="certificate-serial">
-                    <span>
-                      Security Series
-                      <strong id="previewCredentialId">CRD-PREVIEW</strong>
-                    </span>
-
-                    <span>
-                      Verifiable on Credity.ink
-                    </span>
-                  </div>
-
-                  <div class="certificate-content text-center">
-                    <div class="mt-[4%]">
-                      <div class="cert-emblem">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                      </div>
-
-                      <div class="cert-pretitle">Official verified credential</div>
-                      <div class="cert-recipient-label">This certificate is presented to</div>
-                      <div id="previewStudent" class="cert-recipient">Alex Rivera</div>
-                    </div>
-
-                    <div class="mt-[4%] flex-grow">
-                      <div id="previewTitle" class="cert-title">Certificate of Achievement</div>
-
-                      <div id="previewDescription" class="cert-description">
-                        has successfully completed the required learning experience and demonstrated exceptional understanding, commitment, and achievement.
-                      </div>
-                    </div>
-
-                    <div class="cert-footer">
-                      <div class="cert-footer-block">
-                        <div class="cert-detail-line">
-                          <div class="cert-record-icon">
-                            <i class="fa-solid fa-circle-check"></i>
-                          </div>
-
-                          <div
-                            id="previewCompletionLabel"
-                            class="cert-record-value"
-                          >
-                            Verified Completion
-                          </div>
-
-                          <div class="cert-footer-label">
-                            Achievement Record
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="cert-footer-block">
-                        <div class="cert-detail-line">
-                          <div
-                            id="previewDate"
-                            class="cert-record-value"
-                          >
-                            Issue Date
-                          </div>
-
-                          <div class="cert-footer-label">
-                            Date of Issue
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="cert-footer-block">
-                        <div class="qr-security-wrap">
-                          <div class="qr-guilloche-core"></div>
-
-                          <svg class="qr-ring-svg" viewBox="0 0 220 220" aria-hidden="true">
-                            <defs>
-                              <path id="ringPath1" d="M110 8 a102 102 0 1 1 0 204 a102 102 0 1 1 0 -204" />
-                              <path id="ringPath2" d="M110 22 a88 88 0 1 1 0 176 a88 88 0 1 1 0 -176" />
-                              <path id="ringPath3" d="M110 36 a74 74 0 1 1 0 148 a74 74 0 1 1 0 -148" />
-                              <path id="ringPath4" d="M110 50 a60 60 0 1 1 0 120 a60 60 0 1 1 0 -120" />
-                            </defs>
-
-                            <text>
-                              <textPath href="#ringPath1" startOffset="0%" textLength="640" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
-                            </text>
-
-                            <text class="ring-two">
-                              <textPath href="#ringPath2" startOffset="0%" textLength="552" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
-                            </text>
-
-                            <text class="ring-three">
-                              <textPath href="#ringPath3" startOffset="0%" textLength="465" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
-                            </text>
-
-                            <text class="ring-four">
-                              <textPath href="#ringPath4" startOffset="0%" textLength="377" lengthAdjust="spacingAndGlyphs">VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK • VERIFIABLE ON CREDITY.INK •</textPath>
-                            </text>
-                          </svg>
-
-                          <img
-                            id="previewQrCode"
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fcredity.ink%2Fverify"
-                            alt="Verification QR code"
-                            class="qr-security-code"
-                            crossorigin="anonymous"
-                          >
-                        </div>
-
-                        <div class="cert-footer-label mt-[1.2cqi]">Digital Verification</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="certificate-action-bar">
-                  <button
-                    type="button"
-                    onclick="openCertificateViewer()"
-                    class="certificate-action-button"
-                  >
-                    <i class="fa-solid fa-expand"></i>
-                    View Digital Copy
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick="downloadCertificate()"
-                    class="certificate-action-button"
-                  >
-                    <i class="fa-solid fa-download"></i>
-                    Download PNG
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick="printCertificate()"
-                    class="certificate-action-button"
-                  >
-                    <i class="fa-solid fa-print"></i>
-                    Print / Save PDF
-                  </button>
-                </div>
-
-                <div class="grid sm:grid-cols-2 gap-3 mt-4">
-                  <div class="p-4 rounded-xl bg-white border border-slate-200">
-                    <div class="text-sm font-semibold">Eight text waves</div>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                      Every security row is actual text following a wave path and fills the certificate from left to right.
-                    </p>
-                  </div>
-
-                  <div class="p-4 rounded-xl bg-white border border-slate-200">
-                    <div class="text-sm font-semibold">Four continuous text rings</div>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                      Every QR ring continuously repeats “VERIFIABLE ON CREDITY.INK” around its complete circumference.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </section>
-
-        <section
-          class="view-panel hidden"
-          data-view-panel="digital-copies"
-        >
-          <div class="panel-strong rounded-2xl p-5 md:p-7 mb-6">
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
-              <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium mb-4">
-                  <i class="fa-solid fa-file-shield"></i>
-                  DIGITAL CERTIFICATE LIBRARY
-                </div>
-
-                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight">
-                  View, download, and print certificates
-                </h2>
-
-                <p class="text-slate-500 mt-2 max-w-3xl leading-relaxed">
-                  Completed students are detected from assignment
-                  submissions. Load a student into the certificate
-                  designer, then download the digital copy or print it
-                  as a PDF.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onclick="showView('certificates')"
-                class="btn btn-primary px-5 py-3"
-              >
-                Open Certificate Designer
-              </button>
-            </div>
-
-            <div class="grid sm:grid-cols-3 gap-3 mt-7">
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-xs text-slate-500 uppercase tracking-wider">
-                  Completed Students
-                </div>
-
-                <div class="text-3xl font-semibold mt-1">
-                  <%= completedRecipients.length %>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-xs text-slate-500 uppercase tracking-wider">
-                  Issued Copies
-                </div>
-
-                <div class="text-3xl font-semibold mt-1">
-                  <%= safeIssuedCertificates.length %>
-                </div>
-              </div>
-
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <div class="text-xs text-slate-500 uppercase tracking-wider">
-                  Auto-Issue
-                </div>
-
-                <div class="text-lg font-semibold text-emerald-700 mt-2">
-                  Ready
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid xl:grid-cols-2 gap-6">
-            <div class="panel-strong rounded-2xl p-5 md:p-6">
-              <div class="flex items-center justify-between gap-3 mb-5">
-                <div>
-                  <h3 class="text-xl font-semibold">
-                    Completed Assignment Records
-                  </h3>
-
-                  <p class="text-xs text-slate-500 mt-1">
-                    The student account name becomes the certificate name.
-                  </p>
-                </div>
-
-                <span class="text-xs text-slate-400">
-                  <%= completedRecipients.length %>
-                </span>
-              </div>
-
-              <% if (completedRecipients.length > 0) { %>
-                <div class="space-y-3 max-h-[42rem] overflow-y-auto custom-scroll pr-1">
-                  <% completedRecipients.slice().reverse().forEach((record, reverseIndex) => {
-                    const originalIndex =
-                      completedRecipients.length - 1 - reverseIndex;
-                  %>
-                    <article class="digital-copy-card">
-                      <div class="flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-3">
-                          <div class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-user-graduate"></i>
-                          </div>
-
-                          <div>
-                            <div class="font-semibold break-anywhere">
-                              <%= record.studentName %>
-                            </div>
-
-                            <div class="text-sm text-slate-600 mt-1 break-anywhere">
-                              <%= record.assessmentTitle %>
-                            </div>
-
-                            <div class="text-xs text-slate-500 mt-1">
-                              <%= record.className %>
-                              <% if (record.score !== '') { %>
-                                • Score <%= record.score %>%
-                              <% } %>
-                            </div>
-                          </div>
-                        </div>
-
-                        <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-medium">
-                          COMPLETED
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onclick="loadCompletionIntoCertificate(<%= originalIndex %>)"
-                        class="btn btn-dark w-full py-3 mt-4 text-sm"
-                      >
-                        <i class="fa-solid fa-certificate mr-1"></i>
-                        Create Digital Copy
-                      </button>
-                    </article>
+              <!-- Final Course Test -->
+              <div class="mt-8 p-5 rounded-xl border border-slate-200 bg-white">
+                <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Final Course Assessment (Optional)</label>
+                <select name="finalCourseTestId" class="input px-4 py-3 rounded-lg">
+                  <option value="">No final test</option>
+                  <% safeTests.forEach(test => { %>
+                    <option value="<%= test.id %>"><%= test.title %></option>
                   <% }) %>
-                </div>
-              <% } else { %>
-                <div class="p-10 rounded-xl border border-dashed border-slate-300 text-center">
-                  <i class="fa-solid fa-hourglass-half text-4xl text-slate-300 mb-4"></i>
-
-                  <div class="font-semibold">
-                    No completed assignments yet
-                  </div>
-
-                  <p class="text-sm text-slate-500 mt-1">
-                    Student records will appear here after submission.
-                  </p>
-                </div>
-              <% } %>
-            </div>
-
-            <div class="panel-strong rounded-2xl p-5 md:p-6">
-              <div class="flex items-center justify-between gap-3 mb-5">
-                <div>
-                  <h3 class="text-xl font-semibold">
-                    Issued Certificate Copies
-                  </h3>
-
-                  <p class="text-xs text-slate-500 mt-1">
-                    Open a saved certificate or load it for printing.
-                  </p>
-                </div>
-
-                <span class="text-xs text-slate-400">
-                  <%= safeIssuedCertificates.length %>
-                </span>
-              </div>
-
-              <% if (safeIssuedCertificates.length > 0) { %>
-                <div class="space-y-3 max-h-[42rem] overflow-y-auto custom-scroll pr-1">
-                  <% safeIssuedCertificates.slice().reverse().forEach((credential, reverseIndex) => {
-                    const originalIndex =
-                      safeIssuedCertificates.length - 1 - reverseIndex;
-
-                    const verifyHash =
-                      credential.hash ||
-                      credential.verifyHash ||
-                      credential.verificationHash ||
-                      credential.verificationCode ||
-                      credential.id ||
-                      '';
-
-                    const recipient =
-                      credential.recipientName ||
-                      credential.studentName ||
-                      credential.issuedToName ||
-                      credential.holderName ||
-                      'Student';
-
-                    const credentialTitle =
-                      credential.title ||
-                      credential.credentialTitle ||
-                      'Certificate of Achievement';
-                  %>
-                    <article class="digital-copy-card">
-                      <div class="flex items-start gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                          <i class="fa-solid fa-file-circle-check"></i>
-                        </div>
-
-                        <div>
-                          <div class="font-semibold break-anywhere">
-                            <%= credentialTitle %>
-                          </div>
-
-                          <div class="text-sm text-slate-600 mt-1 break-anywhere">
-                            <%= recipient %>
-                          </div>
-
-                          <div class="text-xs text-slate-500 mt-1">
-                            <%= credential.createdAtFormatted || credential.issuedAtFormatted || credential.createdAt || 'Digital certificate' %>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="grid sm:grid-cols-2 gap-2 mt-4">
-                        <button
-                          type="button"
-                          onclick="loadSavedCertificate(<%= originalIndex %>)"
-                          class="btn btn-dark py-3 text-sm"
-                        >
-                          Load Copy
-                        </button>
-
-                        <% if (verifyHash) { %>
-                          <a
-                            href="/verify/<%= verifyHash %>"
-                            target="_blank"
-                            rel="noopener"
-                            class="btn btn-light py-3 text-sm"
-                          >
-                            View Verification
-                          </a>
-                        <% } else { %>
-                          <button
-                            type="button"
-                            onclick="loadSavedCertificate(<%= originalIndex %>)"
-                            class="btn btn-light py-3 text-sm"
-                          >
-                            View Copy
-                          </button>
-                        <% } %>
-                      </div>
-                    </article>
-                  <% }) %>
-                </div>
-              <% } else { %>
-                <div class="p-10 rounded-xl border border-dashed border-slate-300 text-center">
-                  <i class="fa-solid fa-file-circle-plus text-4xl text-slate-300 mb-4"></i>
-
-                  <div class="font-semibold">
-                    No issued copies yet
-                  </div>
-
-                  <p class="text-sm text-slate-500 mt-1">
-                    Save a certificate template and issue it to a completed student.
-                  </p>
-                </div>
-              <% } %>
-            </div>
-          </div>
-        </section>
-
-        <section class="view-panel hidden" data-view-panel="badges">
-          <div class="grid lg:grid-cols-2 gap-6">
-            <form action="/create-credential" method="POST" class="panel-strong rounded-2xl p-5 md:p-6 space-y-6">
-              <input type="hidden" name="type" value="badge">
-              <input type="hidden" id="selectedBadgeIcon" name="badgeIcon" value="fa-shield-halved">
-              <input type="hidden" id="selectedBadgeShape" name="badgeShape" value="badge-shape-shield">
-
-              <div>
-                <h2 class="text-2xl font-semibold">Badge Creator</h2>
-                <p class="text-sm text-slate-500 mt-1">Create verified badges for achievements and assessments.</p>
-              </div>
-
-              <select name="assessmentId" class="input px-4 py-3 rounded-lg text-sm">
-                <option value="">Standalone badge</option>
-                <% safeTests.forEach(test => { %>
-                  <option value="<%= test.id %>"><%= test.title %></option>
-                <% }) %>
-              </select>
-
-              <input type="text" id="badgeTitle" name="title" value="Certified Learner" oninput="updateBadge()" class="input px-4 py-3 rounded-lg" required>
-
-              <textarea name="description" class="input px-4 py-3 rounded-lg h-24 text-sm">Awarded for demonstrating strong subject knowledge and skill proficiency.</textarea>
-
-              <div class="grid grid-cols-2 gap-4">
-                <select id="badgeShape" onchange="updateBadge()" class="input px-4 py-3 rounded-lg">
-                  <option value="badge-shape-shield">Shield</option>
-                  <option value="badge-shape-hexagon">Hexagon</option>
-                  <option value="badge-shape-circle">Circle</option>
-                  <option value="badge-shape-diamond">Diamond</option>
-                  <option value="badge-shape-star">Star</option>
                 </select>
-
-                <input type="color" id="badgeColor" name="designColor" value="#0f172a" oninput="updateBadge()" class="w-full h-12 p-0 border-0 rounded-lg cursor-pointer">
               </div>
 
-              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                <button type="button" onclick="setBadgeIcon('fa-shield-halved')" class="btn btn-light p-3"><i class="fa-solid fa-shield-halved text-xl"></i></button>
-                <button type="button" onclick="setBadgeIcon('fa-award')" class="btn btn-light p-3"><i class="fa-solid fa-award text-xl"></i></button>
-                <button type="button" onclick="setBadgeIcon('fa-code')" class="btn btn-light p-3"><i class="fa-solid fa-code text-xl"></i></button>
-                <button type="button" onclick="setBadgeIcon('fa-brain')" class="btn btn-light p-3"><i class="fa-solid fa-brain text-xl"></i></button>
-                <button type="button" onclick="setBadgeIcon('fa-bolt')" class="btn btn-light p-3"><i class="fa-solid fa-bolt text-xl"></i></button>
-                <button type="button" onclick="setBadgeIcon('fa-graduation-cap')" class="btn btn-light p-3"><i class="fa-solid fa-graduation-cap text-xl"></i></button>
-              </div>
-
-              <button type="submit" class="btn btn-dark w-full py-4">Create Badge</button>
+              <button type="submit" class="btn btn-primary w-full py-4 text-lg mt-8">
+                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Save & Publish Course
+              </button>
             </form>
 
-            <div class="relative min-h-[420px] p-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
-              <div class="relative z-10 text-center">
-                <div id="previewBadgeTitle" class="text-sm font-semibold uppercase tracking-[0.22em] mb-8">Certified Learner</div>
-
-                <div class="relative w-56 h-56 mx-auto">
-                  <div id="previewBadgeBase" class="badge-shape-shield w-full h-full flex flex-col items-center justify-center text-white shadow-2xl relative" style="background:linear-gradient(145deg,#0f172a,#334155)">
-                    <div class="badge-security-ring"></div>
-                    <i id="previewBadgeIcon" class="fa-solid fa-shield-halved text-6xl relative z-10"></i>
-                  </div>
+            <% if (safeCourses.length > 0) { %>
+              <div class="mt-12">
+                <h3 class="text-xl font-semibold mb-4">Published Courses</h3>
+                <div class="space-y-4">
+                  <% safeCourses.forEach(course => { %>
+                    <div class="p-5 rounded-xl border border-slate-200 bg-white flex justify-between items-center">
+                      <div>
+                        <div class="font-semibold text-lg"><%= course.title %></div>
+                        <div class="text-sm text-slate-500"><%= course.isPaid ? 'Paid' : 'Free' %> • Assigned to Class ID: <%= course.classId %></div>
+                      </div>
+                      <form action="/delete-course" method="POST" onsubmit="return confirm('Delete this course?')">
+                        <input type="hidden" name="courseId" value="<%= course.id %>">
+                        <button class="btn btn-red px-4 py-2 text-sm">Delete</button>
+                      </form>
+                    </div>
+                  <% }) %>
                 </div>
               </div>
-            </div>
+            <% } %>
+
           </div>
         </section>
 
+        <!-- ANNOUNCEMENTS -->
         <section class="view-panel hidden" data-view-panel="announcements">
           <div class="grid lg:grid-cols-[minmax(260px,420px)_minmax(0,1fr)] gap-6">
             <div class="panel-strong rounded-2xl p-5 md:p-6 h-fit">
               <h2 class="text-2xl font-semibold">Global Announcement</h2>
-
               <form action="/post-event" method="POST" class="space-y-5 mt-6">
                 <input type="text" name="title" placeholder="Announcement title" class="input px-4 py-3 rounded-lg" required>
                 <textarea name="description" placeholder="Announcement details..." class="input px-4 py-3 rounded-lg h-28 text-sm"></textarea>
-
-                <select name="specialBadgeId" class="input px-4 py-3 rounded-lg">
-                  <option value="">No badge attached</option>
-                  <% safeBadges.forEach(badge => { %>
-                    <option value="<%= badge.id || badge.templateId %>"><%= badge.title %></option>
-                  <% }) %>
-                </select>
-
                 <button type="submit" class="btn btn-purple w-full py-4">Publish Announcement</button>
               </form>
             </div>
-
             <div class="panel-strong rounded-2xl p-5 md:p-6">
               <h3 class="text-2xl font-semibold mb-5">Published Announcements</h3>
-
               <% if (safeEvents.length > 0) { %>
                 <div class="space-y-3 max-h-[34rem] overflow-y-auto custom-scroll">
                   <% safeEvents.slice().reverse().forEach(item => { %>
@@ -3240,1327 +472,110 @@
   </div>
 
   <script>
-    const completedRecipientData =
-      <%- JSON.stringify(completedRecipients).replace(/</g, '\\u003c') %>;
-
-    const issuedCertificateData =
-      <%- JSON.stringify(safeIssuedCertificates).replace(/</g, '\\u003c') %>;
-
-    const certificateTemplates = [
-      { className: 'tpl-sovereign', name: 'Sovereign Navy', subtitle: 'Ornate triple-border classic', accent: '#14213d', secondary: '#c89b3c', paper: '#fffdf7', border: '5px double #14213d' },
-      { className: 'tpl-university', name: 'Royal University', subtitle: 'Academic crest and arch', accent: '#1e3a8a', secondary: '#b68b2c', paper: '#ffffff', border: '7px double #172554' },
-      { className: 'tpl-executive', name: 'Executive Black', subtitle: 'Corporate masthead layout', accent: '#111827', secondary: '#bfa56a', paper: '#ffffff', border: '8px solid #111827' },
-      { className: 'tpl-azure', name: 'Modern Azure', subtitle: 'Asymmetric geometric design', accent: '#0369a1', secondary: '#38bdf8', paper: '#f0f9ff', border: '3px solid #0369a1' },
-      { className: 'tpl-gold', name: 'Gold Scholar', subtitle: 'Parchment and medallion', accent: '#78350f', secondary: '#d4a64a', paper: '#fff6df', border: '6px double #78350f' },
-      { className: 'tpl-emerald', name: 'Emerald Laureate', subtitle: 'Laurel-side composition', accent: '#065f46', secondary: '#b9a15b', paper: '#ecfdf5', border: '5px solid #065f46' },
-      { className: 'tpl-burgundy', name: 'Burgundy Heritage', subtitle: 'Diagonal heritage corners', accent: '#6b1531', secondary: '#c6a45d', paper: '#fffafb', border: '6px double #6b1531' },
-      { className: 'tpl-platinum', name: 'Digital Platinum', subtitle: 'Circuit grid credential', accent: '#334155', secondary: '#8ea2b7', paper: '#f1f5f9', border: '3px solid #334155' },
-      { className: 'tpl-midnight', name: 'Midnight Prestige', subtitle: 'Dark luxury presentation', accent: '#d7b76d', secondary: '#8ab4ff', paper: '#0f172a', border: '4px double #d7b76d' },
-      { className: 'tpl-luxe', name: 'Minimal Luxe', subtitle: 'Vertical band and open space', accent: '#18181b', secondary: '#b58b55', paper: '#ffffff', border: '4px solid #18181b' }
-    ];
-
-    const presetLogos = [
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',
-      'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg'
-    ];
-
-    let currentCertificateTemplate = 'tpl-sovereign';
-    let activeCertificateLogos = [];
-
+    // Navigation handling
     function openSidebar() {
       document.getElementById('sidebar').classList.add('open');
       document.getElementById('mobileOverlay').classList.add('open');
     }
-
     function closeSidebar() {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('mobileOverlay').classList.remove('open');
     }
-
-    function showView(view, scroll = true) {
+    function showView(view) {
       document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
-
       const selectedPanel = document.querySelector(`[data-view-panel="${view}"]`);
       if (selectedPanel) selectedPanel.classList.remove('hidden');
 
       document.querySelectorAll('[data-view-link]').forEach(link => link.classList.remove('active'));
-
       const selectedLink = document.querySelector(`[data-view-link="${view}"]`);
       if (selectedLink) selectedLink.classList.add('active');
 
       history.replaceState(null, '', `#${view}`);
       closeSidebar();
-
-      if (scroll) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
     function selectClass(classId) {
       showView('classes');
-
       document.querySelectorAll('[data-class-button]').forEach(button => button.classList.remove('active'));
-
       const classButton = document.querySelector(`[data-class-button="${classId}"]`);
       if (classButton) classButton.classList.add('active');
 
       document.querySelectorAll('[data-class-panel]').forEach(panel => panel.classList.add('hidden'));
-
       const classPanel = document.querySelector(`[data-class-panel="${classId}"]`);
-
-      if (classPanel) {
-        classPanel.classList.remove('hidden');
-        setTimeout(() => classPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-      }
+      if (classPanel) classPanel.classList.remove('hidden');
     }
 
-    function selectTask(taskId) {
-      showView('tasks');
-
-      document.querySelectorAll('[data-task-button]').forEach(button => button.classList.remove('active'));
-
-      const taskButton = document.querySelector(`[data-task-button="${taskId}"]`);
-      if (taskButton) taskButton.classList.add('active');
-
-      document.querySelectorAll('[data-task-card]').forEach(card => {
-        card.style.outline = '';
-        card.style.outlineOffset = '';
-      });
-
-      const taskCard = document.querySelector(`[data-task-card="${taskId}"]`);
-
-      if (taskCard) {
-        taskCard.style.outline = '3px solid rgba(37,99,235,.22)';
-        taskCard.style.outlineOffset = '2px';
-        setTimeout(() => taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-      }
+    // Hash navigation routing
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.querySelector(`[data-view-panel="${hash}"]`)) {
+      showView(hash);
+    } else {
+      showView('overview');
     }
 
-    function renderTemplatePicker() {
-      const container = document.getElementById('templatePicker');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      certificateTemplates.forEach((template, index) => {
-        const button = document.createElement('button');
-
-        button.type = 'button';
-        button.className = `template-picker-button ${index === 0 ? 'active' : ''}`;
-
-        button.innerHTML = `
-          <div
-            class="template-miniature"
-            style="
-              --mini-paper:${template.paper};
-              --mini-accent:${template.accent};
-              --mini-secondary:${template.secondary};
-              --mini-border:${template.border};
-            "
-          ></div>
-
-          <div class="text-sm font-semibold">${template.name}</div>
-          <div class="text-xs text-slate-500 mt-1">${template.subtitle}</div>
-        `;
-
-        button.onclick = () => setCertificateTemplate(template, button);
-        container.appendChild(button);
-      });
-    }
-
-    function setCertificateTemplate(template, button) {
-      const preview = document.getElementById('certificatePreview');
-
-      preview.classList.remove(currentCertificateTemplate);
-      preview.classList.add(template.className);
-
-      currentCertificateTemplate = template.className;
-
-      document.getElementById('selectedCertificateTemplate').value = template.className;
-      document.getElementById('certColor').value = template.accent;
-
-      document.querySelectorAll('.template-picker-button').forEach(item => item.classList.remove('active'));
-      button.classList.add('active');
-
-      updateCertificate();
-    }
-
-    function refreshCompletedStudentOptions() {
-      const assessmentSelect =
-        document.getElementById(
-          'certificateAssessmentSelect'
-        );
-
-      const recipientSelect =
-        document.getElementById(
-          'certificateRecipientSelect'
-        );
-
-      if (!assessmentSelect || !recipientSelect) {
-        return;
-      }
-
-      const assessmentId =
-        String(assessmentSelect.value || '');
-
-      const selectedTest =
-        Array.from(assessmentSelect.options)
-          .find(option =>
-            option.value === assessmentId
-          );
-
-      const matchingRecipients =
-        completedRecipientData
-          .map((record, index) => ({
-            ...record,
-            sourceIndex: index
-          }))
-          .filter(record => {
-            if (!assessmentId) {
-              return false;
-            }
-
-            return (
-              String(record.assessmentId || '') ===
-              assessmentId
-            );
-          });
-
-      recipientSelect.innerHTML = '';
-
-      if (!assessmentId) {
-        recipientSelect.innerHTML =
-          '<option value="">Select an assignment first</option>';
-
-        setCertificateRecipient(null);
-        updateCertificate();
-        return;
-      }
-
-      if (matchingRecipients.length === 0) {
-        recipientSelect.innerHTML =
-          '<option value="">Automatic when a student completes</option>';
-
-        setCertificateRecipient(null);
-
-        document.getElementById(
-          'previewCompletionLabel'
-        ).textContent =
-          selectedTest?.textContent?.trim() ||
-          'Verified Completion';
-
-        updateCertificate();
-        return;
-      }
-
-      matchingRecipients.forEach(record => {
-        const option =
-          document.createElement('option');
-
-        option.value =
-          String(record.sourceIndex);
-
-        const scoreLabel =
-          record.score !== '' &&
-          record.score !== null &&
-          record.score !== undefined
-            ? ` • ${record.score}%`
-            : '';
-
-        option.textContent =
-          `${record.studentName}${scoreLabel}`;
-
-        recipientSelect.appendChild(option);
-      });
-
-      recipientSelect.value =
-        String(
-          matchingRecipients[0].sourceIndex
-        );
-
-      applyCompletedRecipient();
-    }
-
-    function setCertificateRecipient(record) {
-      const recipientName =
-        record?.studentName ||
-        'Student Name';
-
-      document.getElementById(
-        'certStudent'
-      ).value = recipientName;
-
-      document.getElementById(
-        'certificateRecipientName'
-      ).value =
-        record?.studentName || '';
-
-      document.getElementById(
-        'certificateStudentId'
-      ).value =
-        record?.studentId || '';
-
-      document.getElementById(
-        'certificateRecipientEmail'
-      ).value =
-        record?.studentEmail || '';
-
-      document.getElementById(
-        'certificateSubmissionId'
-      ).value =
-        record?.submissionId || '';
-    }
-
-    function applyCompletedRecipient() {
-      const recipientSelect =
-        document.getElementById(
-          'certificateRecipientSelect'
-        );
-
-      const rawIndex =
-        recipientSelect?.value;
-
-      const sourceIndex =
-        rawIndex !== '' &&
-        rawIndex !== undefined &&
-        rawIndex !== null
-          ? Number(rawIndex)
-          : NaN;
-
-      const record =
-        Number.isInteger(sourceIndex)
-          ? completedRecipientData[sourceIndex]
-          : null;
-
-      setCertificateRecipient(record);
-
-      if (record) {
-        const assessmentSelect =
-          document.getElementById(
-            'certificateAssessmentSelect'
-          );
-
-        if (
-          record.assessmentId &&
-          assessmentSelect
-        ) {
-          assessmentSelect.value =
-            String(record.assessmentId);
-        }
-      }
-
-      updateCertificate();
-    }
-
-    function loadCompletionIntoCertificate(index) {
-      const record =
-        completedRecipientData[index];
-
-      if (!record) {
-        return;
-      }
-
-      showView('certificates');
-
-      const assessmentSelect =
-        document.getElementById(
-          'certificateAssessmentSelect'
-        );
-
-      if (assessmentSelect) {
-        assessmentSelect.value =
-          String(record.assessmentId || '');
-      }
-
-      refreshCompletedStudentOptions();
-
-      const recipientSelect =
-        document.getElementById(
-          'certificateRecipientSelect'
-        );
-
-      if (recipientSelect) {
-        recipientSelect.value =
-          String(index);
-      }
-
-      setCertificateRecipient(record);
-      updateCertificate();
-
-      setTimeout(
-        () =>
-          document
-            .getElementById(
-              'certificatePreview'
-            )
-            ?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center'
-            }),
-        140
-      );
-    }
-
-    function loadSavedCertificate(index) {
-      const credential =
-        issuedCertificateData[index];
-
-      if (!credential) {
-        return;
-      }
-
-      showView('certificates');
-
-      const title =
-        credential.title ||
-        credential.credentialTitle ||
-        'Certificate of Achievement';
-
-      const description =
-        credential.description ||
-        credential.credentialDescription ||
-        'has successfully completed the required learning experience and demonstrated exceptional understanding, commitment, and achievement.';
-
-      const recipientName =
-        credential.recipientName ||
-        credential.studentName ||
-        credential.issuedToName ||
-        credential.holderName ||
-        'Student Name';
-
-      const accent =
-        credential.designColor ||
-        credential.color ||
-        '#14213d';
-
-      const assessmentId =
-        credential.assessmentId ||
-        credential.testId ||
-        '';
-
-      document.getElementById(
-        'certTitle'
-      ).value = title;
-
-      document.getElementById(
-        'certDescription'
-      ).value = description;
-
-      document.getElementById(
-        'certColor'
-      ).value = accent;
-
-      document.getElementById(
-        'certStudent'
-      ).value = recipientName;
-
-      document.getElementById(
-        'certificateRecipientName'
-      ).value = recipientName;
-
-      document.getElementById(
-        'certificateStudentId'
-      ).value =
-        credential.studentId ||
-        credential.recipientId ||
-        '';
-
-      document.getElementById(
-        'certificateRecipientEmail'
-      ).value =
-        credential.recipientEmail ||
-        credential.studentEmail ||
-        '';
-
-      document.getElementById(
-        'certificateSubmissionId'
-      ).value =
-        credential.submissionId ||
-        '';
-
-      const assessmentSelect =
-        document.getElementById(
-          'certificateAssessmentSelect'
-        );
-
-      if (
-        assessmentSelect &&
-        assessmentId
-      ) {
-        assessmentSelect.value =
-          String(assessmentId);
-      }
-
-      const templateClass =
-        credential.templateStyle;
-
-      if (templateClass) {
-        const templateIndex =
-          certificateTemplates.findIndex(
-            item =>
-              item.className ===
-              templateClass
-          );
-
-        const template =
-          certificateTemplates[
-            templateIndex
-          ];
-
-        const button =
-          Array.from(
-            document.querySelectorAll(
-              '.template-picker-button'
-            )
-          )[templateIndex];
-
-        if (template && button) {
-          setCertificateTemplate(
-            template,
-            button
-          );
-        }
-      }
-
-      updateCertificate();
-
-      setTimeout(
-        openCertificateViewer,
-        160
-      );
-    }
-
-    function updateCertificate() {
-      const title =
-        document.getElementById(
-          'certTitle'
-        )?.value ||
-        'Certificate of Achievement';
-
-      const description =
-        document.getElementById(
-          'certDescription'
-        )?.value ||
-        '';
-
-      const student =
-        document.getElementById(
-          'certStudent'
-        )?.value ||
-        'Student Name';
-
-      const date =
-        document.getElementById(
-          'certDate'
-        )?.value;
-
-      const accent =
-        document.getElementById(
-          'certColor'
-        )?.value ||
-        '#14213d';
-
-      const assessmentSelect =
-        document.getElementById(
-          'certificateAssessmentSelect'
-        );
-
-      const assessmentLabel =
-        assessmentSelect?.selectedOptions?.[0]
-          ?.textContent?.trim();
-
-      const submissionId =
-        document.getElementById(
-          'certificateSubmissionId'
-        )?.value ||
-        '';
-
-      const studentId =
-        document.getElementById(
-          'certificateStudentId'
-        )?.value ||
-        '';
-
-      const serialSeed =
-        submissionId ||
-        studentId ||
-        `${title}-${student}`;
-
-      const serial =
-        createCredentialSerial(
-          serialSeed
-        );
-
-      document.getElementById(
-        'previewTitle'
-      ).textContent = title;
-
-      document.getElementById(
-        'previewDescription'
-      ).textContent = description;
-
-      document.getElementById(
-        'previewStudent'
-      ).textContent = student;
-
-      document.getElementById(
-        'previewCredentialId'
-      ).textContent = serial;
-
-      document.getElementById(
-        'previewCompletionLabel'
-      ).textContent =
-        assessmentLabel &&
-        assessmentSelect?.value
-          ? assessmentLabel
-          : 'Verified Completion';
-
-      if (date) {
-        document.getElementById(
-          'previewDate'
-        ).textContent =
-          new Date(
-            `${date}T12:00:00`
-          ).toLocaleDateString();
+    // Courses UI Handling
+    function togglePaypalForm(val) {
+      const el = document.getElementById('paypalEmbedSection');
+      if (val === 'paid') {
+        el.classList.remove('hidden');
       } else {
-        document.getElementById(
-          'previewDate'
-        ).textContent =
-          'Issue Date';
-      }
-
-      const preview =
-        document.getElementById(
-          'certificatePreview'
-        );
-
-      preview.style.setProperty(
-        '--cert-accent',
-        accent
-      );
-
-      const verificationPayload =
-        new URL(
-          '/verify',
-          'https://credity.ink'
-        );
-
-      verificationPayload.searchParams.set(
-        'credential',
-        serial
-      );
-
-      if (studentId) {
-        verificationPayload.searchParams.set(
-          'student',
-          studentId
-        );
-      }
-
-      if (assessmentSelect?.value) {
-        verificationPayload.searchParams.set(
-          'assessment',
-          assessmentSelect.value
-        );
-      }
-
-      const qrCode =
-        document.getElementById(
-          'previewQrCode'
-        );
-
-      if (qrCode) {
-        renderQrCodeDataUrl(
-          qrCode,
-          verificationPayload.toString()
-        );
+        el.classList.add('hidden');
       }
     }
 
-    function renderQrCodeDataUrl(
-      imageElement,
-      value
-    ) {
-      if (
-        !imageElement ||
-        typeof QRCode !== 'function'
-      ) {
-        imageElement.src =
-          'https://api.qrserver.com/v1/create-qr-code/' +
-          '?size=180x180&data=' +
-          encodeURIComponent(value);
-
-        return;
-      }
-
-      const holder =
-        document.createElement('div');
-
-      holder.style.position =
-        'fixed';
-
-      holder.style.left =
-        '-99999px';
-
-      holder.style.top =
-        '-99999px';
-
-      document.body.appendChild(holder);
-
-      new QRCode(holder, {
-        text: value,
-        width: 180,
-        height: 180,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel:
-          QRCode.CorrectLevel.H
-      });
-
-      requestAnimationFrame(() => {
-        const canvas =
-          holder.querySelector('canvas');
-
-        const generatedImage =
-          holder.querySelector('img');
-
-        if (canvas) {
-          imageElement.src =
-            canvas.toDataURL(
-              'image/png'
-            );
-        } else if (generatedImage?.src) {
-          imageElement.src =
-            generatedImage.src;
-        }
-
-        holder.remove();
-      });
-    }
-
-    function createCredentialSerial(value) {
-      const normalized =
-        String(value || 'preview')
-          .toUpperCase();
-
-      let hash = 0;
-
-      for (
-        let index = 0;
-        index < normalized.length;
-        index += 1
-      ) {
-        hash =
-          (
-            (hash << 5) -
-            hash +
-            normalized.charCodeAt(index)
-          ) |
-          0;
-      }
-
-      return (
-        'CRD-' +
-        Math.abs(hash)
-          .toString(36)
-          .toUpperCase()
-          .padStart(8, '0')
-          .slice(0, 8)
-      );
-    }
-
-    function prepareCertificateClone() {
-      const source =
-        document.getElementById(
-          'certificatePreview'
-        );
-
-      if (!source) {
-        return null;
-      }
-
-      const clone =
-        source.cloneNode(true);
-
-      const clonePrefix =
-        `certificate-copy-${Date.now()}-${Math.random().toString(36).slice(2)}-`;
-
-      const idMap =
-        new Map();
-
-      if (clone.id) {
-        idMap.set(
-          clone.id,
-          clonePrefix + clone.id
-        );
-
-        clone.id =
-          clonePrefix + clone.id;
-      }
-
-      clone
-        .querySelectorAll('[id]')
-        .forEach(element => {
-          const originalId =
-            element.id;
-
-          const replacementId =
-            clonePrefix + originalId;
-
-          idMap.set(
-            originalId,
-            replacementId
-          );
-
-          element.id =
-            replacementId;
-        });
-
-      clone
-        .querySelectorAll(
-          '[href^="#"], [xlink\\:href^="#"]'
-        )
-        .forEach(element => {
-          const href =
-            element.getAttribute('href') ||
-            element.getAttribute(
-              'xlink:href'
-            );
-
-          if (!href) {
-            return;
-          }
-
-          const originalId =
-            href.slice(1);
-
-          const replacementId =
-            idMap.get(originalId);
-
-          if (!replacementId) {
-            return;
-          }
-
-          element.setAttribute(
-            'href',
-            `#${replacementId}`
-          );
-
-          element.setAttribute(
-            'xlink:href',
-            `#${replacementId}`
-          );
-        });
-
-      clone
-        .querySelectorAll(
-          '.draggable-logo'
-        )
-        .forEach(element => {
-          element.style.pointerEvents =
-            'none';
-        });
-
-      const computed =
-        getComputedStyle(source);
-
-      [
-        '--cert-accent',
-        '--cert-secondary',
-        '--cert-ink',
-        '--cert-muted',
-        '--cert-paper'
-      ].forEach(property => {
-        clone.style.setProperty(
-          property,
-          computed.getPropertyValue(
-            property
-          )
-        );
-      });
-
-      return clone;
-    }
-
-    function openCertificateViewer() {
-      const stage =
-        document.getElementById(
-          'certificateViewerStage'
-        );
-
-      const modal =
-        document.getElementById(
-          'certificateViewerModal'
-        );
-
-      const clone =
-        prepareCertificateClone();
-
-      if (!stage || !modal || !clone) {
-        return;
-      }
-
-      stage.innerHTML = '';
-      stage.appendChild(clone);
-      modal.classList.add('open');
-
-      document.body.style.overflow =
-        'hidden';
-    }
-
-    function closeCertificateViewer() {
-      document
-        .getElementById(
-          'certificateViewerModal'
-        )
-        ?.classList.remove('open');
-
-      document.body.style.overflow =
-        '';
-    }
-
-    function handleCertificateViewerBackdrop(
-      event
-    ) {
-      if (
-        event.target?.id ===
-        'certificateViewerModal'
-      ) {
-        closeCertificateViewer();
-      }
-    }
-
-    async function downloadCertificate() {
-      const source =
-        document.getElementById(
-          'certificatePreview'
-        );
-
-      if (!source) {
-        return;
-      }
-
-      if (
-        typeof html2canvas !==
-        'function'
-      ) {
-        alert(
-          'The image renderer is still loading. Please try again.'
-        );
-
-        return;
-      }
-
-      source.classList.add(
-        'certificate-loading'
-      );
-
-      try {
-        const canvas =
-          await html2canvas(source, {
-            scale: 3,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: null,
-            logging: false
-          });
-
-        const studentName =
-          document.getElementById(
-            'certStudent'
-          )?.value ||
-          'student';
-
-        const title =
-          document.getElementById(
-            'certTitle'
-          )?.value ||
-          'certificate';
-
-        const fileName =
-          sanitizeFileName(
-            `${studentName}-${title}`
-          ) + '.png';
-
-        const link =
-          document.createElement('a');
-
-        link.download = fileName;
-        link.href =
-          canvas.toDataURL(
-            'image/png',
-            1
-          );
-
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } catch (error) {
-        console.error(error);
-
-        alert(
-          'The certificate image could not be downloaded. Check that custom logo URLs allow cross-origin image access.'
-        );
-      } finally {
-        source.classList.remove(
-          'certificate-loading'
-        );
-      }
-    }
-
-    function printCertificate() {
-      const clone =
-        prepareCertificateClone();
-
-      if (!clone) {
-        return;
-      }
-
-      const printWindow =
-        window.open(
-          '',
-          '_blank',
-          'width=1400,height=1000'
-        );
-
-      if (!printWindow) {
-        alert(
-          'Allow pop-ups to print the certificate.'
-        );
-
-        return;
-      }
-
-      const styles =
-        Array.from(
-          document.querySelectorAll(
-            'style, link[rel="stylesheet"]'
-          )
-        )
-          .map(node => node.outerHTML)
-          .join('\n');
-
-      printWindow.document.open();
-
-      printWindow.document.write(
-        `<!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <title>Credity Digital Certificate</title>
-            ${styles}
-            <style>
-              @page {
-                size: A4 landscape;
-                margin: 8mm;
-              }
-
-              html,
-              body {
-                width: 100%;
-                min-height: 100%;
-                margin: 0;
-                background: #ffffff;
-              }
-
-              body {
-                display: grid;
-                place-items: center;
-                padding: 0;
-              }
-
-              .print-certificate-stage {
-                width: 100%;
-                display: grid;
-                place-items: center;
-              }
-
-              .print-certificate-stage .certificate-preview {
-                width: 100%;
-                max-width: 1120px;
-                box-shadow: none !important;
-              }
-
-              .draggable-logo {
-                pointer-events: none !important;
-              }
-
-              @media print {
-                .print-certificate-stage {
-                  break-inside: avoid;
-                }
-              }
-            </style>
-          </head>
-
-          <body>
-            <div class="print-certificate-stage">
-              ${clone.outerHTML}
-            </div>
-          </body>
-        </html>`
-      );
-
-      printWindow.document.close();
-
-      printWindow.addEventListener(
-        'load',
-        () => {
-          setTimeout(() => {
-            printWindow.focus();
-            printWindow.print();
-          }, 500);
-        }
-      );
-    }
-
-    function sanitizeFileName(value) {
-      return String(value || 'certificate')
-        .trim()
-        .replace(/[^a-z0-9-_]+/gi, '-')
-        .replace(/^-+|-+$/g, '')
-        .toLowerCase();
-    }
-
-    function renderLogoButtons() {
-      const container = document.getElementById('logoGrid');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      presetLogos.forEach(url => {
-        const button = document.createElement('button');
-
-        button.type = 'button';
-        button.className = 'w-11 h-11 p-1.5 rounded-lg border border-transparent bg-slate-50 hover:border-blue-500';
-        button.innerHTML = `<img src="${url}" alt="Preset logo" class="w-full h-full object-contain">`;
-        button.onclick = () => addLogoToCertificate(url);
-
-        container.appendChild(button);
-      });
-    }
-
-    function addCustomLogo() {
-      const input = document.getElementById('customLogoInput');
-      const url = input.value.trim();
-
-      if (!url) return;
-
-      addLogoToCertificate(url);
-      input.value = '';
-    }
-
-    function addLogoToCertificate(url) {
-      if (activeCertificateLogos.length >= 3) {
-        alert('You can add up to three logos.');
-        return;
-      }
-
-      const boundary = document.getElementById('logoDragBoundary');
-      const id = `certificate_logo_${Date.now()}`;
-      const wrapper = document.createElement('div');
-
-      wrapper.id = id;
-      wrapper.className = 'draggable-logo';
-      wrapper.style.left = `${8 + activeCertificateLogos.length * 11}%`;
-      wrapper.style.top = '7%';
-
-      const image = document.createElement('img');
-
-      image.src = url;
-      image.alt = 'Certificate logo';
-
-      image.onload = () => {
-        wrapper.appendChild(image);
-        boundary.appendChild(wrapper);
-        makeDraggable(wrapper);
-
-        activeCertificateLogos.push({ id, url });
-
-        renderActiveLogos();
-        syncHiddenLogos();
-      };
-
-      image.onerror = () => alert('The logo could not be loaded.');
-    }
-
-    function removeCertificateLogo(id) {
-      activeCertificateLogos = activeCertificateLogos.filter(logo => logo.id !== id);
-      document.getElementById(id)?.remove();
-      renderActiveLogos();
-      syncHiddenLogos();
-    }
-
-    function clearCertificateLogos() {
-      activeCertificateLogos.forEach(logo => document.getElementById(logo.id)?.remove());
-      activeCertificateLogos = [];
-      renderActiveLogos();
-      syncHiddenLogos();
-    }
-
-    function renderActiveLogos() {
-      const container = document.getElementById('activeLogosList');
-
-      container.innerHTML = '';
-
-      if (activeCertificateLogos.length === 0) {
-        container.innerHTML = '<span class="text-xs text-slate-400">No logos added.</span>';
-        return;
-      }
-
-      activeCertificateLogos.forEach((logo, index) => {
-        const item = document.createElement('div');
-
-        item.className = 'max-w-full flex items-center gap-2 pl-2 pr-1 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs';
-
-        item.innerHTML = `
-          <img src="${logo.url}" alt="" class="w-4 h-4 object-contain">
-          <span class="truncate">Logo ${index + 1}</span>
-          <button type="button" onclick="removeCertificateLogo('${logo.id}')" class="px-1 text-red-500">
-            <i class="fa-solid fa-xmark"></i>
+    let moduleCounter = 0;
+    const existingTestsOptions = `<%- safeTests.map(t => `<option value="${t.id}">${t.title.replace(/"/g, '&quot;')}</option>`).join('') %>`;
+
+    function addModule() {
+      moduleCounter++;
+      const container = document.getElementById('modulesContainer');
+      
+      const moduleHtml = `
+        <div class="panel p-5 rounded-xl bg-slate-50" id="module_${moduleCounter}">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="font-semibold text-lg">Module ${moduleCounter}</h4>
+            <button type="button" onclick="document.getElementById('module_${moduleCounter}').remove()" class="text-red-500 text-sm font-medium"><i class="fa-solid fa-trash"></i> Remove</button>
+          </div>
+          
+          <input type="text" name="modules[${moduleCounter}][title]" placeholder="Module Title (e.g. Introduction)" class="input px-4 py-3 rounded-lg w-full mb-4" required>
+          
+          <div class="mb-4">
+             <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Module Test (Optional)</label>
+             <select name="modules[${moduleCounter}][testId]" class="input px-4 py-2 rounded-lg text-sm w-full">
+               <option value="">No test for this module</option>
+               ${existingTestsOptions}
+             </select>
+          </div>
+
+          <div id="lessons_container_${moduleCounter}" class="space-y-3 pl-4 border-l-2 border-blue-200">
+            <!-- Lessons go here -->
+          </div>
+
+          <button type="button" onclick="addLesson(${moduleCounter})" class="btn btn-light px-4 py-2 text-sm mt-4">
+            <i class="fa-solid fa-plus text-blue-600 mr-1"></i> Add Lesson
           </button>
-        `;
-
-        container.appendChild(item);
-      });
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', moduleHtml);
+      addLesson(moduleCounter); // add one default lesson
     }
 
-    function syncHiddenLogos() {
-      const container = document.getElementById('certificateHiddenLogos');
-      container.innerHTML = '';
-
-      activeCertificateLogos.forEach(logo => {
-        const input = document.createElement('input');
-
-        input.type = 'hidden';
-        input.name = 'logoUrl';
-        input.value = logo.url;
-
-        container.appendChild(input);
-      });
+    function addLesson(modId) {
+      const container = document.getElementById(`lessons_container_${modId}`);
+      const lessonCount = container.children.length + 1;
+      
+      const lessonHtml = `
+        <div class="bg-white p-4 rounded-lg border border-slate-200 relative">
+          <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+          <div class="font-medium text-sm mb-2 text-slate-700">Lesson</div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <input type="text" name="modules[${modId}][lessons][][title]" placeholder="Lesson Title" class="input px-3 py-2 rounded text-sm w-full" required>
+            <input type="url" name="modules[${modId}][lessons][][url]" placeholder="Link (Google Drive, YouTube...)" class="input px-3 py-2 rounded text-sm w-full" required>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', lessonHtml);
     }
-
-    function makeDraggable(element) {
-      let startingX = 0;
-      let startingY = 0;
-      let startingLeft = 0;
-      let startingTop = 0;
-
-      element.addEventListener('pointerdown', startDragging);
-
-      function startDragging(event) {
-        event.preventDefault();
-
-        const boundary = document.getElementById('logoDragBoundary').getBoundingClientRect();
-        const rectangle = element.getBoundingClientRect();
-
-        startingX = event.clientX;
-        startingY = event.clientY;
-        startingLeft = ((rectangle.left - boundary.left) / boundary.width) * 100;
-        startingTop = ((rectangle.top - boundary.top) / boundary.height) * 100;
-
-        element.setPointerCapture(event.pointerId);
-        element.addEventListener('pointermove', moveLogo);
-        element.addEventListener('pointerup', stopDragging);
-        element.addEventListener('pointercancel', stopDragging);
-      }
-
-      function moveLogo(event) {
-        const boundary = document.getElementById('logoDragBoundary').getBoundingClientRect();
-
-        const deltaX = ((event.clientX - startingX) / boundary.width) * 100;
-        const deltaY = ((event.clientY - startingY) / boundary.height) * 100;
-
-        element.style.left = `${Math.max(0, Math.min(startingLeft + deltaX, 91))}%`;
-        element.style.top = `${Math.max(0, Math.min(startingTop + deltaY, 91))}%`;
-      }
-
-      function stopDragging(event) {
-        try {
-          element.releasePointerCapture(event.pointerId);
-        } catch {}
-
-        element.removeEventListener('pointermove', moveLogo);
-        element.removeEventListener('pointerup', stopDragging);
-        element.removeEventListener('pointercancel', stopDragging);
-      }
-    }
-
-    function setBadgeIcon(iconClass) {
-      document.getElementById('selectedBadgeIcon').value = iconClass;
-      document.getElementById('previewBadgeIcon').className = `fa-solid ${iconClass} text-6xl relative z-10`;
-    }
-
-    function updateBadge() {
-      const title = document.getElementById('badgeTitle')?.value || 'Certified Learner';
-      const shape = document.getElementById('badgeShape')?.value || 'badge-shape-shield';
-      const color = document.getElementById('badgeColor')?.value || '#0f172a';
-
-      document.getElementById('previewBadgeTitle').textContent = title;
-      document.getElementById('selectedBadgeShape').value = shape;
-
-      const preview = document.getElementById('previewBadgeBase');
-
-      preview.className = `${shape} w-full h-full flex flex-col items-center justify-center text-white shadow-2xl relative`;
-      preview.style.background = `linear-gradient(145deg, ${color}, #0f172a)`;
-    }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert(`Copied: ${text}`);
-      } catch {
-        prompt('Copy this value:', text);
-      }
-    }
-
-    function initializeDashboard() {
-      const dateInput = document.getElementById('certDate');
-
-      if (dateInput) {
-        dateInput.value = new Date().toISOString().split('T')[0];
-      }
-
-      renderTemplatePicker();
-      renderLogoButtons();
-      renderActiveLogos();
-      refreshCompletedStudentOptions();
-      updateCertificate();
-      updateBadge();
-
-      document.addEventListener(
-        'keydown',
-        event => {
-          if (event.key === 'Escape') {
-            closeCertificateViewer();
-          }
-        }
-      );
-
-      document
-        .getElementById(
-          'certificateForm'
-        )
-        ?.addEventListener(
-          'submit',
-          () => {
-            applyCompletedRecipient();
-          }
-        );
-
-      const hash = window.location.hash.replace('#', '');
-
-      if (hash && document.querySelector(`[data-view-panel="${hash}"]`)) {
-        showView(hash, false);
-      }
-    }
-
-    window.addEventListener('load', initializeDashboard);
   </script>
 </body>
 </html>
