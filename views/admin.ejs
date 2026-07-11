@@ -132,16 +132,15 @@
           </div>
         </div>
         
+        <!-- UPDATED STAT COUNTER SECTION -->
         <div class="hidden xl:block">
-          <div class="flex items-center gap-4 text-sm">
-            <div class="flex -space-x-3">
-              <div class="w-9 h-9 bg-emerald-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-sm"></i></div>
-              <div class="w-9 h-9 bg-blue-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-sm"></i></div>
-              <div class="w-9 h-9 bg-violet-500 rounded-full ring-4 ring-white flex items-center justify-center"><i class="fa-solid fa-check text-white text-sm"></i></div>
+          <div class="flex items-center gap-4 text-sm bg-white/70 p-4 rounded-2xl border border-blue-50 shadow-sm">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shadow-inner">
+              <i class="fa-solid fa-users text-blue-600 text-xl"></i>
             </div>
             <div>
-              <div class="font-bold text-emerald-600">2,847 credentials issued</div>
-              <div class="text-xs text-slate-500">this month • 100% verified</div>
+              <div class="font-bold text-slate-900 text-xl"><%= typeof users !== 'undefined' ? users.length : 0 %> Registered Users</div>
+              <div class="text-xs text-slate-500 font-medium">System Wide • Credity</div>
             </div>
           </div>
         </div>
@@ -334,10 +333,18 @@
 
     <div id="overview-tab" class="tab-content hidden">
       <div class="glass rounded-3xl overflow-hidden border border-slate-200">
-        <div class="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-          <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
+        
+        <!-- UPDATED DIRECTORY HEADER -->
+        <div class="p-6 border-b border-slate-200 bg-slate-50 flex flex-wrap gap-4 justify-between items-center">
+          <div class="flex items-center gap-3">
+            <h2 class="text-xl font-bold text-slate-900">Account Directory</h2>
+            <span class="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold uppercase tracking-wider">
+              <%= typeof users !== 'undefined' ? users.length : 0 %> Total Users
+            </span>
+          </div>
           <div class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold uppercase tracking-wider">Status: Online</div>
         </div>
+        
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
